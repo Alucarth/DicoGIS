@@ -1,67 +1,67 @@
-﻿#--------------------------------
-# Nom:         dicoshapes.py
-# Objectif:    dresse la liste des shapes présents dans une
-#              arborescence, en extrait les informations de base et
-#              construit un fichier excel avec les informations.
-# Auteur:      Julien Moura
-# Crée le :    06/10/2011
-# Last update: 09/05/2012
-# Python Version:  2.7.3
-#--------------------------------
+﻿# -*- coding: UTF-8 -*-
 #!/usr/bin/env python
+#--------------------------------
+# Name:         dicoshapes.py
+# Purpose:      make an Excel file about shapefiles present in a databse files
+#               structured, gathering basic informations. The output file could
+#               be used as a database dictionary.
+# Author:       Julien Moura (https://github.com/Guts)
+# Created:      06/10/2011
+# Last update:  09/02/2013
+# Python version:  2.7.3
+# Language: French (fr-fr)
+#--------------------------------
 
 ###################################
-##### Import des librairies #######
+########### Libraries #############
 ###################################
 
-from Tkinter import Tk
-
-from os import walk, path
-
-from time import localtime
-
-from osgeo import ogr    # pour la géométrie
-from xlwt import Workbook, Font, XFStyle, easyxf, Formula
-
+from Tkinter import Tk      # GUI
 from tkFileDialog import askdirectory as doss_cible
 from tkFileDialog import asksaveasfilename as savefic
 from tkMessageBox import showinfo as info
+
+from os import walk, path       # files and folder managing
+from os import startfile        # open a file in Windows system
+
+from time import localtime
+
+from osgeo import ogr    # spatial files
+from xlwt import Workbook, Font, XFStyle, easyxf, Formula   # excel library
 
 from pickle import dump
 from sys import exit
 
 ###################################
-###### Définition fonctions #######
+############ Functions ############
 ###################################
 
-def listing_shapes(chemin_dossier):
-    u"""Liste les shapes contenus dans un répertoire et
-    ses sous-répertoires"""
+def listing_shapes(folderpath):
+    u""" List shapefiles contained in the folder and its subfolders """
     global liste_shapes
-    for root, dirs, files in walk(chemin_dossier):
+    for root, dirs, files in walk(folderpath):
         for i in files:
             if path.splitext(path.join(root, i))[1] == u'.shp' and \
             path.isfile(path.join(root, i)[:-4] + u'.dbf') and \
             path.isfile(path.join(root, i)[:-4] + u'.shx') and \
             path.isfile(path.join(root, i)[:-4] + u'.prj'):
                 liste_shapes.append(path.join(root, i))
+    # end of function
     return liste_shapes
 
-def infos_ogr(chemin_couche):
-    u"""Utilise les fonctions de la librairie OGR pour extraire les
-    caractéristiques de la table donnée en paramètre et les stocker dans le
-    dictionnaire correspondant."""
+def infos_ogr(shapepath):
+    u""" Uses gdal/ogr functions to extract basic informations about shapefile
+    given as parameter and store into the corresponding dictionary. """
     global dico_infos_couche, dico_champs, liste_chps
-    driver = ogr.GetDriverByName('ESRI Shapefile')    # driver OGR
-    source = driver.Open(chemin_couche, 0)
-    couche = source.GetLayer()
-    objet = couche.GetFeature(0)
-    geom = objet.GetGeometryRef()
-    def_couche = couche.GetLayerDefn()
-    srs = couche.GetSpatialRef()
-    srs.AutoIdentifyEPSG()
-    # remplissage du dictionnaire
-    dico_infos_couche[u'nom'] = path.basename(chemin_couche)
+    source = ogr.Open(shapepath, 0)     # OGR driver
+    couche = source.GetLayer()          # get the layer
+    objet = couche.GetFeature(0)        # get the first object (index 0)
+    geom = objet.GetGeometryRef()       # get the geometry
+    def_couche = couche.GetLayerDefn()  # get the layer definitions
+    srs = couche.GetSpatialRef()        # get spatial system reference
+    srs.AutoIdentifyEPSG()              # try to determine the EPSG code
+    # Storing into the dictionary
+    dico_infos_couche[u'nom'] = path.basename(shapepath)
     dico_infos_couche[u'titre'] = dico_infos_couche[u'nom'][:-4].replace('_', ' ').capitalize()
     dico_infos_couche[u'nbr_objets'] = couche.GetFeatureCount()
     dico_infos_couche[u'nbr_attributs'] = def_couche.GetFieldCount()
@@ -80,13 +80,13 @@ def infos_ogr(chemin_couche):
         dico_infos_couche[u'type_geom'] = u'Polygone'
     else:
         dico_infos_couche[u'type_geom'] = geom.GetGeometryName()
-    # extension
+    # Spatial extent (bounding box)
     dico_infos_couche[u'Xmin'] = round(couche.GetExtent()[0],2)
     dico_infos_couche[u'Xmax'] = round(couche.GetExtent()[1],2)
     dico_infos_couche[u'Ymin'] = round(couche.GetExtent()[2],2)
     dico_infos_couche[u'Ymax'] = round(couche.GetExtent()[3],2)
 
-    # champs
+    # Fields
     i = 0
     while i < def_couche.GetFieldCount():
         liste_chps.append(def_couche.GetFieldDefn(i).GetName())
@@ -95,13 +95,13 @@ def infos_ogr(chemin_couche):
                                                             def_couche.GetFieldDefn(i).GetPrecision()
         i = i+1
 
-    dico_infos_couche[u'date_actu'] = unicode(localtime(path.getmtime(chemin_couche))[2]) +\
-                                   u'/'+ unicode(localtime(path.getmtime(chemin_couche))[1]) +\
-                                   u'/'+ unicode(localtime(path.getmtime(chemin_couche))[0])
-    dico_infos_couche[u'date_creation'] = unicode(localtime(path.getctime(chemin_couche))[2]) +\
-                                   u'/'+ unicode(localtime(path.getctime(chemin_couche))[1]) +\
-                                   u'/'+ unicode(localtime(path.getctime(chemin_couche))[0])
-    # fin de fonction
+    dico_infos_couche[u'date_actu'] = unicode(localtime(path.getmtime(shapepath))[2]) +\
+                                   u'/'+ unicode(localtime(path.getmtime(shapepath))[1]) +\
+                                   u'/'+ unicode(localtime(path.getmtime(shapepath))[0])
+    dico_infos_couche[u'date_creation'] = unicode(localtime(path.getctime(shapepath))[2]) +\
+                                   u'/'+ unicode(localtime(path.getctime(shapepath))[1]) +\
+                                   u'/'+ unicode(localtime(path.getctime(shapepath))[0])
+    # end of function
     return dico_infos_couche, dico_champs, liste_chps
 
 
@@ -109,34 +109,35 @@ def infos_ogr(chemin_couche):
 ########### Variables #############
 ###################################
 
-liste_shapes = []         # liste des chemins des shapes
-dico_infos_couche = {}    # dictionnaire destiné aux caractéristiques des
-                          # couches analysées par le curseur OGR
-dico_champs = {}          # dictionnaire destiné aux attributs
-dico_err = {}             # liste des erreurs
+liste_shapes = []         # list for shapefiles path
+dico_infos_couche = {}    # dictionary where will be stored informations
+dico_champs = {}          # dictionary for fields information
+dico_err = {}             # errors list
 
 today = unicode(localtime()[0]) + u"-" +\
         unicode(localtime()[1]) + u"-" +\
-        unicode(localtime()[2])    # date du jour
+        unicode(localtime()[2])    # date of the day
 ###################################
-######### Fichier Excel ###########
+####### Output Excel file #########
 ###################################
-# configuration du fichier excel de sortie
+# Basic configurationdu
 book = Workbook(encoding = 'utf8')
 feuy1 = book.add_sheet(u'Shapes', cell_overwrite_ok=True)
 
-# personnalisation du fichier excel
-font1 = Font()             # création police 1
+# Some customization: fonts and styles
+# first line style
+entete = XFStyle()
+font1 = Font()
 font1.name = 'Times New Roman'
 font1.bold = True
+entete.font = font1
 
-
-entete = XFStyle()         # création style pour les en-têtes
-entete.font = font1             # application de la police 1 au style entete
-hyperlien = easyxf(u'font: underline single')
+# hyperlinks style
+url = easyxf(u'font: underline single')
+# errors style
 erreur = easyxf(u'font: name Arial, bold 1, colour red')
 
-# titre des colonnes
+# columns name
 feuy1.write(0, 0, u'Nom fichier', entete)
 feuy1.write(0, 1, u'Chemin', entete)
 feuy1.write(0, 2, u'Thème', entete)
@@ -151,97 +152,109 @@ feuy1.write(0, 10, u'Date dernière actualisation', entete)
 feuy1.write(0, 11, u'Liste des champs', entete)
 
 ###################################################
-############## Programme principal ################
+################## Main program ###################
 ###################################################
-# dossier à explorer
+# Folder "target"
 root = Tk()
 root.withdraw()
 cible = doss_cible()
 
-if cible == "":          # si aucun dossier n'est choisi, le programme s'arrête
+if cible == "":     # if any folder is choosen: stop the program
     root.destroy()
     exit()
 
-# appel de la fonction pour lister les shapes
+# Listing of shapefiles into the folder
 listing_shapes(cible)
-# lecture des shapes trouvés
+if len(liste_shapes) == 0:  # if any shapefiles has been found: stop the program
+    root.destroy()
+    exit()
+
+# Reading the shapefiles found
 lig = 1
 for couche in liste_shapes:
-    # remise à zéro des variables
+    # reset variables
     dico_infos_couche.clear()
     dico_champs.clear()
     liste_chps = []
     champs = ""
     theme = ""
     try:
-        # remplissage des dictionnaires
         infos_ogr(couche)
     except:
         dico_err[couche] = u"Probleme dans la structure du shape." + \
                            "\n \n"
         continue
-    # Ecriture des infos dans le fichier excel
-    # Nom de la table
+    # Add the shape informations to the Excel file
+    # Name
     feuy1.write(lig, 0, dico_infos_couche.get('nom'))
-    # Chemin du dossier contenant formaté pour être un lien
+    # Path of containing folder formatted to be a hyperlink
     lien = 'HYPERLINK("' + \
            couche.strip(dico_infos_couche.get('nom')) + \
            '"; "Atteindre le dossier")'    # chemin formaté pour être un lien
-    feuy1.write(lig, 1, Formula(lien), hyperlien)
-    # Dossier
+    feuy1.write(lig, 1, Formula(lien), url)
+    # Name of containing folder
     if path.basename(path.dirname(couche)) != 'shp':
         feuy1.write(lig, 2, path.basename(path.dirname(couche)))
     else:
         feuy1.write(lig, 2, path.basename(path.dirname(path.dirname(couche))))
 
-    # Type de la géométrie
+    # Geometry type
     feuy1.write(lig, 3, dico_infos_couche.get(u'type_geom'))
-    # Emprise
+    # Spatial extent
     emprise = u"Xmin : " + unicode(dico_infos_couche.get(u'Xmin')) +\
               u", Xmax : " + unicode(dico_infos_couche.get(u'Xmax')) +\
               u", Ymin : " + unicode(dico_infos_couche.get(u'Ymin')) +\
               u", Ymax : " + unicode(dico_infos_couche.get(u'Ymax'))
     feuy1.write(lig, 4, emprise)
-    # Nom de la projection
+    # Name of srs
     feuy1.write(lig, 5, dico_infos_couche.get(u'proj'))
-    # EPSG
+    # EPSG code
     feuy1.write(lig, 6, dico_infos_couche.get(u'EPSG'))
-    # Nombre de champs
+    # Number of fields
     feuy1.write(lig, 7, dico_infos_couche.get(u'nbr_attributs'))
-    # Nombre d'objets
+    # Name of objects
     feuy1.write(lig, 8, dico_infos_couche.get(u'nbr_objets'))
-    # Date de l'information
+    # Creation date
     feuy1.write(lig, 9, dico_infos_couche.get(u'date_creation'))
-    # Date dernière actualisation des données
+    # Last update date
     feuy1.write(lig, 10, dico_infos_couche.get(u'date_actu'))
-    # Liste des champs
+    # Field informations
     for chp in liste_chps:
+        # field type
+        if dico_champs[chp][0] == 'Integer' or dico_champs[chp][0] == 'Real':
+            tipo = u'Numérique'
+        elif dico_champs[chp][0] == 'String':
+            tipo = u'Texte'
+        elif dico_champs[chp][0] == 'Date':
+            tipo = u'Date'
         try:
-            # détermine le type du champ
-            if dico_champs[chp][0] == 'Integer' or dico_champs[chp][0] == 'Real':
-                tipo = u'Numérique'
-            elif dico_champs[chp][0] == 'String':
-                tipo = u'Texte'
-            elif dico_champs[chp][0] == 'Date':
-                tipo = u'Date'
-            # concatène les infos sur les champs : type, longueur et précision
+            # concatenation of field informations
             champs = champs +\
                      chp +\
                      " (" + tipo +\
                      ", Lg. = " + unicode(dico_champs[chp][1]) +\
                      ", Pr. = " + unicode(dico_champs[chp][2]) + ") ; "
-        except:
-            dico_err[couche] = u"Probleme sur le champ : " + \
+        except UnicodeDecodeError:
+            # write a notification into the log file
+            dico_err[couche] = u"Problème d'encodage sur le champ : " + \
                                chp.decode('latin1') + \
                                "\n\n"
+            # décode le nom du champ litigieux
+            champs = champs +\
+                     chp.decode('utf8') +\
+                     " (" + tipo +\
+                     ", Lg. = " + unicode(dico_champs[chp][1]) +\
+                     ", Pr. = " + unicode(dico_champs[chp][2]) + ") ; "
+
             continue
 
-    # Une fois tous les champs parcourus, on écrit la liste dans le excel
+    # Once all fieds explored, wirte into the output file
     feuy1.write(lig, 11, champs)
-    # incrémente le numéro de ligne
+    # And go to the next line
     lig = lig +1
-## Sauvegarde du fichier excel
-# Prompt du dossier d'enregistrement
+
+## Save the Excel file
+# Prompt of folder where save the file
 saved = savefic(initialdir= cible,
                 defaultextension = '.xls',
                 initialfile = "DicoShapes_" + today + "_",
@@ -250,7 +263,7 @@ if path.splitext(saved)[1] != ".xls":
     saved = saved + ".xls"
 book.save(saved)
 
-## Bilan programme
+## Log information to the user
 if dico_err.keys() == []:    # s'il n'y a pas d'erreur
     info(title=u"Fin de programme", message=u"Programme terminé.\
                                               \nAucune erreur rencontrée.")
@@ -263,3 +276,8 @@ else:    # s'il y a des erreurs, création d'un fichier log
     info(title=u"Fin de programme", message=u"Programme terminé.\
         \nConsultez le fichier log créé pour les détails : \
         \n" + cible + u"\\" + unicode(today) + u"_dico-shapes_log.txt")
+
+# End of program
+startfile(fic.name)
+startfile(cible)
+del book
