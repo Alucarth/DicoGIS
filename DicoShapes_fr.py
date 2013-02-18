@@ -120,7 +120,7 @@ today = unicode(localtime()[0]) + u"-" +\
 ###################################
 ####### Output Excel file #########
 ###################################
-# Basic configurationdu
+# Basic configuration
 book = Workbook(encoding = 'utf8')
 feuy1 = book.add_sheet(u'Shapes', cell_overwrite_ok=True)
 
