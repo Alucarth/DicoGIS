@@ -19,57 +19,78 @@ class InfosOGR():
     def __init__(self, shapepath, dicoshp, dicochps, listechps):
         u""" Uses gdal/ogr functions to extract basic informations about shapefile
         given as parameter and store into the corresponding dictionary. """
-        source = ogr.Open(shapepath, 0)     # OGR driver
-        couche = source.GetLayer()          # get the layer
-        objet = couche.GetFeature(0)        # get the first object (index 0)
-        geom = objet.GetGeometryRef()       # get the geometry
-        def_couche = couche.GetLayerDefn()  # get the layer definitions
-        srs = couche.GetSpatialRef()        # get spatial system reference
-        srs.AutoIdentifyEPSG()              # try to determine the EPSG code
+        # Creating variables
+        self.source = ogr.Open(shapepath, 0)     # OGR driver
+        self.lay = self.source.GetLayer()          # get the layer
+        if self.lay.GetFeatureCount() == 0:
+            u""" if shape doesn't have any object, return an error """
+            dico_infos_couche[u'nom'] = path.basename(shape)
+            def_couche = couche.GetLayerDefn()
+            dico_infos_couche[u'nbr_attributs'] = def_couche.GetFieldCount()
+            alert = 1
+            return
+        self.obj = self.lay.GetFeature(0)        # get the first object (index 0)
+        self.geom = self.obj.GetGeometryRef()       # get the geometry
+        self.def_couche = self.lay.GetLayerDefn()  # get the layer definitions
+        self.srs = self.lay.GetSpatialRef()        # get spatial system reference
+        self.srs.AutoIdentifyEPSG()              # try to determine the EPSG code
+
+        # basic information
+        self.infos_basics(shapepath, dicoshp)
+        # geometry information
+        self.infos_geom(dicoshp)
+        # fields information
+        self.infos_fields(listechps, dicochps)
+
+    def infos_basics(self, shapepath, dicoshp):
         # Storing into the dictionary
         dicoshp[u'nom'] = path.basename(shapepath)
         dicoshp[u'titre'] = dicoshp[u'nom'][:-4].replace('_', ' ').capitalize()
-        dicoshp[u'nbr_objets'] = couche.GetFeatureCount()
-        dicoshp[u'nbr_attributs'] = def_couche.GetFieldCount()
-        dicoshp[u'proj'] = unicode(srs.GetAttrValue("PROJCS")).replace('_', ' ')
-        dicoshp[u'EPSG'] = unicode(srs.GetAttrValue("AUTHORITY", 1))
-        '''dico_infos_couche[u'EPSG'] = u"Projection : " + \
-                                     unicode(srs.GetAttrValue("PROJCS")).replace('_', ' ') + \
-                                     u" - Code EPSG : " + \
-                                     unicode(srs.GetAttrValue("AUTHORITY", 1))'''
-        # type géométrie
-        if geom.GetGeometryName() == u'POINT':
-            dicoshp[u'type_geom'] = u'Point'
-        elif u'LINESTRING' in geom.GetGeometryName():
-            dicoshp[u'type_geom'] = u'Ligne'
-        elif u'POLYGON' in geom.GetGeometryName():
-            dicoshp[u'type_geom'] = u'Polygone'
-        else:
-            dicoshp[u'type_geom'] = geom.GetGeometryName()
-        # Spatial extent (bounding box)
-        dicoshp[u'Xmin'] = round(couche.GetExtent()[0],2)
-        dicoshp[u'Xmax'] = round(couche.GetExtent()[1],2)
-        dicoshp[u'Ymin'] = round(couche.GetExtent()[2],2)
-        dicoshp[u'Ymax'] = round(couche.GetExtent()[3],2)
-
-        # Fields
-        i = 0
-        while i < def_couche.GetFieldCount():
-            listechps.append(def_couche.GetFieldDefn(i).GetName())
-            dicochps[def_couche.GetFieldDefn(i).GetName()] = def_couche.GetFieldDefn(i).GetTypeName(),\
-                                                                def_couche.GetFieldDefn(i).GetWidth(),\
-                                                                def_couche.GetFieldDefn(i).GetPrecision()
-            i = i+1
-
+        dicoshp[u'nbr_objets'] = self.lay.GetFeatureCount()
+        dicoshp[u'nbr_attributs'] = self.def_couche.GetFieldCount()
+        dicoshp[u'proj'] = unicode(self.srs.GetAttrValue("PROJCS")).replace('_', ' ')
+        dicoshp[u'EPSG'] = unicode(self.srs.GetAttrValue("AUTHORITY", 1))
         dicoshp[u'date_actu'] = unicode(localtime(path.getmtime(shapepath))[2]) +\
-                                       u'/'+ unicode(localtime(path.getmtime(shapepath))[1]) +\
-                                       u'/'+ unicode(localtime(path.getmtime(shapepath))[0])
+                          u'/'+ unicode(localtime(path.getmtime(shapepath))[1]) +\
+                          u'/'+ unicode(localtime(path.getmtime(shapepath))[0])
         dicoshp[u'date_creation'] = unicode(localtime(path.getctime(shapepath))[2]) +\
                                        u'/'+ unicode(localtime(path.getctime(shapepath))[1]) +\
                                        u'/'+ unicode(localtime(path.getctime(shapepath))[0])
         # end of function
-        return dicoshp, dicochps, listechps
+        return dicoshp
+
+    def infos_geom(self, dicoshp):
+        # type géométrie
+        if self.geom.GetGeometryName() == u'POINT':
+            dicoshp[u'type_geom'] = u'Point'
+        elif u'LINESTRING' in self.geom.GetGeometryName():
+            dicoshp[u'type_geom'] = u'Ligne'
+        elif u'POLYGON' in self.geom.GetGeometryName():
+            dicoshp[u'type_geom'] = u'Polygone'
+        else:
+            dicoshp[u'type_geom'] = self.geom.GetGeometryName()
+        # Spatial extent (bounding box)
+        dicoshp[u'Xmin'] = round(self.lay.GetExtent()[0],2)
+        dicoshp[u'Xmax'] = round(self.lay.GetExtent()[1],2)
+        dicoshp[u'Ymin'] = round(self.lay.GetExtent()[2],2)
+        dicoshp[u'Ymax'] = round(self.lay.GetExtent()[3],2)
+        # end of function
+        return dicoshp
+
+    def infos_fields(self, liste_chps, dicochps):
+        for i in range(self.def_couche.GetFieldCount()):
+            champomy = self.def_couche.GetFieldDefn(i)
+            liste_chps.append(champomy.GetName())  # liste ordonnée des champs
+            dicochps[champomy.GetName()] = champomy.GetTypeName(),\
+                                           champomy.GetWidth(),\
+                                           champomy.GetPrecision()
+
+
+        # end of function
+        return liste_chps, dicochps
 
 
 if __name__ == '__main__':
-    main()
+    lishps = []         # list for shapefiles path
+    dicouche = {}    # dictionary where will be stored informations
+    dicochps = {}          # dictionary for fields information

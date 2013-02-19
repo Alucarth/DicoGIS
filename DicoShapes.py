@@ -34,13 +34,13 @@ from modules import InfosOGR
 ########### Variables #############
 ###################################
 
-liste_shapes = []         # list for shapefiles path
-today = unicode(localtime()[0]) + u"-" +\
-        unicode(localtime()[1]) + u"-" +\
-        unicode(localtime()[2])    # date of the day
-dico_infos_couche = {}    # dictionary where will be stored informations
-dico_champs = {}          # dictionary for fields information
-dico_err = {}             # errors list
+##liste_shapes = []         # list for shapefiles path
+##today = unicode(localtime()[0]) + u"-" +\
+##        unicode(localtime()[1]) + u"-" +\
+##        unicode(localtime()[2])    # date of the day
+##dico_infos_couche = {}    # dictionary where will be stored informations
+##dico_champs = {}          # dictionary for fields information
+##dico_err = {}             # errors list
 
 
 class DicoShapes:
@@ -48,6 +48,14 @@ class DicoShapes:
         u""" Constructeur de la fenêtre principale """
         self.root =Tk()
         self.root.withdraw()
+        # variables
+        self.lishp = []         # list for shapefiles path
+        self.today = unicode(localtime()[0]) + u"-" \
+                     + unicode(localtime()[1]) + u"-" \
+                     + unicode(localtime()[2])    # date of the day
+        self.dicouche = {}    # dictionary where will be stored informations
+        self.dicochps = {}          # dictionary for fields information
+        self.dicoerr = {}             # errors list
         # determine the folder "target"
         self.cible = doss_cible()
         if self.cible == "":     # if any folder is choosen: stop the program
@@ -55,31 +63,30 @@ class DicoShapes:
         self.cible = path.normpath(self.cible)
         # Listing of shapefiles into the folder
         self.listing_shapes(self.cible)
-        if len(liste_shapes) == 0:  # if any shapefiles has been found: stop the program
+        if len(self.lishp) == 0:  # if any shapefiles has been found: stop the program
             self.erreurStop(mess = "Aucun shape compatible rencontré")
 
         # creation of excel structure
         self.configexcel()
 
-        # getting the info from shapefiles
-        self.liste_chps = []
-        InfosOGR(liste_shapes[0], dico_infos_couche, dico_champs, self.liste_chps)
+        # getting the info from shapefiles and compile it in the excel
+        self.dictionarize(self.lishp)
+
 
         # saving dictionary
-        self.savedico(self.book)
+        self.savedico(self)
 
     def listing_shapes(self, folderpath):
         u""" List shapefiles contained in the folder and its subfolders """
-        global liste_shapes
         for root, dirs, files in walk(folderpath):
             for i in files:
                 if path.splitext(path.join(root, i))[1] == u'.shp' and \
                 path.isfile(path.join(root, i)[:-4] + u'.dbf') and \
                 path.isfile(path.join(root, i)[:-4] + u'.shx') and \
                 path.isfile(path.join(root, i)[:-4] + u'.prj'):
-                    liste_shapes.append(path.join(root, i))
+                    self.lishp.append(path.join(root, i))
         # end of function
-        return liste_shapes
+        return self.lishp
 
     def configexcel(self):
         # Basic configurationdu
@@ -112,10 +119,23 @@ class DicoShapes:
         self.feuy1.write(0, 9, u'Date de l\'information', self.entete)
         self.feuy1.write(0, 10, u'Date dernière actualisation', self.entete)
         self.feuy1.write(0, 11, u'Liste des champs', self.entete)
-
+        # end of function
         return self.book
 
-    def savedico(self, excel):
+    def dictionarize(self, listefiles):
+        u""" get the information from shapefiles and write it in the Excel """
+        for shp in listefiles:
+            # reset variables
+            self.dicouche.clear()
+            self.dicochps.clear()
+            champs = ""
+            theme = ""
+            self.liste_chps = []
+            # getting shape information
+            InfosOGR(shp, self.dicouche, self.dicochps, self.liste_chps)
+            print self.dicouche
+
+    def savedico(self):
         u""" Save the Excel file """
         # Prompt of folder where save the file
         self.defaultname = "DicoShapes_" + today + "_"+ path.split(self.cible)[1]
