@@ -34,15 +34,6 @@ from modules import InfosOGR
 ########### Variables #############
 ###################################
 
-##liste_shapes = []         # list for shapefiles path
-##today = unicode(localtime()[0]) + u"-" +\
-##        unicode(localtime()[1]) + u"-" +\
-##        unicode(localtime()[2])    # date of the day
-##dico_infos_couche = {}    # dictionary where will be stored informations
-##dico_champs = {}          # dictionary for fields information
-##dico_err = {}             # errors list
-
-
 class DicoShapes:
     def __init__(self):
         u""" Constructeur de la fenêtre principale """

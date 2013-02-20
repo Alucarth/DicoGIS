@@ -24,11 +24,8 @@ class InfosOGR():
         self.lay = self.source.GetLayer()          # get the layer
         if self.lay.GetFeatureCount() == 0:
             u""" if shape doesn't have any object, return an error """
-            dico_infos_couche[u'nom'] = path.basename(shape)
-            def_couche = couche.GetLayerDefn()
-            dico_infos_couche[u'nbr_attributs'] = def_couche.GetFieldCount()
-            alert = 1
-            return
+            self.erratum(dicoshp)
+            break
         self.obj = self.lay.GetFeature(0)        # get the first object (index 0)
         self.geom = self.obj.GetGeometryRef()       # get the geometry
         self.def_couche = self.lay.GetLayerDefn()  # get the layer definitions
@@ -88,6 +85,13 @@ class InfosOGR():
 
         # end of function
         return liste_chps, dicochps
+
+    def erratum(self, dicoshp):
+        self.dicoshp[u'nom'] = path.basename(shape)
+        def_couche = couche.GetLayerDefn()
+        dico_infos_couche[u'nbr_attributs'] = def_couche.GetFieldCount()
+        alert = 1
+        return self.dicoshp
 
 
 if __name__ == '__main__':
