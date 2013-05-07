@@ -125,6 +125,8 @@ class DicoShapes:
             # getting shape information
             InfosOGR(shp, self.dicouche, self.dicochps, self.liste_chps)
             print self.dicouche
+        # End of function
+        return self.dicouche
 
     def savedico(self):
         u""" Save the Excel file """
