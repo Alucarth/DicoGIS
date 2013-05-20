@@ -11,18 +11,31 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-from osgeo import ogr    # spatial files
+################################################################################
+########### Libraries #############
+###################################
+# Standard library
 from os import walk, path       # files and folder managing
 from time import localtime
 
+# Python 3 backported
+from collections import OrderedDict as OD
+
+# 3rd party libraries
+from osgeo import ogr    # spatial files
+
+################################################################################
+########### Classes #############
+###################################
+
 class InfosOGR():
     def __init__(self, shapepath, dicoshp, dicochps, listechps):
-        u""" Uses gdal/ogr functions to extract basic informations about shapefile
-        given as parameter and store into the corresponding dictionary. """
+        u""" Uses gdal/ogr functions to extract basic informations about
+        shapefile given as parameter and store into the corresponding dictionary. """
         # Creating variables
-        self.source = ogr.Open(shapepath, 0)     # OGR driver
-        self.lay = self.source.GetLayer()          # get the layer
-        if self.lay.GetFeatureCount() == 0:
+        source = ogr.Open(shapepath, 0)     # OGR driver
+        lay = self.source.GetLayer()          # get the layer
+        if lay.GetFeatureCount() == 0:
             u""" if shape doesn't have any object, return an error """
             self.erratum(dicoshp)
             break
@@ -87,14 +100,25 @@ class InfosOGR():
         return liste_chps, dicochps
 
     def erratum(self, dicoshp):
+        u""" errors handling """
+        # local variables
         self.dicoshp[u'nom'] = path.basename(shape)
         def_couche = couche.GetLayerDefn()
         dico_infos_couche[u'nbr_attributs'] = def_couche.GetFieldCount()
         alert = 1
+        # End of function
         return self.dicoshp
 
+################################################################################
+###### Stand alone program ########
+###################################
 
 if __name__ == '__main__':
     lishps = []         # list for shapefiles path
     dicouche = {}    # dictionary where will be stored informations
     dicochps = {}          # dictionary for fields information
+
+################################################################################
+######## Former codelines #########
+###################################
+
