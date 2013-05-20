@@ -11,6 +11,7 @@
 	<gui_choix>Parcourir</gui_choix>
 	<gui_cholang>Langue :</gui_cholang>
 	<gui_numshp> shape(s) ont été trouvés.</gui_numshp>
+	<gui_go>Lancer</gui_go>
 	<gui_quit>Quitter</gui_quit>
 	<gui_fr1>Arborescence cible</gui_fr1>
 	<gui_path>Chemin du dossier : </gui_path>

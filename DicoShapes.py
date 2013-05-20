@@ -19,13 +19,14 @@ from __future__ import unicode_literals
 ########### Libraries #############
 ###################################
 # Standard library
-from Tkinter import Tk, LabelFrame, Label, Entry, Button, N, S, E, W, StringVar, IntVar      # GUI
+from Tkinter import Tk, LabelFrame, Label, Entry, Button, N, S, E, W, StringVar, IntVar, DISABLED, GROOVE      # GUI
 from tkFileDialog import askdirectory, asksaveasfilename
 from tkMessageBox import showinfo as info
 from ttk import Combobox, Progressbar
 
 from sys import exit
 from os import  listdir, walk, path       # files and folder managing
+from os import environ as env
 from time import localtime
 
 
@@ -38,7 +39,7 @@ from xlwt import Workbook, Font, XFStyle, easyxf, Formula   # excel library
 from lxml import etree as ET
 
 # Custom modules
-##from modules import InfosOGR
+from modules import InfosOGR
 
 ################################################################################
 ########### Variables #############
@@ -84,7 +85,7 @@ class DicoShapes(Tk):
         Label(self.FrPath, text = self.blabla.get('gui_fic')).grid(row = 3, column= 1)
         self.output = Entry(self.FrPath, width = 35)
         # language switcher
-        self.ddl_lang = Combobox(self.FrPath, values = self.lang, width = 5)
+        self.ddl_lang = Combobox(self.FrPath, values = li_lang, width = 5)
 
         # widgets placement
         labtarg.grid(row = 1, column = 1, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
@@ -96,6 +97,32 @@ class DicoShapes(Tk):
 
 
             ## Main frame
+        # Hola
+        Label(self, text = self.blabla.get('hi') + env.get(u'USERNAME')).grid(row = 0, column = 0,
+                                                 columnspan = 2, sticky = W+E,
+                                                 padx = 2, pady = 5)
+        # Imagen
+##        self.icone = PhotoImage(file = r'sources/logo_Solinette.GIF')
+##        Label(self, borderwidth = 2, relief = 'ridge',
+##                                     image = self.icone).grid(row = 1,
+##                                                              rowspan = 4,
+##                                                              column = 0,
+##                                                              padx = 1,
+##                                                              pady = 1,
+##                                                              sticky = W)
+
+        # Basic buttons
+        self.val = Button(self, text = self.blabla.get('gui_go'),
+                                relief= 'raised',
+                                state = DISABLED)
+        can = Button(self, text = self.blabla.get('gui_quit'),
+                                relief= 'groove',
+                                command = self.quit)
+
+        # widgets placement
+        self.val.grid(row = 5, column = 1, columnspan = 2,
+                            sticky = N+S+W+E, padx = 2, pady = 5)
+        can.grid(row = 5, column = 0, sticky = N+S+W+E, padx = 2, pady = 5)
         # Frames placement
         self.FrPath.grid(row = 2, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
 
