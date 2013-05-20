@@ -38,7 +38,7 @@ class InfosOGR():
         if lay.GetFeatureCount() == 0:
             u""" if shape doesn't have any object, return an error """
             self.erratum(dicoshp)
-            break
+            return
         self.obj = self.lay.GetFeature(0)        # get the first object (index 0)
         self.geom = self.obj.GetGeometryRef()       # get the geometry
         self.def_couche = self.lay.GetLayerDefn()  # get the layer definitions
