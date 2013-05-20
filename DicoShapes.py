@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 ########### Libraries #############
 ###################################
 # Standard library
-from Tkinter import Tk, LabelFrame, Label, Entry, Button, N, S, E, W, StringVar, IntVar, DISABLED, GROOVE      # GUI
+from Tkinter import Tk, LabelFrame, Label, Entry, Button, N, S, E, W, StringVar, IntVar, ACTIVE, DISABLED, GROOVE, PhotoImage      # GUI
 from tkFileDialog import askdirectory, asksaveasfilename
 from tkMessageBox import showinfo as info
 from ttk import Combobox, Progressbar
@@ -98,18 +98,18 @@ class DicoShapes(Tk):
 
             ## Main frame
         # Hola
-        Label(self, text = self.blabla.get('hi') + env.get(u'USERNAME')).grid(row = 0, column = 0,
-                                                 columnspan = 2, sticky = W+E,
+        Label(self, text = self.blabla.get('hi') + env.get(u'USERNAME')).grid(row = 1, column = 1,
+                                                 columnspan = 1, sticky = N+S+W+E,
                                                  padx = 2, pady = 5)
         # Imagen
-##        self.icone = PhotoImage(file = r'sources/logo_Solinette.GIF')
-##        Label(self, borderwidth = 2, relief = 'ridge',
-##                                     image = self.icone).grid(row = 1,
-##                                                              rowspan = 4,
-##                                                              column = 0,
-##                                                              padx = 1,
-##                                                              pady = 1,
-##                                                              sticky = W)
+        self.icone = PhotoImage(file = r'img/DicoGIS_logo.GIF')
+        Label(self, borderwidth = 2, relief = 'ridge',
+                                     image = self.icone).grid(row = 1,
+                                                              rowspan = 4,
+                                                              column = 0,
+                                                              padx = 1,
+                                                              pady = 1,
+                                                              sticky = W)
 
         # Basic buttons
         self.val = Button(self, text = self.blabla.get('gui_go'),
@@ -117,7 +117,7 @@ class DicoShapes(Tk):
                                 state = DISABLED)
         can = Button(self, text = self.blabla.get('gui_quit'),
                                 relief= 'groove',
-                                command = self.quit)
+                                command = self.destroy)
 
         # widgets placement
         self.val.grid(row = 5, column = 1, columnspan = 2,
@@ -126,16 +126,7 @@ class DicoShapes(Tk):
         # Frames placement
         self.FrPath.grid(row = 2, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
 
-##        # determine the folder "target"
-##        self.cible = doss_cible()
-##        if self.cible == "":     # if any folder is choosen: stop the program
-##            self.erreurStop(mess = "Pas de dossier choisi")
-##        self.cible = path.normpath(self.cible)
-##        # Listing of shapefiles into the folder
-##        self.listing_shapes(self.cible)
-##        if len(self.lishp) == 0:  # if any shapefiles has been found: stop the program
-##            self.erreurStop(mess = "Aucun shape compatible rencontré")
-##
+
 ##        # creation of excel structure
 ##        self.configexcel()
 ##
@@ -161,6 +152,7 @@ class DicoShapes(Tk):
         self.ligeofiles(foldername)
         self.numfiles.set(unicode(len(self.li_shp)) + u' shapefiles - '
                         + unicode(len(self.li_tab)) + u' MapInfo tables')
+        self.val.config(state = ACTIVE)
         # end of function
         return foldername
 
@@ -193,17 +185,33 @@ class DicoShapes(Tk):
         return self.li_shp, self.li_tab
 
 
-    def listing_shapes(self, folderpath):
-        u""" List shapefiles contained in the folder and its subfolders """
-        for root, dirs, files in walk(folderpath):
-            for i in files:
-                if path.splitext(path.join(root, i))[1] == u'.shp' and \
-                path.isfile(path.join(root, i)[:-4] + u'.dbf') and \
-                path.isfile(path.join(root, i)[:-4] + u'.shx') and \
-                path.isfile(path.join(root, i)[:-4] + u'.prj'):
-                    self.lishp.append(path.join(root, i))
-        # end of function
-        return self.lishp
+    def erreurStop(self, mess):
+        u""" In case of error, close the GUI and stop the program """
+        info(title = u'Erreur', message = mess)
+        self.root.destroy()
+        exit()
+
+
+    def load_texts(self, lang='FR'):
+        u""" Load texts according to the selected language """
+        # open xml cursor
+        xml = ET.parse('locale/lang_' + lang + '.xml')
+        # Looping and gathering texts from the xml file
+        for elem in xml.getroot().getiterator():
+            self.blabla[elem.tag] = elem.text
+        # Fin de fonction
+        return self.blabla
+
+
+    def process(self):
+        u""" """
+        # check if there are some layers into the folder structure
+        if len(self.li_shp) + len(self.li_tab) == 0:
+            erreurStop(self.blabla.get('nodata'))
+            return
+        # creating the Excel workbook
+        self.configexcel()
+
 
     def configexcel(self):
         u"""  """
@@ -265,32 +273,6 @@ class DicoShapes(Tk):
         if path.splitext(saved)[1] != ".xls":
             saved = saved + ".xls"
         self.book.save(saved)
-
-    def erreurStop(self, mess):
-        u""" In case of error, close the GUI and stop the program """
-        info(title = u'Erreur', message = mess)
-        self.root.destroy()
-        exit()
-
-
-##    def listing_lang(self):
-##        u""" List available languages  in folder 'locale' """
-##        # Looping in language folders
-##        self.lang = [lg[5:-4] for lg in listdir(r'locale')]
-##        # End of function
-##        return self.lang
-
-
-    def load_texts(self, lang='FR'):
-        u""" Load texts according to the selected language """
-        # open xml cursor
-        xml = ET.parse('locale/lang_' + lang + '.xml')
-        # Looping and gathering texts from the xml file
-        for elem in xml.getroot().getiterator():
-            self.blabla[elem.tag] = elem.text
-        # Fin de fonction
-        return self.blabla
-
 
 
 ################################################################################

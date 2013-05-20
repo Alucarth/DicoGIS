@@ -18,6 +18,7 @@
 	<gui_fic>Nom du fichier en sortie : </gui_fic>
 	<gui_prog>Progression</gui_prog>	
 	<nofolder>Aucun dossier sélectionné</nofolder>
+	<nodata>Aucune donnée géographique compatible (.shp / .tab) trouvée.</nodata>
 	<info_end>Fin du programme</info_end>
 	<info_end2>DicoShapes a terminé son travail. Il a traité </info_end2>
 	<info_end3>Le dictionnaire se trouve dans le dossier : </info_end3>
