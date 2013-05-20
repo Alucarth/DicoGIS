@@ -1,0 +1,170 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<lang iso="ES">
+<!-- Nombre del idioma -->
+	<langue>Español</langue>
+<!-- Rutas archivos -->
+	<path_aide>locale\lang_ES.xml</path_aide>
+<!-- GUI -->
+	<bonjour>¡Hola! </bonjour>
+	<gui_actualiser>Actualizar</gui_actualiser>
+	<gui_choix>Escoge uno de los </gui_choix>
+	<gui_cholang>Idioma:</gui_cholang>
+	<gui_choprofil>Escoger este perfil</gui_choprofil>
+	<gui_crprofil>Crear un nuevo perfil</gui_crprofil>
+	<gui_exist> perfil(es) que ya existe(n):</gui_exist>
+	<gui_nouvprofil>Nuevo perfil...</gui_nouvprofil>
+	<gui_numshp> shape(s) fueron encontrados.</gui_numshp>
+	<gui_quit>Salir</gui_quit>
+	<gui_titre>Selección del perfil de metadatos para aplicar</gui_titre>
+	<info_choption>ELEGIR AL MENOS UNA OPCIÓN DE EXPORTE</info_choption>
+	<info_end>Fin del programa</info_end>
+	<info_end2>Metadator terminó su trabajo. Ha tratado </info_end2>
+	<info_end3>Las fichas están en la carpeta: </info_end3>
+	<info_err> errore(s) encontrado(s). Consultar el archivo log.</info_err>
+	<info_noerr>Ningún error encontrado.</info_noerr>
+	<info_noption>Ninguna opción eligida</info_noption>
+	<info_restart1>Reinicio necesario</info_restart1>
+	<info_restart2>El programa necesita reiniciar para aplicar los cambios.</info_restart2>
+<!-- Log -->
+	<log_dossdest>Carpeta de destinación: </log_dossdest>
+	<log_dossour>Carpeta de las capas fuentes: </log_dossour>
+	<log_end>Fin del tratamiento: </log_end>
+	<log_entete>Progama de creación automatizada de metadatos - Versión : 1.9</log_entete>
+	<log_format>Formatos escogidos: </log_format>
+	<log_newpro>Nuevo perfil creado.</log_newpro>
+	<log_nobjet> campos) - ESTA CAPA NO TIENE NINGUN OBJETO. TRATAMIENTO IMPOSIBLE!</log_nobjet>	
+	<log_numshp>Número de shapes:</log_numshp>
+	<log_profil>Perfil de metadatos aplicado: </log_profil>
+	<log_start>Inicio del tratamiento: </log_start>
+	<log_tps>Tiempo transcurrido: </log_tps>
+	<log_warn>CUIDADO => Carpeta provisional (</log_warn>
+	<log_warn2>) no eliminada. Esta en modo solo lectura.</log_warn2>
+<!-- Metadato -->
+	<!-- Categorías -->
+	<titre>Metadatos de </titre>
+	<nomfic>Nombre del archivo</nomfic>
+	<mtcthem>Palabras claves temáticas</mtcthem>
+	<mtcgeo>Palabras claves geográficas</mtcgeo>
+	<description>Descripción</description>
+	<cadre>Marco de creación de la información</cadre>
+	<num_objets>Número de objetos</num_objets>
+	<num_attrib>Número de atributos</num_attrib>
+	<date_crea>Fecha de la información</date_crea>
+	<date_actu>Fecha de la última actualización</date_actu>
+	<source>Fuente(s)</source>
+	<diffusion>Difusión</diffusion>
+	<responsable>Responsable general</responsable>
+	<ptcontact>Contacto de la fuente</ptcontact>
+	<siteweb>Página web</siteweb>
+	<geometrie>Tipo de geometría</geometrie>
+	<echelle>Escala</echelle>
+	<precision>Precisión</precision>
+	<srs>Sistema de coordenadas</srs>
+	<codepsg>Código EPSG: </codepsg>
+	<emprise>Extensión espacial</emprise>
+	<longueur>Longitud del campo</longueur>
+	<numero>Orden</numero>
+	<nom>Nombre</nom>
+	<type>Tipo</type>
+	<geom_point>Punto</geom_point>
+	<geom_ligne>Línea</geom_ligne>
+	<geom_polyg>Polígono</geom_polyg>
+	<!-- Estadísticas numéricas -->
+	<entier>Numérico (entero)</entier>
+	<reel>Numérico (real)</reel>
+	<valuniq>valores únicos (núm. de objetos = núm. de valores diferentes).</valuniq>
+	<valcom>valor común a todos los objetos: </valcom>
+	<num_valdif> valores diferentes.</num_valdif>
+	<num_valdif20> valores diferentes. Los veinte más representados:</num_valdif20>
+	<statsbase>Estadísticas de base</statsbase>
+	<somme>Suma: </somme>
+	<moyenne>Promedio: </moyenne>
+	<mediane>Mediana: </mediane>
+	<min>Mínimo: </min>
+	<max>Máximo: </max>
+	<ecartype>Desviación estándar: </ecartype>
+	<valnulles>Número de valores nulos: </valnulles>
+	<perctotal>% del total)</perctotal>
+	<valfreq>Valores (frecuencias):</valfreq>
+<!-- Estadísticas textos -->
+	<string>Texto</string>	
+	<txt_valdif> modalidades diferentes.</txt_valdif>
+	<txt_valdif20> modalidades diferentes. Son las 20 más representadas:</txt_valdif20>
+	<txt_moda>Modalidades (ocurrencias): </txt_moda>
+<!-- Estadísticas fechas -->	
+	<date>Fecha</date>	
+	<date_ans>años, </date_ans>
+	<date_mois>meses, </date_mois>
+	<date_jour>días.</date_jour>
+	<champvid>Campo vacío</champvid>
+	<datancienne>Fecha más antigua: </datancienne>
+	<daterecente>fecha más reciente: </daterecente>
+	<date_intervmax>Intervalo máximo: </date_intervmax>
+<!-- HTML y Excel -->		
+	<xls_feuy1>Datos de base</xls_feuy1>
+	<xls_feuy2>Atributos</xls_feuy2>
+	<acompleter>DESCRIPCIÓN A COMPLETAR</acompleter>
+	<listattributs>LISTADO DE LOS ATRIBUTOS</listattributs>
+	<champs> atributos)</champs>
+	<soit> (o sea </soit>
+	<attvide>Este atributo es vacío.</attvide>
+	<inconnu>Tipo de atributo desconocido.</inconnu>
+<!-- FORMULARIO -->
+<!-- Creación perfil -->
+	<prof_exist>Archivo ya existe</prof_exist>
+	<prof_exist2>Ya existe un archivo con el mismo nombre. Remplazarlo (sino, el nombre será incrementado)?</prof_exist2>
+<!-- Palabres clavers personalizados -->
+	<mtc_exist>Error - Palabra clave ya existe o vacío</mtc_exist>
+	<mtc_exist2>Sea la palabra clave ya esta en la lista; Sea el campo es vacío.</mtc_exist2>
+	<mtc_del>Error - Ninguna palabra seleccionada</mtc_del>
+	<mtc_del2>Seleccionar una palabra a suprimir</mtc_del2>
+<!-- Contactos -->
+	<cont_reset>Nuevo contacto (reset)</cont_reset>
+	<cont_resp>Segundo contacto</cont_resp>
+	<cont_id>Identificador</cont_id>
+	<cont_nom>Nombre APELLIDO</cont_nom>
+	<cont_orga>Organización</cont_orga>
+	<cont_role>Rol</cont_role>
+	<cont_rue>Calle</cont_rue>
+	<cont_ville>Ciudad</cont_ville>
+	<cont_cp>Código postal</cont_cp>
+	<cont_pays>País</cont_pays>
+	<cont_tel>Teléfono</cont_tel>
+	<cont_mail>Email</cont_mail>
+	<cont_fonc>Función</cont_fonc>
+<!-- Check campos formularos -->
+	<chp_nomfic>Nombre del fichero del perfil</chp_nomfic>
+	<chp_inspire>Temáticas INSPIRE</chp_inspire>
+	<chp_url>Enlace web: </chp_url>
+	<check_err>Estos campos no son bien rellenos.</check_err>
+<!-- Campos formularios -->
+	<form_titre>Creación de un nuevo perfil de metadatos</form_titre>
+	<form_param>Parametros básicos</form_param>
+	<form_auto>O llenar los campos con este perfil: </form_auto>
+	<form_resume>Descripción: descripción general y común del marco en el cual fueron creados los datos.</form_resume>
+	<form_sourc>Fuentes y histórico: orígen e modalidades de la creación de los datos.</form_sourc>
+	<form_mtc>  PALABRAS CLAVES PERSONALIZADAS  </form_mtc>
+	<form_newmtc>nueva palabra clave</form_newmtc>
+	<form_mtcdes>corta descripción de la palabra clave</form_mtcdes>
+	<form_addmtc>Agregar una nueva palabra clave: </form_addmtc>
+	<form_delmtc>Quitar permanentemente la palabra clave seleccionada</form_delmtc>
+	<form_divers>  DIVERSOS  </form_divers>
+	<form_intiturl>Etiqueta del link: </form_intiturl>
+	<form_exurl>Página oficial / Catálogo</form_exurl>
+	<form_rythm>Ritmo de actualización: </form_rythm>
+	<form_langdo>Idioma del dato: </form_langdo>
+	<form_langmd>Idioma del metadato: </form_langmd>
+	<form_confor>  CONFORMIDAD INSPIRE  </form_confor>
+	<form_spec>Especificación INSPIRE : </form_spec>
+	<form_conf>Conforme</form_conf>
+	<form_noconf>No conforme</form_noconf>
+	<form_noeval>No evaluado</form_noeval>
+	<form_degco>Grado de conformidad</form_degco>
+	<form_cont>  CONTACTOS  </form_cont>
+	<form_applik>Aplicar un contacto registrado</form_applik>
+	<form_duplik>Copiar</form_duplik>
+	<form_save>Guardar el perfil</form_save>
+	<form_back>Volver</form_back>
+<!-- Gestión errores -->
+	<err_encod>El nombre del atributo no esta bien formateado (caracteres especiales): </err_encod>
+</lang>

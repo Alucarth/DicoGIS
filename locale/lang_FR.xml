@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<lang iso="FR">
+<!-- Name of language -->
+	<langue>Français</langue>
+<!-- Paths -->
+	<path_lang>locale\lang_FR.xml</path_lang>
+<!-- GUI -->
+	<gui_excel>Classeurs Excel 2003</gui_excel>
+	<hi>Bonjour </hi>
+	<gui_actualiser>Actualiser</gui_actualiser>
+	<gui_choix>Parcourir</gui_choix>
+	<gui_cholang>Langue :</gui_cholang>
+	<gui_numshp> shape(s) ont été trouvés.</gui_numshp>
+	<gui_quit>Quitter</gui_quit>
+	<gui_fr1>Arborescence cible</gui_fr1>
+	<gui_path>Chemin du dossier : </gui_path>
+	<gui_fic>Nom du fichier en sortie : </gui_fic>
+	<gui_prog>Progression</gui_prog>	
+	<nofolder>Aucun dossier sélectionné</nofolder>
+	<info_end>Fin du programme</info_end>
+	<info_end2>DicoShapes a terminé son travail. Il a traité </info_end2>
+	<info_end3>Le dictionnaire se trouve dans le dossier : </info_end3>
+	<info_err> erreur(s) rencontrée(s). Consulter le fichier log.</info_err>
+	<info_noerr>Aucune erreur rencontrée.</info_noerr>
+	<info_restart1>Redémarrage requis</info_restart1>
+	<info_restart2>Le programme a besoin de redémarrer pour appliquer les changements.</info_restart2>
+<!-- Log -->
+	<log_dossdest>Dossier de destination : </log_dossdest>
+	<log_dossour>Dossier source des shapes : </log_dossour>
+	<log_end>Fin du traitement : </log_end>
+	<log_entete>DicoGIS - dictionnaire automatisé de données géographiques</log_entete>
+	<log_nobjet> champs) - CE SHAPE N'A AUCUN OBJET. TRAITEMENT IMPOSSIBLE !</log_nobjet>
+	<log_numshp>Nombre de shapes : </log_numshp>
+	<log_start>Début du traitement : </log_start>
+	<log_tps>Temps écoulé : </log_tps>
+<!-- Output file -->
+	<nomfic>Nom du fichier</nomfic>
+	<path>Chemin</path>
+	<theme>Thème</theme>
+	<description>Description</description>
+	<num_objets>Nombre d'objets</num_objets>
+	<num_attrib>Nombre d'attributs</num_attrib>
+	<date_crea>Création (sur l'ordinateur)</date_crea>
+	<date_actu>Dernière actualisation</date_actu>
+	<geometrie>Type de géométrie</geometrie>
+	<srs>Système de coordonnées</srs>
+	<codepsg>EPSG</codepsg>
+	<emprise>Emprise spatiale</emprise>
+	<longueur>lg</longueur>
+	<li_chps>Attributs</li_chps>
+	<type>Type</type>
+	<geom_point>Point</geom_point>
+	<geom_ligne>Ligne</geom_ligne>
+	<geom_polyg>Polygone</geom_polyg>
+<!-- Gestion erreurs -->
+	<err_encod>Le nom du champ n'est pas bien formaté (caractères spéciaux) : </err_encod>
+</lang>
