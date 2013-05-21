@@ -62,6 +62,18 @@ class InfosOGR():
         self.infos_fields(li_fields, dico_fields)
 
     def infos_basics(self, layerpath, dico_layer):
+        u"""  """
+        # srs type
+        srsmetod = [(srs.IsCompound(), "compound"),
+                 (srs.IsGeocentric(), "Geocentric"),
+                 (srs.IsGeographic(), "Geographic"),
+                 (srs.IsLocal(), "Local"),
+                 (srs.IsProjected(), "Projected"),
+                 (srs.IsVertical(), "Vertical")]
+        for srsmet in srsmetod:
+            if srsmet[0] == 1:
+                typsrs = srsmet[1]
+        dico_infos_couche[u'srstyp'] = unicode(typsrs)
         # Storing into the dictionary
         dico_layer[u'name'] = path.basename(layerpath)
         dico_layer[u'title'] = dico_layer[u'nom'][:-4].replace('_', ' ').capitalize()
@@ -79,6 +91,7 @@ class InfosOGR():
         return dico_layer
 
     def infos_geom(self, dico_layer):
+        u"""  """
         # type géométrie
         if self.geom.GetGeometryName() == u'POINT':
             dico_layer[u'type_geom'] = u'Point'
@@ -97,6 +110,7 @@ class InfosOGR():
         return dico_layer
 
     def infos_fields(self, liste_chps, dico_fields):
+        u"""  """
         for i in range(self.def_couche.GetFieldCount()):
             champomy = self.def_couche.GetFieldDefn(i)
             liste_chps.append(champomy.GetName())  # liste ordonnée des champs
