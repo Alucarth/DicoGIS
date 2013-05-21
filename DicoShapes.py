@@ -226,6 +226,10 @@ class DicoShapes(Tk):
             line = line +1
         # saving dictionary
         self.savedico()
+
+        # quit and exit
+        self.destroy
+
         # End of function
         return
 
@@ -253,16 +257,18 @@ class DicoShapes(Tk):
         self.feuy1.write(0, 0, self.blabla.get('nomfic'), self.entete)
         self.feuy1.write(0, 1, self.blabla.get('path'), self.entete)
         self.feuy1.write(0, 2, self.blabla.get('theme'), self.entete)
-        self.feuy1.write(0, 3, self.blabla.get('geometrie'), self.entete)
-        self.feuy1.write(0, 4, self.blabla.get('emprise'), self.entete)
-        self.feuy1.write(0, 5, self.blabla.get('srs'), self.entete)
-        self.feuy1.write(0, 6, self.blabla.get('codepsg'), self.entete)
-        self.feuy1.write(0, 7, self.blabla.get('num_attr'), self.entete)
-        self.feuy1.write(0, 8, self.blabla.get('num_objets'), self.entete)
-        self.feuy1.write(0, 9, self.blabla.get('date_crea'), self.entete)
-        self.feuy1.write(0, 10, self.blabla.get('date_actu'), self.entete)
-        self.feuy1.write(0, 11, self.blabla.get('li_chps'), self.entete)
+        self.feuy1.write(0, 3, self.blabla.get('num_attrib'), self.entete)
+        self.feuy1.write(0, 4, self.blabla.get('num_objets'), self.entete)
+        self.feuy1.write(0, 5, self.blabla.get('geometrie'), self.entete)
+        self.feuy1.write(0, 6, self.blabla.get('srs'), self.entete)
+        self.feuy1.write(0, 7, self.blabla.get('srs_type'), self.entete)
+        self.feuy1.write(0, 8, self.blabla.get('codepsg'), self.entete)
+        self.feuy1.write(0, 9, self.blabla.get('emprise'), self.entete)
+        self.feuy1.write(0, 10, self.blabla.get('date_crea'), self.entete)
+        self.feuy1.write(0, 11, self.blabla.get('date_actu'), self.entete)
         self.feuy1.write(0, 12, self.blabla.get('format'), self.entete)
+        self.feuy1.write(0, 13, self.blabla.get('li_chps'), self.entete)
+
         # end of function
         return self.book, self.feuy1, self.entete, self.url, self.erreur
 
@@ -285,59 +291,64 @@ class DicoShapes(Tk):
             sheet.write(line, 2, path.basename(path.dirname(layer_infos.get(u'folder'))))
 
         # Geometry type
-        sheet.write(line, 3, layer_infos.get(u'type_geom'))
+        sheet.write(line, 5, layer_infos.get(u'type_geom'))
         # Spatial extent
         emprise = u"Xmin : " + unicode(layer_infos.get(u'Xmin')) +\
                   u", Xmax : " + unicode(layer_infos.get(u'Xmax')) +\
                   u", Ymin : " + unicode(layer_infos.get(u'Ymin')) +\
                   u", Ymax : " + unicode(layer_infos.get(u'Ymax'))
-        sheet.write(line, 4, emprise)
+        sheet.write(line, 9, emprise)
         # Name of srs
-        sheet.write(line, 5, layer_infos.get(u'srs'))
+        sheet.write(line, 6, layer_infos.get(u'srs'))
+        # Type of SRS
+        sheet.write(line, 7, layer_infos.get(u'srs_type'))
         # EPSG code
-        sheet.write(line, 6, layer_infos.get(u'EPSG'))
+        sheet.write(line, 8, layer_infos.get(u'EPSG'))
         # Number of fields
-        sheet.write(line, 7, layer_infos.get(u'num_fields'))
+        sheet.write(line, 3, layer_infos.get(u'num_fields'))
         # Name of objects
-        sheet.write(line, 8, layer_infos.get(u'num_obj'))
+        sheet.write(line, 4, layer_infos.get(u'num_obj'))
         # Creation date
-        sheet.write(line, 9, layer_infos.get(u'date_crea'))
+        sheet.write(line, 10, layer_infos.get(u'date_crea'))
         # Last update date
-        sheet.write(line, 10, layer_infos.get(u'date_actu'))
+        sheet.write(line, 11, layer_infos.get(u'date_actu'))
         # Format of data
-        sheet.write(line, 10, layer_infos.get('type'))
+        sheet.write(line, 12, layer_infos.get(u'type'))
         # Field informations
         for chp in fields_info.keys():
+            print chp
             # field type
-            if fields_info[chp][0] == 'Integer' or fields_info[chp][0] == 'Real':
-                tipo = u'Numérique'
+            if fields_info[chp][0] == 'Integer':
+                tipo = self.blabla.get(u'entier')
+            elif fields_info[chp][0] == 'Real':
+                tipo = self.blabla.get(u'reel')
             elif fields_info[chp][0] == 'String':
-                tipo = u'Texte'
+                tipo = self.blabla.get(u'string')
             elif fields_info[chp][0] == 'Date':
-                tipo = u'Date'
+                tipo = self.blabla.get(u'date')
+            # concatenation of field informations
             try:
-                # concatenation of field informations
-                champs = champs +\
-                         chp +\
-                         " (" + tipo +\
-                         ", Lg. = " + unicode(fields_info[chp][1]) +\
-                         ", Pr. = " + unicode(fields_info[chp][2]) + ") ; "
+                champs = champs + chp +\
+                         u" (" + tipo + self.blabla.get(u'longueur') +\
+                         unicode(fields_info[chp][1]) +\
+                         self.blabla.get(u'precision') +\
+                         unicode(fields_info[chp][2]) + u") ; "
             except UnicodeDecodeError:
                 # write a notification into the log file
-                dico_err[couche] = self.blabla.get('err_encod') + \
-                                   chp.decode('latin1') + \
-                                   "\n\n"
-                # décode le nom du champ litigieux
+                self.dico_err[layer_infos.get('name')] = self.blabla.get(u'err_encod') + \
+                                                         chp.decode('latin1') + \
+                                                         u"\n\n"
+                # decode the fucking field name
                 champs = champs +\
                          chp.decode('utf8') +\
-                         " (" + tipo +\
-                         ", Lg. = " + unicode(fields_info[chp][1]) +\
-                         ", Pr. = " + unicode(fields_info[chp][2]) + ") ; "
-
+                         u" (" + tipo +\
+                         u", Lg. = " + unicode(fields_info[chp][1]) +\
+                         u", Pr. = " + unicode(fields_info[chp][2]) + ") ; "
+                # then continue
                 continue
 
         # Once all fieds explored, write them
-        sheet.write(line, 11, champs)
+        sheet.write(line, 13, champs)
 
         # End of function
         return self.book, self.feuy1
@@ -354,7 +365,10 @@ class DicoShapes(Tk):
             saved = saved + ".xls"
         # save
         self.book.save(saved)
+        # notification
 
+        # End of function
+        return self.book
 
     def erreurStop(self, mess):
         u""" In case of error, close the GUI and stop the program """
