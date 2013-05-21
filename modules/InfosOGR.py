@@ -84,6 +84,7 @@ class InfosOGR():
         dico_layer[u'srstyp'] = unicode(typsrs)
         # Storing into the dictionary
         dico_layer[u'name'] = path.basename(layerpath)
+        dico_layer[u'folder'] = path.dirname(layerpath)
         dico_layer[u'title'] = dico_layer[u'name'][:-4].replace('_', ' ').capitalize()
         dico_layer[u'num_obj'] = self.layer.GetFeatureCount()
         dico_layer[u'num_fields'] = self.def_couche.GetFieldCount()
@@ -161,16 +162,16 @@ if __name__ == '__main__':
         dicouche.clear()
         dico_fields.clear()
         # getting the informations
-        info_shp = InfosOGR(li_shp[0], dicouche, dico_fields, 'shape')
-        print '\n', dicouche, dico_fields, li_chps
+        info_shp = InfosOGR(shp, dicouche, dico_fields, 'shape')
+        print '\n', dicouche, dico_fields
     for tab in li_tab:
         """ looping on MapInfo tables list """
         # reset recipient data
         dicouche.clear()
         dico_fields.clear()
         # getting the informations
-        info_tab = InfosOGR(li_tab[0], dicouche, dico_fields, 'table')
-        print '\n', dicouche, dico_fields, li_chps
+        info_tab = InfosOGR(tab, dicouche, dico_fields, 'table')
+        print '\n', dicouche, dico_fields
 
 
 
