@@ -19,7 +19,8 @@ from __future__ import unicode_literals
 ########### Libraries #############
 ###################################
 # Standard library
-from Tkinter import Tk, LabelFrame, Label, Entry, Button, N, S, E, W, StringVar, IntVar, ACTIVE, DISABLED, GROOVE, PhotoImage      # GUI
+from Tkinter import Tk, Label, Entry, Button, StringVar, IntVar     # GUI
+from Tkinter import LabelFrame, N, S, E, W, ACTIVE, DISABLED, GROOVE, PhotoImage
 from tkFileDialog import askdirectory, asksaveasfilename
 from tkMessageBox import showinfo as info
 from ttk import Combobox, Progressbar
@@ -126,13 +127,6 @@ class DicoShapes(Tk):
         # Frames placement
         self.FrPath.grid(row = 2, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
 
-
-##        # creation of excel structure
-##        self.configexcel()
-##
-
-##
-##
 
 
     def setpathtarg(self):
