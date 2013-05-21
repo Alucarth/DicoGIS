@@ -58,6 +58,8 @@ class DicoShapes(Tk):
         self.rowconfigure(0, weight=1)
 
         # variables
+        self.def_rep = ""       # default folder to search for
+        self.def_lang = 'FR'    # default language to start
         self.li_shp = []         # list for shapefiles path
         self.li_tab = []         # list for MapInfo tables path
         self.today = unicode(localtime()[0]) + u"-" \
@@ -70,7 +72,8 @@ class DicoShapes(Tk):
         self.blabla = OD()      # texts dictionary
 
         # fillfulling
-        self.load_texts()
+        self.load_settings()
+        self.load_texts(self.def_lang)
 
         # Frames
         self.FrPath = LabelFrame(self, name ='main', text = self.blabla.get('gui_fr1'), padx = 5, pady = 5)
@@ -87,6 +90,7 @@ class DicoShapes(Tk):
         self.output = Entry(self.FrPath, width = 35)
         # language switcher
         self.ddl_lang = Combobox(self.FrPath, values = li_lang, width = 5)
+        self.ddl_lang.current(li_lang.index(self.def_lang))
 
         # widgets placement
         labtarg.grid(row = 1, column = 1, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
@@ -129,6 +133,30 @@ class DicoShapes(Tk):
         self.FrPath.grid(row = 2, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
 
 
+    def load_settings(self):
+        u""" load settings from last execution """
+        # open xml cursor
+        xml = ET.parse('settings.xml')
+        print xml
+        # extraction et remplissage dictionnaire
+        for elem in xml.getroot().getiterator():
+            if elem.tag == 'codelang':
+                self.def_lang = elem.text
+                print elem.text
+                continue
+            elif elem.tag == 'rep_defaut':
+                self.def_rep = elem.text
+                continue
+        # End of function
+        return self.def_rep, self.def_lang
+
+
+
+    def save_settings(self):
+        u""" save last options in order to make the next excution more easy """
+
+
+
     def load_texts(self, lang='FR'):
         u""" Load texts according to the selected language """
         # open xml cursor
@@ -143,6 +171,8 @@ class DicoShapes(Tk):
     def setpathtarg(self):
         """ ...browse and insert the path of target folder """
         foldername = askdirectory(parent = self,
+                                  initialdir = self.def_rep,
+                                  mustexist = True,
                                   title = self.blabla.get('gui_cible'))
         # check if a folder has been choosen
         if foldername:
@@ -277,6 +307,17 @@ class DicoShapes(Tk):
         # local variables
         champs = ""
         theme = ""
+
+        # in case of a source error
+        if layer_infos.get('error'):
+            sheet.write(line, 0, layer_infos.get('name'))
+            link = 'HYPERLINK("' + layer_infos.get(u'folder') \
+                             + '"; "' + self.blabla.get('browse') + '")'
+            sheet.write(line, 1, Formula(link), self.url)
+            sheet.write(line, 2, self.blabla.get((layer_infos.get('error')), self.erreur))
+            # Interruption of function
+            return self.book, self.feuy1
+
         # Name
         sheet.write(line, 0, layer_infos.get('name'))
         # Path of containing folder formatted to be a hyperlink

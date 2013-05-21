@@ -41,13 +41,14 @@ class InfosOGR():
 
         """
         # Creating variables
-        print layerpath
+        self.alert = 0
         source = ogr.Open(layerpath, 0)     # OGR driver
         self.layer = source.GetLayer()          # get the layer
         if self.layer.GetFeatureCount() == 0:
-            u""" if shape doesn't have any object, return an error """
-            self.erratum(dico_layer)
-            return
+            u""" if layer doesn't have any object, return an error """
+            self.erratum(dico_layer, layerpath, u'err_nobjet')
+            self.alert = self.alert +1
+            return None
         try:
             obj = self.layer.GetFeature(0)        # get the first object (shp)
             self.geom = obj.GetGeometryRef()       # get the geometry
@@ -130,15 +131,16 @@ class InfosOGR():
         # end of function
         return dico_fields
 
-    def erratum(self, dico_layer):
+    def erratum(self, dicolayer, layerpath, mess):
         u""" errors handling """
         # local variables
-        self.dico_layer[u'nom'] = path.basename(shape)
-        def_couche = couche.GetLayerDefn()
-        dico_infos_couche[u'num_fields'] = def_couche.GetFieldCount()
-        alert = 1
+        dicolayer[u'name'] = path.basename(layerpath)
+        dicolayer[u'folder'] = path.dirname(layerpath)
+        def_couche = self.layer.GetLayerDefn()
+        dicolayer[u'num_fields'] = def_couche.GetFieldCount()
+        dicolayer[u'error'] = mess
         # End of function
-        return self.dico_layer
+        return dicolayer, layerpath
 
 ################################################################################
 ###### Stand alone program ########

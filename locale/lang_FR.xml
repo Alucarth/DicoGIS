@@ -71,4 +71,5 @@
 	<nofolder>Aucun dossier sélectionné</nofolder>
 	<nodata>Aucune donnée géographique compatible (.shp / .tab) trouvée.</nodata>
 	<err_encod>Le nom du champ n'est pas bien formaté (caractères spéciaux) : </err_encod>
+	<err_nobjet> Cette donnée n'a aucun objet. Traitement impossible !</err_nobjet>
 </lang>
