@@ -54,6 +54,12 @@
 	<geom_point>Point</geom_point>
 	<geom_ligne>Ligne</geom_ligne>
 	<geom_polyg>Polygone</geom_polyg>
+<!-- SRS -->
+	<srs_comp>Compound</srs_comp>
+	<srs_geoc>Geocentric</srs_geoc>
+	<srs_loca>Local</srs_loca>
+	<srs_proj>Projected</srs_proj>
+	<srs_vert>Vertical</srs_vert>
 <!-- Gestion erreurs -->
 	<err_encod>Le nom du champ n'est pas bien formaté (caractères spéciaux) : </err_encod>
 </lang>

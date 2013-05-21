@@ -40,6 +40,12 @@
 	<log_warn>WARNING => Temporary folder (</log_warn>
 	<log_warn2>) couldn't be deleted. CHMOD access permissions issue.</log_warn2>
 <!-- Fiche -->
+<!-- SRS -->
+	<srs_comp>Compound</srs_comp>
+	<srs_geoc>Geocentric</srs_geoc>
+	<srs_loca>Local</srs_loca>
+	<srs_proj>Projected</srs_proj>
+	<srs_vert>Vertical</srs_vert>
 <!-- Intitulés -->
 	<titre>Metadata of </titre>	
 	<nomfic>File name</nomfic>
@@ -69,6 +75,12 @@
 	<geom_point>Point</geom_point>
 	<geom_ligne>Line</geom_ligne>
 	<geom_polyg>Polygon</geom_polyg>
+<!-- SRS -->
+	<srs_comp>Compound</srs_comp>
+	<srs_geoc>Geocentric</srs_geoc>
+	<srs_loca>Local</srs_loca>
+	<srs_proj>Projected</srs_proj>
+	<srs_vert>Vertical</srs_vert>
 <!-- Stats numériques -->
 	<entier>Numeric (integer)</entier>
 	<reel>Numeric (float)</reel>
