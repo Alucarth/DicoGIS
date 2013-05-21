@@ -130,12 +130,10 @@ class DicoShapes(Tk):
 ##        # creation of excel structure
 ##        self.configexcel()
 ##
-##        # getting the info from shapefiles and compile it in the excel
-##        self.dictionarize(self.lishp)
+
 ##
 ##
-##        # saving dictionary
-##        self.savedico(self)
+
 
     def setpathtarg(self):
         """ ...browse and insert the path of target folder """
@@ -211,6 +209,10 @@ class DicoShapes(Tk):
             return
         # creating the Excel workbook
         self.configexcel()
+        # getting the info from shapefiles and compile it in the excel
+        self.dictionarize(self.li_shp)
+        # saving dictionary
+        self.savedico(self)
 
 
     def configexcel(self):
@@ -248,9 +250,9 @@ class DicoShapes(Tk):
         # end of function
         return self.book
 
-    def dictionarize(self, listefiles):
+    def dictionarize(self, listfiles):
         u""" get the information from shapefiles and write it in the Excel """
-        for shp in listefiles:
+        for file in listefiles:
             # reset variables
             self.dicouche.clear()
             self.dicochps.clear()
@@ -258,7 +260,7 @@ class DicoShapes(Tk):
             theme = ""
             self.liste_chps = []
             # getting shape information
-            InfosOGR(shp, self.dicouche, self.dicochps, self.liste_chps)
+            InfosOGR(file, self.dicouche, self.dicochps, self.liste_chps)
             print self.dicouche
         # End of function
         return self.dicouche
