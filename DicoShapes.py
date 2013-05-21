@@ -204,9 +204,27 @@ class DicoShapes(Tk):
         # creating the Excel workbook
         self.configexcel()
         # getting the info from shapefiles and compile it in the excel
-        self.dictionarize(self.li_shp)
+        for shp in li_shp:
+            """ looping on shapefiles list """
+            # reset recipient data
+            dicouche.clear()
+            dico_fields.clear()
+            # getting the informations
+            info_shp = InfosOGR(li_shp[0], dicouche, dico_fields, 'shape')
+            print '\n', dicouche, dico_fields, li_chps
+        for tab in li_tab:
+            """ looping on MapInfo tables list """
+            # reset recipient data
+            dicouche.clear()
+            dico_fields.clear()
+            # getting the informations
+            info_tab = InfosOGR(li_tab[0], dicouche, dico_fields, 'table')
+            print '\n', dicouche, dico_fields, li_chps
+            self.dictionarize(self.li_shp)
         # saving dictionary
         self.savedico(self)
+        # End of function
+        return
 
 
     def configexcel(self):
@@ -244,20 +262,6 @@ class DicoShapes(Tk):
         # end of function
         return self.book
 
-    def dictionarize(self, listfiles):
-        u""" get the information from shapefiles and write it in the Excel """
-        for file in listefiles:
-            # reset variables
-            self.dicouche.clear()
-            self.dicochps.clear()
-            champs = ""
-            theme = ""
-            self.liste_chps = []
-            # getting shape information
-            InfosOGR(file, self.dicouche, self.dicochps, self.liste_chps)
-            print self.dicouche
-        # End of function
-        return self.dicouche
 
     def savedico(self):
         u""" Save the Excel file """
