@@ -81,7 +81,7 @@ class InfosOGR():
         for srsmet in srsmetod:
             if srsmet[0] == 1:
                 typsrs = srsmet[1]
-        dico_layer[u'srstyp'] = unicode(typsrs)
+        dico_layer[u'srs_type'] = unicode(typsrs)
         # Storing into the dictionary
         dico_layer[u'name'] = path.basename(layerpath)
         dico_layer[u'folder'] = path.dirname(layerpath)
