@@ -9,6 +9,7 @@
 	<hi>Bonjour </hi>
 	<gui_actualiser>Actualiser</gui_actualiser>
 	<gui_choix>Parcourir</gui_choix>
+	<gui_cible>Sélectionner le dossier cible</gui_cible>
 	<gui_cholang>Langue :</gui_cholang>
 	<gui_numshp> shape(s) ont été trouvés.</gui_numshp>
 	<gui_go>Lancer</gui_go>
@@ -17,8 +18,6 @@
 	<gui_path>Chemin du dossier : </gui_path>
 	<gui_fic>Nom du fichier en sortie : </gui_fic>
 	<gui_prog>Progression</gui_prog>	
-	<nofolder>Aucun dossier sélectionné</nofolder>
-	<nodata>Aucune donnée géographique compatible (.shp / .tab) trouvée.</nodata>
 	<info_end>Fin du programme</info_end>
 	<info_end2>DicoShapes a terminé son travail. Il a traité </info_end2>
 	<info_end3>Le dictionnaire se trouve dans le dossier : </info_end3>
@@ -38,6 +37,7 @@
 <!-- Output file -->
 	<nomfic>Nom du fichier</nomfic>
 	<path>Chemin</path>
+	<browse>Atteindre le dossier</browse>
 	<theme>Thème</theme>
 	<description>Description</description>
 	<num_objets>Nombre d'objets</num_objets>
@@ -45,21 +45,29 @@
 	<date_crea>Création (sur l'ordinateur)</date_crea>
 	<date_actu>Dernière actualisation</date_actu>
 	<geometrie>Type de géométrie</geometrie>
-	<srs>Système de coordonnées</srs>
-	<codepsg>EPSG</codepsg>
-	<emprise>Emprise spatiale</emprise>
-	<longueur>lg</longueur>
-	<li_chps>Attributs</li_chps>
-	<type>Type</type>
 	<geom_point>Point</geom_point>
 	<geom_ligne>Ligne</geom_ligne>
 	<geom_polyg>Polygone</geom_polyg>
+	<srs>Système de coordonnées</srs>
+	<codepsg>EPSG</codepsg>
+	<emprise>Emprise spatiale</emprise>
+	<li_chps>Attributs</li_chps>
+	<entier>Numérique (entier)</entier>
+	<reel>Numérique (réel)</reel>
+	<string>Texte</string>
+	<date>Date</date>
+	<longueur>Lg.</longueur>
+	<precision>Pr.</precision>
+	<format>Format</format>
 <!-- SRS -->
-	<srs_comp>Compound</srs_comp>
-	<srs_geoc>Geocentric</srs_geoc>
-	<srs_loca>Local</srs_loca>
-	<srs_proj>Projected</srs_proj>
-	<srs_vert>Vertical</srs_vert>
+	<srs_comp>Composée</srs_comp>
+	<srs_geoc>Géocentrique</srs_geoc>
+	<srs_geog>Géographique</srs_geog>
+	<srs_loca>Locale</srs_loca>
+	<srs_proj>Projetée</srs_proj>
+	<srs_vert>Verticale</srs_vert>
 <!-- Gestion erreurs -->
+	<nofolder>Aucun dossier sélectionné</nofolder>
+	<nodata>Aucune donnée géographique compatible (.shp / .tab) trouvée.</nodata>
 	<err_encod>Le nom du champ n'est pas bien formaté (caractères spéciaux) : </err_encod>
 </lang>
