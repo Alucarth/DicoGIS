@@ -48,7 +48,8 @@
 	<geom_point>Point</geom_point>
 	<geom_ligne>Ligne</geom_ligne>
 	<geom_polyg>Polygone</geom_polyg>
-	<srs>Système de coordonnées</srs>
+	<srs>Système de coordonnées (SRS)</srs>
+	<srs_type>Type du SRS</srs_type>
 	<codepsg>EPSG</codepsg>
 	<emprise>Emprise spatiale</emprise>
 	<li_chps>Attributs</li_chps>
@@ -56,11 +57,11 @@
 	<reel>Numérique (réel)</reel>
 	<string>Texte</string>
 	<date>Date</date>
-	<longueur>Lg.</longueur>
-	<precision>Pr.</precision>
+	<longueur>, Lg. = </longueur>
+	<precision>, Pr. = </precision>
 	<format>Format</format>
 <!-- SRS -->
-	<srs_comp>Composée</srs_comp>
+	<srs_comp>Composée (2D +)</srs_comp>
 	<srs_geoc>Géocentrique</srs_geoc>
 	<srs_geog>Géographique</srs_geog>
 	<srs_loca>Locale</srs_loca>
