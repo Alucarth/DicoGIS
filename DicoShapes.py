@@ -115,7 +115,8 @@ class DicoShapes(Tk):
         # Basic buttons
         self.val = Button(self, text = self.blabla.get('gui_go'),
                                 relief= 'raised',
-                                state = DISABLED)
+                                state = DISABLED,
+                                command = self.process)
         can = Button(self, text = self.blabla.get('gui_quit'),
                                 relief= 'groove',
                                 command = self.destroy)
@@ -128,22 +129,35 @@ class DicoShapes(Tk):
         self.FrPath.grid(row = 2, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
 
 
+    def load_texts(self, lang='FR'):
+        u""" Load texts according to the selected language """
+        # open xml cursor
+        xml = ET.parse('locale/lang_' + lang + '.xml')
+        # Looping and gathering texts from the xml file
+        for elem in xml.getroot().getiterator():
+            self.blabla[elem.tag] = elem.text
+        # Fin de fonction
+        return self.blabla
+
 
     def setpathtarg(self):
         """ ...browse and insert the path of target folder """
-        foldername = askdirectory(parent = self, title = 'Select the destination folder')
+        foldername = askdirectory(parent = self,
+                                  title = self.blabla.get('gui_cible'))
+        # check if a folder has been choosen
         if foldername:
             try:
                 self.target.insert(0, foldername)
             except:
                 print self.blabla.get('nofolder')
+                return
         # set the default output file
         self.output.insert(0, "DicoShapes_" + path.split(self.target.get())[1]
                             + "_" + self.today + ".xls"  )
         # calculate number of shapefiles and MapInfo files
         self.ligeofiles(foldername)
         self.numfiles.set(unicode(len(self.li_shp)) + u' shapefiles - '
-                        + unicode(len(self.li_tab)) + u' MapInfo tables')
+                        + unicode(len(self.li_tab)) + u' tables (MapInfo)')
         self.val.config(state = ACTIVE)
         # end of function
         return foldername
@@ -174,29 +188,11 @@ class DicoShapes(Tk):
         self.li_tab.sort()
         self.li_tab = tuple(self.li_tab)
         # End of function
-        return self.li_shp, self.li_tab
-
-
-    def erreurStop(self, mess):
-        u""" In case of error, close the GUI and stop the program """
-        info(title = u'Erreur', message = mess)
-        self.root.destroy()
-        exit()
-
-
-    def load_texts(self, lang='FR'):
-        u""" Load texts according to the selected language """
-        # open xml cursor
-        xml = ET.parse('locale/lang_' + lang + '.xml')
-        # Looping and gathering texts from the xml file
-        for elem in xml.getroot().getiterator():
-            self.blabla[elem.tag] = elem.text
-        # Fin de fonction
-        return self.blabla
+        return foldertarget, self.li_shp, self.li_tab
 
 
     def process(self):
-        u""" """
+        u""" launch the different processes """
         # check if there are some layers into the folder structure
         if len(self.li_shp) + len(self.li_tab) == 0:
             erreurStop(self.blabla.get('nodata'))
@@ -204,31 +200,38 @@ class DicoShapes(Tk):
         # creating the Excel workbook
         self.configexcel()
         # getting the info from shapefiles and compile it in the excel
-        for shp in li_shp:
+        line = 1    # line of dictionary
+        for shp in self.li_shp:
             """ looping on shapefiles list """
             # reset recipient data
-            dicouche.clear()
-            dico_fields.clear()
+            self.dico_layer.clear()
+            self.dico_fields.clear()
             # getting the informations
-            info_shp = InfosOGR(li_shp[0], dicouche, dico_fields, 'shape')
-            print '\n', dicouche, dico_fields, li_chps
-        for tab in li_tab:
+            InfosOGR(shp, self.dico_layer, self.dico_fields, 'shape')
+            # writing to the Excel dictionary
+            self.dictionarize(self.dico_layer, self.dico_fields, self.feuy1, line)
+            # increment the line number
+            line = line +1
+        # getting the info from mapinfo tables and compile it in the excel
+        for tab in self.li_tab:
             """ looping on MapInfo tables list """
             # reset recipient data
-            dicouche.clear()
-            dico_fields.clear()
+            self.dico_layer.clear()
+            self.dico_fields.clear()
             # getting the informations
-            info_tab = InfosOGR(li_tab[0], dicouche, dico_fields, 'table')
-            print '\n', dicouche, dico_fields, li_chps
-            self.dictionarize(self.li_shp)
+            InfosOGR(tab, self.dico_layer, self.dico_fields, 'table')
+            # writing to the Excel dictionary
+            self.dictionarize(self.dico_layer, self.dico_fields, self.feuy1, line)
+            # increment the line number
+            line = line +1
         # saving dictionary
-        self.savedico(self)
+        self.savedico()
         # End of function
         return
 
 
     def configexcel(self):
-        u"""  """
+        u""" create and configure the Excel workbook """
         # Basic configurationdu
         self.book = Workbook(encoding = 'utf8')
         self.feuy1 = self.book.add_sheet(u'Shapes', cell_overwrite_ok=True)
@@ -236,10 +239,10 @@ class DicoShapes(Tk):
         # Some customization: fonts and styles
         # first line style
         self.entete = XFStyle()
-        self.font1 = Font()
-        self.font1.name = 'Times New Roman'
-        self.font1.bold = True
-        self.entete.font = self.font1
+        font1 = Font()
+        font1.name = 'Times New Roman'
+        font1.bold = True
+        self.entete.font = font1
 
         # hyperlinks style
         self.url = easyxf(u'font: underline single')
@@ -259,21 +262,105 @@ class DicoShapes(Tk):
         self.feuy1.write(0, 9, self.blabla.get('date_crea'), self.entete)
         self.feuy1.write(0, 10, self.blabla.get('date_actu'), self.entete)
         self.feuy1.write(0, 11, self.blabla.get('li_chps'), self.entete)
+        self.feuy1.write(0, 12, self.blabla.get('format'), self.entete)
         # end of function
-        return self.book
+        return self.book, self.feuy1, self.entete, self.url, self.erreur
 
+    def dictionarize(self, layer_infos, fields_info, sheet, line):
+        u""" write the infos of the layer into the Excel workbook """
+        # local variables
+        champs = ""
+        theme = ""
+        # Name
+        sheet.write(line, 0, layer_infos.get('name'))
+        # Path of containing folder formatted to be a hyperlink
+        link = 'HYPERLINK("' + layer_infos.get(u'folder') \
+                             + '"; "' + self.blabla.get('browse') + '")'
+        sheet.write(line, 1, Formula(link), self.url)
+        # Name of containing folder
+        # with a specific exception to adapt to PACIVUR database
+        if path.basename(layer_infos.get(u'folder')) != 'shp':
+            sheet.write(line, 2, path.basename(layer_infos.get(u'folder')))
+        else:
+            sheet.write(line, 2, path.basename(path.dirname(layer_infos.get(u'folder'))))
+
+        # Geometry type
+        sheet.write(line, 3, layer_infos.get(u'type_geom'))
+        # Spatial extent
+        emprise = u"Xmin : " + unicode(layer_infos.get(u'Xmin')) +\
+                  u", Xmax : " + unicode(layer_infos.get(u'Xmax')) +\
+                  u", Ymin : " + unicode(layer_infos.get(u'Ymin')) +\
+                  u", Ymax : " + unicode(layer_infos.get(u'Ymax'))
+        sheet.write(line, 4, emprise)
+        # Name of srs
+        sheet.write(line, 5, layer_infos.get(u'srs'))
+        # EPSG code
+        sheet.write(line, 6, layer_infos.get(u'EPSG'))
+        # Number of fields
+        sheet.write(line, 7, layer_infos.get(u'num_fields'))
+        # Name of objects
+        sheet.write(line, 8, layer_infos.get(u'num_obj'))
+        # Creation date
+        sheet.write(line, 9, layer_infos.get(u'date_crea'))
+        # Last update date
+        sheet.write(line, 10, layer_infos.get(u'date_actu'))
+        # Format of data
+        sheet.write(line, 10, layer_infos.get('type'))
+        # Field informations
+        for chp in fields_info.keys():
+            # field type
+            if fields_info[chp][0] == 'Integer' or fields_info[chp][0] == 'Real':
+                tipo = u'Numérique'
+            elif fields_info[chp][0] == 'String':
+                tipo = u'Texte'
+            elif fields_info[chp][0] == 'Date':
+                tipo = u'Date'
+            try:
+                # concatenation of field informations
+                champs = champs +\
+                         chp +\
+                         " (" + tipo +\
+                         ", Lg. = " + unicode(fields_info[chp][1]) +\
+                         ", Pr. = " + unicode(fields_info[chp][2]) + ") ; "
+            except UnicodeDecodeError:
+                # write a notification into the log file
+                dico_err[couche] = self.blabla.get('err_encod') + \
+                                   chp.decode('latin1') + \
+                                   "\n\n"
+                # décode le nom du champ litigieux
+                champs = champs +\
+                         chp.decode('utf8') +\
+                         " (" + tipo +\
+                         ", Lg. = " + unicode(fields_info[chp][1]) +\
+                         ", Pr. = " + unicode(fields_info[chp][2]) + ") ; "
+
+                continue
+
+        # Once all fieds explored, write them
+        sheet.write(line, 11, champs)
+
+        # End of function
+        return self.book, self.feuy1
 
     def savedico(self):
         u""" Save the Excel file """
         # Prompt of folder where save the file
-        saved = savefic(initialdir= self.cible,
+        saved = asksaveasfilename(initialdir= self.target.get(),
                         defaultextension = '.xls',
                         initialfile = self.output.get(),
                         filetypes = [(self.blabla.get('gui_excel'),"*.xls")])
+        # check if the extension is correctly indicated
         if path.splitext(saved)[1] != ".xls":
             saved = saved + ".xls"
+        # save
         self.book.save(saved)
 
+
+    def erreurStop(self, mess):
+        u""" In case of error, close the GUI and stop the program """
+        info(title = u'Erreur', message = mess)
+        self.root.destroy()
+        exit()
 
 ################################################################################
 ###### Stand alone program ########
