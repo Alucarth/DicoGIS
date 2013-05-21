@@ -1,14 +1,14 @@
 ﻿# -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 #-------------------------------------------------------------------------------
-# Name:        module1
+# Name:         InfosOGR
 # Purpose:
 #
-# Author:      Utilisateur
+# Author:       Julien Moura (https://github.com/Guts/)
 #
-# Created:     18/02/2013
-# Copyright:   (c) Utilisateur 2013
-# Licence:     <your licence>
+# Created:      18/02/2013
+# Updated:      21/05/2013
+# Licence:      GPL 3
 #-------------------------------------------------------------------------------
 
 ################################################################################
@@ -29,94 +29,115 @@ from osgeo import ogr    # spatial files
 ###################################
 
 class InfosOGR():
-    def __init__(self, shapepath, dicoshp, dicochps, listechps):
+    def __init__(self, layerpath, dico_layer, dico_fields, li_fields):
         u""" Uses gdal/ogr functions to extract basic informations about
-        shapefile given as parameter and store into the corresponding dictionary. """
+        geographic file (handles shapefile or MapInfo tables)
+        and store into the dictionaries.
+
+        layerpath = path to the geographic file
+        dico_layer = dictionary for global informations
+        dico_fields = dictionary for the fields' informations
+        li_fieds = ordered list of fields
+
+        """
         # Creating variables
-        source = ogr.Open(shapepath, 0)     # OGR driver
-        lay = self.source.GetLayer()          # get the layer
-        if lay.GetFeatureCount() == 0:
+        print layerpath
+        source = ogr.Open(layerpath, 0)     # OGR driver
+        self.layer = source.GetLayer()          # get the layer
+        if self.layer.GetFeatureCount() == 0:
             u""" if shape doesn't have any object, return an error """
-            self.erratum(dicoshp)
+            self.erratum(dico_layer)
             return
-        self.obj = self.lay.GetFeature(0)        # get the first object (index 0)
+        self.obj = self.layer.GetFeature(0)        # get the first object (index 0)
         self.geom = self.obj.GetGeometryRef()       # get the geometry
-        self.def_couche = self.lay.GetLayerDefn()  # get the layer definitions
-        self.srs = self.lay.GetSpatialRef()        # get spatial system reference
+        self.def_couche = self.layer.GetLayerDefn()  # get the layer definitions
+        self.srs = self.layer.GetSpatialRef()        # get spatial system reference
         self.srs.AutoIdentifyEPSG()              # try to determine the EPSG code
 
         # basic information
-        self.infos_basics(shapepath, dicoshp)
+        self.infos_basics(layerpath, dico_layer)
         # geometry information
-        self.infos_geom(dicoshp)
+        self.infos_geom(dico_layer)
         # fields information
-        self.infos_fields(listechps, dicochps)
+        self.infos_fields(li_fields, dico_fields)
 
-    def infos_basics(self, shapepath, dicoshp):
+    def infos_basics(self, layerpath, dico_layer):
         # Storing into the dictionary
-        dicoshp[u'nom'] = path.basename(shapepath)
-        dicoshp[u'titre'] = dicoshp[u'nom'][:-4].replace('_', ' ').capitalize()
-        dicoshp[u'nbr_objets'] = self.lay.GetFeatureCount()
-        dicoshp[u'nbr_attributs'] = self.def_couche.GetFieldCount()
-        dicoshp[u'proj'] = unicode(self.srs.GetAttrValue("PROJCS")).replace('_', ' ')
-        dicoshp[u'EPSG'] = unicode(self.srs.GetAttrValue("AUTHORITY", 1))
-        dicoshp[u'date_actu'] = unicode(localtime(path.getmtime(shapepath))[2]) +\
-                          u'/'+ unicode(localtime(path.getmtime(shapepath))[1]) +\
-                          u'/'+ unicode(localtime(path.getmtime(shapepath))[0])
-        dicoshp[u'date_creation'] = unicode(localtime(path.getctime(shapepath))[2]) +\
-                                       u'/'+ unicode(localtime(path.getctime(shapepath))[1]) +\
-                                       u'/'+ unicode(localtime(path.getctime(shapepath))[0])
+        dico_layer[u'name'] = path.basename(layerpath)
+        dico_layer[u'title'] = dico_layer[u'nom'][:-4].replace('_', ' ').capitalize()
+        dico_layer[u'num_obj'] = self.layer.GetFeatureCount()
+        dico_layer[u'num_fields'] = self.def_couche.GetFieldCount()
+        dico_layer[u'srs'] = unicode(self.srs.GetAttrValue("PROJCS")).replace('_', ' ')
+        dico_layer[u'EPSG'] = unicode(self.srs.GetAttrValue("AUTHORITY", 1))
+        dico_layer[u'date_actu'] = unicode(localtime(path.getmtime(layerpath))[2]) +\
+                          u'/'+ unicode(localtime(path.getmtime(layerpath))[1]) +\
+                          u'/'+ unicode(localtime(path.getmtime(layerpath))[0])
+        dico_layer[u'date_crea'] = unicode(localtime(path.getctime(layerpath))[2]) +\
+                                       u'/'+ unicode(localtime(path.getctime(layerpath))[1]) +\
+                                       u'/'+ unicode(localtime(path.getctime(layerpath))[0])
         # end of function
-        return dicoshp
+        return dico_layer
 
-    def infos_geom(self, dicoshp):
+    def infos_geom(self, dico_layer):
         # type géométrie
         if self.geom.GetGeometryName() == u'POINT':
-            dicoshp[u'type_geom'] = u'Point'
+            dico_layer[u'type_geom'] = u'Point'
         elif u'LINESTRING' in self.geom.GetGeometryName():
-            dicoshp[u'type_geom'] = u'Ligne'
+            dico_layer[u'type_geom'] = u'Ligne'
         elif u'POLYGON' in self.geom.GetGeometryName():
-            dicoshp[u'type_geom'] = u'Polygone'
+            dico_layer[u'type_geom'] = u'Polygone'
         else:
-            dicoshp[u'type_geom'] = self.geom.GetGeometryName()
+            dico_layer[u'type_geom'] = self.geom.GetGeometryName()
         # Spatial extent (bounding box)
-        dicoshp[u'Xmin'] = round(self.lay.GetExtent()[0],2)
-        dicoshp[u'Xmax'] = round(self.lay.GetExtent()[1],2)
-        dicoshp[u'Ymin'] = round(self.lay.GetExtent()[2],2)
-        dicoshp[u'Ymax'] = round(self.lay.GetExtent()[3],2)
+        dico_layer[u'Xmin'] = round(self.layer.GetExtent()[0],2)
+        dico_layer[u'Xmax'] = round(self.layer.GetExtent()[1],2)
+        dico_layer[u'Ymin'] = round(self.layer.GetExtent()[2],2)
+        dico_layer[u'Ymax'] = round(self.layer.GetExtent()[3],2)
         # end of function
-        return dicoshp
+        return dico_layer
 
-    def infos_fields(self, liste_chps, dicochps):
+    def infos_fields(self, liste_chps, dico_fields):
         for i in range(self.def_couche.GetFieldCount()):
             champomy = self.def_couche.GetFieldDefn(i)
             liste_chps.append(champomy.GetName())  # liste ordonnée des champs
-            dicochps[champomy.GetName()] = champomy.GetTypeName(),\
+            dico_fields[champomy.GetName()] = champomy.GetTypeName(),\
                                            champomy.GetWidth(),\
                                            champomy.GetPrecision()
 
 
         # end of function
-        return liste_chps, dicochps
+        return liste_chps, dico_fields
 
-    def erratum(self, dicoshp):
+    def erratum(self, dico_layer):
         u""" errors handling """
         # local variables
-        self.dicoshp[u'nom'] = path.basename(shape)
+        self.dico_layer[u'nom'] = path.basename(shape)
         def_couche = couche.GetLayerDefn()
-        dico_infos_couche[u'nbr_attributs'] = def_couche.GetFieldCount()
+        dico_infos_couche[u'num_fields'] = def_couche.GetFieldCount()
         alert = 1
         # End of function
-        return self.dicoshp
+        return self.dico_layer
 
 ################################################################################
 ###### Stand alone program ########
 ###################################
 
 if __name__ == '__main__':
-    lishps = []         # list for shapefiles path
-    dicouche = {}    # dictionary where will be stored informations
-    dicochps = {}          # dictionary for fields information
+    u""" standalone execution for tests. Paths are relative considering a test
+    within the official repository (https://github.com/Guts/DicoShapes/)"""
+    # libraries import
+    from os import getcwd, chdir, path
+    # test files
+    li_shp = [path.join(getcwd(), r'..\test\datatest\airports.shp')]         # shapefile
+    li_tab = [path.join(getcwd(), r'..\test\datatest\airports_MI\tab\airports_MI.tab')] # MapInfo table
+    # recipient datas
+    dicouche = OD()     # dictionary where will be stored informations
+    dico_fields = OD()     # dictionary for fields information
+    li_chps = []        # recipient list for fields
+    # execution
+    info_shp = InfosOGR(li_shp[0], dicouche, dico_fields, li_chps)
+    print info_shp
+    info_tab = InfosOGR(li_tab[0], dicouche, dico_fields, li_chps)
 
 ################################################################################
 ######## Former codelines #########
