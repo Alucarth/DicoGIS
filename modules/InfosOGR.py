@@ -29,7 +29,7 @@ from osgeo import ogr    # spatial files
 ###################################
 
 class InfosOGR():
-    def __init__(self, layerpath, dico_layer, dico_fields, li_fields):
+    def __init__(self, layerpath, dico_layer, dico_fields, tipo):
         u""" Uses gdal/ogr functions to extract basic informations about
         geographic file (handles shapefile or MapInfo tables)
         and store into the dictionaries.
@@ -48,35 +48,43 @@ class InfosOGR():
             u""" if shape doesn't have any object, return an error """
             self.erratum(dico_layer)
             return
-        self.obj = self.layer.GetFeature(0)        # get the first object (index 0)
-        self.geom = self.obj.GetGeometryRef()       # get the geometry
-        self.def_couche = self.layer.GetLayerDefn()  # get the layer definitions
-        self.srs = self.layer.GetSpatialRef()        # get spatial system reference
-        self.srs.AutoIdentifyEPSG()              # try to determine the EPSG code
+        try:
+            obj = self.layer.GetFeature(0)        # get the first object (shp)
+            self.geom = obj.GetGeometryRef()       # get the geometry
+        except AttributeError, e:
+            print '\t', e
+            obj = self.layer.GetFeature(1)        # get the first object (tab)
+            self.geom = obj.GetGeometryRef()      # get the geometry
+        self.def_couche = self.layer.GetLayerDefn()  # get layer definitions
+        self.srs = self.layer.GetSpatialRef()   # get spatial system reference
+        self.srs.AutoIdentifyEPSG()     # try to determine the EPSG code
 
         # basic information
+        dico_layer[u'type'] = tipo
         self.infos_basics(layerpath, dico_layer)
         # geometry information
         self.infos_geom(dico_layer)
         # fields information
-        self.infos_fields(li_fields, dico_fields)
+        self.infos_fields(dico_fields)
 
     def infos_basics(self, layerpath, dico_layer):
-        u"""  """
+        u""" get the globat informations about the layer """
         # srs type
-        srsmetod = [(srs.IsCompound(), "compound"),
-                 (srs.IsGeocentric(), "Geocentric"),
-                 (srs.IsGeographic(), "Geographic"),
-                 (srs.IsLocal(), "Local"),
-                 (srs.IsProjected(), "Projected"),
-                 (srs.IsVertical(), "Vertical")]
+        srsmetod = [
+                    (self.srs.IsCompound(), "compound"),
+                    (self.srs.IsGeocentric(), "Geocentric"),
+                    (self.srs.IsGeographic(), "Geographic"),
+                    (self.srs.IsLocal(), "Local"),
+                    (self.srs.IsProjected(), "Projected"),
+                    (self.srs.IsVertical(), "Vertical")
+                    ]
         for srsmet in srsmetod:
             if srsmet[0] == 1:
                 typsrs = srsmet[1]
-        dico_infos_couche[u'srstyp'] = unicode(typsrs)
+        dico_layer[u'srstyp'] = unicode(typsrs)
         # Storing into the dictionary
         dico_layer[u'name'] = path.basename(layerpath)
-        dico_layer[u'title'] = dico_layer[u'nom'][:-4].replace('_', ' ').capitalize()
+        dico_layer[u'title'] = dico_layer[u'name'][:-4].replace('_', ' ').capitalize()
         dico_layer[u'num_obj'] = self.layer.GetFeatureCount()
         dico_layer[u'num_fields'] = self.def_couche.GetFieldCount()
         dico_layer[u'srs'] = unicode(self.srs.GetAttrValue("PROJCS")).replace('_', ' ')
@@ -91,7 +99,7 @@ class InfosOGR():
         return dico_layer
 
     def infos_geom(self, dico_layer):
-        u"""  """
+        u""" get the informations about geometry """
         # type géométrie
         if self.geom.GetGeometryName() == u'POINT':
             dico_layer[u'type_geom'] = u'Point'
@@ -109,18 +117,17 @@ class InfosOGR():
         # end of function
         return dico_layer
 
-    def infos_fields(self, liste_chps, dico_fields):
-        u"""  """
+    def infos_fields(self, dico_fields):
+        u""" get the informations about fields definitions """
         for i in range(self.def_couche.GetFieldCount()):
-            champomy = self.def_couche.GetFieldDefn(i)
-            liste_chps.append(champomy.GetName())  # liste ordonnée des champs
+            champomy = self.def_couche.GetFieldDefn(i) # liste ordonnée des champs
             dico_fields[champomy.GetName()] = champomy.GetTypeName(),\
                                            champomy.GetWidth(),\
                                            champomy.GetPrecision()
 
 
         # end of function
-        return liste_chps, dico_fields
+        return dico_fields
 
     def erratum(self, dico_layer):
         u""" errors handling """
@@ -147,11 +154,25 @@ if __name__ == '__main__':
     # recipient datas
     dicouche = OD()     # dictionary where will be stored informations
     dico_fields = OD()     # dictionary for fields information
-    li_chps = []        # recipient list for fields
     # execution
-    info_shp = InfosOGR(li_shp[0], dicouche, dico_fields, li_chps)
-    print info_shp
-    info_tab = InfosOGR(li_tab[0], dicouche, dico_fields, li_chps)
+    for shp in li_shp:
+        """ looping on shapefiles list """
+        # reset recipient data
+        dicouche.clear()
+        dico_fields.clear()
+        # getting the informations
+        info_shp = InfosOGR(li_shp[0], dicouche, dico_fields, 'shape')
+        print '\n', dicouche, dico_fields, li_chps
+    for tab in li_tab:
+        """ looping on MapInfo tables list """
+        # reset recipient data
+        dicouche.clear()
+        dico_fields.clear()
+        # getting the informations
+        info_tab = InfosOGR(li_tab[0], dicouche, dico_fields, 'table')
+        print '\n', dicouche, dico_fields, li_chps
+
+
 
 ################################################################################
 ######## Former codelines #########
