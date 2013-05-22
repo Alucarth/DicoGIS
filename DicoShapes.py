@@ -83,29 +83,38 @@ class DicoShapes(Tk):
         # variables
         self.numfiles = StringVar(self.FrPath, '')
         # target folder
-        labtarg = Label(self.FrPath, text = self.blabla.get('gui_path'))
+        self.labtarg = Label(self.FrPath, text = self.blabla.get('gui_path'))
         self.target = Entry(self.FrPath, width = 35)
-        browsetarg = Button(self.FrPath, text = self.blabla.get('gui_choix'), command = self.setpathtarg)
-        Label(self.FrPath, text = self.blabla.get('gui_fic')).grid(row = 3, column= 1)
+        self.browsetarg = Button(self.FrPath, text = self.blabla.get('gui_choix'), command = self.setpathtarg)
+        self.nameouptput = Label(self.FrPath, text = self.blabla.get('gui_fic'))
         self.output = Entry(self.FrPath, width = 35)
         # language switcher
         self.ddl_lang = Combobox(self.FrPath, values = li_lang, width = 5)
         self.ddl_lang.current(li_lang.index(self.def_lang))
-
+        self.ddl_lang.bind("<<ComboboxSelected>>", self.change_lang)
         # widgets placement
-        labtarg.grid(row = 1, column = 1, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
+        self.labtarg.grid(row = 1, column = 1, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
         self.target.grid(row = 1, column = 2, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
-        browsetarg.grid(row = 1, column = 3, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
+        self.browsetarg.grid(row = 1, column = 3, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
         Label(self.FrPath, textvariable = self.numfiles).grid(row = 2, column = 1, columnspan = 3)
         self.ddl_lang.grid(row=1, column = 4, sticky = N+S+W+E, padx = 2, pady = 2)
+        self.nameouptput.grid(row = 3, column= 1)
         self.output.grid(row = 3, column= 2)
+
+            ## Frame 2
+        # variables
+
+        # widgets
+        self.prog_layers = Progressbar(self.FrProg)
+        self.prog_fields = Progressbar(self.FrProg)
+        # widgets placement
+        self.prog_layers.grid(sticky = E, padx = 2, pady = 5)
+        self.prog_fields.grid(sticky = N+S+W+E, padx = 2, pady = 5)
 
 
             ## Main frame
         # Hola
-        Label(self, text = self.blabla.get('hi') + env.get(u'USERNAME')).grid(row = 1, column = 1,
-                                                 columnspan = 1, sticky = N+S+W+E,
-                                                 padx = 2, pady = 5)
+        self.welcome = Label(self, text = self.blabla.get('hi') + env.get(u'USERNAME'))
         # Imagen
         self.icone = PhotoImage(file = r'img/DicoGIS_logo.GIF')
         Label(self, borderwidth = 2, relief = 'ridge',
@@ -119,18 +128,21 @@ class DicoShapes(Tk):
         # Basic buttons
         self.val = Button(self, text = self.blabla.get('gui_go'),
                                 relief= 'raised',
-                                state = DISABLED,
+                                state = ACTIVE,
                                 command = self.process)
-        can = Button(self, text = self.blabla.get('gui_quit'),
-                                relief= 'groove',
-                                command = self.destroy)
+        self.can = Button(self, text = self.blabla.get('gui_quit'),
+                           relief= 'groove',
+                           command = self.destroy)
 
         # widgets placement
+        self.welcome.grid(row = 1, column = 1, columnspan = 1, sticky = N+S+W+E,
+                          padx = 2, pady = 5)
         self.val.grid(row = 5, column = 1, columnspan = 2,
                             sticky = N+S+W+E, padx = 2, pady = 5)
-        can.grid(row = 5, column = 0, sticky = N+S+W+E, padx = 2, pady = 5)
+        self.can.grid(row = 5, column = 0, sticky = N+S+W+E, padx = 2, pady = 5)
         # Frames placement
         self.FrPath.grid(row = 2, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
+        self.FrProg.grid(row = 3, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
 
 
     def load_settings(self):
@@ -165,14 +177,36 @@ class DicoShapes(Tk):
         return self.def_rep, self.def_lang
 
 
+    def change_lang(self, event):
+        u""" update the texts dictionary with the language selected """
+        new_lang = event.widget.get()
+        # change to the new language selected
+        self.load_texts(new_lang)
+        # update widgets text
+        self.welcome.config(text = self.blabla.get('hi') + env.get(u'USERNAME'))
+        self.can.config(text = self.blabla.get('gui_quit'))
+        self.FrPath.config(text = self.blabla.get('gui_fr1'))
+        self.FrProg.config(text = self.blabla.get('gui_prog'))
+        self.labtarg.config(text = self.blabla.get('gui_path'))
+        self.browsetarg.config(text = self.blabla.get('gui_choix'))
+        self.val.config(text = self.blabla.get('gui_go'))
+        self.nameouptput.config(text = self.blabla.get('gui_fic'))
+        # End of function
+        return self.blabla
+
+
 
     def load_texts(self, lang='FR'):
         u""" Load texts according to the selected language """
+        # clearing the text dictionary
+        self.blabla.clear()
         # open xml cursor
         xml = ET.parse('locale/lang_' + lang + '.xml')
         # Looping and gathering texts from the xml file
         for elem in xml.getroot().getiterator():
             self.blabla[elem.tag] = elem.text
+        # updating the GUI
+        self.update()
         # Fin de fonction
         return self.blabla
 
