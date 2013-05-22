@@ -100,6 +100,12 @@ class InfosOGR():
         dico_layer[u'date_crea'] = unicode(localtime(path.getctime(layerpath))[2]) +\
                                        u'/'+ unicode(localtime(path.getctime(layerpath))[1]) +\
                                        u'/'+ unicode(localtime(path.getctime(layerpath))[0])
+        # SRS exception handling
+        if dico_layer[u'EPSG'] == u'4326' and dico_layer[u'srs'] == u'None':
+            print dico_layer[u'srs']
+            dico_layer[u'srs'] = u'WGS 84'
+            print dico_layer[u'srs']
+
         # end of function
         return dico_layer
 
