@@ -7,11 +7,9 @@
 <!-- GUI -->
 	<gui_excel>Classeurs Excel 2003</gui_excel>
 	<hi>Bonjour </hi>
-	<gui_actualiser>Actualiser</gui_actualiser>
 	<gui_choix>Parcourir</gui_choix>
 	<gui_cible>Sélectionner le dossier cible</gui_cible>
 	<gui_cholang>Langue :</gui_cholang>
-	<gui_numshp> shape(s) ont été trouvés.</gui_numshp>
 	<gui_go>Lancer</gui_go>
 	<gui_quit>Quitter</gui_quit>
 	<gui_fr1>Arborescence cible</gui_fr1>
@@ -30,7 +28,6 @@
 	<log_dossour>Dossier source des shapes : </log_dossour>
 	<log_end>Fin du traitement : </log_end>
 	<log_entete>DicoGIS - dictionnaire automatisé de données géographiques</log_entete>
-	<log_nobjet> champs) - CE SHAPE N'A AUCUN OBJET. TRAITEMENT IMPOSSIBLE !</log_nobjet>
 	<log_numshp>Nombre de shapes : </log_numshp>
 	<log_start>Début du traitement : </log_start>
 	<log_tps>Temps écoulé : </log_tps>
@@ -39,7 +36,6 @@
 	<path>Chemin</path>
 	<browse>Atteindre le dossier</browse>
 	<theme>Thème</theme>
-	<description>Description</description>
 	<num_objets>Nombre d'objets</num_objets>
 	<num_attrib>Nombre d'attributs</num_attrib>
 	<date_crea>Création (sur l'ordinateur)</date_crea>
