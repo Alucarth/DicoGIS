@@ -2,10 +2,13 @@
 #!/usr/bin/env python
 #-------------------------------------------------------------------------------
 # Name:         InfosOGR
-# Purpose:
+# Purpose:      Use GDAL/OGR library to extract informations about
+#                   geographic data. It permits a more friendly use as
+#                   submodule.
 #
 # Author:       Julien Moura (https://github.com/Guts/)
 #
+# Python:       2.7.x
 # Created:      18/02/2013
 # Updated:      21/05/2013
 # Licence:      GPL 3

@@ -9,8 +9,9 @@ from __future__ import unicode_literals
 #
 # Author:       Julien Moura (https://github.com/Guts/)
 #
+# Python:       2.7.x
 # Created:      14/02/2013
-# Updated:      20/05/2013
+# Updated:      21/05/2013
 #
 # Licence:      GPL 3
 #-------------------------------------------------------------------------------
