@@ -33,6 +33,7 @@ from os import startfile                    # to open a folder/file
 from time import localtime
 
 import threading
+import Queue
 
 
 # Python 3 backported
@@ -295,8 +296,13 @@ class DicoShapes(Tk):
             # reset recipient data
             self.dico_layer.clear()
             self.dico_fields.clear()
+            # creating separated process threads
+            proc = threading.Thread(target = InfosOGR,
+                                    args = (shp, self.dico_layer, self.dico_fields, 'shape', ))
+            proc.daemon = True
+            proc.start()
             # getting the informations
-            InfosOGR(shp, self.dico_layer, self.dico_fields, 'shape')
+##            InfosOGR(shp, self.dico_layer, self.dico_fields, 'shape')
             # writing to the Excel dictionary
             self.dictionarize(self.dico_layer, self.dico_fields, self.feuy1, line)
             # increment the line number
