@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 ########### Libraries #############
 ###################################
 # Standard library
-from Tkinter import Tk, Label, Entry, Button, StringVar, IntVar     # GUI
+from Tkinter import Tk, Label, Entry, Button, StringVar, IntVar, END     # GUI
 from Tkinter import LabelFrame, N, S, E, W, ACTIVE, DISABLED, GROOVE, PhotoImage
 from tkFileDialog import askdirectory, asksaveasfilename
 from tkMessageBox import showinfo as info
@@ -31,6 +31,9 @@ from os import  listdir, walk, path         # files and folder managing
 from os import environ as env
 from os import startfile                    # to open a folder/file
 from time import localtime
+
+import threading
+
 
 # Python 3 backported
 from collections import OrderedDict as OD
@@ -103,14 +106,14 @@ class DicoShapes(Tk):
         self.output.grid(row = 3, column= 2)
 
             ## Frame 2
-        # variables
-
         # widgets
-        self.prog_layers = Progressbar(self.FrProg)
+        self.prog_layers = Progressbar(self.FrProg,
+                                       orient="horizontal",
+                                       length = 200)
         self.prog_fields = Progressbar(self.FrProg)
         # widgets placement
-        self.prog_layers.grid(sticky = E, padx = 2, pady = 5)
-        self.prog_fields.grid(sticky = N+S+W+E, padx = 2, pady = 5)
+        self.prog_layers.grid(sticky = N+S+W+E, padx = 2, pady = 5)
+##        self.prog_fields.grid(sticky = N+S+W+E, padx = 2, pady = 5)
 
 
             ## Main frame
@@ -226,13 +229,13 @@ class DicoShapes(Tk):
                 print self.blabla.get('nofolder')
                 return
         # set the default output file
+        self.output.delete(0, END)
         self.output.insert(0, "DicoShapes_" + path.split(self.target.get())[1]
                             + "_" + self.today + ".xls"  )
-        # calculate number of shapefiles and MapInfo files
-        self.ligeofiles(foldername)
-        self.numfiles.set(unicode(len(self.li_shp)) + u' shapefiles - '
-                        + unicode(len(self.li_tab)) + u' tables (MapInfo)')
-        self.val.config(state = ACTIVE)
+        # calculate number of shapefiles and MapInfo files in a separated thread
+        proc = threading.Thread(target = self.ligeofiles, args = (foldername, ))
+        proc.daemon = True
+        proc.start()
         # end of function
         return foldername
 
@@ -240,6 +243,10 @@ class DicoShapes(Tk):
     def ligeofiles(self, foldertarget):
         u""" List shapefiles and MapInfo files (.tab, not .mid/mif) contained
         in the folders structure """
+        # reseting global variables
+        self.li_shp = []
+        self.li_tab = []
+        self.browsetarg.config(state = DISABLED)
         # Looping in folders structure
         for root, dirs, files in walk(foldertarget):
             for i in files:
@@ -261,6 +268,11 @@ class DicoShapes(Tk):
         self.li_shp = tuple(self.li_shp)
         self.li_tab.sort()
         self.li_tab = tuple(self.li_tab)
+        # setting the label text and activing the buttons
+        self.numfiles.set(unicode(len(self.li_shp)) + u' shapefiles - '
+                        + unicode(len(self.li_tab)) + u' tables (MapInfo)')
+        self.browsetarg.config(state = ACTIVE)
+        self.val.config(state = ACTIVE)
         # End of function
         return foldertarget, self.li_shp, self.li_tab
 
@@ -273,6 +285,9 @@ class DicoShapes(Tk):
             return
         # creating the Excel workbook
         self.configexcel()
+        # configuring the progression bar
+        self.prog_layers["maximum"] = len(self.li_shp) + len(self.li_tab)
+        self.prog_layers["value"]
         # getting the info from shapefiles and compile it in the excel
         line = 1    # line of dictionary
         for shp in self.li_shp:
@@ -286,6 +301,8 @@ class DicoShapes(Tk):
             self.dictionarize(self.dico_layer, self.dico_fields, self.feuy1, line)
             # increment the line number
             line = line +1
+            # increment the progress bar
+            self.prog_layers["value"] = self.prog_layers["value"] +1
         # getting the info from mapinfo tables and compile it in the excel
         for tab in self.li_tab:
             """ looping on MapInfo tables list """
@@ -298,6 +315,8 @@ class DicoShapes(Tk):
             self.dictionarize(self.dico_layer, self.dico_fields, self.feuy1, line)
             # increment the line number
             line = line +1
+            # increment the progress bar
+            self.prog_layers["value"] = self.prog_layers["value"] +1
         # saving dictionary
         self.savedico()
 
