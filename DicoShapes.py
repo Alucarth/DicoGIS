@@ -110,10 +110,11 @@ class DicoShapes(Tk):
         # widgets
         self.prog_layers = Progressbar(self.FrProg,
                                        orient="horizontal",
-                                       length = 200)
+                                       length = 400,
+                                       mode='determinate')
         self.prog_fields = Progressbar(self.FrProg)
         # widgets placement
-        self.prog_layers.grid(sticky = N+S+W+E, padx = 2, pady = 5)
+        self.prog_layers.grid(row = 1, column = 0, columnspan = 2, sticky = N+S, padx = 2, pady = 5)
 ##        self.prog_fields.grid(sticky = N+S+W+E, padx = 2, pady = 5)
 
 
@@ -297,18 +298,21 @@ class DicoShapes(Tk):
             self.dico_layer.clear()
             self.dico_fields.clear()
             # creating separated process threads
-            proc = threading.Thread(target = InfosOGR,
-                                    args = (shp, self.dico_layer, self.dico_fields, 'shape', ))
-            proc.daemon = True
-            proc.start()
+##            proc = threading.Thread(target = InfosOGR,
+##                                    args = (shp, self.dico_layer, self.dico_fields, 'shape', ))
+##            proc.daemon = True
+##            proc.start()
+            InfosOGR(shp, self.dico_layer, self.dico_fields, 'shape')
             # getting the informations
-##            InfosOGR(shp, self.dico_layer, self.dico_fields, 'shape')
             # writing to the Excel dictionary
             self.dictionarize(self.dico_layer, self.dico_fields, self.feuy1, line)
             # increment the line number
             line = line +1
             # increment the progress bar
+##            proc2 = threading.Thread(target = self.prog_layers.step, args = (1, ))
+##            proc2.start()
             self.prog_layers["value"] = self.prog_layers["value"] +1
+            self.update()
         # getting the info from mapinfo tables and compile it in the excel
         for tab in self.li_tab:
             """ looping on MapInfo tables list """
@@ -323,6 +327,7 @@ class DicoShapes(Tk):
             line = line +1
             # increment the progress bar
             self.prog_layers["value"] = self.prog_layers["value"] +1
+            self.update()
         # saving dictionary
         self.savedico()
 
