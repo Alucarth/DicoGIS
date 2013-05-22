@@ -28,5 +28,5 @@ Compilé en exécutable avec [py2exe](http://www.py2exe.org/).
 
 
 ####To do list:
-- []improve thow look the graphic interface (GUI)
-- []separate processes between various threads (see http://stackoverflow.com/questions/2846653/python-multithreading-for-dummies)
+- [] improve how looks the graphic interface (GUI)
+- [] separate processes between various threads (see http://stackoverflow.com/questions/2846653/python-multithreading-for-dummies)
