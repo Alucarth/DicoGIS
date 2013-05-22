@@ -25,11 +25,11 @@ from tkFileDialog import askdirectory, asksaveasfilename
 from tkMessageBox import showinfo as info
 from ttk import Combobox, Progressbar
 
-from sys import exit
-from os import  listdir, walk, path       # files and folder managing
+from sys import exit, platform
+from os import  listdir, walk, path         # files and folder managing
 from os import environ as env
+from os import startfile                    # to open a folder/file
 from time import localtime
-
 
 # Python 3 backported
 from collections import OrderedDict as OD
@@ -137,12 +137,10 @@ class DicoShapes(Tk):
         u""" load settings from last execution """
         # open xml cursor
         xml = ET.parse('settings.xml')
-        print xml
-        # extraction et remplissage dictionnaire
+        # parsing
         for elem in xml.getroot().getiterator():
             if elem.tag == 'codelang':
                 self.def_lang = elem.text
-                print elem.text
                 continue
             elif elem.tag == 'rep_defaut':
                 self.def_rep = elem.text
@@ -151,9 +149,20 @@ class DicoShapes(Tk):
         return self.def_rep, self.def_lang
 
 
-
     def save_settings(self):
         u""" save last options in order to make the next excution more easy """
+        # open xml cursor
+        xml = ET.parse('settings.xml')
+        # parsing
+        for elem in xml.getroot().getiterator():
+            if elem.tag == 'codelang':
+                elem.text = self.ddl_lang.get()
+                continue
+            elif elem.tag == 'rep_defaut':
+                elem.text = self.target.get()
+                continue
+        # End of function
+        return self.def_rep, self.def_lang
 
 
 
@@ -257,8 +266,13 @@ class DicoShapes(Tk):
         # saving dictionary
         self.savedico()
 
+        # saving settings
+        self.save_settings()
+
         # quit and exit
-        self.destroy
+        startfile(self.target.get())
+        self.destroy()
+        exit()
 
         # End of function
         return
@@ -357,7 +371,6 @@ class DicoShapes(Tk):
         sheet.write(line, 12, layer_infos.get(u'type'))
         # Field informations
         for chp in fields_info.keys():
-            print chp
             # field type
             if fields_info[chp][0] == 'Integer':
                 tipo = self.blabla.get(u'entier')
