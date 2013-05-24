@@ -43,7 +43,7 @@ from collections import OrderedDict as OD
 # 3rd party libraries
 from osgeo import ogr    # spatial files
 from xlwt import Workbook, Font, XFStyle, easyxf, Formula, Alignment, Pattern, Borders, easyfont   # excel library
-from lxml import etree as ET
+from xml.etree import ElementTree as ET
 
 # Custom modules
 from modules import InfosOGR
@@ -65,6 +65,7 @@ class DicoShapes(Tk):
         self.focus_force()
 
         # variables
+        self.num_folders = 0
         self.def_rep = ""       # default folder to search for
         self.def_lang = 'FR'    # default language to start
         self.li_shp = []         # list for shapefiles path
@@ -268,6 +269,7 @@ class DicoShapes(Tk):
         self.browsetarg.config(state = DISABLED)
         # Looping in folders structure
         for root, dirs, files in walk(foldertarget):
+            self.num_folders = self.num_folders + len(dirs)
             for i in files:
                 # Looping on files contained
                 if path.splitext(path.join(root, i))[1] == u'.shp' and \
@@ -289,7 +291,8 @@ class DicoShapes(Tk):
         self.li_tab = tuple(self.li_tab)
         # setting the label text and activing the buttons
         self.numfiles.set(unicode(len(self.li_shp)) + u' shapefiles - '
-                        + unicode(len(self.li_tab)) + u' tables (MapInfo)')
+                        + unicode(len(self.li_tab)) + u' tables (MapInfo) - '
+                        + unicode(self.num_folders) + self.blabla.get('log_numfold'))
         self.browsetarg.config(state = ACTIVE)
         self.val.config(state = ACTIVE)
         # End of function
@@ -512,6 +515,7 @@ class DicoShapes(Tk):
         self.output.delete(0, END)
         self.output.insert(0, saved)
         # notification
+        total_files = unicode(len(self.li_shp) + len(self.li_tab))
         info(title=self.blabla.get('info_end'),
              message = self.blabla.get('info_end2'))
 
