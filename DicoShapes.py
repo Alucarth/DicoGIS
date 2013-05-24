@@ -134,7 +134,7 @@ class DicoShapes(Tk):
         # Basic buttons
         self.val = Button(self, text = self.blabla.get('gui_go'),
                                 relief= 'raised',
-                                state = ACTIVE,
+                                state = DISABLED,
                                 command = self.process)
         self.can = Button(self, text = self.blabla.get('gui_quit'),
                            relief= 'groove',
@@ -159,6 +159,7 @@ class DicoShapes(Tk):
         for elem in xml.getroot().getiterator():
             if elem.tag == 'codelang':
                 self.def_lang = elem.text
+                print self.def_lang
                 continue
             elif elem.tag == 'rep_defaut':
                 self.def_rep = elem.text
@@ -179,6 +180,11 @@ class DicoShapes(Tk):
             elif elem.tag == 'rep_defaut':
                 elem.text = self.target.get()
                 continue
+        # Sauvegarde du fichier XML
+        xml.write(r'settings.xml',
+                  encoding = 'utf-8',
+                  xml_declaration = 'version="1.0"',
+                  method = 'xml')
         # End of function
         return self.def_rep, self.def_lang
 
@@ -302,7 +308,7 @@ class DicoShapes(Tk):
 ##                                    args = (shp, self.dico_layer, self.dico_fields, 'shape', ))
 ##            proc.daemon = True
 ##            proc.start()
-            InfosOGR(shp, self.dico_layer, self.dico_fields, 'shape')
+            InfosOGR(shp, self.dico_layer, self.dico_fields, 'shape', self.blabla)
             # getting the informations
             # writing to the Excel dictionary
             self.dictionarize(self.dico_layer, self.dico_fields, self.feuy1, line)
@@ -320,7 +326,7 @@ class DicoShapes(Tk):
             self.dico_layer.clear()
             self.dico_fields.clear()
             # getting the informations
-            InfosOGR(tab, self.dico_layer, self.dico_fields, 'table')
+            InfosOGR(tab, self.dico_layer, self.dico_fields, 'table', self.blabla)
             # writing to the Excel dictionary
             self.dictionarize(self.dico_layer, self.dico_fields, self.feuy1, line)
             # increment the line number
@@ -476,9 +482,10 @@ class DicoShapes(Tk):
         u""" Save the Excel file """
         # Prompt of folder where save the file
         saved = asksaveasfilename(initialdir= self.target.get(),
-                        defaultextension = '.xls',
-                        initialfile = self.output.get(),
-                        filetypes = [(self.blabla.get('gui_excel'),"*.xls")])
+                            defaultextension = '.xls',
+                            initialfile = self.output.get(),
+                            filetypes = [(self.blabla.get('gui_excel'),"*.xls")])
+
         # check if the extension is correctly indicated
         if path.splitext(saved)[1] != ".xls":
             saved = saved + ".xls"
