@@ -1,5 +1,5 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version='1.0' encoding='UTF-8'?>
 <params>
 	<codelang>FR</codelang>
-	<rep_defaut>C:/Documents and Settings/Utilisateur/Mes documents/GitHub/Metadator/test/datatest</rep_defaut>
+	<rep_defaut>C:/</rep_defaut>
 </params>
