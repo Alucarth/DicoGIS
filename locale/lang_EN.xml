@@ -59,6 +59,7 @@
 <!-- SRS -->
 	<srs_comp>Compound</srs_comp>
 	<srs_geoc>Geocentric</srs_geoc>
+	<srs_geog>Geographic</srs_geog>
 	<srs_loca>Local</srs_loca>
 	<srs_proj>Projected</srs_proj>
 	<srs_vert>Vertical</srs_vert>
