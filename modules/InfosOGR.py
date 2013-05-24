@@ -32,7 +32,7 @@ from osgeo import ogr    # spatial files
 ###################################
 
 class InfosOGR():
-    def __init__(self, layerpath, dico_layer, dico_fields, tipo):
+    def __init__(self, layerpath, dico_layer, dico_fields, tipo, text=''):
         u""" Uses gdal/ogr functions to extract basic informations about
         geographic file (handles shapefile or MapInfo tables)
         and store into the dictionaries.
@@ -65,22 +65,22 @@ class InfosOGR():
 
         # basic information
         dico_layer[u'type'] = tipo
-        self.infos_basics(layerpath, dico_layer)
+        self.infos_basics(layerpath, dico_layer, text)
         # geometry information
-        self.infos_geom(dico_layer)
+        self.infos_geom(dico_layer, text)
         # fields information
         self.infos_fields(dico_fields)
 
-    def infos_basics(self, layerpath, dico_layer):
+    def infos_basics(self, layerpath, dico_layer, txt):
         u""" get the globat informations about the layer """
         # srs type
         srsmetod = [
-                    (self.srs.IsCompound(), "compound"),
-                    (self.srs.IsGeocentric(), "Geocentric"),
-                    (self.srs.IsGeographic(), "Geographic"),
-                    (self.srs.IsLocal(), "Local"),
-                    (self.srs.IsProjected(), "Projected"),
-                    (self.srs.IsVertical(), "Vertical")
+                    (self.srs.IsCompound(), txt.get('srs_comp')),
+                    (self.srs.IsGeocentric(), txt.get('srs_geoc')),
+                    (self.srs.IsGeographic(), txt.get('srs_geog')),
+                    (self.srs.IsLocal(), txt.get('srs_loca')),
+                    (self.srs.IsProjected(), txt.get('srs_proj')),
+                    (self.srs.IsVertical(), txt.get('srs_vert'))
                     ]
         for srsmet in srsmetod:
             if srsmet[0] == 1:
@@ -109,15 +109,15 @@ class InfosOGR():
         # end of function
         return dico_layer
 
-    def infos_geom(self, dico_layer):
+    def infos_geom(self, dico_layer, txt):
         u""" get the informations about geometry """
         # type géométrie
         if self.geom.GetGeometryName() == u'POINT':
-            dico_layer[u'type_geom'] = u'Point'
+            dico_layer[u'type_geom'] = txt.get('geom_point')
         elif u'LINESTRING' in self.geom.GetGeometryName():
-            dico_layer[u'type_geom'] = u'Ligne'
+            dico_layer[u'type_geom'] = txt.get('geom_ligne')
         elif u'POLYGON' in self.geom.GetGeometryName():
-            dico_layer[u'type_geom'] = u'Polygone'
+            dico_layer[u'type_geom'] = txt.get('geom_polyg')
         else:
             dico_layer[u'type_geom'] = self.geom.GetGeometryName()
         # Spatial extent (bounding box)
@@ -163,6 +163,17 @@ if __name__ == '__main__':
     # test files
     li_shp = [path.join(getcwd(), r'..\test\datatest\airports.shp')]         # shapefile
     li_tab = [path.join(getcwd(), r'..\test\datatest\airports_MI\tab\airports_MI.tab')] # MapInfo table
+    # test text dictionary
+    textos = OD()
+    textos['srs_comp'] = u'Compound'
+    textos['srs_geoc'] = u'Geocentric'
+    textos['srs_geog'] = u''
+    textos['srs_loca'] = u'Local'
+    textos['srs_proj'] = u'Projected'
+    textos['srs_vert'] = u'Vertical'
+    textos['geom_point'] = u'Point'
+    textos['geom_ligne'] = u'Line'
+    textos['geom_polyg'] = u'Polygon'
     # recipient datas
     dicouche = OD()     # dictionary where will be stored informations
     dico_fields = OD()     # dictionary for fields information
@@ -173,7 +184,7 @@ if __name__ == '__main__':
         dicouche.clear()
         dico_fields.clear()
         # getting the informations
-        info_shp = InfosOGR(shp, dicouche, dico_fields, 'shape')
+        info_shp = InfosOGR(shp, dicouche, dico_fields, 'shape', textos)
         print '\n', dicouche, dico_fields
     for tab in li_tab:
         """ looping on MapInfo tables list """
@@ -181,7 +192,7 @@ if __name__ == '__main__':
         dicouche.clear()
         dico_fields.clear()
         # getting the informations
-        info_tab = InfosOGR(tab, dicouche, dico_fields, 'table')
+        info_tab = InfosOGR(tab, dicouche, dico_fields, 'table', textos)
         print '\n', dicouche, dico_fields
 
 
