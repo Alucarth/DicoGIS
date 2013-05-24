@@ -11,7 +11,7 @@ from __future__ import unicode_literals
 #
 # Python:       2.7.x
 # Created:      14/02/2013
-# Updated:      21/05/2013
+# Updated:      24/05/2013
 #
 # Licence:      GPL 3
 #-------------------------------------------------------------------------------
@@ -25,12 +25,13 @@ from Tkinter import LabelFrame, N, S, E, W, ACTIVE, DISABLED, GROOVE, PhotoImage
 from tkFileDialog import askdirectory, asksaveasfilename
 from tkMessageBox import showinfo as info
 from ttk import Combobox, Progressbar
+import tkFont
 
 from sys import exit, platform
 from os import  listdir, walk, path         # files and folder managing
 from os import environ as env
 from os import startfile                    # to open a folder/file
-from time import localtime
+from time import strftime
 
 import threading
 import Queue
@@ -41,7 +42,7 @@ from collections import OrderedDict as OD
 
 # 3rd party libraries
 from osgeo import ogr    # spatial files
-from xlwt import Workbook, Font, XFStyle, easyxf, Formula   # excel library
+from xlwt import Workbook, Font, XFStyle, easyxf, Formula, Alignment, Pattern, Borders, easyfont   # excel library
 from lxml import etree as ET
 
 # Custom modules
@@ -61,20 +62,22 @@ class DicoShapes(Tk):
         self.resizable(width = False, height = False)
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
+        self.focus_force()
 
         # variables
         self.def_rep = ""       # default folder to search for
         self.def_lang = 'FR'    # default language to start
         self.li_shp = []         # list for shapefiles path
         self.li_tab = []         # list for MapInfo tables path
-        self.today = unicode(localtime()[0]) + u"-" \
-                     + unicode(localtime()[1]) + u"-" \
-                     + unicode(localtime()[2])    # date of the day
+        self.today = strftime("%Y-%m-%d")   # date of the day
         self.dico_layer = OD()    # dictionary where will be stored informations
         self.dico_fields = OD()    # dictionary for fields information
         self.dico_err = OD()     # errors list
         li_lang = [lg[5:-4] for lg in listdir(r'locale')]        # list of available languages
         self.blabla = OD()      # texts dictionary
+
+        # GUI fonts
+        ft_tit = tkFont.Font(family="Times", size=10, weight=tkFont.BOLD)
 
         # fillfulling
         self.load_settings()
@@ -90,8 +93,13 @@ class DicoShapes(Tk):
         # target folder
         self.labtarg = Label(self.FrPath, text = self.blabla.get('gui_path'))
         self.target = Entry(self.FrPath, width = 35)
-        self.browsetarg = Button(self.FrPath, text = self.blabla.get('gui_choix'), command = self.setpathtarg)
-        self.nameouptput = Label(self.FrPath, text = self.blabla.get('gui_fic'))
+        self.browsetarg = Button(self.FrPath,       # browse button
+                                 text = self.blabla.get('gui_choix'),
+                                 command = self.setpathtarg,
+                                 takefocus = True)
+        self.browsetarg.focus_force()               # foce the focus on
+        self.nameoutput = Label(self.FrPath,
+                                 text = self.blabla.get('gui_fic'))
         self.output = Entry(self.FrPath, width = 35)
         # language switcher
         self.ddl_lang = Combobox(self.FrPath, values = li_lang, width = 5)
@@ -103,7 +111,7 @@ class DicoShapes(Tk):
         self.browsetarg.grid(row = 1, column = 3, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
         Label(self.FrPath, textvariable = self.numfiles).grid(row = 2, column = 1, columnspan = 3)
         self.ddl_lang.grid(row=1, column = 4, sticky = N+S+W+E, padx = 2, pady = 2)
-        self.nameouptput.grid(row = 3, column= 1)
+        self.nameoutput.grid(row = 3, column= 1)
         self.output.grid(row = 3, column= 2)
 
             ## Frame 2
@@ -120,7 +128,10 @@ class DicoShapes(Tk):
 
             ## Main frame
         # Hola
-        self.welcome = Label(self, text = self.blabla.get('hi') + env.get(u'USERNAME'))
+        self.welcome = Label(self,
+                             text = self.blabla.get('hi') + env.get(u'USERNAME'),
+                             font = ft_tit,
+                             fg="red2")
         # Imagen
         self.icone = PhotoImage(file = r'img/DicoGIS_logo.GIF')
         Label(self, borderwidth = 2, relief = 'ridge',
@@ -202,7 +213,7 @@ class DicoShapes(Tk):
         self.labtarg.config(text = self.blabla.get('gui_path'))
         self.browsetarg.config(text = self.blabla.get('gui_choix'))
         self.val.config(text = self.blabla.get('gui_go'))
-        self.nameouptput.config(text = self.blabla.get('gui_fic'))
+        self.nameoutput.config(text = self.blabla.get('gui_fic'))
         # End of function
         return self.blabla
 
@@ -341,7 +352,7 @@ class DicoShapes(Tk):
         self.save_settings()
 
         # quit and exit
-        startfile(self.target.get())
+        startfile(self.output.get())
         self.destroy()
         exit()
 
@@ -357,11 +368,18 @@ class DicoShapes(Tk):
 
         # Some customization: fonts and styles
         # first line style
-        self.entete = XFStyle()
+        self.entete = easyxf()
+            # font
         font1 = Font()
         font1.name = 'Times New Roman'
         font1.bold = True
+            # alignment
+        alig1 = Alignment()
+        alig1.horz = 2
+            # assign
         self.entete.font = font1
+        self.entete.alignment = alig1
+
 
         # hyperlinks style
         self.url = easyxf(u'font: underline single')
@@ -491,10 +509,14 @@ class DicoShapes(Tk):
             saved = saved + ".xls"
         # save
         self.book.save(saved)
+        self.output.delete(0, END)
+        self.output.insert(0, saved)
         # notification
+        info(title=self.blabla.get('info_end'),
+             message = self.blabla.get('info_end2'))
 
         # End of function
-        return self.book
+        return self.book, saved
 
     def erreurStop(self, mess):
         u""" In case of error, close the GUI and stop the program """
