@@ -29,6 +29,7 @@
 	<log_end>End: </log_end>
 	<log_entete>DicoGIS - automatized geographic database dictionary</log_entete>
 	<log_numshp>Number of layers: </log_numshp>
+	<log_numfold> folders.</log_numfold>
 	<log_start>Start: </log_start>
 	<log_tps>Time elapsed: </log_tps>
 <!-- Output file -->

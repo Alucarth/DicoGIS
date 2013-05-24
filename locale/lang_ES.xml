@@ -29,6 +29,7 @@
 	<log_end>Fín: </log_end>
 	<log_entete>DicoGIS - diccionario automatizado de datos geográficos</log_entete>
 	<log_numshp>Número de archivos: </log_numshp>
+	<log_numfold> carpetas.</log_numfold>
 	<log_start>Inicio: </log_start>
 	<log_tps>Tiempo transcurrido: </log_tps>
 <!-- Output file -->

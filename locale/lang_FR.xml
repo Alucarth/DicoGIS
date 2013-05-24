@@ -17,7 +17,7 @@
 	<gui_fic>Nom du fichier en sortie : </gui_fic>
 	<gui_prog>Progression</gui_prog>	
 	<info_end>Fin du programme</info_end>
-	<info_end2>DicoShapes a terminé son travail. Il a traité </info_end2>
+	<info_end2>DicoShapes a terminé son travail.</info_end2>
 	<info_end3>Le dictionnaire se trouve dans le dossier : </info_end3>
 	<info_err> erreur(s) rencontrée(s). Consulter le fichier log.</info_err>
 	<info_noerr>Aucune erreur rencontrée.</info_noerr>
@@ -28,7 +28,8 @@
 	<log_dossour>Dossier source des shapes : </log_dossour>
 	<log_end>Fin du traitement : </log_end>
 	<log_entete>DicoGIS - dictionnaire automatisé de données géographiques</log_entete>
-	<log_numshp>Nombre de shapes : </log_numshp>
+	<log_numshp>Nombre de fichiers : </log_numshp>
+	<log_numfold> dossiers.</log_numfold>
 	<log_start>Début du traitement : </log_start>
 	<log_tps>Temps écoulé : </log_tps>
 <!-- Output file -->
