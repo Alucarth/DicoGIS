@@ -1,0 +1,1111 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD><TITLE>Python: module DicoGIS</TITLE>
+<META content="text/html; charset=utf-8" http-equiv=Content-Type></HEAD>
+<BODY bgColor=#f0f0f8>
+<TABLE cellSpacing=0 cellPadding=2 width="100%" summary=heading border=0>
+  <TBODY>
+  <TR bgColor=#7799ee>
+    <TD vAlign=bottom>&nbsp;<BR><FONT color=#ffffff 
+      face="helvetica, arial">&nbsp;<BR><BIG><BIG><STRONG>DicoGIS</STRONG></BIG></BIG></FONT></TD>
+    <TD vAlign=bottom align=right><FONT color=#ffffff 
+      face="helvetica, arial"><A href=".">index</A><BR><A 
+      href="file:///E:/mes%20documents/github/dicoshapes/dicogis.py">e:\mes 
+      documents\github\dicoshapes\dicogis.py</A></FONT></TD></TR></TBODY></TABLE>
+<P></P>
+<P>
+<TABLE cellSpacing=0 cellPadding=2 width="100%" summary=section border=0>
+  <TBODY>
+  <TR bgColor=#aa55cc>
+    <TD vAlign=bottom colSpan=3>&nbsp;<BR><FONT color=#ffffff 
+      face="helvetica, arial"><BIG><STRONG>Modules</STRONG></BIG></FONT></TD></TR>
+  <TR>
+    <TD bgColor=#aa55cc><TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TT></TD>
+    <TD>&nbsp;</TD>
+    <TD width="100%">
+      <TABLE width="100%" summary=list>
+        <TBODY>
+        <TR>
+          <TD vAlign=top width="25%"><A 
+            href="xml.etree.ElementTree.html">xml.etree.ElementTree</A><BR><A 
+            href="Queue.html">Queue</A><BR></TD>
+          <TD vAlign=top width="25%"><A 
+            href="osgeo.ogr.html">osgeo.ogr</A><BR><A 
+            href="ntpath.html">ntpath</A><BR></TD>
+          <TD vAlign=top width="25%"><A 
+            href="threading.html">threading</A><BR><A 
+            href="tkFont.html">tkFont</A><BR></TD>
+          <TD vAlign=top width="25%"></TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE>
+<P>
+<TABLE cellSpacing=0 cellPadding=2 width="100%" summary=section border=0>
+  <TBODY>
+  <TR bgColor=#ee77aa>
+    <TD vAlign=bottom colSpan=3>&nbsp;<BR><FONT color=#ffffff 
+      face="helvetica, arial"><BIG><STRONG>Classes</STRONG></BIG></FONT></TD></TR>
+  <TR>
+    <TD bgColor=#ee77aa><TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TT></TD>
+    <TD>&nbsp;</TD>
+    <TD width="100%">
+      <DL>
+        <DT><FONT face="helvetica, arial"><A 
+        href="Tkinter.html#Tk">Tkinter.Tk</A>(<A 
+        href="Tkinter.html#Misc">Tkinter.Misc</A>, <A 
+        href="Tkinter.html#Wm">Tkinter.Wm</A>) </FONT>
+        <DD>
+        <DL>
+          <DT><FONT face="helvetica, arial"><A 
+          href="DicoGIS.html#DicoShapes">DicoShapes</A> </FONT></DT></DL></DD></DL>
+      <P>
+      <TABLE cellSpacing=0 cellPadding=2 width="100%" summary=section 
+        border=0><TBODY>
+        <TR bgColor=#ffc8d8>
+          <TD vAlign=bottom colSpan=3>&nbsp;<BR><FONT color=#000000 
+            face="helvetica, arial"><A name=DicoShapes>class 
+            <STRONG>DicoShapes</STRONG></A>(<A 
+            href="Tkinter.html#Tk">Tkinter.Tk</A>)</FONT></TD></TR>
+        <TR>
+          <TD bgColor=#ffc8d8><TT>&nbsp;&nbsp;&nbsp;</TT></TD>
+          <TD>&nbsp;</TD>
+          <TD width="100%">
+            <DL>
+              <DT>Method resolution order: 
+              <DD><A href="DicoGIS.html#DicoShapes">DicoShapes</A> 
+              <DD><A href="Tkinter.html#Tk">Tkinter.Tk</A> 
+              <DD><A href="Tkinter.html#Misc">Tkinter.Misc</A> 
+              <DD><A href="Tkinter.html#Wm">Tkinter.Wm</A> </DD></DL>
+            <HR>
+            Methods defined here:<BR>
+            <DL>
+              <DT><A 
+name=DicoShapes-__init__><STRONG>__init__</STRONG></A>(self)
+              <DD><TT>Constructeur&nbsp;de&nbsp;la&nbsp;fenêtre&nbsp;principale</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-change_lang><STRONG>change_lang</STRONG></A>(self, 
+              event)
+              <DD><TT>update&nbsp;the&nbsp;texts&nbsp;dictionary&nbsp;with&nbsp;the&nbsp;language&nbsp;selected</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-configexcel><STRONG>configexcel</STRONG></A>(self)
+              <DD><TT>create&nbsp;and&nbsp;configure&nbsp;the&nbsp;Excel&nbsp;workbook</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-dictionarize><STRONG>dictionarize</STRONG></A>(self, 
+              layer_infos, fields_info, sheet, line)
+              <DD><TT>write&nbsp;the&nbsp;infos&nbsp;of&nbsp;the&nbsp;layer&nbsp;into&nbsp;the&nbsp;Excel&nbsp;workbook</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-erreurStop><STRONG>erreurStop</STRONG></A>(self, 
+              mess)
+              <DD><TT>In&nbsp;case&nbsp;of&nbsp;error,&nbsp;close&nbsp;the&nbsp;GUI&nbsp;and&nbsp;stop&nbsp;the&nbsp;program</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-ligeofiles><STRONG>ligeofiles</STRONG></A>(self, 
+              foldertarget)
+              <DD><TT>List&nbsp;shapefiles&nbsp;and&nbsp;MapInfo&nbsp;files&nbsp;(.tab,&nbsp;not&nbsp;.mid/mif)&nbsp;contained<BR>in&nbsp;the&nbsp;folders&nbsp;structure</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-load_settings><STRONG>load_settings</STRONG></A>(self)
+              <DD><TT>load&nbsp;settings&nbsp;from&nbsp;last&nbsp;execution</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-load_texts><STRONG>load_texts</STRONG></A>(self, 
+              lang<FONT color=#909090>=u'FR'</FONT>)
+              <DD><TT>Load&nbsp;texts&nbsp;according&nbsp;to&nbsp;the&nbsp;selected&nbsp;language</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-process><STRONG>process</STRONG></A>(self)
+              <DD><TT>launch&nbsp;the&nbsp;different&nbsp;processes</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-save_settings><STRONG>save_settings</STRONG></A>(self)
+              <DD><TT>save&nbsp;last&nbsp;options&nbsp;in&nbsp;order&nbsp;to&nbsp;make&nbsp;the&nbsp;next&nbsp;excution&nbsp;more&nbsp;easy</TT></DD></DL>
+            <DL>
+              <DT><A 
+name=DicoShapes-savedico><STRONG>savedico</STRONG></A>(self)
+              <DD><TT>Save&nbsp;the&nbsp;Excel&nbsp;file</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-setpathtarg><STRONG>setpathtarg</STRONG></A>(self)
+              <DD><TT>...browse&nbsp;and&nbsp;insert&nbsp;the&nbsp;path&nbsp;of&nbsp;target&nbsp;folder</TT></DD></DL>
+            <HR>
+            Methods inherited from <A href="Tkinter.html#Tk">Tkinter.Tk</A>:<BR>
+            <DL>
+              <DT><A 
+              name=DicoShapes-__getattr__><STRONG>__getattr__</STRONG></A>(self, 
+              attr)
+              <DD><TT>Delegate&nbsp;attribute&nbsp;access&nbsp;to&nbsp;the&nbsp;interpreter&nbsp;object</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-destroy><STRONG>destroy</STRONG></A>(self)
+              <DD><TT>Destroy&nbsp;this&nbsp;and&nbsp;all&nbsp;descendants&nbsp;widgets.&nbsp;This&nbsp;will<BR>end&nbsp;the&nbsp;application&nbsp;of&nbsp;this&nbsp;Tcl&nbsp;interpreter.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-loadtk><STRONG>loadtk</STRONG></A>(self)</DT></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-readprofile><STRONG>readprofile</STRONG></A>(self, 
+              baseName, className)
+              <DD><TT>Internal&nbsp;function.&nbsp;It&nbsp;reads&nbsp;BASENAME.tcl&nbsp;and&nbsp;CLASSNAME.tcl&nbsp;into<BR>the&nbsp;Tcl&nbsp;Interpreter&nbsp;and&nbsp;calls&nbsp;execfile&nbsp;on&nbsp;BASENAME.py&nbsp;and&nbsp;CLASSNAME.py&nbsp;if<BR>such&nbsp;a&nbsp;file&nbsp;exists&nbsp;in&nbsp;the&nbsp;home&nbsp;directory.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-report_callback_exception><STRONG>report_callback_exception</STRONG></A>(self, 
+              exc, val, tb)
+              <DD><TT>Internal&nbsp;function.&nbsp;It&nbsp;reports&nbsp;exception&nbsp;on&nbsp;sys.stderr.</TT></DD></DL>
+            <HR>
+            Methods inherited from <A 
+            href="Tkinter.html#Misc">Tkinter.Misc</A>:<BR>
+            <DL>
+              <DT><A 
+              name=DicoShapes-__contains__><STRONG>__contains__</STRONG></A>(self, 
+              key)</DT></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-__getitem__><STRONG>__getitem__</STRONG></A> = 
+              cget(self, key)
+              <DD><TT>Return&nbsp;the&nbsp;resource&nbsp;value&nbsp;for&nbsp;a&nbsp;KEY&nbsp;given&nbsp;as&nbsp;string.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-__setitem__><STRONG>__setitem__</STRONG></A>(self, 
+              key, value)</DT></DL>
+            <DL>
+              <DT><A name=DicoShapes-__str__><STRONG>__str__</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;window&nbsp;path&nbsp;name&nbsp;of&nbsp;this&nbsp;widget.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-after><STRONG>after</STRONG></A>(self, ms, 
+              func<FONT color=#909090>=None</FONT>, *args)
+              <DD><TT>Call&nbsp;function&nbsp;once&nbsp;after&nbsp;given&nbsp;time.<BR>&nbsp;<BR>MS&nbsp;specifies&nbsp;the&nbsp;time&nbsp;in&nbsp;milliseconds.&nbsp;FUNC&nbsp;gives&nbsp;the<BR>function&nbsp;which&nbsp;shall&nbsp;be&nbsp;called.&nbsp;Additional&nbsp;parameters<BR>are&nbsp;given&nbsp;as&nbsp;parameters&nbsp;to&nbsp;the&nbsp;function&nbsp;call.&nbsp;&nbsp;Return<BR>identifier&nbsp;to&nbsp;cancel&nbsp;scheduling&nbsp;with&nbsp;after_cancel.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-after_cancel><STRONG>after_cancel</STRONG></A>(self, 
+              id)
+              <DD><TT>Cancel&nbsp;scheduling&nbsp;of&nbsp;function&nbsp;identified&nbsp;with&nbsp;ID.<BR>&nbsp;<BR>Identifier&nbsp;returned&nbsp;by&nbsp;after&nbsp;or&nbsp;after_idle&nbsp;must&nbsp;be<BR>given&nbsp;as&nbsp;first&nbsp;parameter.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-after_idle><STRONG>after_idle</STRONG></A>(self, 
+              func, *args)
+              <DD><TT>Call&nbsp;FUNC&nbsp;once&nbsp;if&nbsp;the&nbsp;Tcl&nbsp;main&nbsp;loop&nbsp;has&nbsp;no&nbsp;event&nbsp;to<BR>process.<BR>&nbsp;<BR>Return&nbsp;an&nbsp;identifier&nbsp;to&nbsp;cancel&nbsp;the&nbsp;scheduling&nbsp;with<BR>after_cancel.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-bbox><STRONG>bbox</STRONG></A> = 
+              grid_bbox(self, column<FONT color=#909090>=None</FONT>, row<FONT 
+              color=#909090>=None</FONT>, col2<FONT color=#909090>=None</FONT>, 
+              row2<FONT color=#909090>=None</FONT>)
+              <DD><TT>Return&nbsp;a&nbsp;tuple&nbsp;of&nbsp;integer&nbsp;coordinates&nbsp;for&nbsp;the&nbsp;bounding<BR>box&nbsp;of&nbsp;this&nbsp;widget&nbsp;controlled&nbsp;by&nbsp;the&nbsp;geometry&nbsp;manager&nbsp;grid.<BR>&nbsp;<BR>If&nbsp;COLUMN,&nbsp;ROW&nbsp;is&nbsp;given&nbsp;the&nbsp;bounding&nbsp;box&nbsp;applies&nbsp;from<BR>the&nbsp;cell&nbsp;with&nbsp;row&nbsp;and&nbsp;column&nbsp;0&nbsp;to&nbsp;the&nbsp;specified<BR>cell.&nbsp;If&nbsp;COL2&nbsp;and&nbsp;ROW2&nbsp;are&nbsp;given&nbsp;the&nbsp;bounding&nbsp;box<BR>starts&nbsp;at&nbsp;that&nbsp;cell.<BR>&nbsp;<BR>The&nbsp;returned&nbsp;integers&nbsp;specify&nbsp;the&nbsp;offset&nbsp;of&nbsp;the&nbsp;upper&nbsp;left<BR>corner&nbsp;in&nbsp;the&nbsp;master&nbsp;widget&nbsp;and&nbsp;the&nbsp;width&nbsp;and&nbsp;height.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-bell><STRONG>bell</STRONG></A>(self, 
+              displayof<FONT color=#909090>=0</FONT>)
+              <DD><TT>Ring&nbsp;a&nbsp;display's&nbsp;bell.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-bind><STRONG>bind</STRONG></A>(self, 
+              sequence<FONT color=#909090>=None</FONT>, func<FONT 
+              color=#909090>=None</FONT>, add<FONT color=#909090>=None</FONT>)
+              <DD><TT>Bind&nbsp;to&nbsp;this&nbsp;widget&nbsp;at&nbsp;event&nbsp;SEQUENCE&nbsp;a&nbsp;call&nbsp;to&nbsp;function&nbsp;FUNC.<BR>&nbsp;<BR>SEQUENCE&nbsp;is&nbsp;a&nbsp;string&nbsp;of&nbsp;concatenated&nbsp;event<BR>patterns.&nbsp;An&nbsp;event&nbsp;pattern&nbsp;is&nbsp;of&nbsp;the&nbsp;form<BR>&lt;MODIFIER-MODIFIER-TYPE-DETAIL&gt;&nbsp;where&nbsp;MODIFIER&nbsp;is&nbsp;one<BR>of&nbsp;Control,&nbsp;Mod2,&nbsp;M2,&nbsp;Shift,&nbsp;Mod3,&nbsp;M3,&nbsp;Lock,&nbsp;Mod4,&nbsp;M4,<BR>Button1,&nbsp;B1,&nbsp;Mod5,&nbsp;M5&nbsp;Button2,&nbsp;B2,&nbsp;Meta,&nbsp;M,&nbsp;Button3,<BR>B3,&nbsp;Alt,&nbsp;Button4,&nbsp;B4,&nbsp;Double,&nbsp;Button5,&nbsp;B5&nbsp;Triple,<BR>Mod1,&nbsp;M1.&nbsp;TYPE&nbsp;is&nbsp;one&nbsp;of&nbsp;Activate,&nbsp;Enter,&nbsp;Map,<BR>ButtonPress,&nbsp;Button,&nbsp;Expose,&nbsp;Motion,&nbsp;ButtonRelease<BR>FocusIn,&nbsp;MouseWheel,&nbsp;Circulate,&nbsp;FocusOut,&nbsp;Property,<BR>Colormap,&nbsp;Gravity&nbsp;Reparent,&nbsp;Configure,&nbsp;KeyPress,&nbsp;Key,<BR>Unmap,&nbsp;Deactivate,&nbsp;KeyRelease&nbsp;Visibility,&nbsp;Destroy,<BR>Leave&nbsp;and&nbsp;DETAIL&nbsp;is&nbsp;the&nbsp;button&nbsp;number&nbsp;for&nbsp;ButtonPress,<BR>ButtonRelease&nbsp;and&nbsp;DETAIL&nbsp;is&nbsp;the&nbsp;Keysym&nbsp;for&nbsp;KeyPress&nbsp;and<BR>KeyRelease.&nbsp;Examples&nbsp;are<BR>&lt;Control-Button-1&gt;&nbsp;for&nbsp;pressing&nbsp;Control&nbsp;and&nbsp;mouse&nbsp;button&nbsp;1&nbsp;or<BR>&lt;Alt-A&gt;&nbsp;for&nbsp;pressing&nbsp;A&nbsp;and&nbsp;the&nbsp;Alt&nbsp;key&nbsp;(KeyPress&nbsp;can&nbsp;be&nbsp;omitted).<BR>An&nbsp;event&nbsp;pattern&nbsp;can&nbsp;also&nbsp;be&nbsp;a&nbsp;virtual&nbsp;event&nbsp;of&nbsp;the&nbsp;form<BR>&lt;&lt;AString&gt;&gt;&nbsp;where&nbsp;AString&nbsp;can&nbsp;be&nbsp;arbitrary.&nbsp;This<BR>event&nbsp;can&nbsp;be&nbsp;generated&nbsp;by&nbsp;event_generate.<BR>If&nbsp;events&nbsp;are&nbsp;concatenated&nbsp;they&nbsp;must&nbsp;appear&nbsp;shortly<BR>after&nbsp;each&nbsp;other.<BR>&nbsp;<BR>FUNC&nbsp;will&nbsp;be&nbsp;called&nbsp;if&nbsp;the&nbsp;event&nbsp;sequence&nbsp;occurs&nbsp;with&nbsp;an<BR>instance&nbsp;of&nbsp;Event&nbsp;as&nbsp;argument.&nbsp;If&nbsp;the&nbsp;return&nbsp;value&nbsp;of&nbsp;FUNC&nbsp;is<BR>"break"&nbsp;no&nbsp;further&nbsp;bound&nbsp;function&nbsp;is&nbsp;invoked.<BR>&nbsp;<BR>An&nbsp;additional&nbsp;boolean&nbsp;parameter&nbsp;ADD&nbsp;specifies&nbsp;whether&nbsp;FUNC&nbsp;will<BR>be&nbsp;called&nbsp;additionally&nbsp;to&nbsp;the&nbsp;other&nbsp;bound&nbsp;function&nbsp;or&nbsp;whether<BR>it&nbsp;will&nbsp;replace&nbsp;the&nbsp;previous&nbsp;function.<BR>&nbsp;<BR>Bind&nbsp;will&nbsp;return&nbsp;an&nbsp;identifier&nbsp;to&nbsp;allow&nbsp;deletion&nbsp;of&nbsp;the&nbsp;bound&nbsp;function&nbsp;with<BR>unbind&nbsp;without&nbsp;memory&nbsp;leak.<BR>&nbsp;<BR>If&nbsp;FUNC&nbsp;or&nbsp;SEQUENCE&nbsp;is&nbsp;omitted&nbsp;the&nbsp;bound&nbsp;function&nbsp;or&nbsp;list<BR>of&nbsp;bound&nbsp;events&nbsp;are&nbsp;returned.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-bind_all><STRONG>bind_all</STRONG></A>(self, 
+              sequence<FONT color=#909090>=None</FONT>, func<FONT 
+              color=#909090>=None</FONT>, add<FONT color=#909090>=None</FONT>)
+              <DD><TT>Bind&nbsp;to&nbsp;all&nbsp;widgets&nbsp;at&nbsp;an&nbsp;event&nbsp;SEQUENCE&nbsp;a&nbsp;call&nbsp;to&nbsp;function&nbsp;FUNC.<BR>An&nbsp;additional&nbsp;boolean&nbsp;parameter&nbsp;ADD&nbsp;specifies&nbsp;whether&nbsp;FUNC&nbsp;will<BR>be&nbsp;called&nbsp;additionally&nbsp;to&nbsp;the&nbsp;other&nbsp;bound&nbsp;function&nbsp;or&nbsp;whether<BR>it&nbsp;will&nbsp;replace&nbsp;the&nbsp;previous&nbsp;function.&nbsp;See&nbsp;bind&nbsp;for&nbsp;the&nbsp;return&nbsp;value.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-bind_class><STRONG>bind_class</STRONG></A>(self, 
+              className, sequence<FONT color=#909090>=None</FONT>, func<FONT 
+              color=#909090>=None</FONT>, add<FONT color=#909090>=None</FONT>)
+              <DD><TT>Bind&nbsp;to&nbsp;widgets&nbsp;with&nbsp;bindtag&nbsp;CLASSNAME&nbsp;at&nbsp;event<BR>SEQUENCE&nbsp;a&nbsp;call&nbsp;of&nbsp;function&nbsp;FUNC.&nbsp;An&nbsp;additional<BR>boolean&nbsp;parameter&nbsp;ADD&nbsp;specifies&nbsp;whether&nbsp;FUNC&nbsp;will&nbsp;be<BR>called&nbsp;additionally&nbsp;to&nbsp;the&nbsp;other&nbsp;bound&nbsp;function&nbsp;or<BR>whether&nbsp;it&nbsp;will&nbsp;replace&nbsp;the&nbsp;previous&nbsp;function.&nbsp;See&nbsp;bind&nbsp;for<BR>the&nbsp;return&nbsp;value.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-bindtags><STRONG>bindtags</STRONG></A>(self, 
+              tagList<FONT color=#909090>=None</FONT>)
+              <DD><TT>Set&nbsp;or&nbsp;get&nbsp;the&nbsp;list&nbsp;of&nbsp;bindtags&nbsp;for&nbsp;this&nbsp;widget.<BR>&nbsp;<BR>With&nbsp;no&nbsp;argument&nbsp;return&nbsp;the&nbsp;list&nbsp;of&nbsp;all&nbsp;bindtags&nbsp;associated&nbsp;with<BR>this&nbsp;widget.&nbsp;With&nbsp;a&nbsp;list&nbsp;of&nbsp;strings&nbsp;as&nbsp;argument&nbsp;the&nbsp;bindtags&nbsp;are<BR>set&nbsp;to&nbsp;this&nbsp;list.&nbsp;The&nbsp;bindtags&nbsp;determine&nbsp;in&nbsp;which&nbsp;order&nbsp;events&nbsp;are<BR>processed&nbsp;(see&nbsp;bind).</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-cget><STRONG>cget</STRONG></A>(self, key)
+              <DD><TT>Return&nbsp;the&nbsp;resource&nbsp;value&nbsp;for&nbsp;a&nbsp;KEY&nbsp;given&nbsp;as&nbsp;string.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-clipboard_append><STRONG>clipboard_append</STRONG></A>(self, 
+              string, **kw)
+              <DD><TT>Append&nbsp;STRING&nbsp;to&nbsp;the&nbsp;<A 
+              href="Tkinter.html#Tk">Tk</A>&nbsp;clipboard.<BR>&nbsp;<BR>A&nbsp;widget&nbsp;specified&nbsp;at&nbsp;the&nbsp;optional&nbsp;displayof&nbsp;keyword<BR>argument&nbsp;specifies&nbsp;the&nbsp;target&nbsp;display.&nbsp;The&nbsp;clipboard<BR>can&nbsp;be&nbsp;retrieved&nbsp;with&nbsp;selection_get.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-clipboard_clear><STRONG>clipboard_clear</STRONG></A>(self, 
+              **kw)
+              <DD><TT>Clear&nbsp;the&nbsp;data&nbsp;in&nbsp;the&nbsp;<A 
+              href="Tkinter.html#Tk">Tk</A>&nbsp;clipboard.<BR>&nbsp;<BR>A&nbsp;widget&nbsp;specified&nbsp;for&nbsp;the&nbsp;optional&nbsp;displayof&nbsp;keyword<BR>argument&nbsp;specifies&nbsp;the&nbsp;target&nbsp;display.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-clipboard_get><STRONG>clipboard_get</STRONG></A>(self, 
+              **kw)
+              <DD><TT>Retrieve&nbsp;data&nbsp;from&nbsp;the&nbsp;clipboard&nbsp;on&nbsp;window's&nbsp;display.<BR>&nbsp;<BR>The&nbsp;window&nbsp;keyword&nbsp;defaults&nbsp;to&nbsp;the&nbsp;root&nbsp;window&nbsp;of&nbsp;the&nbsp;Tkinter<BR>application.<BR>&nbsp;<BR>The&nbsp;type&nbsp;keyword&nbsp;specifies&nbsp;the&nbsp;form&nbsp;in&nbsp;which&nbsp;the&nbsp;data&nbsp;is<BR>to&nbsp;be&nbsp;returned&nbsp;and&nbsp;should&nbsp;be&nbsp;an&nbsp;atom&nbsp;name&nbsp;such&nbsp;as&nbsp;STRING<BR>or&nbsp;FILE_NAME.&nbsp;&nbsp;Type&nbsp;defaults&nbsp;to&nbsp;STRING,&nbsp;except&nbsp;on&nbsp;X11,&nbsp;where&nbsp;the&nbsp;default<BR>is&nbsp;to&nbsp;try&nbsp;UTF8_STRING&nbsp;and&nbsp;fall&nbsp;back&nbsp;to&nbsp;STRING.<BR>&nbsp;<BR>This&nbsp;command&nbsp;is&nbsp;equivalent&nbsp;to:<BR>&nbsp;<BR><A 
+              href="#DicoShapes-selection_get">selection_get</A>(CLIPBOARD)</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-colormodel><STRONG>colormodel</STRONG></A>(self, 
+              value<FONT color=#909090>=None</FONT>)
+              <DD><TT>Useless.&nbsp;Not&nbsp;implemented&nbsp;in&nbsp;<A 
+              href="Tkinter.html#Tk">Tk</A>.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-columnconfigure><STRONG>columnconfigure</STRONG></A> 
+              = grid_columnconfigure(self, index, cnf<FONT 
+              color=#909090>={}</FONT>, **kw)
+              <DD><TT>Configure&nbsp;column&nbsp;INDEX&nbsp;of&nbsp;a&nbsp;grid.<BR>&nbsp;<BR>Valid&nbsp;resources&nbsp;are&nbsp;minsize&nbsp;(minimum&nbsp;size&nbsp;of&nbsp;the&nbsp;column),<BR>weight&nbsp;(how&nbsp;much&nbsp;does&nbsp;additional&nbsp;space&nbsp;propagate&nbsp;to&nbsp;this&nbsp;column)<BR>and&nbsp;pad&nbsp;(how&nbsp;much&nbsp;space&nbsp;to&nbsp;let&nbsp;additionally).</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-config><STRONG>config</STRONG></A> = 
+              configure(self, cnf<FONT color=#909090>=None</FONT>, **kw)
+              <DD><TT>Configure&nbsp;resources&nbsp;of&nbsp;a&nbsp;widget.<BR>&nbsp;<BR>The&nbsp;values&nbsp;for&nbsp;resources&nbsp;are&nbsp;specified&nbsp;as&nbsp;keyword<BR>arguments.&nbsp;To&nbsp;get&nbsp;an&nbsp;overview&nbsp;about<BR>the&nbsp;allowed&nbsp;keyword&nbsp;arguments&nbsp;call&nbsp;the&nbsp;method&nbsp;keys.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-configure><STRONG>configure</STRONG></A>(self, 
+              cnf<FONT color=#909090>=None</FONT>, **kw)
+              <DD><TT>Configure&nbsp;resources&nbsp;of&nbsp;a&nbsp;widget.<BR>&nbsp;<BR>The&nbsp;values&nbsp;for&nbsp;resources&nbsp;are&nbsp;specified&nbsp;as&nbsp;keyword<BR>arguments.&nbsp;To&nbsp;get&nbsp;an&nbsp;overview&nbsp;about<BR>the&nbsp;allowed&nbsp;keyword&nbsp;arguments&nbsp;call&nbsp;the&nbsp;method&nbsp;keys.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-deletecommand><STRONG>deletecommand</STRONG></A>(self, 
+              name)
+              <DD><TT>Internal&nbsp;function.<BR>&nbsp;<BR>Delete&nbsp;the&nbsp;Tcl&nbsp;command&nbsp;provided&nbsp;in&nbsp;NAME.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-event_add><STRONG>event_add</STRONG></A>(self, 
+              virtual, *sequences)
+              <DD><TT>Bind&nbsp;a&nbsp;virtual&nbsp;event&nbsp;VIRTUAL&nbsp;(of&nbsp;the&nbsp;form&nbsp;&lt;&lt;Name&gt;&gt;)<BR>to&nbsp;an&nbsp;event&nbsp;SEQUENCE&nbsp;such&nbsp;that&nbsp;the&nbsp;virtual&nbsp;event&nbsp;is&nbsp;triggered<BR>whenever&nbsp;SEQUENCE&nbsp;occurs.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-event_delete><STRONG>event_delete</STRONG></A>(self, 
+              virtual, *sequences)
+              <DD><TT>Unbind&nbsp;a&nbsp;virtual&nbsp;event&nbsp;VIRTUAL&nbsp;from&nbsp;SEQUENCE.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-event_generate><STRONG>event_generate</STRONG></A>(self, 
+              sequence, **kw)
+              <DD><TT>Generate&nbsp;an&nbsp;event&nbsp;SEQUENCE.&nbsp;Additional<BR>keyword&nbsp;arguments&nbsp;specify&nbsp;parameter&nbsp;of&nbsp;the&nbsp;event<BR>(e.g.&nbsp;x,&nbsp;y,&nbsp;rootx,&nbsp;rooty).</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-event_info><STRONG>event_info</STRONG></A>(self, 
+              virtual<FONT color=#909090>=None</FONT>)
+              <DD><TT>Return&nbsp;a&nbsp;list&nbsp;of&nbsp;all&nbsp;virtual&nbsp;events&nbsp;or&nbsp;the&nbsp;information<BR>about&nbsp;the&nbsp;SEQUENCE&nbsp;bound&nbsp;to&nbsp;the&nbsp;virtual&nbsp;event&nbsp;VIRTUAL.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-focus><STRONG>focus</STRONG></A> = 
+              focus_set(self)
+              <DD><TT>Direct&nbsp;input&nbsp;focus&nbsp;to&nbsp;this&nbsp;widget.<BR>&nbsp;<BR>If&nbsp;the&nbsp;application&nbsp;currently&nbsp;does&nbsp;not&nbsp;have&nbsp;the&nbsp;focus<BR>this&nbsp;widget&nbsp;will&nbsp;get&nbsp;the&nbsp;focus&nbsp;if&nbsp;the&nbsp;application&nbsp;gets<BR>the&nbsp;focus&nbsp;through&nbsp;the&nbsp;window&nbsp;manager.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-focus_displayof><STRONG>focus_displayof</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;widget&nbsp;which&nbsp;has&nbsp;currently&nbsp;the&nbsp;focus&nbsp;on&nbsp;the<BR>display&nbsp;where&nbsp;this&nbsp;widget&nbsp;is&nbsp;located.<BR>&nbsp;<BR>Return&nbsp;None&nbsp;if&nbsp;the&nbsp;application&nbsp;does&nbsp;not&nbsp;have&nbsp;the&nbsp;focus.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-focus_force><STRONG>focus_force</STRONG></A>(self)
+              <DD><TT>Direct&nbsp;input&nbsp;focus&nbsp;to&nbsp;this&nbsp;widget&nbsp;even&nbsp;if&nbsp;the<BR>application&nbsp;does&nbsp;not&nbsp;have&nbsp;the&nbsp;focus.&nbsp;Use&nbsp;with<BR>caution!</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-focus_get><STRONG>focus_get</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;widget&nbsp;which&nbsp;has&nbsp;currently&nbsp;the&nbsp;focus&nbsp;in&nbsp;the<BR>application.<BR>&nbsp;<BR>Use&nbsp;focus_displayof&nbsp;to&nbsp;allow&nbsp;working&nbsp;with&nbsp;several<BR>displays.&nbsp;Return&nbsp;None&nbsp;if&nbsp;application&nbsp;does&nbsp;not&nbsp;have<BR>the&nbsp;focus.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-focus_lastfor><STRONG>focus_lastfor</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;widget&nbsp;which&nbsp;would&nbsp;have&nbsp;the&nbsp;focus&nbsp;if&nbsp;top&nbsp;level<BR>for&nbsp;this&nbsp;widget&nbsp;gets&nbsp;the&nbsp;focus&nbsp;from&nbsp;the&nbsp;window&nbsp;manager.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-focus_set><STRONG>focus_set</STRONG></A>(self)
+              <DD><TT>Direct&nbsp;input&nbsp;focus&nbsp;to&nbsp;this&nbsp;widget.<BR>&nbsp;<BR>If&nbsp;the&nbsp;application&nbsp;currently&nbsp;does&nbsp;not&nbsp;have&nbsp;the&nbsp;focus<BR>this&nbsp;widget&nbsp;will&nbsp;get&nbsp;the&nbsp;focus&nbsp;if&nbsp;the&nbsp;application&nbsp;gets<BR>the&nbsp;focus&nbsp;through&nbsp;the&nbsp;window&nbsp;manager.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-getboolean><STRONG>getboolean</STRONG></A>(self, 
+s)
+              <DD><TT>Return&nbsp;a&nbsp;boolean&nbsp;value&nbsp;for&nbsp;Tcl&nbsp;boolean&nbsp;values&nbsp;true&nbsp;and&nbsp;false&nbsp;given&nbsp;as&nbsp;parameter.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-getvar><STRONG>getvar</STRONG></A>(self, 
+              name<FONT color=#909090>='PY_VAR'</FONT>)
+              <DD><TT>Return&nbsp;value&nbsp;of&nbsp;Tcl&nbsp;variable&nbsp;NAME.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-grab_current><STRONG>grab_current</STRONG></A>(self)
+              <DD><TT>Return&nbsp;widget&nbsp;which&nbsp;has&nbsp;currently&nbsp;the&nbsp;grab&nbsp;in&nbsp;this&nbsp;application<BR>or&nbsp;None.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-grab_release><STRONG>grab_release</STRONG></A>(self)
+              <DD><TT>Release&nbsp;grab&nbsp;for&nbsp;this&nbsp;widget&nbsp;if&nbsp;currently&nbsp;set.</TT></DD></DL>
+            <DL>
+              <DT><A 
+name=DicoShapes-grab_set><STRONG>grab_set</STRONG></A>(self)
+              <DD><TT>Set&nbsp;grab&nbsp;for&nbsp;this&nbsp;widget.<BR>&nbsp;<BR>A&nbsp;grab&nbsp;directs&nbsp;all&nbsp;events&nbsp;to&nbsp;this&nbsp;and&nbsp;descendant<BR>widgets&nbsp;in&nbsp;the&nbsp;application.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-grab_set_global><STRONG>grab_set_global</STRONG></A>(self)
+              <DD><TT>Set&nbsp;global&nbsp;grab&nbsp;for&nbsp;this&nbsp;widget.<BR>&nbsp;<BR>A&nbsp;global&nbsp;grab&nbsp;directs&nbsp;all&nbsp;events&nbsp;to&nbsp;this&nbsp;and<BR>descendant&nbsp;widgets&nbsp;on&nbsp;the&nbsp;display.&nbsp;Use&nbsp;with&nbsp;caution&nbsp;-<BR>other&nbsp;applications&nbsp;do&nbsp;not&nbsp;get&nbsp;events&nbsp;anymore.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-grab_status><STRONG>grab_status</STRONG></A>(self)
+              <DD><TT>Return&nbsp;None,&nbsp;"local"&nbsp;or&nbsp;"global"&nbsp;if&nbsp;this&nbsp;widget&nbsp;has<BR>no,&nbsp;a&nbsp;local&nbsp;or&nbsp;a&nbsp;global&nbsp;grab.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-grid_bbox><STRONG>grid_bbox</STRONG></A>(self, 
+              column<FONT color=#909090>=None</FONT>, row<FONT 
+              color=#909090>=None</FONT>, col2<FONT color=#909090>=None</FONT>, 
+              row2<FONT color=#909090>=None</FONT>)
+              <DD><TT>Return&nbsp;a&nbsp;tuple&nbsp;of&nbsp;integer&nbsp;coordinates&nbsp;for&nbsp;the&nbsp;bounding<BR>box&nbsp;of&nbsp;this&nbsp;widget&nbsp;controlled&nbsp;by&nbsp;the&nbsp;geometry&nbsp;manager&nbsp;grid.<BR>&nbsp;<BR>If&nbsp;COLUMN,&nbsp;ROW&nbsp;is&nbsp;given&nbsp;the&nbsp;bounding&nbsp;box&nbsp;applies&nbsp;from<BR>the&nbsp;cell&nbsp;with&nbsp;row&nbsp;and&nbsp;column&nbsp;0&nbsp;to&nbsp;the&nbsp;specified<BR>cell.&nbsp;If&nbsp;COL2&nbsp;and&nbsp;ROW2&nbsp;are&nbsp;given&nbsp;the&nbsp;bounding&nbsp;box<BR>starts&nbsp;at&nbsp;that&nbsp;cell.<BR>&nbsp;<BR>The&nbsp;returned&nbsp;integers&nbsp;specify&nbsp;the&nbsp;offset&nbsp;of&nbsp;the&nbsp;upper&nbsp;left<BR>corner&nbsp;in&nbsp;the&nbsp;master&nbsp;widget&nbsp;and&nbsp;the&nbsp;width&nbsp;and&nbsp;height.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-grid_columnconfigure><STRONG>grid_columnconfigure</STRONG></A>(self, 
+              index, cnf<FONT color=#909090>={}</FONT>, **kw)
+              <DD><TT>Configure&nbsp;column&nbsp;INDEX&nbsp;of&nbsp;a&nbsp;grid.<BR>&nbsp;<BR>Valid&nbsp;resources&nbsp;are&nbsp;minsize&nbsp;(minimum&nbsp;size&nbsp;of&nbsp;the&nbsp;column),<BR>weight&nbsp;(how&nbsp;much&nbsp;does&nbsp;additional&nbsp;space&nbsp;propagate&nbsp;to&nbsp;this&nbsp;column)<BR>and&nbsp;pad&nbsp;(how&nbsp;much&nbsp;space&nbsp;to&nbsp;let&nbsp;additionally).</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-grid_location><STRONG>grid_location</STRONG></A>(self, 
+              x, y)
+              <DD><TT>Return&nbsp;a&nbsp;tuple&nbsp;of&nbsp;column&nbsp;and&nbsp;row&nbsp;which&nbsp;identify&nbsp;the&nbsp;cell<BR>at&nbsp;which&nbsp;the&nbsp;pixel&nbsp;at&nbsp;position&nbsp;X&nbsp;and&nbsp;Y&nbsp;inside&nbsp;the&nbsp;master<BR>widget&nbsp;is&nbsp;located.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-grid_propagate><STRONG>grid_propagate</STRONG></A>(self, 
+              flag<FONT color=#909090>=['_noarg_']</FONT>)
+              <DD><TT>Set&nbsp;or&nbsp;get&nbsp;the&nbsp;status&nbsp;for&nbsp;propagation&nbsp;of&nbsp;geometry&nbsp;information.<BR>&nbsp;<BR>A&nbsp;boolean&nbsp;argument&nbsp;specifies&nbsp;whether&nbsp;the&nbsp;geometry&nbsp;information<BR>of&nbsp;the&nbsp;slaves&nbsp;will&nbsp;determine&nbsp;the&nbsp;size&nbsp;of&nbsp;this&nbsp;widget.&nbsp;If&nbsp;no&nbsp;argument<BR>is&nbsp;given,&nbsp;the&nbsp;current&nbsp;setting&nbsp;will&nbsp;be&nbsp;returned.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-grid_rowconfigure><STRONG>grid_rowconfigure</STRONG></A>(self, 
+              index, cnf<FONT color=#909090>={}</FONT>, **kw)
+              <DD><TT>Configure&nbsp;row&nbsp;INDEX&nbsp;of&nbsp;a&nbsp;grid.<BR>&nbsp;<BR>Valid&nbsp;resources&nbsp;are&nbsp;minsize&nbsp;(minimum&nbsp;size&nbsp;of&nbsp;the&nbsp;row),<BR>weight&nbsp;(how&nbsp;much&nbsp;does&nbsp;additional&nbsp;space&nbsp;propagate&nbsp;to&nbsp;this&nbsp;row)<BR>and&nbsp;pad&nbsp;(how&nbsp;much&nbsp;space&nbsp;to&nbsp;let&nbsp;additionally).</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-grid_size><STRONG>grid_size</STRONG></A>(self)
+              <DD><TT>Return&nbsp;a&nbsp;tuple&nbsp;of&nbsp;the&nbsp;number&nbsp;of&nbsp;column&nbsp;and&nbsp;rows&nbsp;in&nbsp;the&nbsp;grid.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-grid_slaves><STRONG>grid_slaves</STRONG></A>(self, 
+              row<FONT color=#909090>=None</FONT>, column<FONT 
+              color=#909090>=None</FONT>)
+              <DD><TT>Return&nbsp;a&nbsp;list&nbsp;of&nbsp;all&nbsp;slaves&nbsp;of&nbsp;this&nbsp;widget<BR>in&nbsp;its&nbsp;packing&nbsp;order.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-image_names><STRONG>image_names</STRONG></A>(self)
+              <DD><TT>Return&nbsp;a&nbsp;list&nbsp;of&nbsp;all&nbsp;existing&nbsp;image&nbsp;names.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-image_types><STRONG>image_types</STRONG></A>(self)
+              <DD><TT>Return&nbsp;a&nbsp;list&nbsp;of&nbsp;all&nbsp;available&nbsp;image&nbsp;types&nbsp;(e.g.&nbsp;phote&nbsp;bitmap).</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-keys><STRONG>keys</STRONG></A>(self)
+              <DD><TT>Return&nbsp;a&nbsp;list&nbsp;of&nbsp;all&nbsp;resource&nbsp;names&nbsp;of&nbsp;this&nbsp;widget.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-lift><STRONG>lift</STRONG></A> = 
+              tkraise(self, aboveThis<FONT color=#909090>=None</FONT>)
+              <DD><TT>Raise&nbsp;this&nbsp;widget&nbsp;in&nbsp;the&nbsp;stacking&nbsp;order.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-lower><STRONG>lower</STRONG></A>(self, 
+              belowThis<FONT color=#909090>=None</FONT>)
+              <DD><TT>Lower&nbsp;this&nbsp;widget&nbsp;in&nbsp;the&nbsp;stacking&nbsp;order.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-mainloop><STRONG>mainloop</STRONG></A>(self, 
+              n<FONT color=#909090>=0</FONT>)
+              <DD><TT>Call&nbsp;the&nbsp;mainloop&nbsp;of&nbsp;<A 
+              href="Tkinter.html#Tk">Tk</A>.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-nametowidget><STRONG>nametowidget</STRONG></A>(self, 
+              name)
+              <DD><TT>Return&nbsp;the&nbsp;Tkinter&nbsp;instance&nbsp;of&nbsp;a&nbsp;widget&nbsp;identified&nbsp;by<BR>its&nbsp;Tcl&nbsp;name&nbsp;NAME.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-option_add><STRONG>option_add</STRONG></A>(self, 
+              pattern, value, priority<FONT color=#909090>=None</FONT>)
+              <DD><TT>Set&nbsp;a&nbsp;VALUE&nbsp;(second&nbsp;parameter)&nbsp;for&nbsp;an&nbsp;option<BR>PATTERN&nbsp;(first&nbsp;parameter).<BR>&nbsp;<BR>An&nbsp;optional&nbsp;third&nbsp;parameter&nbsp;gives&nbsp;the&nbsp;numeric&nbsp;priority<BR>(defaults&nbsp;to&nbsp;80).</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-option_clear><STRONG>option_clear</STRONG></A>(self)
+              <DD><TT>Clear&nbsp;the&nbsp;option&nbsp;database.<BR>&nbsp;<BR>It&nbsp;will&nbsp;be&nbsp;reloaded&nbsp;if&nbsp;option_add&nbsp;is&nbsp;called.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-option_get><STRONG>option_get</STRONG></A>(self, 
+              name, className)
+              <DD><TT>Return&nbsp;the&nbsp;value&nbsp;for&nbsp;an&nbsp;option&nbsp;NAME&nbsp;for&nbsp;this&nbsp;widget<BR>with&nbsp;CLASSNAME.<BR>&nbsp;<BR>Values&nbsp;with&nbsp;higher&nbsp;priority&nbsp;override&nbsp;lower&nbsp;values.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-option_readfile><STRONG>option_readfile</STRONG></A>(self, 
+              fileName, priority<FONT color=#909090>=None</FONT>)
+              <DD><TT>Read&nbsp;file&nbsp;FILENAME&nbsp;into&nbsp;the&nbsp;option&nbsp;database.<BR>&nbsp;<BR>An&nbsp;optional&nbsp;second&nbsp;parameter&nbsp;gives&nbsp;the&nbsp;numeric<BR>priority.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-pack_propagate><STRONG>pack_propagate</STRONG></A>(self, 
+              flag<FONT color=#909090>=['_noarg_']</FONT>)
+              <DD><TT>Set&nbsp;or&nbsp;get&nbsp;the&nbsp;status&nbsp;for&nbsp;propagation&nbsp;of&nbsp;geometry&nbsp;information.<BR>&nbsp;<BR>A&nbsp;boolean&nbsp;argument&nbsp;specifies&nbsp;whether&nbsp;the&nbsp;geometry&nbsp;information<BR>of&nbsp;the&nbsp;slaves&nbsp;will&nbsp;determine&nbsp;the&nbsp;size&nbsp;of&nbsp;this&nbsp;widget.&nbsp;If&nbsp;no&nbsp;argument<BR>is&nbsp;given&nbsp;the&nbsp;current&nbsp;setting&nbsp;will&nbsp;be&nbsp;returned.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-pack_slaves><STRONG>pack_slaves</STRONG></A>(self)
+              <DD><TT>Return&nbsp;a&nbsp;list&nbsp;of&nbsp;all&nbsp;slaves&nbsp;of&nbsp;this&nbsp;widget<BR>in&nbsp;its&nbsp;packing&nbsp;order.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-place_slaves><STRONG>place_slaves</STRONG></A>(self)
+              <DD><TT>Return&nbsp;a&nbsp;list&nbsp;of&nbsp;all&nbsp;slaves&nbsp;of&nbsp;this&nbsp;widget<BR>in&nbsp;its&nbsp;packing&nbsp;order.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-propagate><STRONG>propagate</STRONG></A> = 
+              pack_propagate(self, flag<FONT color=#909090>=['_noarg_']</FONT>)
+              <DD><TT>Set&nbsp;or&nbsp;get&nbsp;the&nbsp;status&nbsp;for&nbsp;propagation&nbsp;of&nbsp;geometry&nbsp;information.<BR>&nbsp;<BR>A&nbsp;boolean&nbsp;argument&nbsp;specifies&nbsp;whether&nbsp;the&nbsp;geometry&nbsp;information<BR>of&nbsp;the&nbsp;slaves&nbsp;will&nbsp;determine&nbsp;the&nbsp;size&nbsp;of&nbsp;this&nbsp;widget.&nbsp;If&nbsp;no&nbsp;argument<BR>is&nbsp;given&nbsp;the&nbsp;current&nbsp;setting&nbsp;will&nbsp;be&nbsp;returned.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-quit><STRONG>quit</STRONG></A>(self)
+              <DD><TT>Quit&nbsp;the&nbsp;Tcl&nbsp;interpreter.&nbsp;All&nbsp;widgets&nbsp;will&nbsp;be&nbsp;destroyed.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-register><STRONG>register</STRONG></A> = 
+              _register(self, func, subst<FONT color=#909090>=None</FONT>, 
+              needcleanup<FONT color=#909090>=1</FONT>)
+              <DD><TT>Return&nbsp;a&nbsp;newly&nbsp;created&nbsp;Tcl&nbsp;function.&nbsp;If&nbsp;this<BR>function&nbsp;is&nbsp;called,&nbsp;the&nbsp;Python&nbsp;function&nbsp;FUNC&nbsp;will<BR>be&nbsp;executed.&nbsp;An&nbsp;optional&nbsp;function&nbsp;SUBST&nbsp;can<BR>be&nbsp;given&nbsp;which&nbsp;will&nbsp;be&nbsp;executed&nbsp;before&nbsp;FUNC.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-rowconfigure><STRONG>rowconfigure</STRONG></A> = 
+              grid_rowconfigure(self, index, cnf<FONT color=#909090>={}</FONT>, 
+              **kw)
+              <DD><TT>Configure&nbsp;row&nbsp;INDEX&nbsp;of&nbsp;a&nbsp;grid.<BR>&nbsp;<BR>Valid&nbsp;resources&nbsp;are&nbsp;minsize&nbsp;(minimum&nbsp;size&nbsp;of&nbsp;the&nbsp;row),<BR>weight&nbsp;(how&nbsp;much&nbsp;does&nbsp;additional&nbsp;space&nbsp;propagate&nbsp;to&nbsp;this&nbsp;row)<BR>and&nbsp;pad&nbsp;(how&nbsp;much&nbsp;space&nbsp;to&nbsp;let&nbsp;additionally).</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-selection_clear><STRONG>selection_clear</STRONG></A>(self, 
+              **kw)
+              <DD><TT>Clear&nbsp;the&nbsp;current&nbsp;X&nbsp;selection.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-selection_get><STRONG>selection_get</STRONG></A>(self, 
+              **kw)
+              <DD><TT>Return&nbsp;the&nbsp;contents&nbsp;of&nbsp;the&nbsp;current&nbsp;X&nbsp;selection.<BR>&nbsp;<BR>A&nbsp;keyword&nbsp;parameter&nbsp;selection&nbsp;specifies&nbsp;the&nbsp;name&nbsp;of<BR>the&nbsp;selection&nbsp;and&nbsp;defaults&nbsp;to&nbsp;PRIMARY.&nbsp;&nbsp;A&nbsp;keyword<BR>parameter&nbsp;displayof&nbsp;specifies&nbsp;a&nbsp;widget&nbsp;on&nbsp;the&nbsp;display<BR>to&nbsp;use.&nbsp;A&nbsp;keyword&nbsp;parameter&nbsp;type&nbsp;specifies&nbsp;the&nbsp;form&nbsp;of&nbsp;data&nbsp;to&nbsp;be<BR>fetched,&nbsp;defaulting&nbsp;to&nbsp;STRING&nbsp;except&nbsp;on&nbsp;X11,&nbsp;where&nbsp;UTF8_STRING&nbsp;is&nbsp;tried<BR>before&nbsp;STRING.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-selection_handle><STRONG>selection_handle</STRONG></A>(self, 
+              command, **kw)
+              <DD><TT>Specify&nbsp;a&nbsp;function&nbsp;COMMAND&nbsp;to&nbsp;call&nbsp;if&nbsp;the&nbsp;X<BR>selection&nbsp;owned&nbsp;by&nbsp;this&nbsp;widget&nbsp;is&nbsp;queried&nbsp;by&nbsp;another<BR>application.<BR>&nbsp;<BR>This&nbsp;function&nbsp;must&nbsp;return&nbsp;the&nbsp;contents&nbsp;of&nbsp;the<BR>selection.&nbsp;The&nbsp;function&nbsp;will&nbsp;be&nbsp;called&nbsp;with&nbsp;the<BR>arguments&nbsp;OFFSET&nbsp;and&nbsp;LENGTH&nbsp;which&nbsp;allows&nbsp;the&nbsp;chunking<BR>of&nbsp;very&nbsp;long&nbsp;selections.&nbsp;The&nbsp;following&nbsp;keyword<BR>parameters&nbsp;can&nbsp;be&nbsp;provided:<BR>selection&nbsp;-&nbsp;name&nbsp;of&nbsp;the&nbsp;selection&nbsp;(default&nbsp;PRIMARY),<BR>type&nbsp;-&nbsp;type&nbsp;of&nbsp;the&nbsp;selection&nbsp;(e.g.&nbsp;STRING,&nbsp;FILE_NAME).</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-selection_own><STRONG>selection_own</STRONG></A>(self, 
+              **kw)
+              <DD><TT>Become&nbsp;owner&nbsp;of&nbsp;X&nbsp;selection.<BR>&nbsp;<BR>A&nbsp;keyword&nbsp;parameter&nbsp;selection&nbsp;specifies&nbsp;the&nbsp;name&nbsp;of<BR>the&nbsp;selection&nbsp;(default&nbsp;PRIMARY).</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-selection_own_get><STRONG>selection_own_get</STRONG></A>(self, 
+              **kw)
+              <DD><TT>Return&nbsp;owner&nbsp;of&nbsp;X&nbsp;selection.<BR>&nbsp;<BR>The&nbsp;following&nbsp;keyword&nbsp;parameter&nbsp;can<BR>be&nbsp;provided:<BR>selection&nbsp;-&nbsp;name&nbsp;of&nbsp;the&nbsp;selection&nbsp;(default&nbsp;PRIMARY),<BR>type&nbsp;-&nbsp;type&nbsp;of&nbsp;the&nbsp;selection&nbsp;(e.g.&nbsp;STRING,&nbsp;FILE_NAME).</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-send><STRONG>send</STRONG></A>(self, 
+              interp, cmd, *args)
+              <DD><TT>Send&nbsp;Tcl&nbsp;command&nbsp;CMD&nbsp;to&nbsp;different&nbsp;interpreter&nbsp;INTERP&nbsp;to&nbsp;be&nbsp;executed.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-setvar><STRONG>setvar</STRONG></A>(self, 
+              name<FONT color=#909090>='PY_VAR'</FONT>, value<FONT 
+              color=#909090>='1'</FONT>)
+              <DD><TT>Set&nbsp;Tcl&nbsp;variable&nbsp;NAME&nbsp;to&nbsp;VALUE.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-size><STRONG>size</STRONG></A> = 
+              grid_size(self)
+              <DD><TT>Return&nbsp;a&nbsp;tuple&nbsp;of&nbsp;the&nbsp;number&nbsp;of&nbsp;column&nbsp;and&nbsp;rows&nbsp;in&nbsp;the&nbsp;grid.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-slaves><STRONG>slaves</STRONG></A> = 
+              pack_slaves(self)
+              <DD><TT>Return&nbsp;a&nbsp;list&nbsp;of&nbsp;all&nbsp;slaves&nbsp;of&nbsp;this&nbsp;widget<BR>in&nbsp;its&nbsp;packing&nbsp;order.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-tk_bisque><STRONG>tk_bisque</STRONG></A>(self)
+              <DD><TT>Change&nbsp;the&nbsp;color&nbsp;scheme&nbsp;to&nbsp;light&nbsp;brown&nbsp;as&nbsp;used&nbsp;in&nbsp;<A 
+              href="Tkinter.html#Tk">Tk</A>&nbsp;3.6&nbsp;and&nbsp;before.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-tk_focusFollowsMouse><STRONG>tk_focusFollowsMouse</STRONG></A>(self)
+              <DD><TT>The&nbsp;widget&nbsp;under&nbsp;mouse&nbsp;will&nbsp;get&nbsp;automatically&nbsp;focus.&nbsp;Can&nbsp;not<BR>be&nbsp;disabled&nbsp;easily.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-tk_focusNext><STRONG>tk_focusNext</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;next&nbsp;widget&nbsp;in&nbsp;the&nbsp;focus&nbsp;order&nbsp;which&nbsp;follows<BR>widget&nbsp;which&nbsp;has&nbsp;currently&nbsp;the&nbsp;focus.<BR>&nbsp;<BR>The&nbsp;focus&nbsp;order&nbsp;first&nbsp;goes&nbsp;to&nbsp;the&nbsp;next&nbsp;child,&nbsp;then&nbsp;to<BR>the&nbsp;children&nbsp;of&nbsp;the&nbsp;child&nbsp;recursively&nbsp;and&nbsp;then&nbsp;to&nbsp;the<BR>next&nbsp;sibling&nbsp;which&nbsp;is&nbsp;higher&nbsp;in&nbsp;the&nbsp;stacking&nbsp;order.&nbsp;&nbsp;A<BR>widget&nbsp;is&nbsp;omitted&nbsp;if&nbsp;it&nbsp;has&nbsp;the&nbsp;takefocus&nbsp;resource&nbsp;set<BR>to&nbsp;0.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-tk_focusPrev><STRONG>tk_focusPrev</STRONG></A>(self)
+              <DD><TT>Return&nbsp;previous&nbsp;widget&nbsp;in&nbsp;the&nbsp;focus&nbsp;order.&nbsp;See&nbsp;tk_focusNext&nbsp;for&nbsp;details.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-tk_menuBar><STRONG>tk_menuBar</STRONG></A>(self, 
+              *args)
+              <DD><TT>Do&nbsp;not&nbsp;use.&nbsp;Needed&nbsp;in&nbsp;<A 
+              href="Tkinter.html#Tk">Tk</A>&nbsp;3.6&nbsp;and&nbsp;earlier.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-tk_setPalette><STRONG>tk_setPalette</STRONG></A>(self, 
+              *args, **kw)
+              <DD><TT>Set&nbsp;a&nbsp;new&nbsp;color&nbsp;scheme&nbsp;for&nbsp;all&nbsp;widget&nbsp;elements.<BR>&nbsp;<BR>A&nbsp;single&nbsp;color&nbsp;as&nbsp;argument&nbsp;will&nbsp;cause&nbsp;that&nbsp;all&nbsp;colors&nbsp;of&nbsp;<A 
+              href="Tkinter.html#Tk">Tk</A><BR>widget&nbsp;elements&nbsp;are&nbsp;derived&nbsp;from&nbsp;this.<BR>Alternatively&nbsp;several&nbsp;keyword&nbsp;parameters&nbsp;and&nbsp;its&nbsp;associated<BR>colors&nbsp;can&nbsp;be&nbsp;given.&nbsp;The&nbsp;following&nbsp;keywords&nbsp;are&nbsp;valid:<BR>activeBackground,&nbsp;foreground,&nbsp;selectColor,<BR>activeForeground,&nbsp;highlightBackground,&nbsp;selectBackground,<BR>background,&nbsp;highlightColor,&nbsp;selectForeground,<BR>disabledForeground,&nbsp;insertBackground,&nbsp;troughColor.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-tk_strictMotif><STRONG>tk_strictMotif</STRONG></A>(self, 
+              boolean<FONT color=#909090>=None</FONT>)
+              <DD><TT>Set&nbsp;Tcl&nbsp;internal&nbsp;variable,&nbsp;whether&nbsp;the&nbsp;look&nbsp;and&nbsp;feel<BR>should&nbsp;adhere&nbsp;to&nbsp;Motif.<BR>&nbsp;<BR>A&nbsp;parameter&nbsp;of&nbsp;1&nbsp;means&nbsp;adhere&nbsp;to&nbsp;Motif&nbsp;(e.g.&nbsp;no&nbsp;color<BR>change&nbsp;if&nbsp;mouse&nbsp;passes&nbsp;over&nbsp;slider).<BR>Returns&nbsp;the&nbsp;set&nbsp;value.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-tkraise><STRONG>tkraise</STRONG></A>(self, 
+              aboveThis<FONT color=#909090>=None</FONT>)
+              <DD><TT>Raise&nbsp;this&nbsp;widget&nbsp;in&nbsp;the&nbsp;stacking&nbsp;order.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-unbind><STRONG>unbind</STRONG></A>(self, 
+              sequence, funcid<FONT color=#909090>=None</FONT>)
+              <DD><TT>Unbind&nbsp;for&nbsp;this&nbsp;widget&nbsp;for&nbsp;event&nbsp;SEQUENCE&nbsp;&nbsp;the<BR>function&nbsp;identified&nbsp;with&nbsp;FUNCID.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-unbind_all><STRONG>unbind_all</STRONG></A>(self, 
+              sequence)
+              <DD><TT>Unbind&nbsp;for&nbsp;all&nbsp;widgets&nbsp;for&nbsp;event&nbsp;SEQUENCE&nbsp;all&nbsp;functions.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-unbind_class><STRONG>unbind_class</STRONG></A>(self, 
+              className, sequence)
+              <DD><TT>Unbind&nbsp;for&nbsp;a&nbsp;all&nbsp;widgets&nbsp;with&nbsp;bindtag&nbsp;CLASSNAME&nbsp;for&nbsp;event&nbsp;SEQUENCE<BR>all&nbsp;functions.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-update><STRONG>update</STRONG></A>(self)
+              <DD><TT>Enter&nbsp;event&nbsp;loop&nbsp;until&nbsp;all&nbsp;pending&nbsp;events&nbsp;have&nbsp;been&nbsp;processed&nbsp;by&nbsp;Tcl.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-update_idletasks><STRONG>update_idletasks</STRONG></A>(self)
+              <DD><TT>Enter&nbsp;event&nbsp;loop&nbsp;until&nbsp;all&nbsp;idle&nbsp;callbacks&nbsp;have&nbsp;been&nbsp;called.&nbsp;This<BR>will&nbsp;update&nbsp;the&nbsp;display&nbsp;of&nbsp;windows&nbsp;but&nbsp;not&nbsp;process&nbsp;events&nbsp;caused&nbsp;by<BR>the&nbsp;user.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wait_variable><STRONG>wait_variable</STRONG></A>(self, 
+              name<FONT color=#909090>='PY_VAR'</FONT>)
+              <DD><TT>Wait&nbsp;until&nbsp;the&nbsp;variable&nbsp;is&nbsp;modified.<BR>&nbsp;<BR>A&nbsp;parameter&nbsp;of&nbsp;type&nbsp;IntVar,&nbsp;StringVar,&nbsp;DoubleVar&nbsp;or<BR>BooleanVar&nbsp;must&nbsp;be&nbsp;given.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wait_visibility><STRONG>wait_visibility</STRONG></A>(self, 
+              window<FONT color=#909090>=None</FONT>)
+              <DD><TT>Wait&nbsp;until&nbsp;the&nbsp;visibility&nbsp;of&nbsp;a&nbsp;WIDGET&nbsp;changes<BR>(e.g.&nbsp;it&nbsp;appears).<BR>&nbsp;<BR>If&nbsp;no&nbsp;parameter&nbsp;is&nbsp;given&nbsp;self&nbsp;is&nbsp;used.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wait_window><STRONG>wait_window</STRONG></A>(self, 
+              window<FONT color=#909090>=None</FONT>)
+              <DD><TT>Wait&nbsp;until&nbsp;a&nbsp;WIDGET&nbsp;is&nbsp;destroyed.<BR>&nbsp;<BR>If&nbsp;no&nbsp;parameter&nbsp;is&nbsp;given&nbsp;self&nbsp;is&nbsp;used.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-waitvar><STRONG>waitvar</STRONG></A> = 
+              wait_variable(self, name<FONT color=#909090>='PY_VAR'</FONT>)
+              <DD><TT>Wait&nbsp;until&nbsp;the&nbsp;variable&nbsp;is&nbsp;modified.<BR>&nbsp;<BR>A&nbsp;parameter&nbsp;of&nbsp;type&nbsp;IntVar,&nbsp;StringVar,&nbsp;DoubleVar&nbsp;or<BR>BooleanVar&nbsp;must&nbsp;be&nbsp;given.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_atom><STRONG>winfo_atom</STRONG></A>(self, 
+              name, displayof<FONT color=#909090>=0</FONT>)
+              <DD><TT>Return&nbsp;integer&nbsp;which&nbsp;represents&nbsp;atom&nbsp;NAME.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_atomname><STRONG>winfo_atomname</STRONG></A>(self, 
+              id, displayof<FONT color=#909090>=0</FONT>)
+              <DD><TT>Return&nbsp;name&nbsp;of&nbsp;atom&nbsp;with&nbsp;identifier&nbsp;ID.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_cells><STRONG>winfo_cells</STRONG></A>(self)
+              <DD><TT>Return&nbsp;number&nbsp;of&nbsp;cells&nbsp;in&nbsp;the&nbsp;colormap&nbsp;for&nbsp;this&nbsp;widget.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_children><STRONG>winfo_children</STRONG></A>(self)
+              <DD><TT>Return&nbsp;a&nbsp;list&nbsp;of&nbsp;all&nbsp;widgets&nbsp;which&nbsp;are&nbsp;children&nbsp;of&nbsp;this&nbsp;widget.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_class><STRONG>winfo_class</STRONG></A>(self)
+              <DD><TT>Return&nbsp;window&nbsp;class&nbsp;name&nbsp;of&nbsp;this&nbsp;widget.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_colormapfull><STRONG>winfo_colormapfull</STRONG></A>(self)
+              <DD><TT>Return&nbsp;true&nbsp;if&nbsp;at&nbsp;the&nbsp;last&nbsp;color&nbsp;request&nbsp;the&nbsp;colormap&nbsp;was&nbsp;full.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_containing><STRONG>winfo_containing</STRONG></A>(self, 
+              rootX, rootY, displayof<FONT color=#909090>=0</FONT>)
+              <DD><TT>Return&nbsp;the&nbsp;widget&nbsp;which&nbsp;is&nbsp;at&nbsp;the&nbsp;root&nbsp;coordinates&nbsp;ROOTX,&nbsp;ROOTY.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_depth><STRONG>winfo_depth</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;number&nbsp;of&nbsp;bits&nbsp;per&nbsp;pixel.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_exists><STRONG>winfo_exists</STRONG></A>(self)
+              <DD><TT>Return&nbsp;true&nbsp;if&nbsp;this&nbsp;widget&nbsp;exists.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_fpixels><STRONG>winfo_fpixels</STRONG></A>(self, 
+              number)
+              <DD><TT>Return&nbsp;the&nbsp;number&nbsp;of&nbsp;pixels&nbsp;for&nbsp;the&nbsp;given&nbsp;distance&nbsp;NUMBER<BR>(e.g.&nbsp;"3c")&nbsp;as&nbsp;float.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_geometry><STRONG>winfo_geometry</STRONG></A>(self)
+              <DD><TT>Return&nbsp;geometry&nbsp;string&nbsp;for&nbsp;this&nbsp;widget&nbsp;in&nbsp;the&nbsp;form&nbsp;"widthxheight+X+Y".</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_height><STRONG>winfo_height</STRONG></A>(self)
+              <DD><TT>Return&nbsp;height&nbsp;of&nbsp;this&nbsp;widget.</TT></DD></DL>
+            <DL>
+              <DT><A 
+name=DicoShapes-winfo_id><STRONG>winfo_id</STRONG></A>(self)
+              <DD><TT>Return&nbsp;identifier&nbsp;ID&nbsp;for&nbsp;this&nbsp;widget.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_interps><STRONG>winfo_interps</STRONG></A>(self, 
+              displayof<FONT color=#909090>=0</FONT>)
+              <DD><TT>Return&nbsp;the&nbsp;name&nbsp;of&nbsp;all&nbsp;Tcl&nbsp;interpreters&nbsp;for&nbsp;this&nbsp;display.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_ismapped><STRONG>winfo_ismapped</STRONG></A>(self)
+              <DD><TT>Return&nbsp;true&nbsp;if&nbsp;this&nbsp;widget&nbsp;is&nbsp;mapped.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_manager><STRONG>winfo_manager</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;window&nbsp;mananger&nbsp;name&nbsp;for&nbsp;this&nbsp;widget.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_name><STRONG>winfo_name</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;name&nbsp;of&nbsp;this&nbsp;widget.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_parent><STRONG>winfo_parent</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;parent&nbsp;of&nbsp;this&nbsp;widget.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_pathname><STRONG>winfo_pathname</STRONG></A>(self, 
+              id, displayof<FONT color=#909090>=0</FONT>)
+              <DD><TT>Return&nbsp;the&nbsp;pathname&nbsp;of&nbsp;the&nbsp;widget&nbsp;given&nbsp;by&nbsp;ID.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_pixels><STRONG>winfo_pixels</STRONG></A>(self, 
+              number)
+              <DD><TT>Rounded&nbsp;integer&nbsp;value&nbsp;of&nbsp;winfo_fpixels.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_pointerx><STRONG>winfo_pointerx</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;x&nbsp;coordinate&nbsp;of&nbsp;the&nbsp;pointer&nbsp;on&nbsp;the&nbsp;root&nbsp;window.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_pointerxy><STRONG>winfo_pointerxy</STRONG></A>(self)
+              <DD><TT>Return&nbsp;a&nbsp;tuple&nbsp;of&nbsp;x&nbsp;and&nbsp;y&nbsp;coordinates&nbsp;of&nbsp;the&nbsp;pointer&nbsp;on&nbsp;the&nbsp;root&nbsp;window.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_pointery><STRONG>winfo_pointery</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;y&nbsp;coordinate&nbsp;of&nbsp;the&nbsp;pointer&nbsp;on&nbsp;the&nbsp;root&nbsp;window.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_reqheight><STRONG>winfo_reqheight</STRONG></A>(self)
+              <DD><TT>Return&nbsp;requested&nbsp;height&nbsp;of&nbsp;this&nbsp;widget.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_reqwidth><STRONG>winfo_reqwidth</STRONG></A>(self)
+              <DD><TT>Return&nbsp;requested&nbsp;width&nbsp;of&nbsp;this&nbsp;widget.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_rgb><STRONG>winfo_rgb</STRONG></A>(self, 
+              color)
+              <DD><TT>Return&nbsp;tuple&nbsp;of&nbsp;decimal&nbsp;values&nbsp;for&nbsp;red,&nbsp;green,&nbsp;blue&nbsp;for<BR>COLOR&nbsp;in&nbsp;this&nbsp;widget.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_rootx><STRONG>winfo_rootx</STRONG></A>(self)
+              <DD><TT>Return&nbsp;x&nbsp;coordinate&nbsp;of&nbsp;upper&nbsp;left&nbsp;corner&nbsp;of&nbsp;this&nbsp;widget&nbsp;on&nbsp;the<BR>root&nbsp;window.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_rooty><STRONG>winfo_rooty</STRONG></A>(self)
+              <DD><TT>Return&nbsp;y&nbsp;coordinate&nbsp;of&nbsp;upper&nbsp;left&nbsp;corner&nbsp;of&nbsp;this&nbsp;widget&nbsp;on&nbsp;the<BR>root&nbsp;window.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_screen><STRONG>winfo_screen</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;screen&nbsp;name&nbsp;of&nbsp;this&nbsp;widget.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_screencells><STRONG>winfo_screencells</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;number&nbsp;of&nbsp;the&nbsp;cells&nbsp;in&nbsp;the&nbsp;colormap&nbsp;of&nbsp;the&nbsp;screen<BR>of&nbsp;this&nbsp;widget.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_screendepth><STRONG>winfo_screendepth</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;number&nbsp;of&nbsp;bits&nbsp;per&nbsp;pixel&nbsp;of&nbsp;the&nbsp;root&nbsp;window&nbsp;of&nbsp;the<BR>screen&nbsp;of&nbsp;this&nbsp;widget.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_screenheight><STRONG>winfo_screenheight</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;number&nbsp;of&nbsp;pixels&nbsp;of&nbsp;the&nbsp;height&nbsp;of&nbsp;the&nbsp;screen&nbsp;of&nbsp;this&nbsp;widget<BR>in&nbsp;pixel.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_screenmmheight><STRONG>winfo_screenmmheight</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;number&nbsp;of&nbsp;pixels&nbsp;of&nbsp;the&nbsp;height&nbsp;of&nbsp;the&nbsp;screen&nbsp;of<BR>this&nbsp;widget&nbsp;in&nbsp;mm.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_screenmmwidth><STRONG>winfo_screenmmwidth</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;number&nbsp;of&nbsp;pixels&nbsp;of&nbsp;the&nbsp;width&nbsp;of&nbsp;the&nbsp;screen&nbsp;of<BR>this&nbsp;widget&nbsp;in&nbsp;mm.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_screenvisual><STRONG>winfo_screenvisual</STRONG></A>(self)
+              <DD><TT>Return&nbsp;one&nbsp;of&nbsp;the&nbsp;strings&nbsp;directcolor,&nbsp;grayscale,&nbsp;pseudocolor,<BR>staticcolor,&nbsp;staticgray,&nbsp;or&nbsp;truecolor&nbsp;for&nbsp;the&nbsp;default<BR>colormodel&nbsp;of&nbsp;this&nbsp;screen.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_screenwidth><STRONG>winfo_screenwidth</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;number&nbsp;of&nbsp;pixels&nbsp;of&nbsp;the&nbsp;width&nbsp;of&nbsp;the&nbsp;screen&nbsp;of<BR>this&nbsp;widget&nbsp;in&nbsp;pixel.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_server><STRONG>winfo_server</STRONG></A>(self)
+              <DD><TT>Return&nbsp;information&nbsp;of&nbsp;the&nbsp;X-Server&nbsp;of&nbsp;the&nbsp;screen&nbsp;of&nbsp;this&nbsp;widget&nbsp;in<BR>the&nbsp;form&nbsp;"XmajorRminor&nbsp;vendor&nbsp;vendorVersion".</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_toplevel><STRONG>winfo_toplevel</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;toplevel&nbsp;widget&nbsp;of&nbsp;this&nbsp;widget.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_viewable><STRONG>winfo_viewable</STRONG></A>(self)
+              <DD><TT>Return&nbsp;true&nbsp;if&nbsp;the&nbsp;widget&nbsp;and&nbsp;all&nbsp;its&nbsp;higher&nbsp;ancestors&nbsp;are&nbsp;mapped.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_visual><STRONG>winfo_visual</STRONG></A>(self)
+              <DD><TT>Return&nbsp;one&nbsp;of&nbsp;the&nbsp;strings&nbsp;directcolor,&nbsp;grayscale,&nbsp;pseudocolor,<BR>staticcolor,&nbsp;staticgray,&nbsp;or&nbsp;truecolor&nbsp;for&nbsp;the<BR>colormodel&nbsp;of&nbsp;this&nbsp;widget.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_visualid><STRONG>winfo_visualid</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;X&nbsp;identifier&nbsp;for&nbsp;the&nbsp;visual&nbsp;for&nbsp;this&nbsp;widget.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_visualsavailable><STRONG>winfo_visualsavailable</STRONG></A>(self, 
+              includeids<FONT color=#909090>=0</FONT>)
+              <DD><TT>Return&nbsp;a&nbsp;list&nbsp;of&nbsp;all&nbsp;visuals&nbsp;available&nbsp;for&nbsp;the&nbsp;screen<BR>of&nbsp;this&nbsp;widget.<BR>&nbsp;<BR>Each&nbsp;item&nbsp;in&nbsp;the&nbsp;list&nbsp;consists&nbsp;of&nbsp;a&nbsp;visual&nbsp;name&nbsp;(see&nbsp;winfo_visual),&nbsp;a<BR>depth&nbsp;and&nbsp;if&nbsp;INCLUDEIDS=1&nbsp;is&nbsp;given&nbsp;also&nbsp;the&nbsp;X&nbsp;identifier.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_vrootheight><STRONG>winfo_vrootheight</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;height&nbsp;of&nbsp;the&nbsp;virtual&nbsp;root&nbsp;window&nbsp;associated&nbsp;with&nbsp;this<BR>widget&nbsp;in&nbsp;pixels.&nbsp;If&nbsp;there&nbsp;is&nbsp;no&nbsp;virtual&nbsp;root&nbsp;window&nbsp;return&nbsp;the<BR>height&nbsp;of&nbsp;the&nbsp;screen.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_vrootwidth><STRONG>winfo_vrootwidth</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;width&nbsp;of&nbsp;the&nbsp;virtual&nbsp;root&nbsp;window&nbsp;associated&nbsp;with&nbsp;this<BR>widget&nbsp;in&nbsp;pixel.&nbsp;If&nbsp;there&nbsp;is&nbsp;no&nbsp;virtual&nbsp;root&nbsp;window&nbsp;return&nbsp;the<BR>width&nbsp;of&nbsp;the&nbsp;screen.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_vrootx><STRONG>winfo_vrootx</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;x&nbsp;offset&nbsp;of&nbsp;the&nbsp;virtual&nbsp;root&nbsp;relative&nbsp;to&nbsp;the&nbsp;root<BR>window&nbsp;of&nbsp;the&nbsp;screen&nbsp;of&nbsp;this&nbsp;widget.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_vrooty><STRONG>winfo_vrooty</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;y&nbsp;offset&nbsp;of&nbsp;the&nbsp;virtual&nbsp;root&nbsp;relative&nbsp;to&nbsp;the&nbsp;root<BR>window&nbsp;of&nbsp;the&nbsp;screen&nbsp;of&nbsp;this&nbsp;widget.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-winfo_width><STRONG>winfo_width</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;width&nbsp;of&nbsp;this&nbsp;widget.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-winfo_x><STRONG>winfo_x</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;x&nbsp;coordinate&nbsp;of&nbsp;the&nbsp;upper&nbsp;left&nbsp;corner&nbsp;of&nbsp;this&nbsp;widget<BR>in&nbsp;the&nbsp;parent.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-winfo_y><STRONG>winfo_y</STRONG></A>(self)
+              <DD><TT>Return&nbsp;the&nbsp;y&nbsp;coordinate&nbsp;of&nbsp;the&nbsp;upper&nbsp;left&nbsp;corner&nbsp;of&nbsp;this&nbsp;widget<BR>in&nbsp;the&nbsp;parent.</TT></DD></DL>
+            <HR>
+            Data and other attributes inherited from <A 
+            href="Tkinter.html#Misc">Tkinter.Misc</A>:<BR>
+            <DL>
+              <DT><STRONG>getdouble</STRONG> = &lt;type 'float'&gt;
+              <DD><TT>float(x)&nbsp;-&gt;&nbsp;floating&nbsp;point&nbsp;number<BR>&nbsp;<BR>Convert&nbsp;a&nbsp;string&nbsp;or&nbsp;number&nbsp;to&nbsp;a&nbsp;floating&nbsp;point&nbsp;number,&nbsp;if&nbsp;possible.</TT></DD></DL>
+            <DL>
+              <DT><STRONG>getint</STRONG> = &lt;type 'int'&gt;
+              <DD><TT>int(x=0)&nbsp;-&gt;&nbsp;int&nbsp;or&nbsp;long<BR>int(x,&nbsp;base=10)&nbsp;-&gt;&nbsp;int&nbsp;or&nbsp;long<BR>&nbsp;<BR>Convert&nbsp;a&nbsp;number&nbsp;or&nbsp;string&nbsp;to&nbsp;an&nbsp;integer,&nbsp;or&nbsp;return&nbsp;0&nbsp;if&nbsp;no&nbsp;arguments<BR>are&nbsp;given.&nbsp;&nbsp;If&nbsp;x&nbsp;is&nbsp;floating&nbsp;point,&nbsp;the&nbsp;conversion&nbsp;truncates&nbsp;towards&nbsp;zero.<BR>If&nbsp;x&nbsp;is&nbsp;outside&nbsp;the&nbsp;integer&nbsp;range,&nbsp;the&nbsp;function&nbsp;returns&nbsp;a&nbsp;long&nbsp;instead.<BR>&nbsp;<BR>If&nbsp;x&nbsp;is&nbsp;not&nbsp;a&nbsp;number&nbsp;or&nbsp;if&nbsp;base&nbsp;is&nbsp;given,&nbsp;then&nbsp;x&nbsp;must&nbsp;be&nbsp;a&nbsp;string&nbsp;or<BR>Unicode&nbsp;object&nbsp;representing&nbsp;an&nbsp;integer&nbsp;literal&nbsp;in&nbsp;the&nbsp;given&nbsp;base.&nbsp;&nbsp;The<BR>literal&nbsp;can&nbsp;be&nbsp;preceded&nbsp;by&nbsp;'+'&nbsp;or&nbsp;'-'&nbsp;and&nbsp;be&nbsp;surrounded&nbsp;by&nbsp;whitespace.<BR>The&nbsp;base&nbsp;defaults&nbsp;to&nbsp;10.&nbsp;&nbsp;Valid&nbsp;bases&nbsp;are&nbsp;0&nbsp;and&nbsp;2-36.&nbsp;&nbsp;Base&nbsp;0&nbsp;means&nbsp;to<BR>interpret&nbsp;the&nbsp;base&nbsp;from&nbsp;the&nbsp;string&nbsp;as&nbsp;an&nbsp;integer&nbsp;literal.<BR>&gt;&gt;&gt;&nbsp;int('0b100',&nbsp;base=0)<BR>4</TT></DD></DL>
+            <HR>
+            Methods inherited from <A href="Tkinter.html#Wm">Tkinter.Wm</A>:<BR>
+            <DL>
+              <DT><A name=DicoShapes-aspect><STRONG>aspect</STRONG></A> = 
+              wm_aspect(self, minNumer<FONT color=#909090>=None</FONT>, 
+              minDenom<FONT color=#909090>=None</FONT>, maxNumer<FONT 
+              color=#909090>=None</FONT>, maxDenom<FONT 
+              color=#909090>=None</FONT>)
+              <DD><TT>Instruct&nbsp;the&nbsp;window&nbsp;manager&nbsp;to&nbsp;set&nbsp;the&nbsp;aspect&nbsp;ratio&nbsp;(width/height)<BR>of&nbsp;this&nbsp;widget&nbsp;to&nbsp;be&nbsp;between&nbsp;MINNUMER/MINDENOM&nbsp;and&nbsp;MAXNUMER/MAXDENOM.&nbsp;Return&nbsp;a&nbsp;tuple<BR>of&nbsp;the&nbsp;actual&nbsp;values&nbsp;if&nbsp;no&nbsp;argument&nbsp;is&nbsp;given.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-attributes><STRONG>attributes</STRONG></A> 
+              = wm_attributes(self, *args)
+              <DD><TT>This&nbsp;subcommand&nbsp;returns&nbsp;or&nbsp;sets&nbsp;platform&nbsp;specific&nbsp;attributes<BR>&nbsp;<BR>The&nbsp;first&nbsp;form&nbsp;returns&nbsp;a&nbsp;list&nbsp;of&nbsp;the&nbsp;platform&nbsp;specific&nbsp;flags&nbsp;and<BR>their&nbsp;values.&nbsp;The&nbsp;second&nbsp;form&nbsp;returns&nbsp;the&nbsp;value&nbsp;for&nbsp;the&nbsp;specific<BR>option.&nbsp;The&nbsp;third&nbsp;form&nbsp;sets&nbsp;one&nbsp;or&nbsp;more&nbsp;of&nbsp;the&nbsp;values.&nbsp;The&nbsp;values<BR>are&nbsp;as&nbsp;follows:<BR>&nbsp;<BR>On&nbsp;Windows,&nbsp;-disabled&nbsp;gets&nbsp;or&nbsp;sets&nbsp;whether&nbsp;the&nbsp;window&nbsp;is&nbsp;in&nbsp;a<BR>disabled&nbsp;state.&nbsp;-toolwindow&nbsp;gets&nbsp;or&nbsp;sets&nbsp;the&nbsp;style&nbsp;of&nbsp;the&nbsp;window<BR>to&nbsp;toolwindow&nbsp;(as&nbsp;defined&nbsp;in&nbsp;the&nbsp;MSDN).&nbsp;-topmost&nbsp;gets&nbsp;or&nbsp;sets<BR>whether&nbsp;this&nbsp;is&nbsp;a&nbsp;topmost&nbsp;window&nbsp;(displays&nbsp;above&nbsp;all&nbsp;other<BR>windows).<BR>&nbsp;<BR>On&nbsp;Macintosh,&nbsp;XXXXX<BR>&nbsp;<BR>On&nbsp;Unix,&nbsp;there&nbsp;are&nbsp;currently&nbsp;no&nbsp;special&nbsp;attribute&nbsp;values.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-client><STRONG>client</STRONG></A> = 
+              wm_client(self, name<FONT color=#909090>=None</FONT>)
+              <DD><TT>Store&nbsp;NAME&nbsp;in&nbsp;WM_CLIENT_MACHINE&nbsp;property&nbsp;of&nbsp;this&nbsp;widget.&nbsp;Return<BR>current&nbsp;value.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-colormapwindows><STRONG>colormapwindows</STRONG></A> 
+              = wm_colormapwindows(self, *wlist)
+              <DD><TT>Store&nbsp;list&nbsp;of&nbsp;window&nbsp;names&nbsp;(WLIST)&nbsp;into&nbsp;WM_COLORMAPWINDOWS&nbsp;property<BR>of&nbsp;this&nbsp;widget.&nbsp;This&nbsp;list&nbsp;contains&nbsp;windows&nbsp;whose&nbsp;colormaps&nbsp;differ&nbsp;from&nbsp;their<BR>parents.&nbsp;Return&nbsp;current&nbsp;list&nbsp;of&nbsp;widgets&nbsp;if&nbsp;WLIST&nbsp;is&nbsp;empty.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-command><STRONG>command</STRONG></A> = 
+              wm_command(self, value<FONT color=#909090>=None</FONT>)
+              <DD><TT>Store&nbsp;VALUE&nbsp;in&nbsp;WM_COMMAND&nbsp;property.&nbsp;It&nbsp;is&nbsp;the&nbsp;command<BR>which&nbsp;shall&nbsp;be&nbsp;used&nbsp;to&nbsp;invoke&nbsp;the&nbsp;application.&nbsp;Return&nbsp;current<BR>command&nbsp;if&nbsp;VALUE&nbsp;is&nbsp;None.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-deiconify><STRONG>deiconify</STRONG></A> = 
+              wm_deiconify(self)
+              <DD><TT>Deiconify&nbsp;this&nbsp;widget.&nbsp;If&nbsp;it&nbsp;was&nbsp;never&nbsp;mapped&nbsp;it&nbsp;will&nbsp;not&nbsp;be&nbsp;mapped.<BR>On&nbsp;Windows&nbsp;it&nbsp;will&nbsp;raise&nbsp;this&nbsp;widget&nbsp;and&nbsp;give&nbsp;it&nbsp;the&nbsp;focus.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-focusmodel><STRONG>focusmodel</STRONG></A> 
+              = wm_focusmodel(self, model<FONT color=#909090>=None</FONT>)
+              <DD><TT>Set&nbsp;focus&nbsp;model&nbsp;to&nbsp;MODEL.&nbsp;"active"&nbsp;means&nbsp;that&nbsp;this&nbsp;widget&nbsp;will&nbsp;claim<BR>the&nbsp;focus&nbsp;itself,&nbsp;"passive"&nbsp;means&nbsp;that&nbsp;the&nbsp;window&nbsp;manager&nbsp;shall&nbsp;give<BR>the&nbsp;focus.&nbsp;Return&nbsp;current&nbsp;focus&nbsp;model&nbsp;if&nbsp;MODEL&nbsp;is&nbsp;None.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-frame><STRONG>frame</STRONG></A> = 
+              wm_frame(self)
+              <DD><TT>Return&nbsp;identifier&nbsp;for&nbsp;decorative&nbsp;frame&nbsp;of&nbsp;this&nbsp;widget&nbsp;if&nbsp;present.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-geometry><STRONG>geometry</STRONG></A> = 
+              wm_geometry(self, newGeometry<FONT color=#909090>=None</FONT>)
+              <DD><TT>Set&nbsp;geometry&nbsp;to&nbsp;NEWGEOMETRY&nbsp;of&nbsp;the&nbsp;form&nbsp;=widthxheight+x+y.&nbsp;Return<BR>current&nbsp;value&nbsp;if&nbsp;None&nbsp;is&nbsp;given.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-grid><STRONG>grid</STRONG></A> = 
+              wm_grid(self, baseWidth<FONT color=#909090>=None</FONT>, 
+              baseHeight<FONT color=#909090>=None</FONT>, widthInc<FONT 
+              color=#909090>=None</FONT>, heightInc<FONT 
+              color=#909090>=None</FONT>)
+              <DD><TT>Instruct&nbsp;the&nbsp;window&nbsp;manager&nbsp;that&nbsp;this&nbsp;widget&nbsp;shall&nbsp;only&nbsp;be<BR>resized&nbsp;on&nbsp;grid&nbsp;boundaries.&nbsp;WIDTHINC&nbsp;and&nbsp;HEIGHTINC&nbsp;are&nbsp;the&nbsp;width&nbsp;and<BR>height&nbsp;of&nbsp;a&nbsp;grid&nbsp;unit&nbsp;in&nbsp;pixels.&nbsp;BASEWIDTH&nbsp;and&nbsp;BASEHEIGHT&nbsp;are&nbsp;the<BR>number&nbsp;of&nbsp;grid&nbsp;units&nbsp;requested&nbsp;in&nbsp;Tk_GeometryRequest.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-group><STRONG>group</STRONG></A> = 
+              wm_group(self, pathName<FONT color=#909090>=None</FONT>)
+              <DD><TT>Set&nbsp;the&nbsp;group&nbsp;leader&nbsp;widgets&nbsp;for&nbsp;related&nbsp;widgets&nbsp;to&nbsp;PATHNAME.&nbsp;Return<BR>the&nbsp;group&nbsp;leader&nbsp;of&nbsp;this&nbsp;widget&nbsp;if&nbsp;None&nbsp;is&nbsp;given.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-iconbitmap><STRONG>iconbitmap</STRONG></A> 
+              = wm_iconbitmap(self, bitmap<FONT color=#909090>=None</FONT>, 
+              default<FONT color=#909090>=None</FONT>)
+              <DD><TT>Set&nbsp;bitmap&nbsp;for&nbsp;the&nbsp;iconified&nbsp;widget&nbsp;to&nbsp;BITMAP.&nbsp;Return<BR>the&nbsp;bitmap&nbsp;if&nbsp;None&nbsp;is&nbsp;given.<BR>&nbsp;<BR>Under&nbsp;Windows,&nbsp;the&nbsp;DEFAULT&nbsp;parameter&nbsp;can&nbsp;be&nbsp;used&nbsp;to&nbsp;set&nbsp;the&nbsp;icon<BR>for&nbsp;the&nbsp;widget&nbsp;and&nbsp;any&nbsp;descendents&nbsp;that&nbsp;don't&nbsp;have&nbsp;an&nbsp;icon&nbsp;set<BR>explicitly.&nbsp;&nbsp;DEFAULT&nbsp;can&nbsp;be&nbsp;the&nbsp;relative&nbsp;path&nbsp;to&nbsp;a&nbsp;.ico&nbsp;file<BR>(example:&nbsp;root.<A 
+              href="#DicoShapes-iconbitmap">iconbitmap</A>(default='myicon.ico')&nbsp;).&nbsp;&nbsp;See&nbsp;<A 
+              href="Tkinter.html#Tk">Tk</A><BR>documentation&nbsp;for&nbsp;more&nbsp;information.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-iconify><STRONG>iconify</STRONG></A> = 
+              wm_iconify(self)
+              <DD><TT>Display&nbsp;widget&nbsp;as&nbsp;icon.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-iconmask><STRONG>iconmask</STRONG></A> = 
+              wm_iconmask(self, bitmap<FONT color=#909090>=None</FONT>)
+              <DD><TT>Set&nbsp;mask&nbsp;for&nbsp;the&nbsp;icon&nbsp;bitmap&nbsp;of&nbsp;this&nbsp;widget.&nbsp;Return&nbsp;the<BR>mask&nbsp;if&nbsp;None&nbsp;is&nbsp;given.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-iconname><STRONG>iconname</STRONG></A> = 
+              wm_iconname(self, newName<FONT color=#909090>=None</FONT>)
+              <DD><TT>Set&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;icon&nbsp;for&nbsp;this&nbsp;widget.&nbsp;Return&nbsp;the&nbsp;name&nbsp;if<BR>None&nbsp;is&nbsp;given.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-iconposition><STRONG>iconposition</STRONG></A> = 
+              wm_iconposition(self, x<FONT color=#909090>=None</FONT>, y<FONT 
+              color=#909090>=None</FONT>)
+              <DD><TT>Set&nbsp;the&nbsp;position&nbsp;of&nbsp;the&nbsp;icon&nbsp;of&nbsp;this&nbsp;widget&nbsp;to&nbsp;X&nbsp;and&nbsp;Y.&nbsp;Return<BR>a&nbsp;tuple&nbsp;of&nbsp;the&nbsp;current&nbsp;values&nbsp;of&nbsp;X&nbsp;and&nbsp;X&nbsp;if&nbsp;None&nbsp;is&nbsp;given.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-iconwindow><STRONG>iconwindow</STRONG></A> 
+              = wm_iconwindow(self, pathName<FONT color=#909090>=None</FONT>)
+              <DD><TT>Set&nbsp;widget&nbsp;PATHNAME&nbsp;to&nbsp;be&nbsp;displayed&nbsp;instead&nbsp;of&nbsp;icon.&nbsp;Return&nbsp;the&nbsp;current<BR>value&nbsp;if&nbsp;None&nbsp;is&nbsp;given.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-maxsize><STRONG>maxsize</STRONG></A> = 
+              wm_maxsize(self, width<FONT color=#909090>=None</FONT>, 
+              height<FONT color=#909090>=None</FONT>)
+              <DD><TT>Set&nbsp;max&nbsp;WIDTH&nbsp;and&nbsp;HEIGHT&nbsp;for&nbsp;this&nbsp;widget.&nbsp;If&nbsp;the&nbsp;window&nbsp;is&nbsp;gridded<BR>the&nbsp;values&nbsp;are&nbsp;given&nbsp;in&nbsp;grid&nbsp;units.&nbsp;Return&nbsp;the&nbsp;current&nbsp;values&nbsp;if&nbsp;None<BR>is&nbsp;given.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-minsize><STRONG>minsize</STRONG></A> = 
+              wm_minsize(self, width<FONT color=#909090>=None</FONT>, 
+              height<FONT color=#909090>=None</FONT>)
+              <DD><TT>Set&nbsp;min&nbsp;WIDTH&nbsp;and&nbsp;HEIGHT&nbsp;for&nbsp;this&nbsp;widget.&nbsp;If&nbsp;the&nbsp;window&nbsp;is&nbsp;gridded<BR>the&nbsp;values&nbsp;are&nbsp;given&nbsp;in&nbsp;grid&nbsp;units.&nbsp;Return&nbsp;the&nbsp;current&nbsp;values&nbsp;if&nbsp;None<BR>is&nbsp;given.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-overrideredirect><STRONG>overrideredirect</STRONG></A> 
+              = wm_overrideredirect(self, boolean<FONT 
+              color=#909090>=None</FONT>)
+              <DD><TT>Instruct&nbsp;the&nbsp;window&nbsp;manager&nbsp;to&nbsp;ignore&nbsp;this&nbsp;widget<BR>if&nbsp;BOOLEAN&nbsp;is&nbsp;given&nbsp;with&nbsp;1.&nbsp;Return&nbsp;the&nbsp;current&nbsp;value&nbsp;if&nbsp;None<BR>is&nbsp;given.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-positionfrom><STRONG>positionfrom</STRONG></A> = 
+              wm_positionfrom(self, who<FONT color=#909090>=None</FONT>)
+              <DD><TT>Instruct&nbsp;the&nbsp;window&nbsp;manager&nbsp;that&nbsp;the&nbsp;position&nbsp;of&nbsp;this&nbsp;widget&nbsp;shall<BR>be&nbsp;defined&nbsp;by&nbsp;the&nbsp;user&nbsp;if&nbsp;WHO&nbsp;is&nbsp;"user",&nbsp;and&nbsp;by&nbsp;its&nbsp;own&nbsp;policy&nbsp;if&nbsp;WHO&nbsp;is<BR>"program".</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-protocol><STRONG>protocol</STRONG></A> = 
+              wm_protocol(self, name<FONT color=#909090>=None</FONT>, func<FONT 
+              color=#909090>=None</FONT>)
+              <DD><TT>Bind&nbsp;function&nbsp;FUNC&nbsp;to&nbsp;command&nbsp;NAME&nbsp;for&nbsp;this&nbsp;widget.<BR>Return&nbsp;the&nbsp;function&nbsp;bound&nbsp;to&nbsp;NAME&nbsp;if&nbsp;None&nbsp;is&nbsp;given.&nbsp;NAME&nbsp;could&nbsp;be<BR>e.g.&nbsp;"WM_SAVE_YOURSELF"&nbsp;or&nbsp;"WM_DELETE_WINDOW".</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-resizable><STRONG>resizable</STRONG></A> = 
+              wm_resizable(self, width<FONT color=#909090>=None</FONT>, 
+              height<FONT color=#909090>=None</FONT>)
+              <DD><TT>Instruct&nbsp;the&nbsp;window&nbsp;manager&nbsp;whether&nbsp;this&nbsp;width&nbsp;can&nbsp;be&nbsp;resized<BR>in&nbsp;WIDTH&nbsp;or&nbsp;HEIGHT.&nbsp;Both&nbsp;values&nbsp;are&nbsp;boolean&nbsp;values.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-sizefrom><STRONG>sizefrom</STRONG></A> = 
+              wm_sizefrom(self, who<FONT color=#909090>=None</FONT>)
+              <DD><TT>Instruct&nbsp;the&nbsp;window&nbsp;manager&nbsp;that&nbsp;the&nbsp;size&nbsp;of&nbsp;this&nbsp;widget&nbsp;shall<BR>be&nbsp;defined&nbsp;by&nbsp;the&nbsp;user&nbsp;if&nbsp;WHO&nbsp;is&nbsp;"user",&nbsp;and&nbsp;by&nbsp;its&nbsp;own&nbsp;policy&nbsp;if&nbsp;WHO&nbsp;is<BR>"program".</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-state><STRONG>state</STRONG></A> = 
+              wm_state(self, newstate<FONT color=#909090>=None</FONT>)
+              <DD><TT>Query&nbsp;or&nbsp;set&nbsp;the&nbsp;state&nbsp;of&nbsp;this&nbsp;widget&nbsp;as&nbsp;one&nbsp;of&nbsp;normal,&nbsp;icon,<BR>iconic&nbsp;(see&nbsp;wm_iconwindow),&nbsp;withdrawn,&nbsp;or&nbsp;zoomed&nbsp;(Windows&nbsp;only).</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-title><STRONG>title</STRONG></A> = 
+              wm_title(self, string<FONT color=#909090>=None</FONT>)
+              <DD><TT>Set&nbsp;the&nbsp;title&nbsp;of&nbsp;this&nbsp;widget.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-transient><STRONG>transient</STRONG></A> = 
+              wm_transient(self, master<FONT color=#909090>=None</FONT>)
+              <DD><TT>Instruct&nbsp;the&nbsp;window&nbsp;manager&nbsp;that&nbsp;this&nbsp;widget&nbsp;is&nbsp;transient<BR>with&nbsp;regard&nbsp;to&nbsp;widget&nbsp;MASTER.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-withdraw><STRONG>withdraw</STRONG></A> = 
+              wm_withdraw(self)
+              <DD><TT>Withdraw&nbsp;this&nbsp;widget&nbsp;from&nbsp;the&nbsp;screen&nbsp;such&nbsp;that&nbsp;it&nbsp;is&nbsp;unmapped<BR>and&nbsp;forgotten&nbsp;by&nbsp;the&nbsp;window&nbsp;manager.&nbsp;Re-draw&nbsp;it&nbsp;with&nbsp;wm_deiconify.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_aspect><STRONG>wm_aspect</STRONG></A>(self, 
+              minNumer<FONT color=#909090>=None</FONT>, minDenom<FONT 
+              color=#909090>=None</FONT>, maxNumer<FONT 
+              color=#909090>=None</FONT>, maxDenom<FONT 
+              color=#909090>=None</FONT>)
+              <DD><TT>Instruct&nbsp;the&nbsp;window&nbsp;manager&nbsp;to&nbsp;set&nbsp;the&nbsp;aspect&nbsp;ratio&nbsp;(width/height)<BR>of&nbsp;this&nbsp;widget&nbsp;to&nbsp;be&nbsp;between&nbsp;MINNUMER/MINDENOM&nbsp;and&nbsp;MAXNUMER/MAXDENOM.&nbsp;Return&nbsp;a&nbsp;tuple<BR>of&nbsp;the&nbsp;actual&nbsp;values&nbsp;if&nbsp;no&nbsp;argument&nbsp;is&nbsp;given.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_attributes><STRONG>wm_attributes</STRONG></A>(self, 
+              *args)
+              <DD><TT>This&nbsp;subcommand&nbsp;returns&nbsp;or&nbsp;sets&nbsp;platform&nbsp;specific&nbsp;attributes<BR>&nbsp;<BR>The&nbsp;first&nbsp;form&nbsp;returns&nbsp;a&nbsp;list&nbsp;of&nbsp;the&nbsp;platform&nbsp;specific&nbsp;flags&nbsp;and<BR>their&nbsp;values.&nbsp;The&nbsp;second&nbsp;form&nbsp;returns&nbsp;the&nbsp;value&nbsp;for&nbsp;the&nbsp;specific<BR>option.&nbsp;The&nbsp;third&nbsp;form&nbsp;sets&nbsp;one&nbsp;or&nbsp;more&nbsp;of&nbsp;the&nbsp;values.&nbsp;The&nbsp;values<BR>are&nbsp;as&nbsp;follows:<BR>&nbsp;<BR>On&nbsp;Windows,&nbsp;-disabled&nbsp;gets&nbsp;or&nbsp;sets&nbsp;whether&nbsp;the&nbsp;window&nbsp;is&nbsp;in&nbsp;a<BR>disabled&nbsp;state.&nbsp;-toolwindow&nbsp;gets&nbsp;or&nbsp;sets&nbsp;the&nbsp;style&nbsp;of&nbsp;the&nbsp;window<BR>to&nbsp;toolwindow&nbsp;(as&nbsp;defined&nbsp;in&nbsp;the&nbsp;MSDN).&nbsp;-topmost&nbsp;gets&nbsp;or&nbsp;sets<BR>whether&nbsp;this&nbsp;is&nbsp;a&nbsp;topmost&nbsp;window&nbsp;(displays&nbsp;above&nbsp;all&nbsp;other<BR>windows).<BR>&nbsp;<BR>On&nbsp;Macintosh,&nbsp;XXXXX<BR>&nbsp;<BR>On&nbsp;Unix,&nbsp;there&nbsp;are&nbsp;currently&nbsp;no&nbsp;special&nbsp;attribute&nbsp;values.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_client><STRONG>wm_client</STRONG></A>(self, 
+              name<FONT color=#909090>=None</FONT>)
+              <DD><TT>Store&nbsp;NAME&nbsp;in&nbsp;WM_CLIENT_MACHINE&nbsp;property&nbsp;of&nbsp;this&nbsp;widget.&nbsp;Return<BR>current&nbsp;value.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_colormapwindows><STRONG>wm_colormapwindows</STRONG></A>(self, 
+              *wlist)
+              <DD><TT>Store&nbsp;list&nbsp;of&nbsp;window&nbsp;names&nbsp;(WLIST)&nbsp;into&nbsp;WM_COLORMAPWINDOWS&nbsp;property<BR>of&nbsp;this&nbsp;widget.&nbsp;This&nbsp;list&nbsp;contains&nbsp;windows&nbsp;whose&nbsp;colormaps&nbsp;differ&nbsp;from&nbsp;their<BR>parents.&nbsp;Return&nbsp;current&nbsp;list&nbsp;of&nbsp;widgets&nbsp;if&nbsp;WLIST&nbsp;is&nbsp;empty.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_command><STRONG>wm_command</STRONG></A>(self, 
+              value<FONT color=#909090>=None</FONT>)
+              <DD><TT>Store&nbsp;VALUE&nbsp;in&nbsp;WM_COMMAND&nbsp;property.&nbsp;It&nbsp;is&nbsp;the&nbsp;command<BR>which&nbsp;shall&nbsp;be&nbsp;used&nbsp;to&nbsp;invoke&nbsp;the&nbsp;application.&nbsp;Return&nbsp;current<BR>command&nbsp;if&nbsp;VALUE&nbsp;is&nbsp;None.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_deiconify><STRONG>wm_deiconify</STRONG></A>(self)
+              <DD><TT>Deiconify&nbsp;this&nbsp;widget.&nbsp;If&nbsp;it&nbsp;was&nbsp;never&nbsp;mapped&nbsp;it&nbsp;will&nbsp;not&nbsp;be&nbsp;mapped.<BR>On&nbsp;Windows&nbsp;it&nbsp;will&nbsp;raise&nbsp;this&nbsp;widget&nbsp;and&nbsp;give&nbsp;it&nbsp;the&nbsp;focus.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_focusmodel><STRONG>wm_focusmodel</STRONG></A>(self, 
+              model<FONT color=#909090>=None</FONT>)
+              <DD><TT>Set&nbsp;focus&nbsp;model&nbsp;to&nbsp;MODEL.&nbsp;"active"&nbsp;means&nbsp;that&nbsp;this&nbsp;widget&nbsp;will&nbsp;claim<BR>the&nbsp;focus&nbsp;itself,&nbsp;"passive"&nbsp;means&nbsp;that&nbsp;the&nbsp;window&nbsp;manager&nbsp;shall&nbsp;give<BR>the&nbsp;focus.&nbsp;Return&nbsp;current&nbsp;focus&nbsp;model&nbsp;if&nbsp;MODEL&nbsp;is&nbsp;None.</TT></DD></DL>
+            <DL>
+              <DT><A 
+name=DicoShapes-wm_frame><STRONG>wm_frame</STRONG></A>(self)
+              <DD><TT>Return&nbsp;identifier&nbsp;for&nbsp;decorative&nbsp;frame&nbsp;of&nbsp;this&nbsp;widget&nbsp;if&nbsp;present.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_geometry><STRONG>wm_geometry</STRONG></A>(self, 
+              newGeometry<FONT color=#909090>=None</FONT>)
+              <DD><TT>Set&nbsp;geometry&nbsp;to&nbsp;NEWGEOMETRY&nbsp;of&nbsp;the&nbsp;form&nbsp;=widthxheight+x+y.&nbsp;Return<BR>current&nbsp;value&nbsp;if&nbsp;None&nbsp;is&nbsp;given.</TT></DD></DL>
+            <DL>
+              <DT><A name=DicoShapes-wm_grid><STRONG>wm_grid</STRONG></A>(self, 
+              baseWidth<FONT color=#909090>=None</FONT>, baseHeight<FONT 
+              color=#909090>=None</FONT>, widthInc<FONT 
+              color=#909090>=None</FONT>, heightInc<FONT 
+              color=#909090>=None</FONT>)
+              <DD><TT>Instruct&nbsp;the&nbsp;window&nbsp;manager&nbsp;that&nbsp;this&nbsp;widget&nbsp;shall&nbsp;only&nbsp;be<BR>resized&nbsp;on&nbsp;grid&nbsp;boundaries.&nbsp;WIDTHINC&nbsp;and&nbsp;HEIGHTINC&nbsp;are&nbsp;the&nbsp;width&nbsp;and<BR>height&nbsp;of&nbsp;a&nbsp;grid&nbsp;unit&nbsp;in&nbsp;pixels.&nbsp;BASEWIDTH&nbsp;and&nbsp;BASEHEIGHT&nbsp;are&nbsp;the<BR>number&nbsp;of&nbsp;grid&nbsp;units&nbsp;requested&nbsp;in&nbsp;Tk_GeometryRequest.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_group><STRONG>wm_group</STRONG></A>(self, 
+              pathName<FONT color=#909090>=None</FONT>)
+              <DD><TT>Set&nbsp;the&nbsp;group&nbsp;leader&nbsp;widgets&nbsp;for&nbsp;related&nbsp;widgets&nbsp;to&nbsp;PATHNAME.&nbsp;Return<BR>the&nbsp;group&nbsp;leader&nbsp;of&nbsp;this&nbsp;widget&nbsp;if&nbsp;None&nbsp;is&nbsp;given.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_iconbitmap><STRONG>wm_iconbitmap</STRONG></A>(self, 
+              bitmap<FONT color=#909090>=None</FONT>, default<FONT 
+              color=#909090>=None</FONT>)
+              <DD><TT>Set&nbsp;bitmap&nbsp;for&nbsp;the&nbsp;iconified&nbsp;widget&nbsp;to&nbsp;BITMAP.&nbsp;Return<BR>the&nbsp;bitmap&nbsp;if&nbsp;None&nbsp;is&nbsp;given.<BR>&nbsp;<BR>Under&nbsp;Windows,&nbsp;the&nbsp;DEFAULT&nbsp;parameter&nbsp;can&nbsp;be&nbsp;used&nbsp;to&nbsp;set&nbsp;the&nbsp;icon<BR>for&nbsp;the&nbsp;widget&nbsp;and&nbsp;any&nbsp;descendents&nbsp;that&nbsp;don't&nbsp;have&nbsp;an&nbsp;icon&nbsp;set<BR>explicitly.&nbsp;&nbsp;DEFAULT&nbsp;can&nbsp;be&nbsp;the&nbsp;relative&nbsp;path&nbsp;to&nbsp;a&nbsp;.ico&nbsp;file<BR>(example:&nbsp;root.<A 
+              href="#DicoShapes-iconbitmap">iconbitmap</A>(default='myicon.ico')&nbsp;).&nbsp;&nbsp;See&nbsp;<A 
+              href="Tkinter.html#Tk">Tk</A><BR>documentation&nbsp;for&nbsp;more&nbsp;information.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_iconify><STRONG>wm_iconify</STRONG></A>(self)
+              <DD><TT>Display&nbsp;widget&nbsp;as&nbsp;icon.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_iconmask><STRONG>wm_iconmask</STRONG></A>(self, 
+              bitmap<FONT color=#909090>=None</FONT>)
+              <DD><TT>Set&nbsp;mask&nbsp;for&nbsp;the&nbsp;icon&nbsp;bitmap&nbsp;of&nbsp;this&nbsp;widget.&nbsp;Return&nbsp;the<BR>mask&nbsp;if&nbsp;None&nbsp;is&nbsp;given.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_iconname><STRONG>wm_iconname</STRONG></A>(self, 
+              newName<FONT color=#909090>=None</FONT>)
+              <DD><TT>Set&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;icon&nbsp;for&nbsp;this&nbsp;widget.&nbsp;Return&nbsp;the&nbsp;name&nbsp;if<BR>None&nbsp;is&nbsp;given.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_iconposition><STRONG>wm_iconposition</STRONG></A>(self, 
+              x<FONT color=#909090>=None</FONT>, y<FONT 
+              color=#909090>=None</FONT>)
+              <DD><TT>Set&nbsp;the&nbsp;position&nbsp;of&nbsp;the&nbsp;icon&nbsp;of&nbsp;this&nbsp;widget&nbsp;to&nbsp;X&nbsp;and&nbsp;Y.&nbsp;Return<BR>a&nbsp;tuple&nbsp;of&nbsp;the&nbsp;current&nbsp;values&nbsp;of&nbsp;X&nbsp;and&nbsp;X&nbsp;if&nbsp;None&nbsp;is&nbsp;given.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_iconwindow><STRONG>wm_iconwindow</STRONG></A>(self, 
+              pathName<FONT color=#909090>=None</FONT>)
+              <DD><TT>Set&nbsp;widget&nbsp;PATHNAME&nbsp;to&nbsp;be&nbsp;displayed&nbsp;instead&nbsp;of&nbsp;icon.&nbsp;Return&nbsp;the&nbsp;current<BR>value&nbsp;if&nbsp;None&nbsp;is&nbsp;given.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_maxsize><STRONG>wm_maxsize</STRONG></A>(self, 
+              width<FONT color=#909090>=None</FONT>, height<FONT 
+              color=#909090>=None</FONT>)
+              <DD><TT>Set&nbsp;max&nbsp;WIDTH&nbsp;and&nbsp;HEIGHT&nbsp;for&nbsp;this&nbsp;widget.&nbsp;If&nbsp;the&nbsp;window&nbsp;is&nbsp;gridded<BR>the&nbsp;values&nbsp;are&nbsp;given&nbsp;in&nbsp;grid&nbsp;units.&nbsp;Return&nbsp;the&nbsp;current&nbsp;values&nbsp;if&nbsp;None<BR>is&nbsp;given.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_minsize><STRONG>wm_minsize</STRONG></A>(self, 
+              width<FONT color=#909090>=None</FONT>, height<FONT 
+              color=#909090>=None</FONT>)
+              <DD><TT>Set&nbsp;min&nbsp;WIDTH&nbsp;and&nbsp;HEIGHT&nbsp;for&nbsp;this&nbsp;widget.&nbsp;If&nbsp;the&nbsp;window&nbsp;is&nbsp;gridded<BR>the&nbsp;values&nbsp;are&nbsp;given&nbsp;in&nbsp;grid&nbsp;units.&nbsp;Return&nbsp;the&nbsp;current&nbsp;values&nbsp;if&nbsp;None<BR>is&nbsp;given.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_overrideredirect><STRONG>wm_overrideredirect</STRONG></A>(self, 
+              boolean<FONT color=#909090>=None</FONT>)
+              <DD><TT>Instruct&nbsp;the&nbsp;window&nbsp;manager&nbsp;to&nbsp;ignore&nbsp;this&nbsp;widget<BR>if&nbsp;BOOLEAN&nbsp;is&nbsp;given&nbsp;with&nbsp;1.&nbsp;Return&nbsp;the&nbsp;current&nbsp;value&nbsp;if&nbsp;None<BR>is&nbsp;given.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_positionfrom><STRONG>wm_positionfrom</STRONG></A>(self, 
+              who<FONT color=#909090>=None</FONT>)
+              <DD><TT>Instruct&nbsp;the&nbsp;window&nbsp;manager&nbsp;that&nbsp;the&nbsp;position&nbsp;of&nbsp;this&nbsp;widget&nbsp;shall<BR>be&nbsp;defined&nbsp;by&nbsp;the&nbsp;user&nbsp;if&nbsp;WHO&nbsp;is&nbsp;"user",&nbsp;and&nbsp;by&nbsp;its&nbsp;own&nbsp;policy&nbsp;if&nbsp;WHO&nbsp;is<BR>"program".</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_protocol><STRONG>wm_protocol</STRONG></A>(self, 
+              name<FONT color=#909090>=None</FONT>, func<FONT 
+              color=#909090>=None</FONT>)
+              <DD><TT>Bind&nbsp;function&nbsp;FUNC&nbsp;to&nbsp;command&nbsp;NAME&nbsp;for&nbsp;this&nbsp;widget.<BR>Return&nbsp;the&nbsp;function&nbsp;bound&nbsp;to&nbsp;NAME&nbsp;if&nbsp;None&nbsp;is&nbsp;given.&nbsp;NAME&nbsp;could&nbsp;be<BR>e.g.&nbsp;"WM_SAVE_YOURSELF"&nbsp;or&nbsp;"WM_DELETE_WINDOW".</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_resizable><STRONG>wm_resizable</STRONG></A>(self, 
+              width<FONT color=#909090>=None</FONT>, height<FONT 
+              color=#909090>=None</FONT>)
+              <DD><TT>Instruct&nbsp;the&nbsp;window&nbsp;manager&nbsp;whether&nbsp;this&nbsp;width&nbsp;can&nbsp;be&nbsp;resized<BR>in&nbsp;WIDTH&nbsp;or&nbsp;HEIGHT.&nbsp;Both&nbsp;values&nbsp;are&nbsp;boolean&nbsp;values.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_sizefrom><STRONG>wm_sizefrom</STRONG></A>(self, 
+              who<FONT color=#909090>=None</FONT>)
+              <DD><TT>Instruct&nbsp;the&nbsp;window&nbsp;manager&nbsp;that&nbsp;the&nbsp;size&nbsp;of&nbsp;this&nbsp;widget&nbsp;shall<BR>be&nbsp;defined&nbsp;by&nbsp;the&nbsp;user&nbsp;if&nbsp;WHO&nbsp;is&nbsp;"user",&nbsp;and&nbsp;by&nbsp;its&nbsp;own&nbsp;policy&nbsp;if&nbsp;WHO&nbsp;is<BR>"program".</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_state><STRONG>wm_state</STRONG></A>(self, 
+              newstate<FONT color=#909090>=None</FONT>)
+              <DD><TT>Query&nbsp;or&nbsp;set&nbsp;the&nbsp;state&nbsp;of&nbsp;this&nbsp;widget&nbsp;as&nbsp;one&nbsp;of&nbsp;normal,&nbsp;icon,<BR>iconic&nbsp;(see&nbsp;wm_iconwindow),&nbsp;withdrawn,&nbsp;or&nbsp;zoomed&nbsp;(Windows&nbsp;only).</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_title><STRONG>wm_title</STRONG></A>(self, 
+              string<FONT color=#909090>=None</FONT>)
+              <DD><TT>Set&nbsp;the&nbsp;title&nbsp;of&nbsp;this&nbsp;widget.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_transient><STRONG>wm_transient</STRONG></A>(self, 
+              master<FONT color=#909090>=None</FONT>)
+              <DD><TT>Instruct&nbsp;the&nbsp;window&nbsp;manager&nbsp;that&nbsp;this&nbsp;widget&nbsp;is&nbsp;transient<BR>with&nbsp;regard&nbsp;to&nbsp;widget&nbsp;MASTER.</TT></DD></DL>
+            <DL>
+              <DT><A 
+              name=DicoShapes-wm_withdraw><STRONG>wm_withdraw</STRONG></A>(self)
+              <DD><TT>Withdraw&nbsp;this&nbsp;widget&nbsp;from&nbsp;the&nbsp;screen&nbsp;such&nbsp;that&nbsp;it&nbsp;is&nbsp;unmapped<BR>and&nbsp;forgotten&nbsp;by&nbsp;the&nbsp;window&nbsp;manager.&nbsp;Re-draw&nbsp;it&nbsp;with&nbsp;wm_deiconify.</TT></DD></DL></TD></TR></TBODY></TABLE></P></TD></TR></TBODY></TABLE>
+<P>
+<TABLE cellSpacing=0 cellPadding=2 width="100%" summary=section border=0>
+  <TBODY>
+  <TR bgColor=#eeaa77>
+    <TD vAlign=bottom colSpan=3>&nbsp;<BR><FONT color=#ffffff 
+      face="helvetica, arial"><BIG><STRONG>Functions</STRONG></BIG></FONT></TD></TR>
+  <TR>
+    <TD bgColor=#eeaa77><TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TT></TD>
+    <TD>&nbsp;</TD>
+    <TD width="100%">
+      <DL>
+        <DT><A name=-exit><STRONG>exit</STRONG></A>(...)
+        <DD><TT><A 
+        href="#-exit">exit</A>([status])<BR>&nbsp;<BR>Exit&nbsp;the&nbsp;interpreter&nbsp;by&nbsp;raising&nbsp;SystemExit(status).<BR>If&nbsp;the&nbsp;status&nbsp;is&nbsp;omitted&nbsp;or&nbsp;None,&nbsp;it&nbsp;defaults&nbsp;to&nbsp;zero&nbsp;(i.e.,&nbsp;success).<BR>If&nbsp;the&nbsp;status&nbsp;is&nbsp;numeric,&nbsp;it&nbsp;will&nbsp;be&nbsp;used&nbsp;as&nbsp;the&nbsp;system&nbsp;exit&nbsp;status.<BR>If&nbsp;it&nbsp;is&nbsp;another&nbsp;kind&nbsp;of&nbsp;object,&nbsp;it&nbsp;will&nbsp;be&nbsp;printed&nbsp;and&nbsp;the&nbsp;system<BR>exit&nbsp;status&nbsp;will&nbsp;be&nbsp;one&nbsp;(i.e.,&nbsp;failure).</TT></DD></DL>
+      <DL>
+        <DT><A name=-listdir><STRONG>listdir</STRONG></A>(...)
+        <DD><TT><A 
+        href="#-listdir">listdir</A>(path)&nbsp;-&gt;&nbsp;list_of_strings<BR>&nbsp;<BR>Return&nbsp;a&nbsp;list&nbsp;containing&nbsp;the&nbsp;names&nbsp;of&nbsp;the&nbsp;entries&nbsp;in&nbsp;the&nbsp;directory.<BR>&nbsp;<BR>&nbsp;&nbsp;&nbsp;&nbsp;path:&nbsp;path&nbsp;of&nbsp;directory&nbsp;to&nbsp;list<BR>&nbsp;<BR>The&nbsp;list&nbsp;is&nbsp;in&nbsp;arbitrary&nbsp;order.&nbsp;&nbsp;It&nbsp;does&nbsp;not&nbsp;include&nbsp;the&nbsp;special<BR>entries&nbsp;'.'&nbsp;and&nbsp;'..'&nbsp;even&nbsp;if&nbsp;they&nbsp;are&nbsp;present&nbsp;in&nbsp;the&nbsp;directory.</TT></DD></DL>
+      <DL>
+        <DT><A name=-startfile><STRONG>startfile</STRONG></A>(...)
+        <DD><TT><A 
+        href="#-startfile">startfile</A>(filepath&nbsp;[,&nbsp;operation])&nbsp;-&nbsp;Start&nbsp;a&nbsp;file&nbsp;with&nbsp;its&nbsp;associated<BR>application.<BR>&nbsp;<BR>When&nbsp;"operation"&nbsp;is&nbsp;not&nbsp;specified&nbsp;or&nbsp;"open",&nbsp;this&nbsp;acts&nbsp;like<BR>double-clicking&nbsp;the&nbsp;file&nbsp;in&nbsp;Explorer,&nbsp;or&nbsp;giving&nbsp;the&nbsp;file&nbsp;name&nbsp;as&nbsp;an<BR>argument&nbsp;to&nbsp;the&nbsp;DOS&nbsp;"start"&nbsp;command:&nbsp;the&nbsp;file&nbsp;is&nbsp;opened&nbsp;with&nbsp;whatever<BR>application&nbsp;(if&nbsp;any)&nbsp;its&nbsp;extension&nbsp;is&nbsp;associated.<BR>When&nbsp;another&nbsp;"operation"&nbsp;is&nbsp;given,&nbsp;it&nbsp;specifies&nbsp;what&nbsp;should&nbsp;be&nbsp;done&nbsp;with<BR>the&nbsp;file.&nbsp;&nbsp;A&nbsp;typical&nbsp;operation&nbsp;is&nbsp;"print".<BR>&nbsp;<BR>startfile&nbsp;returns&nbsp;as&nbsp;soon&nbsp;as&nbsp;the&nbsp;associated&nbsp;application&nbsp;is&nbsp;launched.<BR>There&nbsp;is&nbsp;no&nbsp;option&nbsp;to&nbsp;wait&nbsp;for&nbsp;the&nbsp;application&nbsp;to&nbsp;close,&nbsp;and&nbsp;no&nbsp;way<BR>to&nbsp;retrieve&nbsp;the&nbsp;application's&nbsp;exit&nbsp;status.<BR>&nbsp;<BR>The&nbsp;filepath&nbsp;is&nbsp;relative&nbsp;to&nbsp;the&nbsp;current&nbsp;directory.&nbsp;&nbsp;If&nbsp;you&nbsp;want&nbsp;to&nbsp;use<BR>an&nbsp;absolute&nbsp;path,&nbsp;make&nbsp;sure&nbsp;the&nbsp;first&nbsp;character&nbsp;is&nbsp;not&nbsp;a&nbsp;slash&nbsp;("/");<BR>the&nbsp;underlying&nbsp;Win32&nbsp;ShellExecute&nbsp;function&nbsp;doesn't&nbsp;work&nbsp;if&nbsp;it&nbsp;is.</TT></DD></DL>
+      <DL>
+        <DT><A name=-strftime><STRONG>strftime</STRONG></A>(...)
+        <DD><TT><A 
+        href="#-strftime">strftime</A>(format[,&nbsp;tuple])&nbsp;-&gt;&nbsp;string<BR>&nbsp;<BR>Convert&nbsp;a&nbsp;time&nbsp;tuple&nbsp;to&nbsp;a&nbsp;string&nbsp;according&nbsp;to&nbsp;a&nbsp;format&nbsp;specification.<BR>See&nbsp;the&nbsp;library&nbsp;reference&nbsp;manual&nbsp;for&nbsp;formatting&nbsp;codes.&nbsp;When&nbsp;the&nbsp;time&nbsp;tuple<BR>is&nbsp;not&nbsp;present,&nbsp;current&nbsp;time&nbsp;as&nbsp;returned&nbsp;by&nbsp;localtime()&nbsp;is&nbsp;used.</TT></DD></DL></TD></TR></TBODY></TABLE>
+<P>
+<TABLE cellSpacing=0 cellPadding=2 width="100%" summary=section border=0>
+  <TBODY>
+  <TR bgColor=#55aa55>
+    <TD vAlign=bottom colSpan=3>&nbsp;<BR><FONT color=#ffffff 
+      face="helvetica, arial"><BIG><STRONG>Data</STRONG></BIG></FONT></TD></TR>
+  <TR>
+    <TD bgColor=#55aa55><TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TT></TD>
+    <TD>&nbsp;</TD>
+    <TD width="100%"><STRONG>ACTIVE</STRONG> = 
+      'active'<BR><STRONG>DISABLED</STRONG> = 'disabled'<BR><STRONG>E</STRONG> = 
+      'e'<BR><STRONG>END</STRONG> = 'end'<BR><STRONG>GROOVE</STRONG> = 
+      'groove'<BR><STRONG>N</STRONG> = 'n'<BR><STRONG>S</STRONG> = 
+      's'<BR><STRONG>W</STRONG> = 'w'<BR><STRONG>env</STRONG> = {'TMP': 
+      'C:\\Users\\Julien\\AppData\\Local\\Temp...m Files 
+      (x86)\\Java\\jre7\\lib\\ext\\QTJava.zip'}<BR><STRONG>platform</STRONG> = 
+      'win32'<BR><STRONG>unicode_literals</STRONG> = _Feature((2, 6, 0, 'alpha', 
+      2), (3, 0, 0, 'alpha', 0), 131072)</TD></TR></TBODY></TABLE></P></BODY></HTML>
