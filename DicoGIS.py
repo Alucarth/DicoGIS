@@ -102,16 +102,11 @@ class DicoShapes(Tk):
         self.nameoutput = Label(self.FrPath,
                                  text = self.blabla.get('gui_fic'))
         self.output = Entry(self.FrPath, width = 35)
-        # language switcher
-        self.ddl_lang = Combobox(self.FrPath, values = li_lang, width = 5)
-        self.ddl_lang.current(li_lang.index(self.def_lang))
-        self.ddl_lang.bind("<<ComboboxSelected>>", self.change_lang)
         # widgets placement
         self.labtarg.grid(row = 1, column = 1, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
         self.target.grid(row = 1, column = 2, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
-        self.browsetarg.grid(row = 1, column = 3, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
+        self.browsetarg.grid(row = 1, column = 3, sticky = N+S+W+E, padx = 2, pady = 2)
         Label(self.FrPath, textvariable = self.numfiles).grid(row = 2, column = 1, columnspan = 1)
-        self.ddl_lang.grid(row=1, column = 4, sticky = N+S+W+E, padx = 2, pady = 2)
         self.nameoutput.grid(row = 3, column= 1)
         self.output.grid(row = 3, column= 2)
 
@@ -119,13 +114,11 @@ class DicoShapes(Tk):
         # widgets
         self.prog_layers = Progressbar(self.FrProg,
                                        orient="horizontal",
-                                       length = 300,
-                                       mode='determinate')
+                                       length = 400)
         self.prog_fields = Progressbar(self.FrProg)
         # widgets placement
-        self.prog_layers.grid(row = 1, column = 0, columnspan = 2, sticky = E, padx = 2, pady = 2)
-##        self.prog_fields.grid(sticky = N+S+W+E, padx = 2, pady = 5)
-
+        self.prog_layers.grid(row = 1, column = 0,  sticky = N+S+W+E,
+                              padx = 2, pady = 2)
 
             ## Main frame
         # Hola
@@ -136,13 +129,16 @@ class DicoShapes(Tk):
         # Imagen
         self.icone = PhotoImage(file = r'img/DicoGIS_logo.GIF')
         Label(self, borderwidth = 2, relief = 'ridge',
-                                     image = self.icone).grid(row = 2,
+                                     image = self.icone).grid(row = 1,
                                                               rowspan = 3,
                                                               column = 0,
                                                               padx = 2,
                                                               pady = 2,
                                                               sticky = W)
-
+        # language switcher
+        self.ddl_lang = Combobox(self, values = li_lang, width = 5)
+        self.ddl_lang.current(li_lang.index(self.def_lang))
+        self.ddl_lang.bind("<<ComboboxSelected>>", self.change_lang)
         # Basic buttons
         self.val = Button(self, text = self.blabla.get('gui_go'),
                                 relief= 'raised',
@@ -155,6 +151,7 @@ class DicoShapes(Tk):
         # widgets placement
         self.welcome.grid(row = 1, column = 1, columnspan = 1, sticky = N+S+W+E,
                           padx = 2, pady = 2)
+        self.ddl_lang.grid(row=1, column = 1, sticky = N+S+E, padx = 2, pady = 2)
         self.val.grid(row = 5, column = 1, columnspan = 2,
                             sticky = N+S+W+E, padx = 2, pady = 2)
         self.can.grid(row = 5, column = 0, sticky = N+S+W+E, padx = 2, pady = 2)
@@ -171,7 +168,6 @@ class DicoShapes(Tk):
         for elem in xml.getroot().getiterator():
             if elem.tag == 'codelang':
                 self.def_lang = elem.text
-                print self.def_lang
                 continue
             elif elem.tag == 'rep_defaut':
                 self.def_rep = elem.text
@@ -246,7 +242,8 @@ class DicoShapes(Tk):
             try:
                 self.target.insert(0, foldername)
             except:
-                print self.blabla.get('nofolder')
+                info(title = self.blabla.get('nofolder'),
+                     message = self.blabla.get('nofolder'))
                 return
         # set the default output file
         self.output.delete(0, END)
