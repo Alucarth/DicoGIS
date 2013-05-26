@@ -60,8 +60,8 @@ class DicoShapes(Tk):
         self.title(u'DicoGIS')
         self.iconbitmap('DicoGIS.ico')
         self.resizable(width = False, height = False)
-        self.columnconfigure(0, weight=1)
-        self.rowconfigure(0, weight=1)
+##        self.columnconfigure(0, weight=1)
+##        self.rowconfigure(0, weight=1)
         self.focus_force()
 
         # variables
@@ -110,7 +110,7 @@ class DicoShapes(Tk):
         self.labtarg.grid(row = 1, column = 1, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
         self.target.grid(row = 1, column = 2, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
         self.browsetarg.grid(row = 1, column = 3, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
-        Label(self.FrPath, textvariable = self.numfiles).grid(row = 2, column = 1, columnspan = 3)
+        Label(self.FrPath, textvariable = self.numfiles).grid(row = 2, column = 1, columnspan = 1)
         self.ddl_lang.grid(row=1, column = 4, sticky = N+S+W+E, padx = 2, pady = 2)
         self.nameoutput.grid(row = 3, column= 1)
         self.output.grid(row = 3, column= 2)
@@ -119,11 +119,11 @@ class DicoShapes(Tk):
         # widgets
         self.prog_layers = Progressbar(self.FrProg,
                                        orient="horizontal",
-                                       length = 400,
+                                       length = 300,
                                        mode='determinate')
         self.prog_fields = Progressbar(self.FrProg)
         # widgets placement
-        self.prog_layers.grid(row = 1, column = 0, columnspan = 2, sticky = N+S, padx = 2, pady = 5)
+        self.prog_layers.grid(row = 1, column = 0, columnspan = 2, sticky = E, padx = 2, pady = 2)
 ##        self.prog_fields.grid(sticky = N+S+W+E, padx = 2, pady = 5)
 
 
@@ -136,11 +136,11 @@ class DicoShapes(Tk):
         # Imagen
         self.icone = PhotoImage(file = r'img/DicoGIS_logo.GIF')
         Label(self, borderwidth = 2, relief = 'ridge',
-                                     image = self.icone).grid(row = 1,
-                                                              rowspan = 4,
+                                     image = self.icone).grid(row = 2,
+                                                              rowspan = 3,
                                                               column = 0,
-                                                              padx = 1,
-                                                              pady = 1,
+                                                              padx = 2,
+                                                              pady = 2,
                                                               sticky = W)
 
         # Basic buttons
@@ -154,10 +154,10 @@ class DicoShapes(Tk):
 
         # widgets placement
         self.welcome.grid(row = 1, column = 1, columnspan = 1, sticky = N+S+W+E,
-                          padx = 2, pady = 5)
+                          padx = 2, pady = 2)
         self.val.grid(row = 5, column = 1, columnspan = 2,
-                            sticky = N+S+W+E, padx = 2, pady = 5)
-        self.can.grid(row = 5, column = 0, sticky = N+S+W+E, padx = 2, pady = 5)
+                            sticky = N+S+W+E, padx = 2, pady = 2)
+        self.can.grid(row = 5, column = 0, sticky = N+S+W+E, padx = 2, pady = 2)
         # Frames placement
         self.FrPath.grid(row = 2, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
         self.FrProg.grid(row = 3, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
