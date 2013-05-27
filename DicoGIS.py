@@ -11,7 +11,7 @@ from __future__ import unicode_literals
 #
 # Python:       2.7.x
 # Created:      14/02/2013
-# Updated:      24/05/2013
+# Updated:      28/05/2013
 #
 # Licence:      GPL 3
 #-------------------------------------------------------------------------------
@@ -35,7 +35,6 @@ from time import strftime
 
 import threading
 import Queue
-
 
 # Python 3 backported
 from collections import OrderedDict as OD
@@ -86,8 +85,12 @@ class DicoShapes(Tk):
         self.load_texts(self.def_lang)
 
         # Frames
-        self.FrPath = LabelFrame(self, name ='main', text = self.blabla.get('gui_fr1'), padx = 5, pady = 5)
-        self.FrProg = LabelFrame(self, name ='progression', text = self.blabla.get('gui_prog'), padx = 5, pady = 5)
+        self.FrPath = LabelFrame(self, name ='main',
+                                       text = self.blabla.get('gui_fr1'),
+                                       padx = 5, pady = 5)
+        self.FrProg = LabelFrame(self, name ='progression',
+                                       text = self.blabla.get('gui_prog'),
+                                       padx = 5, pady = 5)
 
             ## Frame 1
         # variables
@@ -107,7 +110,9 @@ class DicoShapes(Tk):
         self.labtarg.grid(row = 1, column = 1, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
         self.target.grid(row = 1, column = 2, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
         self.browsetarg.grid(row = 1, column = 3, sticky = N+S+W+E, padx = 2, pady = 2)
-        Label(self.FrPath, textvariable = self.numfiles).grid(row = 2, column = 1, columnspan = 1)
+        Label(self.FrPath, textvariable = self.numfiles,
+                           fg= 'DodgerBlue').grid(row = 2,
+                                                  column = 1, columnspan = 3)
         self.nameoutput.grid(row = 3, column= 1)
         self.output.grid(row = 3, column= 2)
 
@@ -216,7 +221,6 @@ class DicoShapes(Tk):
         return self.blabla
 
 
-
     def load_texts(self, lang='FR'):
         u""" Load texts according to the selected language """
         # clearing the text dictionary
@@ -251,6 +255,7 @@ class DicoShapes(Tk):
         self.output.insert(0, "DicoShapes_" + path.split(self.target.get())[1]
                             + "_" + self.today + ".xls"  )
         # calculate number of shapefiles and MapInfo files in a separated thread
+
         proc = threading.Thread(target = self.ligeofiles, args = (foldername, ))
         proc.daemon = True
         proc.start()
@@ -266,6 +271,8 @@ class DicoShapes(Tk):
         self.li_tab = []
         self.browsetarg.config(state = DISABLED)
         # Looping in folders structure
+        self.numfiles.set(self.blabla.get('gui_prog1'))
+        self.prog_layers.start()
         for root, dirs, files in walk(foldertarget):
             self.num_folders = self.num_folders + len(dirs)
             for i in files:
@@ -282,6 +289,7 @@ class DicoShapes(Tk):
                    path.isfile(path.join(root, i)[:-4] + u'.id'):
                     # add complete path of MapInfo file
                     self.li_tab.append(path.join(root, i))
+        self.prog_layers.stop()
         # Lists ordering and tupling
         self.li_shp.sort()
         self.li_shp = tuple(self.li_shp)
@@ -316,10 +324,6 @@ class DicoShapes(Tk):
             self.dico_layer.clear()
             self.dico_fields.clear()
             # creating separated process threads
-##            proc = threading.Thread(target = InfosOGR,
-##                                    args = (shp, self.dico_layer, self.dico_fields, 'shape', ))
-##            proc.daemon = True
-##            proc.start()
             InfosOGR(shp, self.dico_layer, self.dico_fields, 'shape', self.blabla)
             # getting the informations
             # writing to the Excel dictionary
@@ -327,8 +331,6 @@ class DicoShapes(Tk):
             # increment the line number
             line = line +1
             # increment the progress bar
-##            proc2 = threading.Thread(target = self.prog_layers.step, args = (1, ))
-##            proc2.start()
             self.prog_layers["value"] = self.prog_layers["value"] +1
             self.update()
         # getting the info from mapinfo tables and compile it in the excel
