@@ -92,7 +92,12 @@ class InfosOGR():
         dico_layer[u'title'] = dico_layer[u'name'][:-4].replace('_', ' ').capitalize()
         dico_layer[u'num_obj'] = self.layer.GetFeatureCount()
         dico_layer[u'num_fields'] = self.def_couche.GetFieldCount()
-        dico_layer[u'srs'] = unicode(self.srs.GetAttrValue("PROJCS")).replace('_', ' ')
+        print layerpath, self.srs.GetAttrValue("PROJCS")
+        try:
+            dico_layer[u'srs'] = unicode(self.srs.GetAttrValue("PROJCS")).replace('_', ' ')
+        except UnicodeDecodeError, e:
+            print 'youpiyo', e
+            dico_layer[u'srs'] = self.srs.GetAttrValue("PROJCS").decode('latin1').replace('_', ' ')
         dico_layer[u'EPSG'] = unicode(self.srs.GetAttrValue("AUTHORITY", 1))
         dico_layer[u'date_actu'] = unicode(localtime(path.getmtime(layerpath))[2]) +\
                           u'/'+ unicode(localtime(path.getmtime(layerpath))[1]) +\
