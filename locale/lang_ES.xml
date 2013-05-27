@@ -15,7 +15,9 @@
 	<gui_fr1>Carpeta</gui_fr1>
 	<gui_path>Ruta de la carpeta: </gui_path>
 	<gui_fic>Nombre del diccionario: </gui_fic>
-	<gui_prog>Progresión</gui_prog>	
+	<gui_prog>Progresión</gui_prog>
+	<gui_prog1>Progresión: análisis de los archivos compatibles</gui_prog1>
+	<gui_prog2>Progresión: proceso de los archivos</gui_prog2>	
 	<info_end>Fín del programa</info_end>
 	<info_end2>DicoGIS terminó su trabajo.</info_end2>
 	<info_end3>El diccionario se encuentra aquí: </info_end3>

@@ -15,7 +15,9 @@
 	<gui_fr1>Folders structure target</gui_fr1>
 	<gui_path>Folder path: </gui_path>
 	<gui_fic>Name of output file: </gui_fic>
-	<gui_prog>Progress</gui_prog>	
+	<gui_prog>Progression</gui_prog>
+	<gui_prog1>Progress: parsing and retrieving compatible files</gui_prog1>
+	<gui_prog2>Progress: processing the files</gui_prog2>
 	<info_end>End of program</info_end>
 	<info_end2>DicoGIS: job done.</info_end2>
 	<info_end3>The dictionary can be found here: </info_end3>
