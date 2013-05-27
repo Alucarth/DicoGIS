@@ -54,7 +54,8 @@ from modules import InfosOGR
 
 class DicoShapes(Tk):
     def __init__(self):
-        u""" Constructeur de la fenêtre principale """
+        u""" Main window constructor
+        Creates 1 frame and 2 labelled subframes"""
         # basics settings
         Tk.__init__(self)               # constructor of parent graphic class
         self.title(u'DicoGIS')
