@@ -1,5 +1,6 @@
 ﻿# -*- coding: UTF-8 -*-
 #!/usr/bin/env python
+##from __future__ import unicode_literals
 #-------------------------------------------------------------------------------
 # Name:         InfosOGR
 # Purpose:      Use GDAL/OGR library to extract informations about
@@ -19,7 +20,7 @@
 ###################################
 # Standard library
 from os import walk, path       # files and folder managing
-from time import localtime
+from time import localtime, strptime, strftime
 
 # Python 3 backported
 from collections import OrderedDict as OD
@@ -46,6 +47,11 @@ class InfosOGR():
         # Creating variables
         self.alert = 0
         source = ogr.Open(layerpath, 0)     # OGR driver
+        if not source:
+            u""" if layer doesn't have any object, return an error """
+            print 'no compatible source'
+            self.erratum(dico_layer, layerpath, u'err_nobjet')
+            self.alert = self.alert +1
         self.layer = source.GetLayer()          # get the layer
         if self.layer.GetFeatureCount() == 0:
             u""" if layer doesn't have any object, return an error """
@@ -56,9 +62,15 @@ class InfosOGR():
             obj = self.layer.GetFeature(0)        # get the first object (shp)
             self.geom = obj.GetGeometryRef()       # get the geometry
         except AttributeError, e:
-            print '\t', e
-            obj = self.layer.GetFeature(1)        # get the first object (tab)
-            self.geom = obj.GetGeometryRef()      # get the geometry
+            try:
+                print '\t', e
+                obj = self.layer.GetFeature(1)        # get the first object (tab)
+                self.geom = obj.GetGeometryRef()      # get the geometry
+            except:
+                print 'error not recognized'
+                self.erratum(dico_layer, layerpath, u'err_nobjet')
+                self.alert = self.alert +1
+                return None
         self.def_couche = self.layer.GetLayerDefn()  # get layer definitions
         self.srs = self.layer.GetSpatialRef()   # get spatial system reference
         self.srs.AutoIdentifyEPSG()     # try to determine the EPSG code
@@ -72,7 +84,7 @@ class InfosOGR():
         self.infos_fields(dico_fields)
 
     def infos_basics(self, layerpath, dico_layer, txt):
-        u""" get the globat informations about the layer """
+        u""" get the global informations about the layer """
         # srs type
         srsmetod = [
                     (self.srs.IsCompound(), txt.get('srs_comp')),
@@ -92,19 +104,24 @@ class InfosOGR():
         dico_layer[u'title'] = dico_layer[u'name'][:-4].replace('_', ' ').capitalize()
         dico_layer[u'num_obj'] = self.layer.GetFeatureCount()
         dico_layer[u'num_fields'] = self.def_couche.GetFieldCount()
-        print layerpath, self.srs.GetAttrValue("PROJCS")
+        # Handling exception in srs names'encoding
         try:
-            dico_layer[u'srs'] = unicode(self.srs.GetAttrValue("PROJCS")).replace('_', ' ')
+            if self.srs.GetAttrValue('PROJCS') != 'unnamed':
+                dico_layer[u'srs'] = unicode(self.srs.GetAttrValue('PROJCS')).replace('_', ' ')
+            else:
+                dico_layer[u'srs'] = unicode(self.srs.GetAttrValue('PROJECTION')).replace('_', ' ')
         except UnicodeDecodeError, e:
             print 'youpiyo', e
-            dico_layer[u'srs'] = self.srs.GetAttrValue("PROJCS").decode('latin1').replace('_', ' ')
+            if self.srs.GetAttrValue('PROJCS') != 'unnamed':
+                dico_layer[u'srs'] = self.srs.GetAttrValue('PROJCS').decode('latin1').replace('_', ' ')
+            else:
+                dico_layer[u'srs'] = self.srs.GetAttrValue('PROJECTION').decode('latin1').replace('_', ' ')
         dico_layer[u'EPSG'] = unicode(self.srs.GetAttrValue("AUTHORITY", 1))
-        dico_layer[u'date_actu'] = unicode(localtime(path.getmtime(layerpath))[2]) +\
-                          u'/'+ unicode(localtime(path.getmtime(layerpath))[1]) +\
-                          u'/'+ unicode(localtime(path.getmtime(layerpath))[0])
-        dico_layer[u'date_crea'] = unicode(localtime(path.getctime(layerpath))[2]) +\
-                                       u'/'+ unicode(localtime(path.getctime(layerpath))[1]) +\
-                                       u'/'+ unicode(localtime(path.getctime(layerpath))[0])
+        # Getting basic dates
+        dico_layer[u'date_actu'] = strftime('%Y-%m-%d',
+                                            localtime(path.getmtime(layerpath)))
+        dico_layer[u'date_crea'] = strftime('%Y-%m-%d',
+                                            localtime(path.getctime(layerpath)))
         # SRS exception handling
         if dico_layer[u'EPSG'] == u'4326' and dico_layer[u'srs'] == u'None':
             print dico_layer[u'srs']
@@ -112,7 +129,7 @@ class InfosOGR():
             print dico_layer[u'srs']
 
         # end of function
-        return dico_layer
+        return dico_layer, layerpath, txt
 
     def infos_geom(self, dico_layer, txt):
         u""" get the informations about geometry """
@@ -172,7 +189,7 @@ if __name__ == '__main__':
     textos = OD()
     textos['srs_comp'] = u'Compound'
     textos['srs_geoc'] = u'Geocentric'
-    textos['srs_geog'] = u''
+    textos['srs_geog'] = u'Geographic'
     textos['srs_loca'] = u'Local'
     textos['srs_proj'] = u'Projected'
     textos['srs_vert'] = u'Vertical'
@@ -189,6 +206,7 @@ if __name__ == '__main__':
         dicouche.clear()
         dico_fields.clear()
         # getting the informations
+        print shp
         info_shp = InfosOGR(shp, dicouche, dico_fields, 'shape', textos)
         print '\n', dicouche, dico_fields
     for tab in li_tab:
