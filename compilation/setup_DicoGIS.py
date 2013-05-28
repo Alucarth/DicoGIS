@@ -12,7 +12,7 @@ py2exe_options = dict(
                       )
 
 setup(name="DicoGIS",
-      version="1.5",
+      version="1.6",
       description=u"Dynamic dictionary of geographic datas",
       author="Julien Moura",
       url = "https://github.com/Guts/DicoGIS",
@@ -24,9 +24,8 @@ setup(name="DicoGIS",
                     ("", ["DicoGIS.ico"]),
                     ("img", ["img/DicoGIS_logo.gif"]),
                     ("doc",["documentation/DicoGIS_Manual_ES.pdf",
-                            "documentation/README.HTML",
-                            "documentation/DicoGIS_GitHub",
-                            "documentation/DicoGIS_TechnicalDetails.html"])],
+                            "documentation/README.html",
+                            "documentation/DicoGIS_TechnicalDetails.htm"])],
       options={'py2exe': py2exe_options},
       windows = [
             {
