@@ -22,9 +22,9 @@ from __future__ import unicode_literals
 # Standard library
 from Tkinter import Tk, Label, Entry, Button, StringVar, IntVar, END     # GUI
 from Tkinter import LabelFrame, N, S, E, W, ACTIVE, DISABLED, GROOVE, PhotoImage
-from tkFileDialog import askdirectory, asksaveasfilename
+from tkFileDialog import askdirectory, asksaveasfilename    # dialogs
 from tkMessageBox import showinfo as info
-from ttk import Combobox, Progressbar
+from ttk import Combobox, Progressbar       # advanced graphic widgets
 import tkFont
 
 from sys import exit, platform
@@ -33,19 +33,22 @@ from os import environ as env
 from os import startfile                    # to open a folder/file
 from time import strftime
 
-import threading
-import Queue
+import threading    # handling various subprocess
+
+import logging      # log files
+from logging.handlers import RotatingFileHandler
 
 # Python 3 backported
-from collections import OrderedDict as OD
+from collections import OrderedDict as OD   # ordered dictionary
 
 # 3rd party libraries
 from osgeo import ogr    # spatial files
-from xlwt import Workbook, Font, XFStyle, easyxf, Formula, Alignment, Pattern, Borders, easyfont   # excel library
-from xml.etree import ElementTree as ET
+from xlwt import Workbook, Font, XFStyle, easyxf, Formula  # excel writer
+from xlwt import Alignment, Pattern, Borders, easyfont      # excel style config
+from xml.etree import ElementTree as ET     # XML parsing and writer
 
 # Custom modules
-from modules import InfosOGR
+from modules import InfosOGR    # custom extractor for geographic data
 
 ################################################################################
 ########### Variables #############
@@ -64,6 +67,17 @@ class DicoShapes(Tk):
 ##        self.rowconfigure(0, weight=1)
         self.focus_force()
 
+        # creation and configuration of log file
+        # see: http://sametmax.com/ecrire-des-logs-en-python/
+        self.logger = logging.getLogger()
+        self.logger.setLevel(logging.DEBUG)  # all errors will be get
+        log_form = logging.Formatter('%(asctime)s || %(levelname)s || %(message)s')
+        logfile = RotatingFileHandler('DicoGIS.log', 'a', 5000000, 1)
+        logfile.setLevel(logging.DEBUG)
+        logfile.setFormatter(log_form)
+        self.logger.addHandler(logfile)
+        self.logger.info('\t ====== DicoGIS ======')  # first write
+
         # variables
         self.num_folders = 0
         self.def_rep = ""       # default folder to search for
@@ -74,7 +88,7 @@ class DicoShapes(Tk):
         self.dico_layer = OD()    # dictionary where will be stored informations
         self.dico_fields = OD()    # dictionary for fields information
         self.dico_err = OD()     # errors list
-        li_lang = [lg[5:-4] for lg in listdir(r'locale')]        # list of available languages
+        li_lang = [lg[5:-4] for lg in listdir(r'locale')] # available languages
         self.blabla = OD()      # texts dictionary
 
         # GUI fonts
@@ -206,6 +220,7 @@ class DicoShapes(Tk):
     def change_lang(self, event):
         u""" update the texts dictionary with the language selected """
         new_lang = event.widget.get()
+        self.logger.info('\tLanguages switched')
         # change to the new language selected
         self.load_texts(new_lang)
         # update widgets text
@@ -245,6 +260,7 @@ class DicoShapes(Tk):
         # check if a folder has been choosen
         if foldername:
             try:
+                self.target.delete(0, END)
                 self.target.insert(0, foldername)
             except:
                 info(title = self.blabla.get('nofolder'),
@@ -273,6 +289,7 @@ class DicoShapes(Tk):
         # Looping in folders structure
         self.numfiles.set(self.blabla.get('gui_prog1'))
         self.prog_layers.start()
+        self.logger.info('Begin of folders parsing')
         for root, dirs, files in walk(foldertarget):
             self.num_folders = self.num_folders + len(dirs)
             for i in files:
@@ -290,6 +307,7 @@ class DicoShapes(Tk):
                     # add complete path of MapInfo file
                     self.li_tab.append(path.join(root, i))
         self.prog_layers.stop()
+        self.logger.info('End of folders parsing: %s folders explored', str(self.num_folders))
         # Lists ordering and tupling
         self.li_shp.sort()
         self.li_shp = tuple(self.li_shp)
@@ -313,36 +331,47 @@ class DicoShapes(Tk):
             return
         # creating the Excel workbook
         self.configexcel()
+        self.logger.info('Excel file created')
         # configuring the progression bar
         self.prog_layers["maximum"] = len(self.li_shp) + len(self.li_tab)
         self.prog_layers["value"]
         # getting the info from shapefiles and compile it in the excel
         line = 1    # line of dictionary
+        self.logger.info('\tShapefiles processed')
         for shp in self.li_shp:
             """ looping on shapefiles list """
+            self.numfiles.set(path.basename(shp))
+            self.logger.info('\n' + shp)
             # reset recipient data
             self.dico_layer.clear()
             self.dico_fields.clear()
             # creating separated process threads
             InfosOGR(shp, self.dico_layer, self.dico_fields, 'shape', self.blabla)
+            self.logger.info('\t Infos OK')
             # getting the informations
             # writing to the Excel dictionary
             self.dictionarize(self.dico_layer, self.dico_fields, self.feuy1, line)
+            self.logger.info('\t Wrote into the dictionary')
             # increment the line number
             line = line +1
             # increment the progress bar
             self.prog_layers["value"] = self.prog_layers["value"] +1
             self.update()
         # getting the info from mapinfo tables and compile it in the excel
+        self.logger.info('\n\tMapInfo tables processed')
         for tab in self.li_tab:
             """ looping on MapInfo tables list """
+            self.numfiles.set(path.basename(tab))
+            self.logger.info('\n' + tab)
             # reset recipient data
             self.dico_layer.clear()
             self.dico_fields.clear()
             # getting the informations
             InfosOGR(tab, self.dico_layer, self.dico_fields, 'table', self.blabla)
+            self.logger.info('\t Infos OK')
             # writing to the Excel dictionary
             self.dictionarize(self.dico_layer, self.dico_fields, self.feuy1, line)
+            self.logger.info('\t Wrote into the dictionary')
             # increment the line number
             line = line +1
             # increment the progress bar
@@ -350,13 +379,15 @@ class DicoShapes(Tk):
             self.update()
         # saving dictionary
         self.savedico()
-
+        self.logger.info('\n\tWorkbook saved: %s', self.output.get())
         # saving settings
         self.save_settings()
 
         # quit and exit
-        startfile(self.output.get())
-        self.destroy()
+        try:
+            startfile(self.output.get())
+        finally:
+            self.destroy()
         exit()
 
         # End of function
@@ -367,7 +398,7 @@ class DicoShapes(Tk):
         u""" create and configure the Excel workbook """
         # Basic configurationdu
         self.book = Workbook(encoding = 'utf8')
-        self.feuy1 = self.book.add_sheet(u'Shapes', cell_overwrite_ok=True)
+        self.feuy1 = self.book.add_sheet(u'DicoGIS', cell_overwrite_ok=True)
 
         # Some customization: fonts and styles
         # first line style
@@ -383,11 +414,11 @@ class DicoShapes(Tk):
         self.entete.font = font1
         self.entete.alignment = alig1
 
-
         # hyperlinks style
         self.url = easyxf(u'font: underline single')
         # errors style
-        self.erreur = easyxf(u'font: name Arial, bold 1, colour red')
+        self.erreur = easyxf('pattern: pattern solid;'
+                             'font: colour red, bold True;')
 
         # columns name
         self.feuy1.write(0, 0, self.blabla.get('nomfic'), self.entete)
@@ -416,6 +447,7 @@ class DicoShapes(Tk):
 
         # in case of a source error
         if layer_infos.get('error'):
+            self.logger.warning('\tproblem detected')
             sheet.write(line, 0, layer_infos.get('name'))
             link = 'HYPERLINK("' + layer_infos.get(u'folder') \
                              + '"; "' + self.blabla.get('browse') + '")'
@@ -525,6 +557,7 @@ class DicoShapes(Tk):
     def erreurStop(self, mess):
         u""" In case of error, close the GUI and stop the program """
         info(title = u'Erreur', message = mess)
+        self.logger.error(mess)
         self.root.destroy()
         exit()
 
