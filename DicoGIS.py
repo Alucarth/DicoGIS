@@ -133,12 +133,9 @@ class DicoShapes(Tk):
             ## Frame 2
         # widgets
         self.prog_layers = Progressbar(self.FrProg,
-                                       orient="horizontal",
-                                       length = 400)
-        self.prog_fields = Progressbar(self.FrProg)
+                                       orient="horizontal")
         # widgets placement
-        self.prog_layers.grid(row = 1, column = 0,  sticky = N+S+W+E,
-                              padx = 2, pady = 2)
+        self.prog_layers.pack(expand=1, fill='both')
 
             ## Main frame
         # Hola
