@@ -4,10 +4,12 @@ from xlwt.Utils import rowcol_to_cell
 
 row = easyxf('pattern: pattern solid, fore_colour blue')
 col = easyxf('pattern: pattern solid, fore_colour green')
-cell = easyxf('pattern: pattern solid, fore_colour red')
+cell = easyxf('pattern: pattern solid, fore_colour light_blue;'
+                              'font: colour white, bold True;')
 
 book = Workbook()
 sheet = book.add_sheet('Precedence')
+
 
 for i in range(0,10,2):
     sheet.row(i).set_style(row)
@@ -16,7 +18,7 @@ for i in range(0,10,2):
     sheet.col(i).set_style(col)
 
 for i in range(10):
-    sheet.write(i,i,None,cell)
+    sheet.write(i,i,'YOUPI',cell)
 
 sheet = book.add_sheet('Hiding')
 
