@@ -1,9 +1,13 @@
 ﻿DicoGIS (formerly DicoShapes)
 ==========
 
+
 ##EN:
 ###Summary
 Automatize the creation of a dictionnary of geographic data in a folders structure. The output dictionary is an Excel file (.xls).
+
+###Use
+1 - Download the zip file in the downloads folder :  <a href="downloads/DicoGIS_1_6_1.zip.zip" target="_blank">Download Link</a> 
 
 ###History
 Developped in Python 2.7.x for the  [PACIVUR](http://www.ifeanet.org/pacivur/) research program which is part of the [IRD](http://en.ird.fr/) (French Institute of Research for the Development).
