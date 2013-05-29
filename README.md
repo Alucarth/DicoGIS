@@ -1,13 +1,17 @@
 ﻿DicoGIS (formerly DicoShapes)
 ==========
-
+Exists in 3 languages but youcan add your own translations (in locale).
 
 ##EN:
 ###Summary
 Automatize the creation of a dictionnary of geographic data in a folders structure. The output dictionary is an Excel file (.xls).
 
 ###Use
-1 - Download the zip file in the downloads folder :  <a href="downloads/DicoGIS_1_6_1.zip.zip" target="_blank">Download Link</a> 
+1 - Download the zip of the whole repository:  <a href="https://github.com/Guts/DicoGIS/archive/master.zip" target="_blank">download Link</a>,
+2 - Uncompress it, open the DicoGIS folder,
+3 - Copy DicoGIS_version_X.x.x.zip file where you want,
+4 - Uncompress it,
+5 - Execute DicoGIS.exe
 
 ###History
 Developped in Python 2.7.x for the  [PACIVUR](http://www.ifeanet.org/pacivur/) research program which is part of the [IRD](http://en.ird.fr/) (French Institute of Research for the Development).
@@ -16,6 +20,13 @@ Compiled in executable with [py2exe](http://www.py2exe.org/).
 ##ES:
 ###Resumen
 Automatiza la creación de un diccionario de los datos geográficos (shapefiles y tablas MapInfo) contenidos en una estructura de carpetas. El archivo final es una tabla Excel 2033 (.xls).
+
+###Uso
+1 - Descargar el archivo del déposito:  <a href="https://github.com/Guts/DicoGIS/archive/master.zip" target="_blank">descargar aquí</a>,
+2 - Extraer y abrir la carpeta 'DicoGIS',
+3 - Copy DicoGIS_version_X.x.x.zip file where you want,
+4 - Uncompress it,
+5 - Execute DicoGIS.exe
 
 ###Histórico
 Desarrollado en Python 2.7.x para el programa de investigación [PACIVUR](http://www.ifeanet.org/pacivur/) (Programa Andino de Capacitación e Investigación sobre Vulnerabilidad y Riesgos en medio urbano) que es parte del [IRD](http://es.ird.fr/) (instituto francés de investigación para el desarrollo).
