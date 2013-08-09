@@ -1,4 +1,4 @@
-﻿# -*- coding: UTF-8 -*-
+# -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 from __future__ import unicode_literals
 #-------------------------------------------------------------------------------
@@ -11,7 +11,7 @@ from __future__ import unicode_literals
 #
 # Python:       2.7.x
 # Created:      14/02/2013
-# Updated:      28/05/2013
+# Updated:      09/08/2013
 #
 # Licence:      GPL 3
 #-------------------------------------------------------------------------------
@@ -30,7 +30,6 @@ import tkFont
 from sys import exit, platform
 from os import  listdir, walk, path         # files and folder managing
 from os import environ as env
-from os import startfile                    # to open a folder/file
 from time import strftime
 
 import threading    # handling various subprocess
@@ -50,23 +49,19 @@ from xml.etree import ElementTree as ET     # XML parsing and writer
 # Custom modules
 from modules import InfosOGR    # custom extractor for geographic data
 
+# Imports depending on operating system
+if platform == 'win32':
+    u""" windows """
+    from os import startfile                            # to open a folder/file
+
 ################################################################################
 ########### Variables #############
 ###################################
 
-class DicoShapes(Tk):
+class DicoGIS(Tk):
     def __init__(self):
         u""" Main window constructor
         Creates 1 frame and 2 labelled subframes"""
-        # basics settings
-        Tk.__init__(self)               # constructor of parent graphic class
-        self.title(u'DicoGIS')
-        self.iconbitmap('DicoGIS.ico')
-        self.resizable(width = False, height = False)
-##        self.columnconfigure(0, weight=1)
-##        self.rowconfigure(0, weight=1)
-        self.focus_force()
-
         # creation and configuration of log file
         # see: http://sametmax.com/ecrire-des-logs-en-python/
         self.logger = logging.getLogger()
@@ -77,6 +72,24 @@ class DicoShapes(Tk):
         logfile.setFormatter(log_form)
         self.logger.addHandler(logfile)
         self.logger.info('\t ====== DicoGIS ======')  # first write
+
+        # basics settings
+        Tk.__init__(self)               # constructor of parent graphic class
+        self.title(u'DicoGIS')
+        if platform == 'win32':
+            self.logger.info('Operating system: Windows')
+            self.iconbitmap('DicoGIS.ico')    # windows icon
+            self.uzer = env.get(u'USERNAME')
+        elif platform == 'linux2':
+            self.logger.info('Operating system: Linux')
+            self.uzer = env.get(u'USER')
+        elif platform == 'darwin':
+            self.logger.info('Operating system: Mac')
+            self.uzer = env.get(u'USER')
+        else:
+            self.logger.warning('Operating system unknown')
+        self.resizable(width = False, height = False)
+        self.focus_force()
 
         # variables
         self.num_folders = 0
@@ -140,11 +153,11 @@ class DicoShapes(Tk):
             ## Main frame
         # Hola
         self.welcome = Label(self,
-                             text = self.blabla.get('hi') + env.get(u'USERNAME'),
+                             text = self.blabla.get('hi') + self.uzer,
                              font = ft_tit,
                              fg="red2")
         # Imagen
-        self.icone = PhotoImage(file = r'img/DicoGIS_logo.GIF')
+        self.icone = PhotoImage(file = r'img/DicoGIS_logo.gif')
         Label(self, borderwidth = 2, relief = 'ridge',
                                      image = self.icone).grid(row = 1,
                                                               rowspan = 3,
@@ -381,10 +394,9 @@ class DicoShapes(Tk):
         self.save_settings()
 
         # quit and exit
-        try:
+        if platform == 'win32':
             startfile(self.output.get())
-        finally:
-            self.destroy()
+        self.destroy()
         exit()
 
         # End of function
@@ -563,7 +575,7 @@ class DicoShapes(Tk):
 ###################################
 
 if __name__ == '__main__':
-    app = DicoShapes()
+    app = DicoGIS()
     app.mainloop()
 
 

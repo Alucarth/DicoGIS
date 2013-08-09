@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
 <params>
 	<codelang>FR</codelang>
-	<rep_defaut>C:/Documents and Settings/Utilisateur/Mes documents/Descargas</rep_defaut>
+	<rep_defaut>/home/guts/donnees/Lima_Callao</rep_defaut>
 </params>
