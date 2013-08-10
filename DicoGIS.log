@@ -1,0 +1,63 @@
+2013-08-09 18:06:44,123 || INFO || 	 ====== DicoGIS ======
+2013-08-09 18:06:44,324 || INFO || Operating system: Linux
+2013-08-09 18:07:09,463 || INFO || 	 ====== DicoGIS ======
+2013-08-09 18:07:09,698 || INFO || Operating system: Linux
+2013-08-09 18:09:08,203 || INFO || Begin of folders parsing
+2013-08-09 18:09:08,600 || INFO || End of folders parsing: 29 folders explored
+2013-08-09 18:09:09,676 || INFO || Excel file created
+2013-08-09 18:09:09,678 || INFO || 	Shapefiles processed
+2013-08-09 18:09:09,679 || INFO || 
+/home/guts/code/GitHub/DicoGIS/test/datatest/airports.shp
+2013-08-09 18:09:09,829 || INFO || 	 Infos OK
+2013-08-09 18:09:09,857 || INFO || 	 Wrote into the dictionary
+2013-08-09 18:09:09,866 || INFO || 
+	MapInfo tables processed
+2013-08-09 18:09:09,867 || INFO || 
+/home/guts/code/GitHub/DicoGIS/test/datatest/airports_MI/tab/airports_MI.tab
+2013-08-09 18:09:09,938 || INFO || 	 Infos OK
+2013-08-09 18:09:09,942 || INFO || 	 Wrote into the dictionary
+2013-08-09 18:09:13,593 || INFO || 
+	Workbook saved: /home/guts/code/GitHub/DicoGIS/DicoShapes_DicoGIS_2013-08-09.xls
+2013-08-09 18:10:54,108 || INFO || 	 ====== DicoGIS ======
+2013-08-09 18:10:54,315 || INFO || Operating system: Linux
+2013-08-09 18:11:07,323 || INFO || Begin of folders parsing
+2013-08-09 18:11:07,941 || INFO || End of folders parsing: 8 folders explored
+2013-08-09 18:11:13,024 || INFO || Begin of folders parsing
+2013-08-09 18:11:26,766 || INFO || 	 ====== DicoGIS ======
+2013-08-09 18:11:26,961 || INFO || Operating system: Linux
+2013-08-09 18:11:38,626 || INFO || Begin of folders parsing
+2013-08-09 18:11:38,643 || INFO || End of folders parsing: 5 folders explored
+2013-08-09 18:11:40,578 || INFO || Excel file created
+2013-08-09 18:11:40,580 || INFO || 	Shapefiles processed
+2013-08-09 18:11:40,581 || INFO || 
+/home/guts/donnees/Lima_Callao/Lugares_Cultos/OSM/OSM_PlaceWorship_Nodes_2012-11-20.shp
+2013-08-09 18:11:40,605 || INFO || 	 Infos OK
+2013-08-09 18:11:40,611 || INFO || 	 Wrote into the dictionary
+2013-08-09 18:11:40,617 || INFO || 
+/home/guts/donnees/Lima_Callao/Lugares_Cultos/shp/Lugares_Culto.shp
+2013-08-09 18:11:40,623 || INFO || 	 Infos OK
+2013-08-09 18:11:40,627 || INFO || 	 Wrote into the dictionary
+2013-08-09 18:11:40,632 || INFO || 
+/home/guts/donnees/Lima_Callao/Lugares_Cultos/shp/Lugares_Culto_Buffer100.shp
+2013-08-09 18:11:40,660 || INFO || 	 Infos OK
+2013-08-09 18:11:40,663 || INFO || 	 Wrote into the dictionary
+2013-08-09 18:11:40,670 || INFO || 
+/home/guts/donnees/Lima_Callao/Vulnerabilidad_Espacial/Mailles_008.shp
+2013-08-09 18:11:40,729 || INFO || 	 Infos OK
+2013-08-09 18:11:40,735 || INFO || 	 Wrote into the dictionary
+2013-08-09 18:11:40,742 || INFO || 
+/home/guts/donnees/Lima_Callao/Vulnerabilidad_Espacial/Mailles_acces_physiq.shp
+2013-08-09 18:11:40,780 || INFO || 	 Infos OK
+2013-08-09 18:11:40,786 || INFO || 	 Wrote into the dictionary
+2013-08-09 18:11:40,791 || INFO || 
+/home/guts/donnees/Lima_Callao/Vulnerabilidad_Espacial/Mailles_inter_pompiers.shp
+2013-08-09 18:11:40,808 || INFO || 	 Infos OK
+2013-08-09 18:11:40,813 || INFO || 	 Wrote into the dictionary
+2013-08-09 18:11:40,818 || INFO || 
+/home/guts/donnees/Lima_Callao/Vulnerabilidad_Espacial/Mailles_tipo_seguro_2.shp
+2013-08-09 18:11:40,826 || INFO || 	 Infos OK
+2013-08-09 18:11:40,830 || INFO || 	 Wrote into the dictionary
+2013-08-09 18:11:40,835 || INFO || 
+	MapInfo tables processed
+2013-08-09 18:11:44,093 || INFO || 
+	Workbook saved: /home/guts/donnees/Lima_Callao/DicoShapes_Lima_Callao_2013-08-09.xls
