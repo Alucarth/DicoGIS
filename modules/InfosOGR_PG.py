@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 ##from __future__ import unicode_literals
@@ -19,8 +22,7 @@
 ########### Libraries #############
 ###################################
 # Standard library
-from os import walk, path       # files and folder managing
-from time import localtime, strptime, strftime
+
 
 # Python 3 backported
 from collections import OrderedDict as OD
@@ -62,9 +64,9 @@ class InfosOGR_PG():
         dico_layer[u'type'] = tipo
         self.infos_basics(layer, dico_layer, text)
         # geometry information
-        self.infos_geom(dico_layer, text)
+        self.infos_geom(layer, dico_layer, text)
         # fields information
-        self.infos_fields(dico_fields)
+        self.infos_fields(layer, dico_fields)
 
     def infos_basics(self, layer, dico_layer, txt):
         u""" get the global informations about the layer """
@@ -101,11 +103,9 @@ class InfosOGR_PG():
                 dico_layer[u'srs'] = self.srs.GetAttrValue('PROJECTION').decode('latin1').replace('_', ' ')
         dico_layer[u'EPSG'] = unicode(self.srs.GetAttrValue("AUTHORITY", 1))
         # Getting basic dates
-        dico_layer[u'date_actu'] = strftime('%Y-%m-%d',
-                                            localtime(path.getmtime(layer)))
-        dico_layer[u'date_crea'] = strftime('%Y-%m-%d',
-                                            localtime(path.getctime(layer)))
-        # SRS exception handling
+        dico_layer[u'date_actu'] = '0000-00-00' # looking for a solution to get the last update of a pg table
+        dico_layer[u'date_crea'] = '0000-00-00' # looking for a solution to get the last update of a pg table
+        # EPSG code
         if dico_layer[u'EPSG'] == u'4326' and dico_layer[u'srs'] == u'None':
             print dico_layer[u'srs']
             dico_layer[u'srs'] = u'WGS 84'
@@ -114,7 +114,7 @@ class InfosOGR_PG():
         # end of function
         return dico_layer, layer, txt
 
-    def infos_geom(self, dico_layer, txt):
+    def infos_geom(self, layer, dico_layer, txt):
         u""" get the informations about geometry """
         # type géométrie
         if self.geom.GetGeometryName() == u'POINT':
@@ -126,14 +126,14 @@ class InfosOGR_PG():
         else:
             dico_layer[u'type_geom'] = self.geom.GetGeometryName()
         # Spatial extent (bounding box)
-        dico_layer[u'Xmin'] = round(self.layer.GetExtent()[0],2)
-        dico_layer[u'Xmax'] = round(self.layer.GetExtent()[1],2)
-        dico_layer[u'Ymin'] = round(self.layer.GetExtent()[2],2)
-        dico_layer[u'Ymax'] = round(self.layer.GetExtent()[3],2)
+        dico_layer[u'Xmin'] = round(layer.GetExtent()[0],2)
+        dico_layer[u'Xmax'] = round(layer.GetExtent()[1],2)
+        dico_layer[u'Ymin'] = round(layer.GetExtent()[2],2)
+        dico_layer[u'Ymax'] = round(layer.GetExtent()[3],2)
         # end of function
         return dico_layer
 
-    def infos_fields(self, dico_fields):
+    def infos_fields(self, layer, dico_fields):
         u""" get the informations about fields definitions """
         for i in range(self.def_couche.GetFieldCount()):
             champomy = self.def_couche.GetFieldDefn(i) # ordered list of fields
@@ -146,8 +146,8 @@ class InfosOGR_PG():
     def erratum(self, dicolayer, layer, mess):
         u""" errors handling """
         # local variables
-        dicolayer[u'name'] = path.basename(layer)
-        dicolayer[u'folder'] = path.dirname(layer)
+        dicolayer[u'name'] = layer.GetName()
+        dicolayer[u'folder'] = 'PostGIS table'
         def_couche = layer.GetLayerDefn()
         dicolayer[u'num_fields'] = def_couche.GetFieldCount()
         dicolayer[u'error'] = mess
@@ -162,7 +162,6 @@ if __name__ == '__main__':
     u""" standalone execution for tests. Paths are relative considering a test
     within the official repository (https://github.com/Guts/DicoGIS/)"""
     # libraries import
-    from os import getcwd, chdir, path
     from sys import exit
     # test text dictionary
     textos = OD()
@@ -184,7 +183,10 @@ if __name__ == '__main__':
     test_user = 'guts_player'
     test_pwd = 'letsplay'
     try:
-        conn = ogr.Open("PG: host=%s dbname=%s user=%s password=%s" %(test_host, test_db, test_user, test_pwd))
+        conn = ogr.Open("PG: host=%s dbname=%s user=%s password=%s" %(test_host, 
+                                                                      test_db, 
+                                                                      test_user, 
+                                                                      test_pwd))
         print "Access granted : connecting people!"
     except:
         print 'Connection to database failed. Check your connection settings.'
@@ -192,10 +194,4 @@ if __name__ == '__main__':
     # parsing the layers
     for layer in conn:
         InfosOGR_PG(layer, dico_layer, dico_fields, 'pg', textos)
-
-
-
-
-################################################################################
-######## Former codelines #########
-###################################
+        print dico_layer
