@@ -11,7 +11,7 @@ from __future__ import unicode_literals
 #
 # Python:       2.7.x
 # Created:      14/02/2013
-# Updated:      09/08/2013
+# Updated:      13/08/2013
 #
 # Licence:      GPL 3
 #-------------------------------------------------------------------------------
@@ -21,10 +21,10 @@ from __future__ import unicode_literals
 ###################################
 # Standard library
 from Tkinter import Tk, Label, Entry, Button, StringVar, IntVar, END     # GUI
-from Tkinter import LabelFrame, N, S, E, W, ACTIVE, DISABLED, GROOVE, PhotoImage
+from Tkinter import LabelFrame, N, S, E, W, ACTIVE, DISABLED, PhotoImage
 from tkFileDialog import askdirectory, asksaveasfilename    # dialogs
 from tkMessageBox import showinfo as info
-from ttk import Combobox, Progressbar       # advanced graphic widgets
+from ttk import Combobox, Progressbar, Radiobutton       # advanced graphic widgets
 import tkFont
 
 from sys import exit, platform
@@ -97,6 +97,7 @@ class DicoGIS(Tk):
         self.def_lang = 'FR'    # default language to start
         self.li_shp = []         # list for shapefiles path
         self.li_tab = []         # list for MapInfo tables path
+        self.typo = IntVar()
         self.today = strftime("%Y-%m-%d")   # date of the day
         self.dico_layer = OD()    # dictionary where will be stored informations
         self.dico_fields = OD()    # dictionary for fields information
@@ -122,6 +123,10 @@ class DicoGIS(Tk):
             ## Frame 1
         # variables
         self.numfiles = StringVar(self.FrPath, '')
+        # type switcher
+        rd_file = Radiobutton(self.FrPath, text = 'Fichiers', variable = self.typo, value = 1).grid(row=0, column = 1, sticky = N+S+E, padx = 2, pady = 2)
+        rd_pg = Radiobutton(self.FrPath, text = 'PostGIS', variable = self.typo, value = 2).grid(row=0, column = 2, sticky = N+S+E, padx = 2, pady = 2)
+
         # target folder
         self.labtarg = Label(self.FrPath, text = self.blabla.get('gui_path'))
         self.target = Entry(self.FrPath, width = 35)
@@ -129,7 +134,7 @@ class DicoGIS(Tk):
                                  text = self.blabla.get('gui_choix'),
                                  command = self.setpathtarg,
                                  takefocus = True)
-        self.browsetarg.focus_force()               # foce the focus on
+        self.browsetarg.focus_force()               # force the focus on
         self.nameoutput = Label(self.FrPath,
                                  text = self.blabla.get('gui_fic'))
         self.output = Entry(self.FrPath, width = 35)
@@ -234,7 +239,7 @@ class DicoGIS(Tk):
         # change to the new language selected
         self.load_texts(new_lang)
         # update widgets text
-        self.welcome.config(text = self.blabla.get('hi') + env.get(u'USERNAME'))
+        self.welcome.config(text = self.blabla.get('hi') + self.uzer)
         self.can.config(text = self.blabla.get('gui_quit'))
         self.FrPath.config(text = self.blabla.get('gui_fr1'))
         self.FrProg.config(text = self.blabla.get('gui_prog'))
