@@ -20,11 +20,10 @@ from __future__ import unicode_literals
 ########### Libraries #############
 ###################################
 # Standard library
-from Tkinter import Tk, Label, Entry, Button, StringVar, IntVar, END     # GUI
-from Tkinter import LabelFrame, N, S, E, W, ACTIVE, DISABLED, PhotoImage
+from Tkinter import *     # GUI
 from tkFileDialog import askdirectory, asksaveasfilename    # dialogs
 from tkMessageBox import showinfo as info
-from ttk import Combobox, Progressbar, Radiobutton, Entry       # advanced graphic widgets
+from ttk import *       # advanced graphic widgets
 import tkFont
 
 from sys import exit, platform
@@ -113,15 +112,12 @@ class DicoGIS(Tk):
         self.load_texts(self.def_lang)
 
         # Frames
-        self.FrPath = LabelFrame(self, name ='files',
-                                       text = self.blabla.get('gui_fr1'),
-                                       padx = 5, pady = 5)
-        self.FrDb = LabelFrame(self, name ='database',
-                                       text = self.blabla.get('gui_fr2'),
-                                       padx = 5, pady = 5)
-        self.FrProg = LabelFrame(self, name ='progression',
-                                       text = self.blabla.get('gui_prog'),
-                                       padx = 5, pady = 5)
+        self.FrPath = Labelframe(self, name ='files',
+                                       text = self.blabla.get('gui_fr1'))
+        self.FrDb = Labelframe(self, name ='database',
+                                       text = self.blabla.get('gui_fr2'))
+        self.FrProg = Labelframe(self, name ='progression',
+                                       text = self.blabla.get('gui_prog'))
 
             ## Frame 1: path of geofiles
         # variables
@@ -142,7 +138,7 @@ class DicoGIS(Tk):
         self.target.grid(row = 1, column = 2, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
         self.browsetarg.grid(row = 1, column = 3, sticky = N+S+W+E, padx = 2, pady = 2)
         Label(self.FrPath, textvariable = self.numfiles,
-                           fg= 'DodgerBlue').grid(row = 2,
+                           foreground = 'DodgerBlue').grid(row = 2,
                                                   column = 1, columnspan = 3)
         self.nameoutput.grid(row = 3, column= 1)
         self.output.grid(row = 3, column= 2)
@@ -156,39 +152,28 @@ class DicoGIS(Tk):
         self.usua = StringVar()
         self.mdpa = StringVar()
         # Form widgets
-        self.H = Entry(self.FrDb, textvariable = self.host)
-        self.P = Entry(self.FrDb, textvariable = self.port)
-        self.D = Entry(self.FrDb, textvariable = self.dbnb)
-        self.U = Entry(self.FrDb, textvariable = self.usua)
-        self.M = Entry(self.FrDb, textvariable = self.mdpa, show='*')
+        self.ent_H = Entry(self.FrDb, textvariable = self.host)
+        self.ent_P = Entry(self.FrDb, textvariable = self.port)
+        self.ent_D = Entry(self.FrDb, textvariable = self.dbnb)
+        self.ent_U = Entry(self.FrDb, textvariable = self.usua)
+        self.ent_M = Entry(self.FrDb, textvariable = self.mdpa, show='*')
         # Label widgets
-        Label(self.FrDb, text = self.blabla.get('gui_host')).grid(row = 1, column = 1,
-                                                  padx = 2, pady = 2,
-                                                  sticky = N+S+W)
-        Label(self.FrDb, text = self.blabla.get('gui_port')).grid(row = 1, column = 3,
-                                             padx = 2, pady = 2,
-                                             sticky = N+S+W)
-        Label(self.FrDb, text = self.blabla.get('gui_db')).grid(row = 2,
-                                                    column = 1,
-                                                    padx = 2,
-                                                    pady = 2,
-                                                    sticky = N+S+W)
-        Label(self.FrDb, text = self.blabla.get('gui_user')).grid(row = 2,
-                                              column = 3,
-                                              padx = 2,
-                                              pady = 2,
-                                              sticky = N+S+W)
-        Label(self.FrDb, text = self.blabla.get('gui_mdp')).grid(row = 3,
-                                                 column = 1,
-                                                 padx = 2,
-                                                 pady = 2,
-                                                 sticky = N+S+W)
+        self.lb_H = Label(self.FrDb, text = self.blabla.get('gui_host'))
+        self.lb_P = Label(self.FrDb, text = self.blabla.get('gui_port'))
+        self.lb_D = Label(self.FrDb, text = self.blabla.get('gui_db'))
+        self.lb_U = Label(self.FrDb, text = self.blabla.get('gui_user'))
+        self.lb_M = Label(self.FrDb, text = self.blabla.get('gui_mdp'))
         # widgets placement
-        self.H.grid(row = 1, column = 1, columnspan = 2, sticky = N+S+W+E, padx = 2, pady = 2)
-        self.P.grid(row = 1, column = 3, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
-        self.D.grid(row = 2, column = 1, columnspan = 2, sticky = N+S+W+E, padx = 2, pady = 2)
-        self.U.grid(row = 2, column = 3, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
-        self.M.grid(row = 3, column = 1, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
+        self.ent_H.grid(row = 1, column = 1, columnspan = 2, sticky = N+S+W+E, padx = 2, pady = 2)
+        self.ent_P.grid(row = 1, column = 3, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
+        self.ent_D.grid(row = 2, column = 1, columnspan = 2, sticky = N+S+W+E, padx = 2, pady = 2)
+        self.ent_U.grid(row = 2, column = 3, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
+        self.ent_M.grid(row = 3, column = 1, columnspan = 2, sticky = N+S+W+E, padx = 2, pady = 2)
+        self.lb_H.grid(row = 1, column = 1, sticky = N+S+W, padx = 2, pady = 2)
+        self.lb_P.grid(row = 1, column = 3, sticky = N+S+W, padx = 2, pady = 2)
+        self.lb_D.grid(row = 2, column = 1, sticky = N+S+W, padx = 2, pady = 2)
+        self.lb_U.grid(row = 2, column = 3, sticky = N+S+W, padx = 2, pady = 2)
+        self.lb_M.grid(row = 3, column = 1, sticky = N+S+W, padx = 2, pady = 2)
 
         # default values
         self.typo.set(1)
@@ -205,7 +190,7 @@ class DicoGIS(Tk):
         self.welcome = Label(self,
                              text = self.blabla.get('hi') + self.uzer,
                              font = ft_tit,
-                             fg="red2")
+                             foreground = "red2")
         # Imagen
         self.icone = PhotoImage(file = r'img/DicoGIS_logo.gif')
         Label(self, borderwidth = 2, relief = 'ridge',
@@ -230,11 +215,9 @@ class DicoGIS(Tk):
                                            command = self.change_type)
         # Basic buttons
         self.val = Button(self, text = self.blabla.get('gui_go'),
-                                relief= 'raised',
                                 state = DISABLED,
                                 command = self.process)
         self.can = Button(self, text = self.blabla.get('gui_quit'),
-                           relief= 'groove',
                            command = self.destroy)
 
         # widgets placement
@@ -302,6 +285,12 @@ class DicoGIS(Tk):
         self.browsetarg.config(text = self.blabla.get('gui_choix'))
         self.val.config(text = self.blabla.get('gui_go'))
         self.nameoutput.config(text = self.blabla.get('gui_fic'))
+        self.lb_H.config(text = self.blabla.get('gui_host'))
+        self.lb_P.config(text = self.blabla.get('gui_port'))
+        self.lb_D.config(text = self.blabla.get('gui_db'))
+        self.lb_U.config(text = self.blabla.get('gui_user'))
+        self.lb_M.config(text = self.blabla.get('gui_mdp'))
+
         # End of function
         return self.blabla
 
