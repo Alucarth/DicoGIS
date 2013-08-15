@@ -12,9 +12,15 @@
 	<gui_cholang>Langue :</gui_cholang>
 	<gui_go>Lancer</gui_go>
 	<gui_quit>Quitter</gui_quit>
-	<gui_fr1>Arborescence cible</gui_fr1>
+	<gui_fr1> Arborescence cible </gui_fr1>
+	<gui_fr2> Base de données cible </gui_fr2>
 	<gui_path>Chemin du dossier : </gui_path>
 	<gui_fic>Nom du fichier en sortie : </gui_fic>
+	<gui_host>Hôte : </gui_host>
+	<gui_port>Port : </gui_port>
+	<gui_db>Base de données : </gui_db>
+	<gui_user>Utilisateur : </gui_user>
+	<gui_mdp>Mot de passe : </gui_mdp>
 	<gui_prog>Progression</gui_prog>
 	<gui_prog1>Progression : recherche des fichiers compatibles</gui_prog1>
 	<gui_prog2>Progression : traitement des fichiers en cours</gui_prog2>

@@ -12,9 +12,15 @@
 	<gui_cholang>Idioma:</gui_cholang>
 	<gui_go>Iniciar</gui_go>
 	<gui_quit>Salir</gui_quit>
-	<gui_fr1>Carpeta</gui_fr1>
+	<gui_fr1> Carpeta </gui_fr1>
+	<gui_fr2> Base de datos </gui_fr2>
 	<gui_path>Ruta de la carpeta: </gui_path>
 	<gui_fic>Nombre del diccionario: </gui_fic>
+	<gui_host>Servidor: </gui_host>
+	<gui_port>Puerto: </gui_port>
+	<gui_db>Base de datos: </gui_db>
+	<gui_user>Usuario: </gui_user>
+	<gui_mdp>Contraseña: </gui_mdp>
 	<gui_prog>Progresión</gui_prog>
 	<gui_prog1>Progresión: análisis de los archivos compatibles</gui_prog1>
 	<gui_prog2>Progresión: proceso de los archivos</gui_prog2>	

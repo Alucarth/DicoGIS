@@ -12,9 +12,15 @@
 	<gui_cholang>Language :</gui_cholang>
 	<gui_go>Go!</gui_go>
 	<gui_quit>Quit</gui_quit>
-	<gui_fr1>Folders structure target</gui_fr1>
+	<gui_fr1> Folders structure target </gui_fr1>
+	<gui_fr2> Database target </gui_fr2>
 	<gui_path>Folder path: </gui_path>
 	<gui_fic>Name of output file: </gui_fic>
+	<gui_host>Host: </gui_host>
+	<gui_port>Port: </gui_port>
+	<gui_db>Database: </gui_db>
+	<gui_user>User: </gui_user>
+	<gui_mdp>Password: </gui_mdp>
 	<gui_prog>Progression</gui_prog>
 	<gui_prog1>Progress: parsing and retrieving compatible files</gui_prog1>
 	<gui_prog2>Progress: processing the files</gui_prog2>

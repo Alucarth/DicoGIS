@@ -24,7 +24,7 @@ from Tkinter import Tk, Label, Entry, Button, StringVar, IntVar, END     # GUI
 from Tkinter import LabelFrame, N, S, E, W, ACTIVE, DISABLED, PhotoImage
 from tkFileDialog import askdirectory, asksaveasfilename    # dialogs
 from tkMessageBox import showinfo as info
-from ttk import Combobox, Progressbar, Radiobutton       # advanced graphic widgets
+from ttk import Combobox, Progressbar, Radiobutton, Entry       # advanced graphic widgets
 import tkFont
 
 from sys import exit, platform
@@ -113,20 +113,19 @@ class DicoGIS(Tk):
         self.load_texts(self.def_lang)
 
         # Frames
-        self.FrPath = LabelFrame(self, name ='main',
+        self.FrPath = LabelFrame(self, name ='files',
                                        text = self.blabla.get('gui_fr1'),
+                                       padx = 5, pady = 5)
+        self.FrDb = LabelFrame(self, name ='database',
+                                       text = self.blabla.get('gui_fr2'),
                                        padx = 5, pady = 5)
         self.FrProg = LabelFrame(self, name ='progression',
                                        text = self.blabla.get('gui_prog'),
                                        padx = 5, pady = 5)
 
-            ## Frame 1
+            ## Frame 1: path of geofiles
         # variables
         self.numfiles = StringVar(self.FrPath, '')
-        # type switcher
-        rd_file = Radiobutton(self.FrPath, text = 'Fichiers', variable = self.typo, value = 1).grid(row=0, column = 1, sticky = N+S+E, padx = 2, pady = 2)
-        rd_pg = Radiobutton(self.FrPath, text = 'PostGIS', variable = self.typo, value = 2).grid(row=0, column = 2, sticky = N+S+E, padx = 2, pady = 2)
-
         # target folder
         self.labtarg = Label(self.FrPath, text = self.blabla.get('gui_path'))
         self.target = Entry(self.FrPath, width = 35)
@@ -148,7 +147,53 @@ class DicoGIS(Tk):
         self.nameoutput.grid(row = 3, column= 1)
         self.output.grid(row = 3, column= 2)
 
-            ## Frame 2
+
+            ## Frame 2: Database
+        # variables
+        self.host = StringVar()
+        self.port = IntVar()
+        self.dbnb = StringVar()
+        self.usua = StringVar()
+        self.mdpa = StringVar()
+        # Form widgets
+        self.H = Entry(self.FrDb, textvariable = self.host)
+        self.P = Entry(self.FrDb, textvariable = self.port)
+        self.D = Entry(self.FrDb, textvariable = self.dbnb)
+        self.U = Entry(self.FrDb, textvariable = self.usua)
+        self.M = Entry(self.FrDb, textvariable = self.mdpa, show='*')
+        # Label widgets
+        Label(self.FrDb, text = self.blabla.get('gui_host')).grid(row = 1, column = 1,
+                                                  padx = 2, pady = 2,
+                                                  sticky = N+S+W)
+        Label(self.FrDb, text = self.blabla.get('gui_port')).grid(row = 1, column = 3,
+                                             padx = 2, pady = 2,
+                                             sticky = N+S+W)
+        Label(self.FrDb, text = self.blabla.get('gui_db')).grid(row = 2,
+                                                    column = 1,
+                                                    padx = 2,
+                                                    pady = 2,
+                                                    sticky = N+S+W)
+        Label(self.FrDb, text = self.blabla.get('gui_user')).grid(row = 2,
+                                              column = 3,
+                                              padx = 2,
+                                              pady = 2,
+                                              sticky = N+S+W)
+        Label(self.FrDb, text = self.blabla.get('gui_mdp')).grid(row = 3,
+                                                 column = 1,
+                                                 padx = 2,
+                                                 pady = 2,
+                                                 sticky = N+S+W)
+        # widgets placement
+        self.H.grid(row = 1, column = 1, columnspan = 2, sticky = N+S+W+E, padx = 2, pady = 2)
+        self.P.grid(row = 1, column = 3, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
+        self.D.grid(row = 2, column = 1, columnspan = 2, sticky = N+S+W+E, padx = 2, pady = 2)
+        self.U.grid(row = 2, column = 3, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
+        self.M.grid(row = 3, column = 1, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
+
+        # default values
+        self.typo.set(1)
+
+            ## Frame 3: Progression bar
         # widgets
         self.prog_layers = Progressbar(self.FrProg,
                                        orient="horizontal")
@@ -165,7 +210,7 @@ class DicoGIS(Tk):
         self.icone = PhotoImage(file = r'img/DicoGIS_logo.gif')
         Label(self, borderwidth = 2, relief = 'ridge',
                                      image = self.icone).grid(row = 1,
-                                                              rowspan = 3,
+                                                              rowspan = 4,
                                                               column = 0,
                                                               padx = 2,
                                                               pady = 2,
@@ -174,6 +219,15 @@ class DicoGIS(Tk):
         self.ddl_lang = Combobox(self, values = li_lang, width = 5)
         self.ddl_lang.current(li_lang.index(self.def_lang))
         self.ddl_lang.bind("<<ComboboxSelected>>", self.change_lang)
+        # type switcher
+        rd_file = Radiobutton(self, text = 'Fichiers', 
+                                           variable = self.typo, 
+                                           value = 1,
+                                           command = self.change_type)
+        rd_pg = Radiobutton(self, text = 'PostGIS', 
+                                         variable = self.typo, 
+                                         value = 2,
+                                           command = self.change_type)
         # Basic buttons
         self.val = Button(self, text = self.blabla.get('gui_go'),
                                 relief= 'raised',
@@ -187,13 +241,14 @@ class DicoGIS(Tk):
         self.welcome.grid(row = 1, column = 1, columnspan = 1, sticky = N+S+W+E,
                           padx = 2, pady = 2)
         self.ddl_lang.grid(row=1, column = 1, sticky = N+S+E, padx = 2, pady = 2)
+        rd_file.grid(row=2, column = 1, sticky = N+S+W, padx = 2, pady = 2)
+        rd_pg.grid(row=2, column = 1, sticky = N+S+E, padx = 2, pady = 2)
         self.val.grid(row = 5, column = 1, columnspan = 2,
                             sticky = N+S+W+E, padx = 2, pady = 2)
         self.can.grid(row = 5, column = 0, sticky = N+S+W+E, padx = 2, pady = 2)
         # Frames placement
-        self.FrPath.grid(row = 2, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
-        self.FrProg.grid(row = 3, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
-
+        self.FrProg.grid(row = 4, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
+        rd_file.invoke()    # to provoc the type (frame 2) placement
 
     def load_settings(self):
         u""" load settings from last execution """
@@ -264,6 +319,18 @@ class DicoGIS(Tk):
         self.update()
         # Fin de fonction
         return self.blabla
+
+
+    def change_type(self):
+        u""" load settings from last execution """
+        print self.typo.get()
+        if self.typo.get() == 1:
+            self.FrDb.grid_forget()
+            self.FrPath.grid(row = 3, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
+        elif self.typo.get() == 2:
+            self.FrPath.grid_forget()
+            self.FrDb.grid(row = 3, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
+
 
 
     def setpathtarg(self):
