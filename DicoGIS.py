@@ -47,6 +47,7 @@ from xml.etree import ElementTree as ET     # XML parsing and writer
 
 # Custom modules
 from modules import InfosOGR    # custom extractor for geographic data
+from modules import InfosOGR_PG    # custom extractor for geographic data in PostGIS databases
 
 # Imports depending on operating system
 if platform == 'win32':
@@ -149,14 +150,14 @@ class DicoGIS(Tk):
         self.host = StringVar()
         self.port = IntVar()
         self.dbnb = StringVar()
-        self.usua = StringVar()
-        self.mdpa = StringVar()
+        self.user = StringVar()
+        self.pswd = StringVar()
         # Form widgets
         self.ent_H = Entry(self.FrDb, textvariable = self.host)
         self.ent_P = Entry(self.FrDb, textvariable = self.port)
         self.ent_D = Entry(self.FrDb, textvariable = self.dbnb)
-        self.ent_U = Entry(self.FrDb, textvariable = self.usua)
-        self.ent_M = Entry(self.FrDb, textvariable = self.mdpa, show='*')
+        self.ent_U = Entry(self.FrDb, textvariable = self.user)
+        self.ent_M = Entry(self.FrDb, textvariable = self.pswd, show='*')
         # Label widgets
         self.lb_H = Label(self.FrDb, text = self.blabla.get('gui_host'))
         self.lb_P = Label(self.FrDb, text = self.blabla.get('gui_port'))
@@ -164,19 +165,24 @@ class DicoGIS(Tk):
         self.lb_U = Label(self.FrDb, text = self.blabla.get('gui_user'))
         self.lb_M = Label(self.FrDb, text = self.blabla.get('gui_mdp'))
         # widgets placement
-        self.ent_H.grid(row = 1, column = 1, columnspan = 2, sticky = N+S+W+E, padx = 2, pady = 2)
-        self.ent_P.grid(row = 1, column = 3, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
-        self.ent_D.grid(row = 2, column = 1, columnspan = 2, sticky = N+S+W+E, padx = 2, pady = 2)
-        self.ent_U.grid(row = 2, column = 3, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
-        self.ent_M.grid(row = 3, column = 1, columnspan = 2, sticky = N+S+W+E, padx = 2, pady = 2)
-        self.lb_H.grid(row = 1, column = 1, sticky = N+S+W, padx = 2, pady = 2)
-        self.lb_P.grid(row = 1, column = 3, sticky = N+S+W, padx = 2, pady = 2)
-        self.lb_D.grid(row = 2, column = 1, sticky = N+S+W, padx = 2, pady = 2)
-        self.lb_U.grid(row = 2, column = 3, sticky = N+S+W, padx = 2, pady = 2)
-        self.lb_M.grid(row = 3, column = 1, sticky = N+S+W, padx = 2, pady = 2)
+        self.ent_H.grid(row = 1, column = 1, columnspan = 1, sticky = N+S+E+W, padx = 2, pady = 2)
+        self.ent_P.grid(row = 1, column = 3, columnspan = 1, sticky = N+S+E+W, padx = 2, pady = 2)
+        self.ent_D.grid(row = 2, column = 1, columnspan = 1, sticky = N+S+E+W, padx = 2, pady = 2)
+        self.ent_U.grid(row = 2, column = 3, columnspan = 1, sticky = N+S+E+W, padx = 2, pady = 2)
+        self.ent_M.grid(row = 3, column = 1, columnspan = 3, sticky = N+S+E+W, padx = 2, pady = 2)
+        self.lb_H.grid(row = 1, column = 0, sticky = N+S+W, padx = 2, pady = 2)
+        self.lb_P.grid(row = 1, column = 2, sticky = N+S+W, padx = 2, pady = 2)
+        self.lb_D.grid(row = 2, column = 0, sticky = N+S+W, padx = 2, pady = 2)
+        self.lb_U.grid(row = 2, column = 2, sticky = N+S+W, padx = 2, pady = 2)
+        self.lb_M.grid(row = 3, column = 0, sticky = N+S+W+E, padx = 2, pady = 2)
 
         # default values
         self.typo.set(1)
+        self.host.set('localhost')
+        self.port.set(5432)
+        self.user.set('postgres')
+        self.dbnb.set('')
+        self.pswd.set('')
 
             ## Frame 3: Progression bar
         # widgets
@@ -215,7 +221,7 @@ class DicoGIS(Tk):
                                            command = self.change_type)
         # Basic buttons
         self.val = Button(self, text = self.blabla.get('gui_go'),
-                                state = DISABLED,
+                                state = ACTIVE,
                                 command = self.process)
         self.can = Button(self, text = self.blabla.get('gui_quit'),
                            command = self.destroy)
@@ -280,6 +286,7 @@ class DicoGIS(Tk):
         self.welcome.config(text = self.blabla.get('hi') + self.uzer)
         self.can.config(text = self.blabla.get('gui_quit'))
         self.FrPath.config(text = self.blabla.get('gui_fr1'))
+        self.FrDb.config(text = self.blabla.get('gui_fr2'))
         self.FrProg.config(text = self.blabla.get('gui_prog'))
         self.labtarg.config(text = self.blabla.get('gui_path'))
         self.browsetarg.config(text = self.blabla.get('gui_choix'))
@@ -312,7 +319,6 @@ class DicoGIS(Tk):
 
     def change_type(self):
         u""" load settings from last execution """
-        print self.typo.get()
         if self.typo.get() == 1:
             self.FrDb.grid_forget()
             self.FrPath.grid(row = 3, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
@@ -393,8 +399,17 @@ class DicoGIS(Tk):
         # End of function
         return foldertarget, self.li_shp, self.li_tab
 
-
     def process(self):
+        print 'process initialized'
+        if self.typo.get() == 1:
+            print '=> files process started'
+            self.process_files()
+        elif self.typo.get() == 2:
+            print '=> DB process started'
+            self.process_db()
+        return
+
+    def process_files(self):
         u""" launch the different processes """
         # check if there are some layers into the folder structure
         if len(self.li_shp) + len(self.li_tab) == 0:
@@ -462,6 +477,116 @@ class DicoGIS(Tk):
 
         # End of function
         return
+
+    def process_db(self):
+        u""" launch the different processes """
+        # creating the Excel workbook
+        self.configexcel()
+        self.logger.info('Excel file created')
+        # # configuring the progression bar
+        # self.prog_layers["maximum"] = len(self.li_shp) + len(self.li_tab)
+        # self.prog_layers["value"]
+        # getting the info from shapefiles and compile it in the excel
+        line = 1    # line of dictionary
+        self.logger.info('\tPostGIS table processing...')
+        try:
+            conn = ogr.Open("PG: host=%s port=%s dbname=%s user=%s password=%s" %(self.host.get(),
+                                                                                  self.port.get(),
+                                                                                  self.dbnb.get(), 
+                                                                                  self.user.get(), 
+                                                                                  self.pswd.get()))
+            print "Access granted : connecting people!"
+        except:
+            print 'Connection to database failed. Check your connection settings.'
+            exit()
+        # parsing the layers
+        for layer in conn:
+            InfosOGR_PG(layer, self.dico_layer, self.dico_fields, 'pg', self.blabla)
+            print self.dico_layer
+            # writing to the Excel dictionary
+            self.dictionarize(self.dico_layer, self.dico_fields, self.feuy1, line)
+            self.logger.info('\t Wrote into the dictionary')
+            # increment the line number
+            line = line +1
+            # increment the progress bar
+            #self.prog_layers["value"] = self.prog_layers["value"] +1
+            self.update()
+        # saving dictionary
+        self.savedico()
+        self.logger.info('\n\tWorkbook saved: %s', self.output.get())
+        # saving settings
+        self.save_settings()
+
+        # quit and exit
+        if platform == 'win32':
+            startfile(self.output.get())
+        self.destroy()
+        exit()
+
+        # End of function
+        return
+
+    def check_fields(self):
+        u""" Check if fields are not empty """
+        # error message
+        msj = u'Any fields should be empty'
+        # checking empty fields
+        if self.host.get() == u'':
+            self.H.configure(background = 'red')
+            err = err +1
+        if self.port.get() == 0:
+            self.P.configure(background = 'red')
+            err = err +1
+        if self.dbnb.get() == u'':
+            self.D.configure(background = 'red')
+            err = err +1
+        if self.user.get() == u'':
+            self.U.configure(background = 'red')
+            err = err +1
+        if self.pswd.get() == u'':
+            self.M.configure(background = 'red')
+            err = err +1
+        # se colunas direcciones y distrito son diferentes
+        if self.ddl_dir.get() == self.ddl_dis.get():
+            msj = msj + u'\nLas dos columnas no deben ser iguales'
+            err = err +1
+
+        # Acción según si hay error(es) o no
+        if err != 0:
+            showerror(title = u'Error: campo(s) vacío(s)',
+                      message = msj)
+        # End of function
+        return err
+
+    def testconnexion(self):
+        u""" testing database connection settings """
+        try:
+            conn = ogr.Open(host = self.host.get(), dbname = self.dbnb.get(),
+                            port = self.port.get(), user = self.user.get(),
+                            password = self.pswd.get())
+            curs = conn.cursor()
+            # check PostgreSQL and PostGIS versions
+            try:
+                curs.execute('SELECT version()')
+                ver = curs.fetchone()
+                print ver
+            except DatabaseError, e:
+                showerror(title = u'Connection issue',
+                message = 'Connection aborted. Error:\n' + str(e))
+                return
+            # change the confirmation button
+            self.val.config(text = '¡D A L E!')
+            showinfo(title = u'Connection granted',
+                     message = u'Test of connection settings successed')
+            self.ok = 1
+
+        except pg.OperationalError, e:
+            showerror(title = u'Connection issue',
+                      message = 'Connection aborted. Error:\n' + str(e))
+            return
+
+        except ImportError , e:
+            return None
 
 
     def configexcel(self):

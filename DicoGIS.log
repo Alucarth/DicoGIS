@@ -191,3 +191,90 @@
 2013-08-15 19:50:36,961 || INFO || Operating system: Linux
 2013-08-15 19:50:41,708 || INFO || 	Languages switched
 2013-08-15 19:50:44,453 || INFO || 	Languages switched
+2013-08-15 19:52:25,749 || INFO || 	 ====== DicoGIS ======
+2013-08-15 19:52:25,963 || INFO || Operating system: Linux
+2013-08-15 19:52:29,683 || INFO || 	Languages switched
+2013-08-15 19:57:41,629 || INFO || 	 ====== DicoGIS ======
+2013-08-15 19:57:41,839 || INFO || Operating system: Linux
+2013-08-15 20:09:37,569 || INFO || 	 ====== DicoGIS ======
+2013-08-15 20:09:37,773 || INFO || Operating system: Linux
+2013-08-15 20:10:49,699 || INFO || 	 ====== DicoGIS ======
+2013-08-15 20:10:49,908 || INFO || Operating system: Linux
+2013-08-15 20:11:49,683 || INFO || 	 ====== DicoGIS ======
+2013-08-15 20:11:49,891 || INFO || Operating system: Linux
+2013-08-15 20:12:50,853 || INFO || 	 ====== DicoGIS ======
+2013-08-15 20:12:51,072 || INFO || Operating system: Linux
+2013-08-15 20:13:25,539 || INFO || 	 ====== DicoGIS ======
+2013-08-15 20:13:25,758 || INFO || Operating system: Linux
+2013-08-15 20:14:21,034 || INFO || 	 ====== DicoGIS ======
+2013-08-15 20:14:21,244 || INFO || Operating system: Linux
+2013-08-15 20:14:55,809 || INFO || 	 ====== DicoGIS ======
+2013-08-15 20:14:56,014 || INFO || Operating system: Linux
+2013-08-15 20:15:38,622 || INFO || 	 ====== DicoGIS ======
+2013-08-15 20:15:38,815 || INFO || Operating system: Linux
+2013-08-15 20:15:44,048 || INFO || 	Languages switched
+2013-08-15 20:15:47,275 || INFO || 	Languages switched
+2013-08-15 20:15:50,046 || INFO || 	Languages switched
+2013-08-15 20:30:07,825 || INFO || 	 ====== DicoGIS ======
+2013-08-15 20:30:08,012 || INFO || Operating system: Linux
+2013-08-15 20:31:29,539 || INFO || 	 ====== DicoGIS ======
+2013-08-15 20:31:29,762 || INFO || Operating system: Linux
+2013-08-16 06:25:38,049 || INFO || 	 ====== DicoGIS ======
+2013-08-16 06:25:38,683 || INFO || Operating system: Linux
+2013-08-16 06:27:43,109 || INFO || 	 ====== DicoGIS ======
+2013-08-16 06:27:43,299 || INFO || Operating system: Linux
+2013-08-16 06:27:48,877 || INFO || Begin of folders parsing
+2013-08-16 06:27:49,217 || INFO || End of folders parsing: 5 folders explored
+2013-08-16 06:28:14,047 || INFO || 	 ====== DicoGIS ======
+2013-08-16 06:28:14,247 || INFO || Operating system: Linux
+2013-08-16 06:28:17,934 || INFO || Begin of folders parsing
+2013-08-16 06:28:17,949 || INFO || End of folders parsing: 5 folders explored
+2013-08-16 06:28:19,024 || INFO || Excel file created
+2013-08-16 06:28:19,026 || INFO || 	Shapefiles processed
+2013-08-16 06:28:19,027 || INFO || 
+/home/guts/donnees/Lima_Callao/Lugares_Cultos/OSM/OSM_PlaceWorship_Nodes_2012-11-20.shp
+2013-08-16 06:28:19,155 || INFO || 	 Infos OK
+2013-08-16 06:28:19,185 || INFO || 	 Wrote into the dictionary
+2013-08-16 06:28:19,193 || INFO || 
+/home/guts/donnees/Lima_Callao/Lugares_Cultos/shp/Lugares_Culto.shp
+2013-08-16 06:28:19,199 || INFO || 	 Infos OK
+2013-08-16 06:28:19,203 || INFO || 	 Wrote into the dictionary
+2013-08-16 06:28:19,210 || INFO || 
+/home/guts/donnees/Lima_Callao/Lugares_Cultos/shp/Lugares_Culto_Buffer100.shp
+2013-08-16 06:28:19,232 || INFO || 	 Infos OK
+2013-08-16 06:28:19,236 || INFO || 	 Wrote into the dictionary
+2013-08-16 06:28:19,242 || INFO || 
+/home/guts/donnees/Lima_Callao/Vulnerabilidad_Espacial/Mailles_008.shp
+2013-08-16 06:28:19,302 || INFO || 	 Infos OK
+2013-08-16 06:28:19,307 || INFO || 	 Wrote into the dictionary
+2013-08-16 06:28:19,314 || INFO || 
+/home/guts/donnees/Lima_Callao/Vulnerabilidad_Espacial/Mailles_acces_physiq.shp
+2013-08-16 06:28:19,348 || INFO || 	 Infos OK
+2013-08-16 06:28:19,352 || INFO || 	 Wrote into the dictionary
+2013-08-16 06:28:19,358 || INFO || 
+/home/guts/donnees/Lima_Callao/Vulnerabilidad_Espacial/Mailles_inter_pompiers.shp
+2013-08-16 06:28:19,380 || INFO || 	 Infos OK
+2013-08-16 06:28:19,384 || INFO || 	 Wrote into the dictionary
+2013-08-16 06:28:19,388 || INFO || 
+/home/guts/donnees/Lima_Callao/Vulnerabilidad_Espacial/Mailles_tipo_seguro_2.shp
+2013-08-16 06:28:19,396 || INFO || 	 Infos OK
+2013-08-16 06:28:19,400 || INFO || 	 Wrote into the dictionary
+2013-08-16 06:28:19,405 || INFO || 
+	MapInfo tables processed
+2013-08-16 06:28:23,967 || INFO || 
+	Workbook saved: /home/guts/donnees/Lima_Callao/DicoShapes_Lima_Callao_2013-08-16.xls
+2013-08-16 06:28:44,588 || INFO || 	 ====== DicoGIS ======
+2013-08-16 06:28:44,770 || INFO || Operating system: Linux
+2013-08-16 06:28:52,641 || INFO || Excel file created
+2013-08-16 06:28:52,643 || INFO || 	PostGIS table processing...
+2013-08-16 06:29:59,600 || INFO || Excel file created
+2013-08-16 06:29:59,601 || INFO || 	PostGIS table processing...
+2013-08-16 06:31:12,802 || INFO || 	 ====== DicoGIS ======
+2013-08-16 06:31:12,998 || INFO || Operating system: Linux
+2013-08-16 06:31:16,266 || INFO || Excel file created
+2013-08-16 06:31:16,267 || INFO || 	PostGIS table processing...
+2013-08-16 06:32:16,881 || INFO || 	 Wrote into the dictionary
+2013-08-16 06:32:24,248 || INFO || 	 Wrote into the dictionary
+2013-08-16 06:32:33,165 || INFO || 	 Wrote into the dictionary
+2013-08-16 06:32:49,372 || INFO || 
+	Workbook saved: /home/guts/code/GitHub/DicoGIS/test/youpiyo.xls
