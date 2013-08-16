@@ -278,3 +278,98 @@
 2013-08-16 06:32:33,165 || INFO || 	 Wrote into the dictionary
 2013-08-16 06:32:49,372 || INFO || 
 	Workbook saved: /home/guts/code/GitHub/DicoGIS/test/youpiyo.xls
+2013-08-16 11:21:09,187 || INFO || 	 ====== DicoGIS ======
+2013-08-16 11:21:09,825 || INFO || Operating system: Linux
+2013-08-16 11:21:21,843 || INFO || Begin of folders parsing
+2013-08-16 11:21:21,914 || INFO || End of folders parsing: 4 folders explored
+2013-08-16 11:21:22,018 || INFO || Excel file created
+2013-08-16 11:21:22,019 || INFO || 	Shapefiles processed
+2013-08-16 11:21:22,021 || INFO || 
+/home/guts/code/GitHub/DicoGIS/test/datatest/airports.shp
+2013-08-16 11:21:22,142 || INFO || 	 Infos OK
+2013-08-16 11:21:22,173 || INFO || 	 Wrote into the dictionary
+2013-08-16 11:21:22,183 || INFO || 
+	MapInfo tables processed
+2013-08-16 11:21:22,184 || INFO || 
+/home/guts/code/GitHub/DicoGIS/test/datatest/airports_MI/tab/airports_MI.tab
+2013-08-16 11:21:22,274 || INFO || 	 Infos OK
+2013-08-16 11:21:22,278 || INFO || 	 Wrote into the dictionary
+2013-08-16 11:21:25,668 || INFO || 
+	Workbook saved: .xls
+2013-08-16 11:21:30,935 || INFO || 	 ====== DicoGIS ======
+2013-08-16 11:21:31,117 || INFO || Operating system: Linux
+2013-08-16 11:21:36,217 || INFO || Begin of folders parsing
+2013-08-16 11:21:36,227 || INFO || End of folders parsing: 4 folders explored
+2013-08-16 11:34:17,716 || INFO || 	 ====== DicoGIS ======
+2013-08-16 11:34:25,981 || INFO || 	 ====== DicoGIS ======
+2013-08-16 11:35:32,103 || INFO || 	 ====== DicoGIS ======
+2013-08-16 11:35:32,300 || INFO || Operating system: Linux
+2013-08-16 11:36:13,635 || INFO || 	 ====== DicoGIS ======
+2013-08-16 11:36:13,834 || INFO || Operating system: Linux
+2013-08-16 11:37:50,204 || INFO || 	 ====== DicoGIS ======
+2013-08-16 11:37:50,400 || INFO || Operating system: Linux
+2013-08-16 11:38:14,061 || INFO || 	 ====== DicoGIS ======
+2013-08-16 11:38:14,257 || INFO || Operating system: Linux
+2013-08-16 11:38:29,492 || INFO || 	 ====== DicoGIS ======
+2013-08-16 11:38:29,688 || INFO || Operating system: Linux
+2013-08-16 11:46:29,885 || INFO || 	 ====== DicoGIS ======
+2013-08-16 11:46:30,081 || INFO || Operating system: Linux
+2013-08-16 11:48:02,225 || INFO || 	 ====== DicoGIS ======
+2013-08-16 11:48:02,429 || INFO || Operating system: Linux
+2013-08-16 11:48:28,537 || INFO || Begin of folders parsing
+2013-08-16 11:48:28,545 || INFO || End of folders parsing: 4 folders explored
+2013-08-16 11:49:38,985 || INFO || 	 ====== DicoGIS ======
+2013-08-16 11:49:39,266 || INFO || Operating system: Linux
+2013-08-16 11:50:47,487 || INFO || 	 ====== DicoGIS ======
+2013-08-16 11:50:47,687 || INFO || Operating system: Linux
+2013-08-16 11:54:04,834 || INFO || 	 ====== DicoGIS ======
+2013-08-16 11:54:05,197 || INFO || Operating system: Linux
+2013-08-16 11:57:27,288 || INFO || 	 ====== DicoGIS ======
+2013-08-16 11:57:27,861 || INFO || Operating system: Linux
+2013-08-16 11:57:44,348 || INFO || 	 ====== DicoGIS ======
+2013-08-16 11:57:44,529 || INFO || Operating system: Linux
+2013-08-16 11:57:48,376 || INFO || Begin of folders parsing
+2013-08-16 11:57:48,465 || INFO || End of folders parsing: 4 folders explored
+2013-08-16 11:58:44,255 || INFO || 	 ====== DicoGIS ======
+2013-08-16 11:58:44,453 || INFO || Operating system: Linux
+2013-08-16 11:58:59,057 || INFO || 	 ====== DicoGIS ======
+2013-08-16 11:58:59,258 || INFO || Operating system: Linux
+2013-08-16 11:59:03,376 || INFO || Begin of folders parsing
+2013-08-16 11:59:03,390 || INFO || End of folders parsing: 4 folders explored
+2013-08-16 11:59:42,242 || INFO || 	 ====== DicoGIS ======
+2013-08-16 11:59:42,443 || INFO || Operating system: Linux
+2013-08-16 11:59:45,686 || INFO || Begin of folders parsing
+2013-08-16 11:59:45,693 || INFO || End of folders parsing: 4 folders explored
+2013-08-16 11:59:56,232 || INFO || Begin of folders parsing
+2013-08-16 11:59:56,241 || INFO || End of folders parsing: 8 folders explored
+2013-08-16 12:00:34,195 || INFO || 	 ====== DicoGIS ======
+2013-08-16 12:00:34,398 || INFO || Operating system: Linux
+2013-08-16 12:00:54,053 || INFO || 	 ====== DicoGIS ======
+2013-08-16 12:00:54,252 || INFO || Operating system: Linux
+2013-08-16 12:01:13,205 || INFO || 	 ====== DicoGIS ======
+2013-08-16 12:01:13,405 || INFO || Operating system: Linux
+2013-08-16 12:01:21,733 || INFO || 	Languages switched
+2013-08-16 12:01:24,457 || INFO || 	Languages switched
+2013-08-16 12:02:00,704 || INFO || 	 ====== DicoGIS ======
+2013-08-16 12:02:00,902 || INFO || Operating system: Linux
+2013-08-16 12:02:30,789 || INFO || 	 ====== DicoGIS ======
+2013-08-16 12:02:30,987 || INFO || Operating system: Linux
+2013-08-16 12:02:54,663 || INFO || 	 ====== DicoGIS ======
+2013-08-16 12:02:54,869 || INFO || Operating system: Linux
+2013-08-16 12:03:26,452 || INFO || 	 ====== DicoGIS ======
+2013-08-16 12:03:26,666 || INFO || Operating system: Linux
+2013-08-16 12:03:51,481 || INFO || 	 ====== DicoGIS ======
+2013-08-16 12:03:51,696 || INFO || Operating system: Linux
+2013-08-16 12:04:25,271 || INFO || 	 ====== DicoGIS ======
+2013-08-16 12:04:25,469 || INFO || Operating system: Linux
+2013-08-16 12:04:57,959 || INFO || 	 ====== DicoGIS ======
+2013-08-16 12:04:58,175 || INFO || Operating system: Linux
+2013-08-16 12:05:18,029 || INFO || 	 ====== DicoGIS ======
+2013-08-16 12:05:18,232 || INFO || Operating system: Linux
+2013-08-16 12:14:30,584 || INFO || 	 ====== DicoGIS ======
+2013-08-16 12:14:30,779 || INFO || Operating system: Linux
+2013-08-16 12:14:31,249 || INFO || Type switched to: files structure
+2013-08-16 12:14:33,087 || INFO || Type switched to: database
+2013-08-16 12:14:35,517 || INFO || => DB process started
+2013-08-16 12:14:35,526 || INFO || Excel file created
+2013-08-16 12:14:35,527 || INFO || 	PostGIS table processing...

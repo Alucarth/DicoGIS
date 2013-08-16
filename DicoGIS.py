@@ -11,7 +11,7 @@ from __future__ import unicode_literals
 #
 # Python:       2.7.x
 # Created:      14/02/2013
-# Updated:      13/08/2013
+# Updated:      16/08/2013
 #
 # Licence:      GPL 3
 #-------------------------------------------------------------------------------
@@ -76,6 +76,7 @@ class DicoGIS(Tk):
         # basics settings
         Tk.__init__(self)               # constructor of parent graphic class
         self.title(u'DicoGIS')
+        self.style = Style().theme_use('clam')
         if platform == 'win32':
             self.logger.info('Operating system: Windows')
             self.iconbitmap('DicoGIS.ico')    # windows icon
@@ -97,7 +98,6 @@ class DicoGIS(Tk):
         self.def_lang = 'FR'    # default language to start
         self.li_shp = []         # list for shapefiles path
         self.li_tab = []         # list for MapInfo tables path
-        self.typo = IntVar()
         self.today = strftime("%Y-%m-%d")   # date of the day
         self.dico_layer = OD()    # dictionary where will be stored informations
         self.dico_fields = OD()    # dictionary for fields information
@@ -121,8 +121,6 @@ class DicoGIS(Tk):
                                        text = self.blabla.get('gui_prog'))
 
             ## Frame 1: path of geofiles
-        # variables
-        self.numfiles = StringVar(self.FrPath, '')
         # target folder
         self.labtarg = Label(self.FrPath, text = self.blabla.get('gui_path'))
         self.target = Entry(self.FrPath, width = 35)
@@ -138,23 +136,20 @@ class DicoGIS(Tk):
         self.labtarg.grid(row = 1, column = 1, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
         self.target.grid(row = 1, column = 2, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
         self.browsetarg.grid(row = 1, column = 3, sticky = N+S+W+E, padx = 2, pady = 2)
-        Label(self.FrPath, textvariable = self.numfiles,
-                           foreground = 'DodgerBlue').grid(row = 2,
-                                                  column = 1, columnspan = 3)
-        self.nameoutput.grid(row = 3, column= 1)
-        self.output.grid(row = 3, column= 2)
+        self.nameoutput.grid(row = 3, column= 1, sticky = N+S+W+E, padx = 2, pady = 2)
+        self.output.grid(row = 3, column= 2, sticky = N+S+W+E, padx = 2, pady = 2)
 
 
             ## Frame 2: Database
         # variables
-        self.host = StringVar()
-        self.port = IntVar()
-        self.dbnb = StringVar()
-        self.user = StringVar()
-        self.pswd = StringVar()
+        self.host = StringVar(self.FrDb, 'localhost')
+        self.port = IntVar(self.FrDb, 5432)
+        self.dbnb = StringVar(self.FrDb)
+        self.user = StringVar(self.FrDb, 'postgres')
+        self.pswd = StringVar(self.FrDb)
         # Form widgets
         self.ent_H = Entry(self.FrDb, textvariable = self.host)
-        self.ent_P = Entry(self.FrDb, textvariable = self.port)
+        self.ent_P = Entry(self.FrDb, textvariable = self.port, width = 5)
         self.ent_D = Entry(self.FrDb, textvariable = self.dbnb)
         self.ent_U = Entry(self.FrDb, textvariable = self.user)
         self.ent_M = Entry(self.FrDb, textvariable = self.pswd, show='*')
@@ -165,33 +160,30 @@ class DicoGIS(Tk):
         self.lb_U = Label(self.FrDb, text = self.blabla.get('gui_user'))
         self.lb_M = Label(self.FrDb, text = self.blabla.get('gui_mdp'))
         # widgets placement
-        self.ent_H.grid(row = 1, column = 1, columnspan = 1, sticky = N+S+E+W, padx = 2, pady = 2)
-        self.ent_P.grid(row = 1, column = 3, columnspan = 1, sticky = N+S+E+W, padx = 2, pady = 2)
+        self.ent_H.grid(row = 1, column = 1, columnspan = 2, sticky = N+S+E+W, padx = 2, pady = 2)
+        self.ent_P.grid(row = 1, column = 3, columnspan = 1, sticky = N+S+E, padx = 2, pady = 2)
         self.ent_D.grid(row = 2, column = 1, columnspan = 1, sticky = N+S+E+W, padx = 2, pady = 2)
         self.ent_U.grid(row = 2, column = 3, columnspan = 1, sticky = N+S+E+W, padx = 2, pady = 2)
         self.ent_M.grid(row = 3, column = 1, columnspan = 3, sticky = N+S+E+W, padx = 2, pady = 2)
-        self.lb_H.grid(row = 1, column = 0, sticky = N+S+W, padx = 2, pady = 2)
-        self.lb_P.grid(row = 1, column = 2, sticky = N+S+W, padx = 2, pady = 2)
+        self.lb_H.grid(row = 1, column = 0, sticky = N+S+E+W, padx = 2, pady = 2)
+        self.lb_P.grid(row = 1, column = 3, sticky = N+S+W, padx = 2, pady = 2)
         self.lb_D.grid(row = 2, column = 0, sticky = N+S+W, padx = 2, pady = 2)
         self.lb_U.grid(row = 2, column = 2, sticky = N+S+W, padx = 2, pady = 2)
         self.lb_M.grid(row = 3, column = 0, sticky = N+S+W+E, padx = 2, pady = 2)
 
-        # default values
-        self.typo.set(1)
-        self.host.set('localhost')
-        self.port.set(5432)
-        self.user.set('postgres')
-        self.dbnb.set('')
-        self.pswd.set('')
-
             ## Frame 3: Progression bar
+        # variables
+        self.status = StringVar(self.FrProg, '')
         # widgets
         self.prog_layers = Progressbar(self.FrProg,
                                        orient="horizontal")
+        Label(self.FrProg, textvariable = self.status,
+                           foreground = 'DodgerBlue').pack()
         # widgets placement
         self.prog_layers.pack(expand=1, fill='both')
 
             ## Main frame
+        self.typo = IntVar(self, 1)    # type value (files or database)
         # Hola
         self.welcome = Label(self,
                              text = self.blabla.get('hi') + self.uzer,
@@ -227,7 +219,7 @@ class DicoGIS(Tk):
                            command = self.destroy)
 
         # widgets placement
-        self.welcome.grid(row = 1, column = 1, columnspan = 1, sticky = N+S+W+E,
+        self.welcome.grid(row = 1, column = 1, columnspan = 1, sticky = N+S,
                           padx = 2, pady = 2)
         self.ddl_lang.grid(row=1, column = 1, sticky = N+S+E, padx = 2, pady = 2)
         rd_file.grid(row=2, column = 1, sticky = N+S+W, padx = 2, pady = 2)
@@ -279,7 +271,7 @@ class DicoGIS(Tk):
     def change_lang(self, event):
         u""" update the texts dictionary with the language selected """
         new_lang = event.widget.get()
-        self.logger.info('\tLanguages switched')
+        self.logger.info('\tLanguage switched to: %s' %event.widget.get())
         # change to the new language selected
         self.load_texts(new_lang)
         # update widgets text
@@ -318,13 +310,19 @@ class DicoGIS(Tk):
 
 
     def change_type(self):
-        u""" load settings from last execution """
+        u""" switch between the available types of data (files or database) """
         if self.typo.get() == 1:
+            self.logger.info('Type switched to: files structure')
             self.FrDb.grid_forget()
+            self.status.set('')
             self.FrPath.grid(row = 3, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
         elif self.typo.get() == 2:
+            self.logger.info('Type switched to: database')
             self.FrPath.grid_forget()
+            self.status.set('')
             self.FrDb.grid(row = 3, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
+        # End of function
+        return self.typo
 
 
 
@@ -364,7 +362,7 @@ class DicoGIS(Tk):
         self.li_tab = []
         self.browsetarg.config(state = DISABLED)
         # Looping in folders structure
-        self.numfiles.set(self.blabla.get('gui_prog1'))
+        self.status.set(self.blabla.get('gui_prog1'))
         self.prog_layers.start()
         self.logger.info('Begin of folders parsing')
         for root, dirs, files in walk(foldertarget):
@@ -391,7 +389,7 @@ class DicoGIS(Tk):
         self.li_tab.sort()
         self.li_tab = tuple(self.li_tab)
         # setting the label text and activing the buttons
-        self.numfiles.set(unicode(len(self.li_shp)) + u' shapefiles - '
+        self.status.set(unicode(len(self.li_shp)) + u' shapefiles - '
                         + unicode(len(self.li_tab)) + u' tables (MapInfo) - '
                         + unicode(self.num_folders) + self.blabla.get('log_numfold'))
         self.browsetarg.config(state = ACTIVE)
@@ -402,10 +400,10 @@ class DicoGIS(Tk):
     def process(self):
         print 'process initialized'
         if self.typo.get() == 1:
-            print '=> files process started'
+            self.logger.info('=> files process started')
             self.process_files()
         elif self.typo.get() == 2:
-            print '=> DB process started'
+            self.logger.info('=> DB process started')
             self.process_db()
         return
 
@@ -426,7 +424,7 @@ class DicoGIS(Tk):
         self.logger.info('\tShapefiles processed')
         for shp in self.li_shp:
             """ looping on shapefiles list """
-            self.numfiles.set(path.basename(shp))
+            self.status.set(path.basename(shp))
             self.logger.info('\n' + shp)
             # reset recipient data
             self.dico_layer.clear()
@@ -447,7 +445,7 @@ class DicoGIS(Tk):
         self.logger.info('\n\tMapInfo tables processed')
         for tab in self.li_tab:
             """ looping on MapInfo tables list """
-            self.numfiles.set(path.basename(tab))
+            self.status.set(path.basename(tab))
             self.logger.info('\n' + tab)
             # reset recipient data
             self.dico_layer.clear()
@@ -495,14 +493,13 @@ class DicoGIS(Tk):
                                                                                   self.dbnb.get(), 
                                                                                   self.user.get(), 
                                                                                   self.pswd.get()))
-            print "Access granted : connecting people!"
         except:
             print 'Connection to database failed. Check your connection settings.'
             exit()
         # parsing the layers
         for layer in conn:
             InfosOGR_PG(layer, self.dico_layer, self.dico_fields, 'pg', self.blabla)
-            print self.dico_layer
+            self.logger.info('Table examined: %s' % layer.GetName())
             # writing to the Excel dictionary
             self.dictionarize(self.dico_layer, self.dico_fields, self.feuy1, line)
             self.logger.info('\t Wrote into the dictionary')
@@ -533,23 +530,14 @@ class DicoGIS(Tk):
         # checking empty fields
         if self.host.get() == u'':
             self.H.configure(background = 'red')
-            err = err +1
         if self.port.get() == 0:
             self.P.configure(background = 'red')
-            err = err +1
         if self.dbnb.get() == u'':
             self.D.configure(background = 'red')
-            err = err +1
         if self.user.get() == u'':
             self.U.configure(background = 'red')
-            err = err +1
         if self.pswd.get() == u'':
             self.M.configure(background = 'red')
-            err = err +1
-        # se colunas direcciones y distrito son diferentes
-        if self.ddl_dir.get() == self.ddl_dis.get():
-            msj = msj + u'\nLas dos columnas no deben ser iguales'
-            err = err +1
 
         # Acción según si hay error(es) o no
         if err != 0:
@@ -569,14 +557,15 @@ class DicoGIS(Tk):
             try:
                 curs.execute('SELECT version()')
                 ver = curs.fetchone()
-                print ver
+                self.logger.info('Connection successed: connecting people!')
+                self.logger.info('Database version: %s' %ver)
             except DatabaseError, e:
                 showerror(title = u'Connection issue',
                 message = 'Connection aborted. Error:\n' + str(e))
                 return
             # change the confirmation button
             self.val.config(text = '¡D A L E!')
-            showinfo(title = u'Connection granted',
+            showinfo(title = u'Connection successed',
                      message = u'Test of connection settings successed')
             self.ok = 1
 
