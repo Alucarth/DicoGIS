@@ -11,7 +11,7 @@ from __future__ import unicode_literals
 #
 # Python:       2.7.x
 # Created:      14/02/2013
-# Updated:      16/08/2013
+# Updated:      31/08/2013
 #
 # Licence:      GPL 3
 #-------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ from sys import exit, platform
 from os import  listdir, walk, path         # files and folder managing
 from os import environ as env
 from time import strftime
-
+from webbrowser import open_new
 import threading    # handling various subprocess
 
 import logging      # log files
@@ -137,7 +137,7 @@ class DicoGIS(Tk):
         self.target.grid(row = 1, column = 2, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
         self.browsetarg.grid(row = 1, column = 3, sticky = N+S+W+E, padx = 2, pady = 2)
         self.nameoutput.grid(row = 3, column= 1, sticky = N+S+W+E, padx = 2, pady = 2)
-        self.output.grid(row = 3, column= 2, sticky = N+S+W+E, padx = 2, pady = 2)
+        self.output.grid(row = 3, column= 2, columnspan = 2, sticky = N+S+W+E, padx = 2, pady = 2)
 
 
             ## Frame 2: Database
@@ -191,13 +191,22 @@ class DicoGIS(Tk):
                              foreground = "red2")
         # Imagen
         self.icone = PhotoImage(file = r'img/DicoGIS_logo.gif')
-        Label(self, borderwidth = 2, relief = 'ridge',
+        Label(self, borderwidth = 2,
                                      image = self.icone).grid(row = 1,
-                                                              rowspan = 4,
+                                                              rowspan = 3,
                                                               column = 0,
                                                               padx = 2,
                                                               pady = 2,
                                                               sticky = W)
+        # credits
+        s = Style(self)
+        s.configure('Kim.TButton', foreground='DodgerBlue', borderwidth = 0)
+        Button(self, text = 'by Julien Moura\n      2013',
+                     style = 'Kim.TButton',
+                     command = lambda: open_new('https://github.com/Guts')).grid(row = 4,
+                                                                                 padx = 2,
+                                                                                 pady = 2,
+                                                                                 sticky = W+E)
         # language switcher
         self.ddl_lang = Combobox(self, values = li_lang, width = 5)
         self.ddl_lang.current(li_lang.index(self.def_lang))

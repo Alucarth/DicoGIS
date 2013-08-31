@@ -373,3 +373,107 @@
 2013-08-16 12:14:35,517 || INFO || => DB process started
 2013-08-16 12:14:35,526 || INFO || Excel file created
 2013-08-16 12:14:35,527 || INFO || 	PostGIS table processing...
+2013-08-19 21:18:01,842 || INFO || 	 ====== DicoGIS ======
+2013-08-19 21:18:02,485 || INFO || Operating system: Linux
+2013-08-19 21:18:03,197 || INFO || Type switched to: files structure
+2013-08-19 21:18:09,378 || INFO || Type switched to: database
+2013-08-19 21:18:14,443 || INFO || Type switched to: files structure
+2013-08-19 21:18:16,365 || INFO || Type switched to: database
+2013-08-19 21:18:18,597 || INFO || Type switched to: files structure
+2013-08-30 10:07:58,639 || INFO || 	 ====== DicoGIS ======
+2013-08-30 10:07:59,248 || INFO || Operating system: Linux
+2013-08-30 10:07:59,789 || INFO || Type switched to: files structure
+2013-08-31 13:15:14,255 || INFO || 	 ====== DicoGIS ======
+2013-08-31 13:15:14,793 || INFO || Operating system: Linux
+2013-08-31 13:15:15,392 || INFO || Type switched to: files structure
+2013-08-31 13:15:33,411 || INFO || Type switched to: database
+2013-08-31 13:15:35,083 || INFO || Type switched to: files structure
+2013-08-31 14:18:00,285 || INFO || 	 ====== DicoGIS ======
+2013-08-31 14:18:00,488 || INFO || Operating system: Linux
+2013-08-31 14:18:01,013 || INFO || Type switched to: files structure
+2013-08-31 14:18:21,817 || INFO || 	 ====== DicoGIS ======
+2013-08-31 14:18:22,041 || INFO || Operating system: Linux
+2013-08-31 14:18:22,505 || INFO || Type switched to: files structure
+2013-08-31 14:18:28,356 || INFO || Type switched to: database
+2013-08-31 14:18:29,840 || INFO || Type switched to: files structure
+2013-08-31 14:18:31,306 || INFO || Type switched to: database
+2013-08-31 14:18:33,795 || INFO || 	Language switched to: ES
+2013-08-31 14:18:38,263 || INFO || 	Language switched to: EN
+2013-08-31 14:18:41,716 || INFO || 	Language switched to: FR
+2013-08-31 14:18:45,239 || INFO || Type switched to: files structure
+2013-08-31 14:19:30,702 || INFO || 	 ====== DicoGIS ======
+2013-08-31 14:19:30,901 || INFO || Operating system: Linux
+2013-08-31 14:19:31,434 || INFO || Type switched to: files structure
+2013-08-31 14:20:13,185 || INFO || 	 ====== DicoGIS ======
+2013-08-31 14:20:13,384 || INFO || Operating system: Linux
+2013-08-31 14:20:13,827 || INFO || Type switched to: files structure
+2013-08-31 14:20:31,183 || INFO || 	 ====== DicoGIS ======
+2013-08-31 14:20:31,385 || INFO || Operating system: Linux
+2013-08-31 14:20:31,829 || INFO || Type switched to: files structure
+2013-08-31 14:21:42,085 || INFO || 	 ====== DicoGIS ======
+2013-08-31 14:21:42,273 || INFO || Operating system: Linux
+2013-08-31 14:21:42,738 || INFO || Type switched to: files structure
+2013-08-31 14:21:53,363 || INFO || 	 ====== DicoGIS ======
+2013-08-31 14:21:53,564 || INFO || Operating system: Linux
+2013-08-31 14:21:54,056 || INFO || Type switched to: files structure
+2013-08-31 14:22:12,481 || INFO || 	 ====== DicoGIS ======
+2013-08-31 14:22:12,685 || INFO || Operating system: Linux
+2013-08-31 14:22:13,135 || INFO || Type switched to: files structure
+2013-08-31 15:07:10,949 || INFO || 	 ====== DicoGIS ======
+2013-08-31 15:07:11,140 || INFO || Operating system: Linux
+2013-08-31 15:07:35,676 || INFO || 	 ====== DicoGIS ======
+2013-08-31 15:07:35,881 || INFO || Operating system: Linux
+2013-08-31 15:08:26,738 || INFO || 	 ====== DicoGIS ======
+2013-08-31 15:08:26,935 || INFO || Operating system: Linux
+2013-08-31 15:08:27,509 || INFO || Type switched to: files structure
+2013-08-31 16:03:38,309 || INFO || 	 ====== DicoGIS ======
+2013-08-31 16:03:38,508 || INFO || Operating system: Linux
+2013-08-31 16:03:38,977 || INFO || Type switched to: files structure
+2013-08-31 16:09:37,996 || INFO || 	 ====== DicoGIS ======
+2013-08-31 16:09:38,201 || INFO || Operating system: Linux
+2013-08-31 16:09:38,679 || INFO || Type switched to: files structure
+2013-08-31 16:10:15,912 || INFO || 	 ====== DicoGIS ======
+2013-08-31 16:10:16,120 || INFO || Operating system: Linux
+2013-08-31 16:10:16,697 || INFO || Type switched to: files structure
+2013-08-31 16:11:55,133 || INFO || 	 ====== DicoGIS ======
+2013-08-31 16:11:55,336 || INFO || Operating system: Linux
+2013-08-31 16:12:05,063 || INFO || 	 ====== DicoGIS ======
+2013-08-31 16:12:05,272 || INFO || Operating system: Linux
+2013-08-31 16:13:41,361 || INFO || 	 ====== DicoGIS ======
+2013-08-31 16:13:41,558 || INFO || Operating system: Linux
+2013-08-31 16:13:41,998 || INFO || Type switched to: files structure
+2013-08-31 16:13:56,712 || INFO || 	 ====== DicoGIS ======
+2013-08-31 16:13:56,916 || INFO || Operating system: Linux
+2013-08-31 16:14:06,492 || INFO || 	 ====== DicoGIS ======
+2013-08-31 16:14:06,722 || INFO || Operating system: Linux
+2013-08-31 16:21:21,725 || INFO || 	 ====== DicoGIS ======
+2013-08-31 16:21:21,925 || INFO || Operating system: Linux
+2013-08-31 16:21:27,129 || INFO || 	 ====== DicoGIS ======
+2013-08-31 16:21:27,328 || INFO || Operating system: Linux
+2013-08-31 16:22:04,667 || INFO || 	 ====== DicoGIS ======
+2013-08-31 16:22:04,884 || INFO || Operating system: Linux
+2013-08-31 16:22:21,219 || INFO || 	 ====== DicoGIS ======
+2013-08-31 16:22:21,417 || INFO || Operating system: Linux
+2013-08-31 16:22:27,940 || INFO || 	 ====== DicoGIS ======
+2013-08-31 16:22:28,147 || INFO || Operating system: Linux
+2013-08-31 16:22:49,577 || INFO || 	 ====== DicoGIS ======
+2013-08-31 16:22:49,776 || INFO || Operating system: Linux
+2013-08-31 16:24:33,295 || INFO || 	 ====== DicoGIS ======
+2013-08-31 16:24:33,496 || INFO || Operating system: Linux
+2013-08-31 16:24:59,865 || INFO || 	 ====== DicoGIS ======
+2013-08-31 16:25:00,066 || INFO || Operating system: Linux
+2013-08-31 16:25:45,669 || INFO || 	 ====== DicoGIS ======
+2013-08-31 16:25:45,872 || INFO || Operating system: Linux
+2013-08-31 16:25:46,361 || INFO || Type switched to: files structure
+2013-08-31 16:26:26,208 || INFO || 	 ====== DicoGIS ======
+2013-08-31 16:26:26,411 || INFO || Operating system: Linux
+2013-08-31 16:26:26,876 || INFO || Type switched to: files structure
+2013-08-31 16:26:35,630 || INFO || 	 ====== DicoGIS ======
+2013-08-31 16:26:35,833 || INFO || Operating system: Linux
+2013-08-31 16:26:36,295 || INFO || Type switched to: files structure
+2013-08-31 16:26:44,331 || INFO || 	 ====== DicoGIS ======
+2013-08-31 16:26:44,533 || INFO || Operating system: Linux
+2013-08-31 16:26:44,988 || INFO || Type switched to: files structure
+2013-08-31 16:26:51,102 || INFO || 	 ====== DicoGIS ======
+2013-08-31 16:26:51,305 || INFO || Operating system: Linux
+2013-08-31 16:26:51,746 || INFO || Type switched to: files structure
