@@ -221,9 +221,11 @@ class DicoGIS(Tk):
                                          value = 2,
                                            command = self.change_type)
         # Basic buttons
+        img_proc = PhotoImage(master = self, file = 'img/Processing_TNP_10789.gif')
         self.val = Button(self, text = self.blabla.get('gui_go'),
                                 state = ACTIVE,
                                 command = self.process)
+        self.val.config(image = img_proc)
         self.can = Button(self, text = self.blabla.get('gui_quit'),
                            command = self.destroy)
 
