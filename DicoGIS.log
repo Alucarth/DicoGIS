@@ -518,3 +518,214 @@
 2013-09-02 09:21:17,532 || INFO || 	 ====== DicoGIS ======
 2013-09-02 09:21:17,740 || INFO || Operating system: Linux
 2013-09-02 09:21:18,480 || INFO || Type switched to: files structure
+2013-09-13 11:40:45,060 || INFO || 	 ====== DicoGIS ======
+2013-09-13 11:40:45,627 || INFO || Operating system: Linux
+2013-09-13 11:40:46,237 || INFO || Type switched to: files structure
+2013-09-13 11:41:28,385 || INFO || Begin of folders parsing
+2013-09-13 11:41:28,476 || INFO || End of folders parsing: 4 folders explored
+2013-09-13 11:43:40,638 || INFO || 	 ====== DicoGIS ======
+2013-09-13 11:43:40,842 || INFO || Operating system: Linux
+2013-09-13 11:43:53,467 || INFO || 	 ====== DicoGIS ======
+2013-09-13 11:43:53,667 || INFO || Operating system: Linux
+2013-09-13 11:43:54,106 || INFO || Type switched to: files structure
+2013-09-13 11:44:01,061 || INFO || Begin of folders parsing
+2013-09-13 11:44:01,074 || INFO || End of folders parsing: 4 folders explored
+2013-09-13 11:44:02,427 || INFO || => files process started
+2013-09-13 11:44:02,433 || INFO || Excel file created
+2013-09-13 11:44:02,435 || INFO || 	Shapefiles processed
+2013-09-13 11:44:02,436 || INFO || 
+/home/guts/code/GitHub/DicoGIS/test/datatest/airports.shp
+2013-09-13 11:44:02,576 || INFO || 	 Infos OK
+2013-09-13 11:44:02,601 || INFO || 	 Wrote into the dictionary
+2013-09-13 11:44:02,611 || INFO || 
+	MapInfo tables processed
+2013-09-13 11:44:02,612 || INFO || 
+/home/guts/code/GitHub/DicoGIS/test/datatest/airports_MI/tab/airports_MI.tab
+2013-09-13 11:44:02,679 || INFO || 	 Infos OK
+2013-09-13 11:44:02,683 || INFO || 	 Wrote into the dictionary
+2013-09-13 11:44:09,444 || INFO || 
+	Workbook saved: /home/guts/code/GitHub/DicoGIS/test/DicoShapes_test_2013-09-13.xls
+2013-09-13 11:55:52,935 || INFO || 	 ====== DicoGIS ======
+2013-09-13 11:55:53,132 || INFO || Operating system: Linux
+2013-09-13 11:55:53,615 || INFO || Type switched to: files structure
+2013-09-13 11:56:00,556 || INFO || Begin of folders parsing
+2013-09-13 11:56:00,568 || INFO || End of folders parsing: 3 folders explored
+2013-09-13 11:56:04,095 || INFO || => files process started
+2013-09-13 11:56:04,105 || INFO || Excel file created
+2013-09-13 11:56:04,106 || INFO || 	Shapefiles processed
+2013-09-13 11:56:04,108 || INFO || 
+/home/guts/code/GitHub/DicoGIS/test/datatest/airports.shp
+2013-09-13 11:56:04,133 || INFO || 	 Infos OK
+2013-09-13 11:56:04,138 || INFO || 	 Wrote into the dictionary
+2013-09-13 11:56:04,147 || INFO || 
+	MapInfo tables processed
+2013-09-13 11:56:04,148 || INFO || 
+/home/guts/code/GitHub/DicoGIS/test/datatest/airports_MI/tab/airports_MI.tab
+2013-09-13 11:56:04,156 || INFO || 	 Infos OK
+2013-09-13 11:56:04,162 || INFO || 	 Wrote into the dictionary
+2013-09-13 11:56:07,102 || INFO || 
+	Workbook saved: .xls
+2013-09-13 12:00:17,941 || INFO || 	 ====== DicoGIS ======
+2013-09-13 12:00:18,138 || INFO || Operating system: Linux
+2013-09-13 12:00:18,726 || INFO || Type switched to: files structure
+2013-09-13 12:00:26,325 || INFO || Begin of folders parsing
+2013-09-13 12:00:26,339 || INFO || End of folders parsing: 4 folders explored
+2013-09-13 12:00:27,928 || INFO || => files process started
+2013-09-13 12:00:27,937 || INFO || Excel file created
+2013-09-13 12:00:27,939 || INFO || 	Shapefiles processed
+2013-09-13 12:00:27,941 || INFO || 
+/home/guts/code/GitHub/DicoGIS/test/datatest/airports.shp
+2013-09-13 12:00:27,965 || INFO || 	 Infos OK
+2013-09-13 12:00:27,969 || INFO || 	 Wrote into the dictionary
+2013-09-13 12:00:27,978 || INFO || 
+	MapInfo tables processed
+2013-09-13 12:00:27,980 || INFO || 
+/home/guts/code/GitHub/DicoGIS/test/datatest/airports_MI/tab/airports_MI.tab
+2013-09-13 12:00:27,988 || INFO || 	 Infos OK
+2013-09-13 12:00:27,997 || INFO || 	 Wrote into the dictionary
+2013-09-13 12:00:33,739 || INFO || 
+	Workbook saved: /home/guts/code/GitHub/DicoGIS/test/DicoShapes_test_2013-09-13.xls
+2013-09-13 12:01:17,295 || INFO || 	 ====== DicoGIS ======
+2013-09-13 12:01:17,484 || INFO || Operating system: Linux
+2013-09-13 12:01:17,908 || INFO || Type switched to: files structure
+2013-09-13 12:01:20,977 || INFO || Begin of folders parsing
+2013-09-13 12:01:20,989 || INFO || End of folders parsing: 4 folders explored
+2013-09-13 12:01:21,857 || INFO || => files process started
+2013-09-13 12:01:21,866 || INFO || Excel file created
+2013-09-13 12:01:21,868 || INFO || 	Shapefiles processed
+2013-09-13 12:01:21,870 || INFO || 
+/home/guts/code/GitHub/DicoGIS/test/datatest/airports.shp
+2013-09-13 12:01:21,895 || INFO || 	 Infos OK
+2013-09-13 12:01:21,899 || INFO || 	 Wrote into the dictionary
+2013-09-13 12:01:21,909 || INFO || 
+	MapInfo tables processed
+2013-09-13 12:01:21,911 || INFO || 
+/home/guts/code/GitHub/DicoGIS/test/datatest/airports_MI/tab/airports_MI.tab
+2013-09-13 12:01:21,919 || INFO || 	 Infos OK
+2013-09-13 12:01:21,925 || INFO || 	 Wrote into the dictionary
+2013-09-13 12:01:25,364 || INFO || 
+	Workbook saved: /home/guts/code/GitHub/DicoGIS/test/DicoShapes_test_2013-09-13.xls
+2013-09-13 12:04:05,093 || INFO || 	 ====== DicoGIS ======
+2013-09-13 12:04:05,293 || INFO || Operating system: Linux
+2013-09-13 12:04:05,749 || INFO || Type switched to: files structure
+2013-09-13 12:04:08,711 || INFO || Begin of folders parsing
+2013-09-13 12:04:08,719 || INFO || End of folders parsing: 4 folders explored
+2013-09-13 12:04:09,820 || INFO || => files process started
+2013-09-13 12:04:09,829 || INFO || Excel file created
+2013-09-13 12:04:09,830 || INFO || 	Shapefiles processed
+2013-09-13 12:04:09,832 || INFO || 
+/home/guts/code/GitHub/DicoGIS/test/datatest/airports.shp
+2013-09-13 12:04:09,856 || INFO || 	 Infos OK
+2013-09-13 12:04:09,861 || INFO || 	 Wrote into the dictionary
+2013-09-13 12:04:09,871 || INFO || 
+	MapInfo tables processed
+2013-09-13 12:04:09,872 || INFO || 
+/home/guts/code/GitHub/DicoGIS/test/datatest/airports_MI/tab/airports_MI.tab
+2013-09-13 12:04:09,880 || INFO || 	 Infos OK
+2013-09-13 12:04:09,885 || INFO || 	 Wrote into the dictionary
+2013-09-13 12:04:12,953 || INFO || 
+	Workbook saved: /home/guts/code/GitHub/DicoGIS/test/DicoShapes_test_2013-09-13.xls
+2013-09-13 12:04:51,734 || INFO || 	 ====== DicoGIS ======
+2013-09-13 12:04:51,941 || INFO || Operating system: Linux
+2013-09-13 12:04:52,419 || INFO || Type switched to: files structure
+2013-09-13 12:04:55,310 || INFO || Begin of folders parsing
+2013-09-13 12:04:55,335 || INFO || End of folders parsing: 4 folders explored
+2013-09-13 12:04:56,566 || INFO || => files process started
+2013-09-13 12:04:56,575 || INFO || Excel file created
+2013-09-13 12:04:56,576 || INFO || 	Shapefiles processed
+2013-09-13 12:04:56,577 || INFO || 
+/home/guts/code/GitHub/DicoGIS/test/datatest/airports.shp
+2013-09-13 12:04:56,601 || INFO || 	 Infos OK
+2013-09-13 12:04:56,606 || INFO || 	 Wrote into the dictionary
+2013-09-13 12:04:56,615 || INFO || 
+	MapInfo tables processed
+2013-09-13 12:04:56,616 || INFO || 
+/home/guts/code/GitHub/DicoGIS/test/datatest/airports_MI/tab/airports_MI.tab
+2013-09-13 12:04:56,625 || INFO || 	 Infos OK
+2013-09-13 12:04:56,630 || INFO || 	 Wrote into the dictionary
+2013-09-13 12:05:01,325 || INFO || 
+	Workbook saved: /home/guts/code/GitHub/DicoGIS/test/DicoShapes_test_2013-09-13.xls
+2013-09-13 12:06:07,366 || INFO || 	 ====== DicoGIS ======
+2013-09-13 12:06:07,566 || INFO || Operating system: Linux
+2013-09-13 12:06:08,070 || INFO || Type switched to: files structure
+2013-09-13 12:06:11,104 || INFO || Begin of folders parsing
+2013-09-13 12:06:11,112 || INFO || End of folders parsing: 4 folders explored
+2013-09-13 12:06:12,814 || INFO || => files process started
+2013-09-13 12:06:12,823 || INFO || Excel file created
+2013-09-13 12:06:12,824 || INFO || 	Shapefiles processed
+2013-09-13 12:06:12,825 || INFO || 
+/home/guts/code/GitHub/DicoGIS/test/datatest/airports.shp
+2013-09-13 12:06:12,849 || INFO || 	 Infos OK
+2013-09-13 12:06:12,854 || INFO || 	 Wrote into the dictionary
+2013-09-13 12:06:12,863 || INFO || 
+	MapInfo tables processed
+2013-09-13 12:06:12,864 || INFO || 
+/home/guts/code/GitHub/DicoGIS/test/datatest/airports_MI/tab/airports_MI.tab
+2013-09-13 12:06:12,873 || INFO || 	 Infos OK
+2013-09-13 12:06:12,878 || INFO || 	 Wrote into the dictionary
+2013-09-13 12:06:36,054 || INFO || 
+	Workbook saved: /home/guts/code/GitHub/DicoGIS/test/DicoShapes_test_2013-09-13.xls
+2013-09-13 12:08:28,254 || INFO || 	 ====== DicoGIS ======
+2013-09-13 12:08:28,462 || INFO || Operating system: Linux
+2013-09-13 12:08:29,012 || INFO || Type switched to: files structure
+2013-09-13 12:08:31,747 || INFO || Begin of folders parsing
+2013-09-13 12:08:31,759 || INFO || End of folders parsing: 4 folders explored
+2013-09-13 12:08:33,081 || INFO || => files process started
+2013-09-13 12:08:33,089 || INFO || Excel file created
+2013-09-13 12:08:33,091 || INFO || 	Shapefiles processed
+2013-09-13 12:08:33,092 || INFO || 
+/home/guts/code/GitHub/DicoGIS/test/datatest/airports.shp
+2013-09-13 12:08:33,116 || INFO || 	 Infos OK
+2013-09-13 12:08:33,120 || INFO || 	 Wrote into the dictionary
+2013-09-13 12:08:33,128 || INFO || 
+	MapInfo tables processed
+2013-09-13 12:08:33,129 || INFO || 
+/home/guts/code/GitHub/DicoGIS/test/datatest/airports_MI/tab/airports_MI.tab
+2013-09-13 12:08:33,138 || INFO || 	 Infos OK
+2013-09-13 12:08:33,144 || INFO || 	 Wrote into the dictionary
+2013-09-13 12:08:36,740 || INFO || 
+	Workbook saved: /home/guts/code/GitHub/DicoGIS/test/DicoShapes_test_2013-09-13.xls
+2013-09-13 12:09:08,319 || INFO || 	 ====== DicoGIS ======
+2013-09-13 12:09:08,543 || INFO || Operating system: Linux
+2013-09-13 12:09:09,001 || INFO || Type switched to: files structure
+2013-09-13 12:09:12,322 || INFO || Begin of folders parsing
+2013-09-13 12:09:12,332 || INFO || End of folders parsing: 4 folders explored
+2013-09-13 12:09:13,527 || INFO || => files process started
+2013-09-13 12:09:13,536 || INFO || Excel file created
+2013-09-13 12:09:13,538 || INFO || 	Shapefiles processed
+2013-09-13 12:09:13,539 || INFO || 
+/home/guts/code/GitHub/DicoGIS/test/datatest/airports.shp
+2013-09-13 12:09:13,564 || INFO || 	 Infos OK
+2013-09-13 12:09:13,569 || INFO || 	 Wrote into the dictionary
+2013-09-13 12:09:13,578 || INFO || 
+	MapInfo tables processed
+2013-09-13 12:09:13,580 || INFO || 
+/home/guts/code/GitHub/DicoGIS/test/datatest/airports_MI/tab/airports_MI.tab
+2013-09-13 12:09:13,588 || INFO || 	 Infos OK
+2013-09-13 12:09:13,593 || INFO || 	 Wrote into the dictionary
+2013-09-13 12:09:16,314 || INFO || 
+	Workbook saved: /home/guts/code/GitHub/DicoGIS/test/DicoShapes_test_2013-09-13.xls
+2013-09-13 12:12:07,548 || INFO || 	 ====== DicoGIS ======
+2013-09-13 12:12:07,740 || INFO || Operating system: Linux
+2013-09-13 12:12:08,307 || INFO || Type switched to: files structure
+2013-09-13 12:12:20,729 || INFO || Begin of folders parsing
+2013-09-13 12:12:20,737 || INFO || End of folders parsing: 4 folders explored
+2013-09-13 12:12:22,576 || INFO || => files process started
+2013-09-13 12:12:22,585 || INFO || Excel file created
+2013-09-13 12:12:22,586 || INFO || 	Shapefiles processed
+2013-09-13 12:12:22,589 || INFO || 
+/home/guts/code/GitHub/DicoGIS/test/datatest/airports.shp
+2013-09-13 12:12:22,613 || INFO || 	 Infos OK
+2013-09-13 12:12:22,618 || INFO || 	 Wrote into the dictionary
+2013-09-13 12:12:22,626 || INFO || 
+	MapInfo tables processed
+2013-09-13 12:12:22,628 || INFO || 
+/home/guts/code/GitHub/DicoGIS/test/datatest/airports_MI/tab/airports_MI.tab
+2013-09-13 12:12:22,636 || INFO || 	 Infos OK
+2013-09-13 12:12:22,642 || INFO || 	 Wrote into the dictionary
+2013-09-13 12:12:26,477 || INFO || 
+	Workbook saved: /home/guts/code/GitHub/DicoGIS/test/DicoShapes_test_2013-09-13.xls
+2013-09-13 12:15:56,160 || INFO || 	 ====== DicoGIS ======
+2013-09-13 12:15:56,366 || INFO || Operating system: Linux
+2013-09-13 12:15:56,874 || INFO || Type switched to: files structure
+2013-09-13 12:16:00,121 || INFO || Type switched to: database

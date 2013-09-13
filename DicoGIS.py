@@ -192,12 +192,12 @@ class DicoGIS(Tk):
         # Imagen
         self.icone = PhotoImage(file = r'img/DicoGIS_logo.gif')
         Label(self, borderwidth = 2,
-                                     image = self.icone).grid(row = 1,
-                                                              rowspan = 3,
-                                                              column = 0,
-                                                              padx = 2,
-                                                              pady = 2,
-                                                              sticky = W)
+                    image = self.icone).grid(row = 1,
+                                             rowspan = 3,
+                                             column = 0,
+                                             padx = 2,
+                                             pady = 2,
+                                             sticky = W)
         # credits
         s = Style(self)
         s.configure('Kim.TButton', foreground='DodgerBlue', borderwidth = 0)
@@ -221,11 +221,11 @@ class DicoGIS(Tk):
                                          value = 2,
                                            command = self.change_type)
         # Basic buttons
-        img_proc = PhotoImage(master = self, file = 'img/Processing_TNP_10789.gif')
+        #img_proc = PhotoImage(master = self, file = 'img/Processing_TNP_10789.gif')
         self.val = Button(self, text = self.blabla.get('gui_go'),
                                 state = ACTIVE,
                                 command = self.process)
-        self.val.config(image = img_proc)
+        #self.val.config(image = img_proc)
         self.can = Button(self, text = self.blabla.get('gui_quit'),
                            command = self.destroy)
 
@@ -505,7 +505,7 @@ class DicoGIS(Tk):
                                                                                   self.user.get(), 
                                                                                   self.pswd.get()))
         except:
-            print 'Connection to database failed. Check your connection settings.'
+            self.logger.info('Connection to database failed. Check your connection settings.')
             exit()
         # parsing the layers
         for layer in conn:
