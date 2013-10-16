@@ -729,3 +729,16 @@
 2013-09-13 12:15:56,366 || INFO || Operating system: Linux
 2013-09-13 12:15:56,874 || INFO || Type switched to: files structure
 2013-09-13 12:16:00,121 || INFO || Type switched to: database
+2013-09-19 11:57:40,807 || INFO || 	 ====== DicoGIS ======
+2013-09-19 11:57:41,021 || INFO || Operating system: Linux
+2013-09-19 11:57:41,638 || INFO || Type switched to: files structure
+2013-09-19 11:57:46,430 || INFO || Type switched to: database
+2013-09-19 11:57:48,126 || INFO || Type switched to: files structure
+2013-10-16 11:58:44,514 || INFO || 	 ====== DicoGIS ======
+2013-10-16 11:58:44,745 || INFO || Operating system: Linux
+2013-10-16 11:58:45,274 || INFO || Type switched to: files structure
+2013-10-16 11:58:57,790 || INFO || Begin of folders parsing
+2013-10-16 11:58:59,581 || INFO || End of folders parsing: 151 folders explored
+2013-10-16 12:00:23,600 || INFO || 	 ====== DicoGIS ======
+2013-10-16 12:00:23,853 || INFO || Operating system: Linux
+2013-10-16 12:00:24,425 || INFO || Type switched to: files structure

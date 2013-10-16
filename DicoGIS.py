@@ -84,6 +84,8 @@ class DicoGIS(Tk):
         elif platform == 'linux2':
             self.logger.info('Operating system: Linux')
             self.uzer = env.get(u'USER')
+            icon = Image("photo", file = r'img/DicoGIS_logo.gif')
+            self.call('wm','iconphoto', self._w, icon)
         elif platform == 'darwin':
             self.logger.info('Operating system: Mac')
             self.uzer = env.get(u'USER')
