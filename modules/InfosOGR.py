@@ -26,7 +26,7 @@ from time import localtime, strptime, strftime
 from collections import OrderedDict as OD
 
 # 3rd party libraries
-from osgeo import ogr    # spatial files
+from osgeo import ogr    # handler for vector spatial files
 
 ################################################################################
 ########### Classes #############
@@ -34,14 +34,16 @@ from osgeo import ogr    # spatial files
 
 class InfosOGR():
     def __init__(self, layerpath, dico_layer, dico_fields, tipo, text=''):
-        u""" Uses gdal/ogr functions to extract basic informations about
-        geographic file (handles shapefile or MapInfo tables)
-        and store into the dictionaries.
+        u""" Uses OGR functions to extract basic informations about
+        geographic vector file (handles shapefile or MapInfo tables)
+        and store into dictionaries.
 
         layerpath = path to the geographic file
         dico_layer = dictionary for global informations
         dico_fields = dictionary for the fields' informations
         li_fieds = ordered list of fields
+        tipo = shp or tab
+        text = dictionary of text in the selected language
 
         """
         # Creating variables
@@ -129,7 +131,7 @@ class InfosOGR():
             print dico_layer[u'srs']
 
         # end of function
-        return dico_layer, layerpath, txt
+        return dico_layer
 
     def infos_geom(self, dico_layer, txt):
         u""" get the informations about geometry """
@@ -171,7 +173,7 @@ class InfosOGR():
         dicolayer[u'num_fields'] = def_couche.GetFieldCount()
         dicolayer[u'error'] = mess
         # End of function
-        return dicolayer, layerpath
+        return dicolayer
 
 ################################################################################
 ###### Stand alone program ########
