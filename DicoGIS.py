@@ -111,6 +111,7 @@ class DicoGIS(Tk):
         self.def_lang = 'FR'    # default language to start
         self.li_shp = []         # list for shapefiles path
         self.li_tab = []         # list for MapInfo tables path
+        self.li_raster = []     # list for rasters paths
         self.today = strftime("%Y-%m-%d")   # date of the day
         self.dico_layer = OD()    # dictionary where will be stored informations
         self.dico_fields = OD()    # dictionary for fields information
@@ -355,9 +356,7 @@ class DicoGIS(Tk):
             try:
                 self.target.delete(0, END)
                 self.target.insert(0, foldername)
-                print("youhou")
             except:
-                print("argh")
                 info(title = self.blabla.get('nofolder'),
                      message = self.blabla.get('nofolder'))
                 return
@@ -380,27 +379,41 @@ class DicoGIS(Tk):
         # reseting global variables
         self.li_shp = []
         self.li_tab = []
+        self.li_raster = []
         self.browsetarg.config(state = DISABLED)
+        # raster formats handled
+        li_raster_formats = (".ecw", ".tif", ".jp2")
         # Looping in folders structure
         self.status.set(self.blabla.get('gui_prog1'))
         self.prog_layers.start()
         self.logger.info('Begin of folders parsing')
         for root, dirs, files in walk(foldertarget):
             self.num_folders = self.num_folders + len(dirs)
-            for i in files:
+            for f in files:
+                try:
+                    unicode(path.join(root, f))
+                    full_path = path.join(root, f)
+                except UnicodeDecodeError, e:
+                    full_path = path.join(root, f.decode('latin1'))
+                    print unicode(full_path), e
                 # Looping on files contained
-                if path.splitext(path.join(root, i))[1] == u'.shp' and \
-                   path.isfile(path.join(root, i)[:-4] + u'.dbf') and \
-                   path.isfile(path.join(root, i)[:-4] + u'.shx') and \
-                   path.isfile(path.join(root, i)[:-4] + u'.prj'):
+                if path.splitext(full_path.lower())[1].lower() == '.shp' and \
+        (path.isfile('%s.dbf' % full_path[:-4]) or path.isfile('%s.DBF' % full_path[:-4])) and \
+        (path.isfile('%s.shx' % full_path[:-4]) or path.isfile('%s.SHX' % full_path[:-4])) and \
+        (path.isfile('%s.prj' % full_path[:-4]) or path.isfile('%s.PRJ' % full_path[:-4])):
                     # add complete path of shapefile
-                    self.li_shp.append(path.join(root, i))
-                elif path.splitext(path.join(root, i))[1] == u'.tab' and \
-                   path.isfile(path.join(root, i)[:-4] + u'.dat') and \
-                   path.isfile(path.join(root, i)[:-4] + u'.map') and \
-                   path.isfile(path.join(root, i)[:-4] + u'.id'):
+                    self.li_shp.append(full_path)
+                elif path.splitext(full_path.lower())[1] == '.tab' and \
+        (path.isfile(full_path[:-4] + '.dat') or path.isfile(full_path[:-4] + '.DAT')) and \
+        (path.isfile(full_path[:-4] + '.map') or path.isfile(full_path[:-4] + '.MAP')) and \
+        (path.isfile(full_path[:-4] + '.id') or path.isfile(full_path[:-4] + '.ID')):
                     # add complete path of MapInfo file
-                    self.li_tab.append(path.join(root, i))
+                    self.li_tab.append(full_path)
+                elif path.splitext(full_path.lower())[1] in li_raster_formats:
+                    # add complete path of MapInfo file
+                    self.li_raster.append(full_path)
+                else:
+                    continue
         self.prog_layers.stop()
         self.logger.info('End of folders parsing: %s folders explored', str(self.num_folders))
         # Lists ordering and tupling
@@ -408,6 +421,9 @@ class DicoGIS(Tk):
         self.li_shp = tuple(self.li_shp)
         self.li_tab.sort()
         self.li_tab = tuple(self.li_tab)
+        self.li_raster.sort()
+        self.li_raster = tuple(self.li_raster)
+        print("\n".join(self.li_raster))
         # setting the label text and activing the buttons
         self.status.set(unicode(len(self.li_shp)) + u' shapefiles - '
                         + unicode(len(self.li_tab)) + u' tables (MapInfo) - '
