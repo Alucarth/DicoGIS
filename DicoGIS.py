@@ -7,7 +7,7 @@ from __future__ import unicode_literals
 #                   contained in a folders structures.
 #                   It produces an Excel output file (.xls)
 #
-# Author:       Julien Moura (https://github.com/Guts/)
+# Author:       Julien Moura (https://twitter.com/geojulien)
 #
 # Python:       2.7.x
 # Created:      14/02/2013
@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 ###################################
 # Standard library
 from Tkinter import Tk, StringVar, IntVar    # GUI
-from Tkinter import N, S, E, W, PhotoImage, ACTIVE
+from Tkinter import N, S, E, W, PhotoImage, ACTIVE, DISABLED, END
 from tkFileDialog import askdirectory, asksaveasfilename    # dialogs
 from tkMessageBox import showinfo as info
 from ttk import Combobox, Progressbar, Style, Labelframe, Frame, Label, Button, Entry, Radiobutton       # advanced graphic widgets
@@ -94,7 +94,7 @@ class DicoGIS(Tk):
         elif platform == 'linux2':
             self.logger.info('Operating system: Linux')
             self.uzer = env.get(u'USER')
-            icon = Image("photo", file = r'img/DicoGIS_logo.gif')
+            icon = Image("photo", file = r'data/img/DicoGIS_logo.gif')
             self.call('wm','iconphoto', self._w, icon)
             self.style = Style().theme_use('clam')
         elif platform == 'darwin':
@@ -115,7 +115,7 @@ class DicoGIS(Tk):
         self.dico_layer = OD()    # dictionary where will be stored informations
         self.dico_fields = OD()    # dictionary for fields information
         self.dico_err = OD()     # errors list
-        li_lang = [lg[5:-4] for lg in listdir(r'locale')] # available languages
+        li_lang = [lg[5:-4] for lg in listdir(r'data/locale')] # available languages
         self.blabla = OD()      # texts dictionary
 
         # GUI fonts
@@ -136,10 +136,10 @@ class DicoGIS(Tk):
             ## Frame 1: path of geofiles
         # target folder
         self.labtarg = Label(self.FrPath, text = self.blabla.get('gui_path'))
-        self.target = Entry(self.FrPath, width = 35)
+        self.target = Entry(master=self.FrPath, width = 35)
         self.browsetarg = Button(self.FrPath,       # browse button
                                  text = self.blabla.get('gui_choix'),
-                                 command = self.setpathtarg,
+                                 command = lambda:self.setpathtarg(),
                                  takefocus = True)
         self.browsetarg.focus_force()               # force the focus on
         self.nameoutput = Label(self.FrPath,
@@ -203,7 +203,7 @@ class DicoGIS(Tk):
                              font = ft_tit,
                              foreground = "red2")
         # Imagen
-        self.icone = PhotoImage(file = r'img/DicoGIS_logo.gif')
+        self.icone = PhotoImage(file = r'data/img/DicoGIS_logo.gif')
         Label(self, borderwidth = 2,
                     image = self.icone).grid(row = 1,
                                              rowspan = 3,
@@ -228,19 +228,19 @@ class DicoGIS(Tk):
         rd_file = Radiobutton(self, text = 'Fichiers', 
                                            variable = self.typo, 
                                            value = 1,
-                                           command = self.change_type)
+                                           command = lambda:self.change_type())
         rd_pg = Radiobutton(self, text = 'PostGIS', 
                                          variable = self.typo, 
                                          value = 2,
-                                           command = self.change_type)
+                                         command = lambda:self.change_type())
         # Basic buttons
         #img_proc = PhotoImage(master = self, file = 'img/Processing_TNP_10789.gif')
         self.val = Button(self, text = self.blabla.get('gui_go'),
                                 state = ACTIVE,
-                                command = self.process)
+                                command = lambda:self.process())
         #self.val.config(image = img_proc)
         self.can = Button(self, text = self.blabla.get('gui_quit'),
-                           command = self.destroy)
+                           command = lambda:self.destroy())
 
         # widgets placement
         self.welcome.grid(row = 1, column = 1, columnspan = 1, sticky = N+S,
@@ -323,7 +323,7 @@ class DicoGIS(Tk):
         # clearing the text dictionary
         self.blabla.clear()
         # open xml cursor
-        xml = ET.parse('locale/lang_' + lang + '.xml')
+        xml = ET.parse('data/locale/lang_' + lang + '.xml')
         # Looping and gathering texts from the xml file
         for elem in xml.getroot().getiterator():
             self.blabla[elem.tag] = elem.text
@@ -361,13 +361,15 @@ class DicoGIS(Tk):
             try:
                 self.target.delete(0, END)
                 self.target.insert(0, foldername)
+                print("youhou")
             except:
+                print("argh")
                 info(title = self.blabla.get('nofolder'),
                      message = self.blabla.get('nofolder'))
                 return
         # set the default output file
         self.output.delete(0, END)
-        self.output.insert(0, "DicoShapes_" + path.split(self.target.get())[1]
+        self.output.insert(0, "DicoGIS_" + path.split(self.target.get())[1]
                             + "_" + self.today + ".xls"  )
         # calculate number of shapefiles and MapInfo files in a separated thread
 
@@ -429,7 +431,8 @@ class DicoGIS(Tk):
         elif self.typo.get() == 2:
             self.logger.info('=> DB process started')
             self.process_db()
-        return
+        # end of function
+        return self.typo.get()
 
     def process_files(self):
         u""" launch the different processes """
@@ -539,8 +542,7 @@ class DicoGIS(Tk):
         self.save_settings()
 
         # quit and exit
-        if platform == 'win32':
-            startfile(self.output.get())
+        self.open_dir_file(self.output.get())
         self.destroy()
         exit()
 
@@ -762,6 +764,36 @@ class DicoGIS(Tk):
         # End of function
         return self.book, saved
 
+    def open_dir_file(self, target):
+        """ open a file or a directory in the explorer of the operating system
+        see: http://sametmax.com/ouvrir-un-fichier-avec-le-bon-programme-en-python"""
+        # check if the file or the directory exists
+        if not path.exists(target):
+            raise IOError('No such file: %s' % target)
+
+        # check the read permission
+        if not access(target, R_OK):
+            raise IOError('Cannot access file: %s' % target)
+
+        # open the directory or the file according to the os
+        if platform == 'win32': # Windows
+            proc = startfile(target)
+
+        elif platform.startswith('linux'): # Linux:
+            proc = subprocess.Popen(['xdg-open', target],
+                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        elif platform == 'darwin': # Mac:
+            proc = subprocess.Popen(['open', '--', target],
+                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        else:
+            raise NotImplementedError(
+                "Your `%s` isn't a supported operating system`." % platform)
+
+        # end of function
+        return proc
+
     def erreurStop(self, mess):
         u""" In case of error, close the GUI and stop the program """
         info(title = u'Erreur', message = mess)
@@ -776,8 +808,3 @@ class DicoGIS(Tk):
 if __name__ == '__main__':
     app = DicoGIS()
     app.mainloop()
-
-
-################################################################################
-######## Former codelines #########
-###################################
