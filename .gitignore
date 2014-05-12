@@ -29,3 +29,6 @@ pip-log.txt
 #Custom
 *.log
 *Thumbs.db
+
+# binaries
+/setup/
