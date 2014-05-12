@@ -25,7 +25,7 @@
 	<gui_prog1>Progression : recherche des fichiers compatibles</gui_prog1>
 	<gui_prog2>Progression : traitement des fichiers en cours</gui_prog2>
 	<info_end>Fin du programme</info_end>
-	<info_end2>DicoShapes a terminé son travail.</info_end2>
+	<info_end2>DicoGIS a terminé son travail.</info_end2>
 	<info_end3>Le dictionnaire se trouve dans le dossier : </info_end3>
 	<info_err> erreur(s) rencontrée(s). Consulter le fichier log.</info_err>
 	<info_noerr>Aucune erreur rencontrée.</info_noerr>
