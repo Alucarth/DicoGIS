@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 ########### Libraries #############
 ###################################
 # Standard library
-from Tkinter import Tk, StringVar, IntVar    # GUI
+from Tkinter import Tk, StringVar, IntVar, Image    # GUI
 from Tkinter import N, S, E, W, PhotoImage, ACTIVE, DISABLED, END
 from tkFileDialog import askdirectory, asksaveasfilename    # dialogs
 from tkMessageBox import showinfo as info
