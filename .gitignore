@@ -27,4 +27,5 @@ pip-log.txt
 .mr.developer.cfg
 
 #Custom
+*.log
 *Thumbs.db
