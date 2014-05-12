@@ -11,7 +11,7 @@ from __future__ import unicode_literals
 #
 # Python:       2.7.x
 # Created:      14/02/2013
-# Updated:      31/08/2013
+# Updated:      03/05/3014
 #
 # Licence:      GPL 3
 #-------------------------------------------------------------------------------
@@ -20,10 +20,11 @@ from __future__ import unicode_literals
 ########### Libraries #############
 ###################################
 # Standard library
-from Tkinter import *     # GUI
+from Tkinter import Tk, StringVar, IntVar    # GUI
+from Tkinter import N, S, E, W, PhotoImage, ACTIVE
 from tkFileDialog import askdirectory, asksaveasfilename    # dialogs
 from tkMessageBox import showinfo as info
-from ttk import *       # advanced graphic widgets
+from ttk import Combobox, Progressbar, Style, Labelframe, Frame, Label, Button, Entry, Radiobutton       # advanced graphic widgets
 import tkFont
 
 from sys import exit, platform
@@ -33,6 +34,8 @@ from time import strftime
 from webbrowser import open_new
 import threading    # handling various subprocess
 
+import ConfigParser         # to manipulate the options.ini file
+
 import logging      # log files
 from logging.handlers import RotatingFileHandler
 
@@ -40,7 +43,15 @@ from logging.handlers import RotatingFileHandler
 from collections import OrderedDict as OD   # ordered dictionary
 
 # 3rd party libraries
-from osgeo import ogr    # spatial files
+try:
+  from osgeo import gdal
+  from osgeo import ogr
+  from osgeo import osr
+except ImportError:
+  import gdal
+  import ogr
+  import osr
+
 from xlwt import Workbook, Font, XFStyle, easyxf, Formula  # excel writer
 from xlwt import Alignment, Pattern, Borders, easyfont      # excel style config
 from xml.etree import ElementTree as ET     # XML parsing and writer
@@ -76,7 +87,6 @@ class DicoGIS(Tk):
         # basics settings
         Tk.__init__(self)               # constructor of parent graphic class
         self.title(u'DicoGIS')
-        self.style = Style().theme_use('clam')
         if platform == 'win32':
             self.logger.info('Operating system: Windows')
             self.iconbitmap('DicoGIS.ico')    # windows icon
@@ -86,6 +96,7 @@ class DicoGIS(Tk):
             self.uzer = env.get(u'USER')
             icon = Image("photo", file = r'img/DicoGIS_logo.gif')
             self.call('wm','iconphoto', self._w, icon)
+            self.style = Style().theme_use('clam')
         elif platform == 'darwin':
             self.logger.info('Operating system: Mac')
             self.uzer = env.get(u'USER')
@@ -203,7 +214,7 @@ class DicoGIS(Tk):
         # credits
         s = Style(self)
         s.configure('Kim.TButton', foreground='DodgerBlue', borderwidth = 0)
-        Button(self, text = 'by Julien Moura\n      2013',
+        Button(self, text = 'by Julien M.\n      2014',
                      style = 'Kim.TButton',
                      command = lambda: open_new('https://github.com/Guts')).grid(row = 4,
                                                                                  padx = 2,
