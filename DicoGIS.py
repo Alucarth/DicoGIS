@@ -255,41 +255,35 @@ class DicoGIS(Tk):
         self.FrProg.grid(row = 4, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
         rd_file.invoke()    # to provoc the type (frame 2) placement
 
+
     def load_settings(self):
         u""" load settings from last execution """
-        # open xml cursor
-        xml = ET.parse('settings.xml')
-        # parsing
-        for elem in xml.getroot().getiterator():
-            if elem.tag == 'codelang':
-                self.def_lang = elem.text
-                continue
-            elif elem.tag == 'rep_defaut':
-                self.def_rep = elem.text
-                continue
+        confile = 'options.ini'
+        config = ConfigParser.RawConfigParser()
+        config.read(confile)
+        # basics
+        self.def_lang = config.get('basics', 'def_codelang')
+        self.def_rep = config.get('basics', 'def_rep')
+        # log
+        self.logger.info('Last options loaded')
         # End of function
         return self.def_rep, self.def_lang
 
 
     def save_settings(self):
         u""" save last options in order to make the next excution more easy """
-        # open xml cursor
-        xml = ET.parse('settings.xml')
-        # parsing
-        for elem in xml.getroot().getiterator():
-            if elem.tag == 'codelang':
-                elem.text = self.ddl_lang.get()
-                continue
-            elif elem.tag == 'rep_defaut':
-                elem.text = self.target.get()
-                continue
-        # Sauvegarde du fichier XML
-        xml.write(r'settings.xml',
-                  encoding = 'utf-8',
-                  xml_declaration = 'version="1.0"',
-                  method = 'xml')
+        confile = 'options.ini'
+        config = ConfigParser.RawConfigParser()
+        # add sections
+        config.add_section('basics')
+        # basics
+        config.set('basics', 'def_codelang', self.ddl_lang.get())
+        config.set('basics', 'def_rep', self.target.get())
+        # Writing the configuration file
+        with open(confile, 'wb') as configfile:
+            config.write(configfile)
         # End of function
-        return self.def_rep, self.def_lang
+        return config
 
 
     def change_lang(self, event):
