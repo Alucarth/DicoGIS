@@ -36,7 +36,7 @@ print path.isfile(li_jpg2[0])
 # read rasters data
 for raster in li_rasters:
     rast = gdal.Open(raster)
-    print "\n\n",dir(rast)
+    print "\n\n", dir(rast)
 
     # check if raster is GDAL friendly
     if rast is None:
@@ -44,7 +44,7 @@ for raster in li_rasters:
         continue
 
     # basic infos
-    print "\nfilename: ", path.basename(raster)
+    print "\n======================\nfilename: ", path.basename(raster)
     print "format: ", path.splitext(raster)[1]
     print "dependencies: ", [path.basename(filedepend) for filedepend in rast.GetFileList() if filedepend != raster]
 
