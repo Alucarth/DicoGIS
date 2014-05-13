@@ -5,8 +5,7 @@ Including 3 languages ([English](#en), [French](#fr) and [Spanish](#es)) but you
 ##EN
 Automatize the creation of a dictionnary of geographic data in a folders structure. The output dictionary is an Excel file (.xls).
 
-###How to use
-####Windows
+###Windows
  1. Download the [last release](https://github.com/Guts/DicoGIS/releases),
  2. Uncompress it,
  3. Execute **DicoGIS.exe**.
@@ -16,7 +15,7 @@ If you've all dependencies installed, you can also clone this repository, edit i
 python setup2exe_DicoGIS.py py2exe
 ```
 
-####Ubuntu (or others Debian distributions)
+###Ubuntu (or others Debian distributions)
 You can [download this repository](https://github.com/Guts/DicoGIS/archive/master.zip) or run these commands:
 ```bash
 sudo apt-get install -y git python-software-propertie
@@ -41,7 +40,7 @@ Si toutes les dépendances sont installées, vous pouvez créer votre version pe
 python setup2exe_DicoGIS.py py2exe
 ```
 
-####Ubuntu (ou toute autre distribution Debian a priori)
+###Ubuntu (ou toute autre distribution Debian a priori)
 Vous pouvez télécharger [l'ensemble du dépôt](https://github.com/Guts/DicoGIS/archive/master.zip) ou bien lancer ces commandes dans un terminal :
 ```bash
 sudo apt-get install -y git python-software-propertie
