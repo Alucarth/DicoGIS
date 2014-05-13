@@ -20,7 +20,7 @@
 # Standard library
 from distutils.core import setup
 import py2exe
-import os
+import os, sys
 import ConfigParser
 import numpy
 
@@ -31,12 +31,19 @@ from modules import *
 ########## Main program ###########
 ###################################
 
+# adding py2exe to the env path
+sys.argv.append('py2exe')
+
 # version
-num_version = "v2.0-beta.3"
+num_version = "v2.0-beta.1"
 
 # Specific data for gdal
 gdal_dir = r'data/gdal'
 gdal_files = [os.path.join(gdal_dir, i) for i in os.listdir(gdal_dir)]
+
+# Specific dll for pywin module
+mfcdir = r'C:\Python27\Lib\site-packages\pythonwin'
+mfcfiles = [os.path.join(mfcdir, i) for i in ["mfc90.dll", "mfc90u.dll", "mfcm90.dll", "mfcm90u.dll", "Microsoft.VC90.MFC.manifest"]]
 
 # initial settings
 confile = 'options.ini'
@@ -61,8 +68,9 @@ py2exe_options = dict(
                                   'pyreadline', 'doctest', 'email',
                                   'optparse', 'pickle'],  # Exclude standard library
                         dll_excludes = ['MSVCP90.dll'],
-                        compressed=True,  # Compress library.zip
+                        compressed=1,  # Compress library.zip
                         optimize = 2,
+                        # bundle_files = 1,
                         dist_dir = 'setup/DicoGIS_{}'.format(num_version)
                       )
 
@@ -74,21 +82,24 @@ setup(name="DicoGIS",
       url = "https://github.com/Guts/DicoGIS",
       license="license GPL v3.0",
       data_files = [
+                    # # pywin and numpy
+                    # ("Microsoft.VC90.MFC", mfcfiles, "C:\\Python27\\Lib\\site-packages\\numpy\\core\\libiomp5md.dll"),
                     # gdal
                     ("data/gdal", gdal_files),
                     # languages
                     ("data/locale", ["data/locale/lang_EN.xml",
-                                "data/locale/lang_ES.xml",
-                                "data/locale/lang_FR.xml"]),
+                                     "data/locale/lang_ES.xml",
+                                     "data/locale/lang_FR.xml"]),
                     # initial configuration
-                    ("", ["settings.xml"]),
+                    ("", ["options.ini"]),
                     # images
                     ("", ["DicoGIS.ico"]),
                     ("data/img", ["data/img/DicoGIS_logo.gif"]),
                     # documentation
-                    ("doc",["doc/DicoGIS_Manual_ES.pdf",
-                            "doc/README.html",
-                            "doc/DicoGIS_TechnicalDetails.htm"])
+                    ("doc",["README.md",
+                            "doc/DicoGIS_Manual_ES.pdf",
+                            "doc/DicoGIS_ReadMe.html",
+                            "doc/DicoGIS_GitHub.url"])
                     ],
       options={'py2exe': py2exe_options, 'build': build_options},
       windows = [
