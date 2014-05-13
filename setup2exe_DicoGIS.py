@@ -38,6 +38,18 @@ num_version = "v2.0-beta.3"
 gdal_dir = r'data/gdal'
 gdal_files = [os.path.join(gdal_dir, i) for i in os.listdir(gdal_dir)]
 
+# initial settings
+confile = 'options.ini'
+config = ConfigParser.RawConfigParser()
+# add sections
+config.add_section('basics')
+# basics
+config.set('basics', 'def_codelang', 'EN')
+config.set('basics', 'def_rep', './')
+# Writing the configuration file
+with open(confile, 'wb') as configfile:
+    config.write(configfile)
+
 # build settings
 build_options = dict(
                     build_base='setup/temp_build',
