@@ -32,3 +32,6 @@ pip-log.txt
 
 # binaries
 /setup/
+
+# geodatabase
+\test\datatestGDB*

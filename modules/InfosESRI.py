@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 ########### Libraries #############
 ###################################
 # Standard library
+import multiprocessing
 from os import walk, path       # files and folder managing
 import sys
 from time import localtime, strptime, strftime
@@ -36,7 +37,8 @@ except ImportError:
     sys.path.append(r'C:\Program Files (x86)\ArcGIS\Desktop10.2\bin')
     sys.path.append(r'C:\Program Files (x86)\ArcGIS\Desktop10.2\ArcToolbox\Scripts')
     try:
-        import arcpy
+        from arcpy import env as enviro
+        from arcpy import ListDatasets, ListFeatureClasses, GetCount_management
         print("ArcGIS has been added to Python path and then imported.")
     except:
         print("ArcGIS isn'installed on this computer")
@@ -47,6 +49,128 @@ except ImportError:
 ########### Classes #############
 #################################
 
+def read_featureClass(featureclass):
+    """  """
+    print featureclass
+
+    # end of function
+    return
+
+# print(sys.path)
+
+class InfosGDB():
+    def __init__(self, gdbpath, dico_layer, dico_fields, tipo, text=''):
+        u""" Uses OGR functions to extract basic informations about
+        geographic vector file (handles shapefile or MapInfo tables)
+        and store into dictionaries.
+
+        gdbpath = path to the FIle Geodatabase Esri
+        dico_layer = dictionary for global informations
+        dico_fields = dictionary for the fields' informations
+        li_fieds = ordered list of fields
+        tipo = shp or tab
+        text = dictionary of text in the selected language
+
+        """
+        ## global ArcGIS environment settings
+        enviro.maintainSpatialIndex = True
+
+        # looking into the gdb
+        enviro.workspace = gdbpath
+
+        # list Features Classes
+        li_fcs = ListFeatureClasses('*')
+        li_fcs = [path.join(enviro.workspace, feature) for feature in li_fcs]
+
+        print('list fcs')
+        self.process(li_fcs)
+
+        
+
+    def read_featureClass(self, featureclass):
+        """  """
+        print featureclass
+
+        # end of function
+        return
 
 
-print(sys.path)
+    def process(self, list_targets):
+        """  """
+        @read_featureClass
+        # create a pool to multi-process the features classes found
+        pool = multiprocessing.Pool()
+        print('\n\tpool_creation')
+        pool.map(lambda:self.read_featureClass, list_targets)
+        print('pool mapped')
+
+        # Synchronize the main process with the job processes to ensure proper cleanup.
+        pool.close()      
+        pool.join()
+
+        # end of function
+        return
+
+
+################################################################################
+###### Stand alone program ########
+###################################
+
+if __name__ == '__main__':
+    u""" standalone execution for tests. Paths are relative considering a test
+    within the official repository (https://github.com/Guts/DicoGIS/)"""
+    # libraries import
+    from os import getcwd, chdir, path, walk
+    # searching for File Geodatabase
+    num_folders = 0
+    li_gdb = []
+    for root, dirs, files in walk(r'..\test\datatest'):
+            num_folders = num_folders + len(dirs)
+            for d in dirs:
+                try:
+                    unicode(path.join(root, d))
+                    full_path = path.join(root, d)
+                except UnicodeDecodeError, e:
+                    full_path = path.join(root, d.decode('latin1'))
+                    print unicode(full_path), e
+                if full_path[-4:].lower() == '.gdb':
+                    # add complete path of shapefile
+                    li_gdb.append(path.abspath(full_path))
+
+    print li_gdb
+    
+    # recipient datas
+    dico_datasets = OD()
+    dico_raster = OD()      # dictionary where will be stored informations
+    dico_bands = OD()       # dictionary for fields information
+    
+    # launch   
+    # def read_featureClass(featureclass):
+    #     """  """
+    #     print featureclass
+
+    #     # end of function
+    #     return
+
+    # enviro.workspace = li_gdb[0]
+
+    # # list Features Classes
+    # li_fcs = ListFeatureClasses('*')
+    # li_fcs = [path.join(enviro.workspace, feature) for feature in li_fcs]
+
+    # print('list fcs')
+    # jobs = []
+    # # create a pool to multi-process the features classes found
+    # pool = multiprocessing.Pool()
+    # print('pool_creation')
+    # jobs.append(pool.apply_async(read_featureClass, (li_fcs[0]))) # send jobs to be processed
+
+    # pool.map(read_featureClass, li_fcs)
+    # print('pool mapped')
+
+    # # Synchronize the main process with the job processes to ensure proper cleanup.
+    # pool.close()      
+    # pool.join()
+
+    for gdb in li_gdb:
+        InfosGDB(gdb,dico_datasets, dico_raster, 'gdb')
