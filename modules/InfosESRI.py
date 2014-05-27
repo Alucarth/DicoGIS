@@ -75,18 +75,56 @@ class InfosGDB():
         """
         ## global ArcGIS environment settings
         enviro.maintainSpatialIndex = True
-
-        # looking into the gdb
         enviro.workspace = gdbpath
 
+        # variables
+        li_fcdatasets = []
+        li_featuresclasses = []
+
+        #
+        feats = []
+        for dataset in ListDatasets("","featuredataset"):
+            feats += ListFeatureClasses("*", "", dataset)
+        print "autre : " + str(feats)
+
+        # list datasets
+        print self.li_fc_datasets(gdbpath, li_fcdatasets)
+
         # list Features Classes
-        li_fcs = ListFeatureClasses('*')
-        li_fcs = [path.join(enviro.workspace, feature) for feature in li_fcs]
+        print self.li_featuresclasses(li_fcdatasets, li_featuresclasses)
 
-        print('list fcs')
-        self.process(li_fcs)
 
-        
+    def li_fc_datasets(self,gdb, li_fcdatasets):
+        u""" list all Feature Datasets into a File Geodatabase  """
+        # looking for datasets
+        for dataset in ListDatasets("","featuredataset"):
+            li_fcdatasets.append(path.join(gdb, dataset))
+
+        #  checking if Feature Classes exist into gdb's root
+        if len(ListFeatureClasses('*')) != 0:
+            li_fcdatasets.append('')
+
+        # end of function
+        return li_fcdatasets
+
+    def li_featuresclasses(self, li_datasets, li_featuresclasses):
+        u"""  """
+        for dataset in li_datasets:
+            li_featuresclasses += ListFeatureClasses("*", "", dataset)
+            
+        # end of function
+        return li_featuresclasses
+
+
+    def li_raster(self, li_datasets):
+        u"""  """
+        for dataset in ListDatasets("","featuredataset"):
+            print dataset
+            li_datasets.append(path.join(gdb, dataset))
+
+        # end of function
+        return li_datasets
+
 
     def read_featureClass(self, featureclass):
         """  """
@@ -96,20 +134,20 @@ class InfosGDB():
         return
 
 
-    def process(self, list_targets):
-        """  """
-        # create a pool to multi-process the features classes found
-        pool = multiprocessing.Pool()
-        print('\n\tpool_creation')
-        pool.map(lambda:self.read_featureClass, list_targets)
-        print('pool mapped')
+    # def process(self, list_targets):
+    #     """  """
+    #     # create a pool to multi-process the features classes found
+    #     pool = multiprocessing.Pool()
+    #     print('\n\tpool_creation')
+    #     pool.map(lambda:self.read_featureClass, list_targets)
+    #     print('pool mapped')
 
-        # Synchronize the main process with the job processes to ensure proper cleanup.
-        pool.close()      
-        pool.join()
+    #     # Synchronize the main process with the job processes to ensure proper cleanup.
+    #     pool.close()      
+    #     pool.join()
 
-        # end of function
-        return
+    #     # end of function
+    #     return
 
 
 ################################################################################
