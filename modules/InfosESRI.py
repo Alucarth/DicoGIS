@@ -41,7 +41,8 @@ except ImportError:
         from arcpy import ListDatasets, ListFeatureClasses, GetCount_management
         print("ArcGIS has been added to Python path and then imported.")
     except:
-        print("ArcGIS isn'installed on this computer")
+        print("ArcGIS isn't installed on this computer")
+        sys.exit()
 
 
 
@@ -97,7 +98,6 @@ class InfosGDB():
 
     def process(self, list_targets):
         """  """
-        @read_featureClass
         # create a pool to multi-process the features classes found
         pool = multiprocessing.Pool()
         print('\n\tpool_creation')
