@@ -24,8 +24,7 @@ except ImportError:
 
 def update_shapefiles(shapefile):
     # Define the projection to wgs84 — factory code is 4326
-    print shapefile
-    print arcpy.GetCount_management(shapefile)
+    print shapefile + " : " + arcpy.GetCount_management(shapefile) + " entities."
 
     # End update_shapefiles
 

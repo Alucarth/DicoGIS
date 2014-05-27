@@ -38,7 +38,7 @@ except ImportError:
     sys.path.append(r'C:\Program Files (x86)\ArcGIS\Desktop10.2\ArcToolbox\Scripts')
     try:
         from arcpy import env as enviro
-        from arcpy import ListDatasets, ListFeatureClasses, GetCount_management
+        from arcpy import ListDatasets, ListFeatureClasses, GetCount_management, ListFiles, ListFields, ListRasters, Describe
         print("ArcGIS has been added to Python path and then imported.")
     except:
         print("ArcGIS isn't installed on this computer")
@@ -78,60 +78,61 @@ class InfosGDB():
         enviro.workspace = gdbpath
 
         # variables
-        li_fcdatasets = []
         li_featuresclasses = []
+        li_rasters = []
 
-        #
-        feats = []
+        # # list datasets
+        # print self.li_fc_datasets(gdbpath, li_fcdatasets)
+
+        # list all features classes
+        self.li_feature_classes(li_featuresclasses)
+
+        # read info from features classes
+        for fc in li_featuresclasses:
+            self.read_featureClass(fc)
+
+        # list all rasters
+        self.li_raster_classes(li_rasters)
+
+
+    def li_feature_classes(self, li_featuresclasses):
+        u""" list all features classes contained in a GDB """
         for dataset in ListDatasets("","featuredataset"):
-            feats += ListFeatureClasses("*", "", dataset)
-        print "autre : " + str(feats)
-
-        # list datasets
-        print self.li_fc_datasets(gdbpath, li_fcdatasets)
-
-        # list Features Classes
-        print self.li_featuresclasses(li_fcdatasets, li_featuresclasses)
-
-
-    def li_fc_datasets(self,gdb, li_fcdatasets):
-        u""" list all Feature Datasets into a File Geodatabase  """
-        # looking for datasets
-        for dataset in ListDatasets("","featuredataset"):
-            li_fcdatasets.append(path.join(gdb, dataset))
-
-        #  checking if Feature Classes exist into gdb's root
-        if len(ListFeatureClasses('*')) != 0:
-            li_fcdatasets.append('')
-
-        # end of function
-        return li_fcdatasets
-
-    def li_featuresclasses(self, li_datasets, li_featuresclasses):
-        u"""  """
-        for dataset in li_datasets:
-            li_featuresclasses += ListFeatureClasses("*", "", dataset)
+            fcs = [path.join(dataset, feature) for feature in ListFeatureClasses("*", "", dataset)]
+            li_featuresclasses += fcs
+        li_featuresclasses += ListFeatureClasses()
             
         # end of function
         return li_featuresclasses
 
 
-    def li_raster(self, li_datasets):
-        u"""  """
+    def li_raster_classes(self, li_rasters):
+        u""" list all rasters contained in a GDB """
         for dataset in ListDatasets("","featuredataset"):
-            print dataset
-            li_datasets.append(path.join(gdb, dataset))
+            rasters = [path.join(dataset, raster) for raster in ListRasters("*")]
+            li_rasters += rasters
+        li_rasters += ListRasters()
 
         # end of function
-        return li_datasets
+        return li_rasters
 
 
     def read_featureClass(self, featureclass):
-        """  """
-        print featureclass
+        """ get information about a feature class """
+        description = Describe(featureclass)
+
+        print "\n" + featureclass + " (in: " + description.catalogPath + ")"
+        print "geometry: " + description.shapeType + " (" + description.featureType + ")"
+        print "# entities: " + str(GetCount_management(featureclass))
+
+        print "# fields:"
+        for nomchp in ListFields(featureclass):
+            print nomchp.name + " (" + nomchp.type + ")"
+
+        print "SRS " + description.spatialReference.name        
 
         # end of function
-        return
+        return featureclass
 
 
     # def process(self, list_targets):
