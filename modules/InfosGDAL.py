@@ -12,7 +12,7 @@ from __future__ import unicode_literals
 #
 # Python:       2.7.x
 # Created:      18/02/2014
-# Updated:      12/05/2014
+# Updated:      28/05/2014
 # Licence:      GPL 3
 #-------------------------------------------------------------------------------
 
@@ -49,6 +49,7 @@ class InfosRasters():
         # variables
         self.alert = 0
 
+        print rasterpath
         # opening file
         self.rast = gdal.Open(rasterpath)
         
@@ -57,8 +58,7 @@ class InfosRasters():
             print("\n\tUnable to open " + rasterpath)
             print("Please check compatibility.")
             self.alert += 1
-            
-        
+
         # basic informations
         dico_raster[u'format'] = tipo
         self.infos_basics(rasterpath, dico_raster, text)
@@ -70,27 +70,43 @@ class InfosRasters():
 
     def infos_basics(self, rasterpath, dico_raster, txt):
         u""" get the global informations about the raster """
+        # files and folder
         dico_raster[u'name'] = path.basename(rasterpath)
         dico_raster[u'folder'] = path.dirname(rasterpath)
         dico_raster[u'title'] = dico_raster[u'name'][:-4].replace('_', ' ').capitalize()
-        dico_raster[u'dependencies'] = [path.basename(filedepend) for filedepend in self.rast.GetFileList() if filedepend != raster]
+        dico_raster[u'dependencies'] = [path.basename(filedepend) for filedepend in self.rast.GetFileList() if filedepend != rasterpath]
+        # format
         dico_raster[u'compr_rate'] = self.rast.GetMetadata().get('COMPRESSION_RATE_TARGET')
         dico_raster[u'color_ref'] = self.rast.GetMetadata().get('COLORSPACE')
-        dico_raster[u'format_version'] = self.rast.GetMetadata().get('VERSION')
+        if self.rast.GetMetadata().get('VERSION'):
+            dico_raster[u'format_version'] = "(v{})".format(self.rast.GetMetadata().get('VERSION'))
+        else:
+            dico_raster[u'format_version'] = ""
+        # image specifications
         dico_raster[u'pixel_size_X'] = self.rast.RasterXSize
         dico_raster[u'pixel_size_Y'] = self.rast.RasterYSize
         dico_raster[u'num_bands'] = self.rast.RasterCount
+
+        # basic dates
+        dico_raster[u'date_actu'] = strftime('%Y-%m-%d',
+                                            localtime(path.getmtime(rasterpath)))
+        dico_raster[u'date_crea'] = strftime('%Y-%m-%d',
+                                            localtime(path.getctime(rasterpath)))
 
         # end of function
         return dico_raster
 
 
-    def infos_geom(self, dico_layer, txt):
+    def infos_geom(self, dico_raster, txt):
         u""" get the informations about geometry """
-
+        # Spatial extent (bounding box)
+        dico_raster[u'Xmin'] = round(self.rast.GetExtent()[0],2)
+        dico_raster[u'Xmax'] = round(self.rast.GetExtent()[1],2)
+        dico_raster[u'Ymin'] = round(self.rast.GetExtent()[2],2)
+        dico_raster[u'Ymax'] = round(self.rast.GetExtent()[3],2)
 
         # end of function
-        return
+        return dico_raster
 
 
     def infos_bands(self, band, dico_bands):
