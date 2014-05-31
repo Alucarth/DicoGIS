@@ -40,23 +40,26 @@
 	<log_numfold> folders.</log_numfold>
 	<log_start>Start: </log_start>
 	<log_tps>Time elapsed: </log_tps>
-<!-- Output file -->
+<!-- Output file: commons -->
 	<nomfic>Filename</nomfic>
 	<path>Path</path>
 	<browse>Reach the folder</browse>
-	<theme>Theme</theme>
-	<num_objets>Number of objects</num_objets>
-	<num_attrib>Number of fields</num_attrib>
+	<theme>Folder</theme>
 	<date_crea>Creation (computer date)</date_crea>
 	<date_actu>Last update</date_actu>
-	<geometrie>Geometry type</geometrie>
-	<geom_point>Point</geom_point>
-	<geom_ligne>Line</geom_ligne>
-	<geom_polyg>Polygon</geom_polyg>
 	<srs>Coordinates system (SRS)</srs>
 	<srs_type>SRS type</srs_type>
 	<codepsg>EPSG</codepsg>
 	<emprise>Spatial extent</emprise>
+	<format>Format</format>
+	<li_depends>Dependencies</li_depends>
+<!-- Output file: vectors -->
+	<num_objets># objects</num_objets>
+	<num_attrib># fields</num_attrib>
+	<geometrie>Geometry type</geometrie>
+	<geom_point>Point</geom_point>
+	<geom_ligne>Line</geom_ligne>
+	<geom_polyg>Polygon</geom_polyg>
 	<li_chps>Fields definition</li_chps>
 	<entier>Numeric (integer)</entier>
 	<reel>Numeric (float)</reel>
@@ -64,7 +67,12 @@
 	<date>Date</date>
 	<longueur>, Lg.=</longueur>
 	<precision>, Pr.=</precision>
-	<format>Format</format>
+<!-- Output file: rasters -->
+	<num_bands># bands</num_bands>
+	<size_X>Pixel size (X)</size_X>
+	<size_Y>Pixel size (Y)</size_Y>
+	<compression>Compression rate</compression>
+	<coloref>Color system</coloref>
 <!-- SRS -->
 	<srs_comp>Compound</srs_comp>
 	<srs_geoc>Geocentric</srs_geoc>

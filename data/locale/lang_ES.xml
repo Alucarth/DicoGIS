@@ -40,23 +40,26 @@
 	<log_numfold> carpetas.</log_numfold>
 	<log_start>Inicio: </log_start>
 	<log_tps>Tiempo transcurrido: </log_tps>
-<!-- Output file -->
+<!-- Output file: commons -->
 	<nomfic>Nombre del archivo</nomfic>
 	<path>Ruta</path>
 	<browse>Alcanzar la carpeta</browse>
-	<theme>Themática</theme>
-	<num_objets>Número de objetos</num_objets>
-	<num_attrib>Número de atributos</num_attrib>
+	<theme>Carpeta</theme>
 	<date_crea>Creación (en esta computadora)</date_crea>
 	<date_actu>Última actualización</date_actu>
-	<geometrie>Tipo de geometría</geometrie>
-	<geom_point>Punto</geom_point>
-	<geom_ligne>Línea</geom_ligne>
-	<geom_polyg>Polígono</geom_polyg>
 	<srs>Sistema de coordenadas (SRS)</srs>
 	<srs_type>Tipo de SRS</srs_type>
 	<codepsg>EPSG</codepsg>
 	<emprise>Extensión espacial</emprise>
+	<format>Formato</format>
+	<li_depends>Relacionados</li_depends>
+<!-- Output file: vectors -->
+	<num_objets># objetos</num_objets>
+	<num_attrib># atributos</num_attrib>
+	<geometrie>Tipo de geometría</geometrie>
+	<geom_point>Punto</geom_point>
+	<geom_ligne>Línea</geom_ligne>
+	<geom_polyg>Polígono</geom_polyg>
 	<li_chps>Atributos</li_chps>
 	<entier>Numérico (entero)</entier>
 	<reel>Numérico (real)</reel>
@@ -64,7 +67,12 @@
 	<date>Fecha</date>
 	<longueur>, Lg. = </longueur>
 	<precision>, Pr. = </precision>
-	<format>Formato</format>
+<!-- Output file: rasters -->
+	<num_bands># bandas</num_bands>
+	<size_X>Talla del pixel (X)</size_X>
+	<size_Y>Talla del pixel(Y)</size_Y>
+	<compression>Rato de compresión</compression>
+	<coloref>Sistema de colores</coloref>
 <!-- SRS -->
 	<srs_comp>Compuesta (2D +)</srs_comp>
 	<srs_geoc>Geocéntrica</srs_geoc>

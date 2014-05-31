@@ -40,23 +40,26 @@
 	<log_numfold> dossiers.</log_numfold>
 	<log_start>Début du traitement : </log_start>
 	<log_tps>Temps écoulé : </log_tps>
-<!-- Output file -->
+<!-- Output file: commons -->
 	<nomfic>Nom du fichier</nomfic>
 	<path>Chemin</path>
 	<browse>Atteindre le dossier</browse>
-	<theme>Thème</theme>
-	<num_objets>Nombre d'objets</num_objets>
-	<num_attrib>Nombre d'attributs</num_attrib>
+	<theme>Dossier</theme>
 	<date_crea>Création (sur l'ordinateur)</date_crea>
 	<date_actu>Dernière actualisation</date_actu>
-	<geometrie>Type de géométrie</geometrie>
-	<geom_point>Point</geom_point>
-	<geom_ligne>Ligne</geom_ligne>
-	<geom_polyg>Polygone</geom_polyg>
 	<srs>Système de coordonnées (SRS)</srs>
 	<srs_type>Type du SRS</srs_type>
 	<codepsg>EPSG</codepsg>
 	<emprise>Emprise spatiale</emprise>
+	<format>Format</format>
+	<li_depends>Dépendances</li_depends>
+<!-- Output file: vectors -->
+	<num_objets># objets</num_objets>
+	<num_attrib># attributs</num_attrib>
+	<geometrie>Type de géométrie</geometrie>
+	<geom_point>Point</geom_point>
+	<geom_ligne>Ligne</geom_ligne>
+	<geom_polyg>Polygone</geom_polyg>
 	<li_chps>Attributs</li_chps>
 	<entier>Numérique (entier)</entier>
 	<reel>Numérique (réel)</reel>
@@ -64,7 +67,13 @@
 	<date>Date</date>
 	<longueur>, Lg. = </longueur>
 	<precision>, Pr. = </precision>
-	<format>Format</format>
+<!-- Output file: rasters -->
+	<num_bands>Nombre de bandes</num_bands>
+	<size_X>Taille du pixel (X)</size_X>
+	<size_Y>Taille du pixel (Y)</size_Y>
+	<compression>Taux de compression</compression>
+	<coloref>Référentiel couleur</coloref>
+
 <!-- SRS -->
 	<srs_comp>Composée (2D +)</srs_comp>
 	<srs_geoc>Géocentrique</srs_geoc>
