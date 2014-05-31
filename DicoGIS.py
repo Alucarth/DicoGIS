@@ -44,21 +44,23 @@ from collections import OrderedDict as OD   # ordered dictionary
 
 # 3rd party libraries
 try:
-  from osgeo import gdal
-  from osgeo import ogr
-  from osgeo import osr
+    from osgeo import gdal
+    from osgeo import ogr
+    from osgeo import osr
 except ImportError:
-  import gdal
-  import ogr
-  import osr
+    import gdal
+    import ogr
+    import osr
 
 from xlwt import Workbook, Font, XFStyle, easyxf, Formula  # excel writer
 from xlwt import Alignment, Pattern, Borders, easyfont      # excel style config
 from xml.etree import ElementTree as ET     # XML parsing and writer
 
 # Custom modules
+from modules import InfosRasters    # custom extractor for geographic data in PostGIS databases
 from modules import InfosOGR    # custom extractor for geographic data
 from modules import InfosOGR_PG    # custom extractor for geographic data in PostGIS databases
+
 
 # Imports depending on operating system
 if platform == 'win32':
@@ -112,9 +114,13 @@ class DicoGIS(Tk):
         self.li_shp = []         # list for shapefiles path
         self.li_tab = []         # list for MapInfo tables path
         self.li_raster = []     # list for rasters paths
+        self.li_raster_formats = (".ecw", ".tif", ".jp2")   # raster formats handled
+        self.li_vectors_formats = (".shp", ".tab")          # vectors formats handled
         self.today = strftime("%Y-%m-%d")   # date of the day
-        self.dico_layer = OD()    # dictionary where will be stored informations
-        self.dico_fields = OD()    # dictionary for fields information
+        self.dico_layer = OD()      # dict for vectors informations
+        self.dico_fields = OD()     # dict for fields informations
+        self.dico_raster = OD()     # dict for rasters global informations
+        self.dico_bands = OD()      # dict for bands informations
         self.dico_err = OD()     # errors list
         li_lang = [lg[5:-4] for lg in listdir(r'data/locale')] # available languages
         self.blabla = OD()      # texts dictionary
@@ -381,15 +387,28 @@ class DicoGIS(Tk):
         self.li_tab = []
         self.li_raster = []
         self.browsetarg.config(state = DISABLED)
-        # raster formats handled
-        li_raster_formats = (".ecw", ".tif", ".jp2")
         # Looping in folders structure
         self.status.set(self.blabla.get('gui_prog1'))
         self.prog_layers.start()
         self.logger.info('Begin of folders parsing')
         for root, dirs, files in walk(foldertarget):
             self.num_folders = self.num_folders + len(dirs)
+            for d in dirs:
+                """ looking for File Geodatabase among directories """
+                try:
+                    unicode(path.join(root, d))
+                    full_path = path.join(root, d)
+                except UnicodeDecodeError, e:
+                    full_path = path.join(root, d.decode('latin1'))
+                    print unicode(full_path), e
+                if full_path[-4:].lower() == '.gdb':
+                    # add complete path of shapefile
+                    li_gdb.append(path.abspath(full_path))
+                    print full_path
+                else:
+                    pass
             for f in files:
+                """ looking for files with geographic data """
                 try:
                     unicode(path.join(root, f))
                     full_path = path.join(root, f)
@@ -409,7 +428,7 @@ class DicoGIS(Tk):
         (path.isfile(full_path[:-4] + '.id') or path.isfile(full_path[:-4] + '.ID')):
                     # add complete path of MapInfo file
                     self.li_tab.append(full_path)
-                elif path.splitext(full_path.lower())[1] in li_raster_formats:
+                elif path.splitext(full_path.lower())[1] in self.li_raster_formats:
                     # add complete path of MapInfo file
                     self.li_raster.append(full_path)
                 else:
@@ -471,15 +490,16 @@ class DicoGIS(Tk):
             self.logger.info('\t Infos OK')
             # getting the informations
             # writing to the Excel dictionary
-            self.dictionarize(self.dico_layer, self.dico_fields, self.feuy1, line)
+            self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line)
             self.logger.info('\t Wrote into the dictionary')
             # increment the line number
             line = line +1
             # increment the progress bar
             self.prog_layers["value"] = self.prog_layers["value"] +1
             self.update()
-        # getting the info from mapinfo tables and compile it in the excel
-        self.logger.info('\n\tMapInfo tables processed')
+            # getting the info from mapinfo tables and compile it in the excel
+            self.logger.info('\n\tMapInfo tables processed')
+        
         for tab in self.li_tab:
             """ looping on MapInfo tables list """
             self.status.set(path.basename(tab))
@@ -491,13 +511,34 @@ class DicoGIS(Tk):
             InfosOGR(tab, self.dico_layer, self.dico_fields, 'table', self.blabla)
             self.logger.info('\t Infos OK')
             # writing to the Excel dictionary
-            self.dictionarize(self.dico_layer, self.dico_fields, self.feuy1, line)
+            self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line)
             self.logger.info('\t Wrote into the dictionary')
             # increment the line number
             line = line +1
             # increment the progress bar
             self.prog_layers["value"] = self.prog_layers["value"] +1
             self.update()
+
+        for raster in self.li_raster:
+            """ looping on rasters list """
+            self.status.set(path.basename(raster))
+            self.logger.info('\n' + raster)
+            # reset recipient data
+            self.dico_raster.clear()
+            self.dico_bands.clear()
+            # getting the informations
+            InfosRasters(raster, self.dico_raster, self.dico_bands, path.splitext(raster)[1], self.blabla)
+            print(self.dico_raster, self.dico_bands)
+            self.logger.info('\t Infos OK')
+            # writing to the Excel dictionary
+            self.dictionarize_rasters(self.dico_raster, self.dico_bands, self.feuy2, line)
+            self.logger.info('\t Wrote into the dictionary')
+            # increment the line number
+            line = line +1
+            # increment the progress bar
+            self.prog_layers["value"] = self.prog_layers["value"] +1
+            self.update()
+
         # saving dictionary
         self.savedico()
         self.logger.info('\n\tWorkbook saved: %s', self.output.get())
@@ -582,7 +623,7 @@ class DicoGIS(Tk):
         # End of function
         return err
 
-    def testconnexion(self):
+    def test_connection(self):
         u""" testing database connection settings """
         try:
             conn = ogr.Open(host = self.host.get(), dbname = self.dbnb.get(),
@@ -616,10 +657,9 @@ class DicoGIS(Tk):
 
     def configexcel(self):
         u""" create and configure the Excel workbook """
-        # Basic configurationdu
+        # Basic configuration
         self.book = Workbook(encoding = 'utf8')
-        self.feuy1 = self.book.add_sheet(u'DicoGIS', cell_overwrite_ok=True)
-
+        self.logger.info('Workbook created')
         # Some customization: fonts and styles
         # first line style
         self.entete = easyxf()
@@ -640,26 +680,54 @@ class DicoGIS(Tk):
         self.erreur = easyxf('pattern: pattern solid;'
                              'font: colour red, bold True;')
 
-        # columns name
-        self.feuy1.write(0, 0, self.blabla.get('nomfic'), self.entete)
-        self.feuy1.write(0, 1, self.blabla.get('path'), self.entete)
-        self.feuy1.write(0, 2, self.blabla.get('theme'), self.entete)
-        self.feuy1.write(0, 3, self.blabla.get('num_attrib'), self.entete)
-        self.feuy1.write(0, 4, self.blabla.get('num_objets'), self.entete)
-        self.feuy1.write(0, 5, self.blabla.get('geometrie'), self.entete)
-        self.feuy1.write(0, 6, self.blabla.get('srs'), self.entete)
-        self.feuy1.write(0, 7, self.blabla.get('srs_type'), self.entete)
-        self.feuy1.write(0, 8, self.blabla.get('codepsg'), self.entete)
-        self.feuy1.write(0, 9, self.blabla.get('emprise'), self.entete)
-        self.feuy1.write(0, 10, self.blabla.get('date_crea'), self.entete)
-        self.feuy1.write(0, 11, self.blabla.get('date_actu'), self.entete)
-        self.feuy1.write(0, 12, self.blabla.get('format'), self.entete)
-        self.feuy1.write(0, 13, self.blabla.get('li_chps'), self.entete)
+        # columns headers
+        if (self.li_tab + self.li_shp) > 0:
+            """ adding a new sheet for vectors informations """
+            self.feuy1 = self.book.add_sheet(u'Vectors', cell_overwrite_ok=True)
+            self.feuy1.write(0, 0, self.blabla.get('nomfic'), self.entete)
+            self.feuy1.write(0, 1, self.blabla.get('path'), self.entete)
+            self.feuy1.write(0, 2, self.blabla.get('theme'), self.entete)
+            self.feuy1.write(0, 3, self.blabla.get('num_attrib'), self.entete)
+            self.feuy1.write(0, 4, self.blabla.get('num_objets'), self.entete)
+            self.feuy1.write(0, 5, self.blabla.get('geometrie'), self.entete)
+            self.feuy1.write(0, 6, self.blabla.get('srs'), self.entete)
+            self.feuy1.write(0, 7, self.blabla.get('srs_type'), self.entete)
+            self.feuy1.write(0, 8, self.blabla.get('codepsg'), self.entete)
+            self.feuy1.write(0, 9, self.blabla.get('emprise'), self.entete)
+            self.feuy1.write(0, 10, self.blabla.get('date_crea'), self.entete)
+            self.feuy1.write(0, 11, self.blabla.get('date_actu'), self.entete)
+            self.feuy1.write(0, 12, self.blabla.get('format'), self.entete)
+            self.feuy1.write(0, 13, self.blabla.get('li_chps'), self.entete)
+            self.logger.info('Sheet vectors adedd')
+        else:
+            pass
+
+        if self.li_raster > 0:
+            """ adding a new sheet for rasters informations """
+            self.feuy2 = self.book.add_sheet(u'Rasters', cell_overwrite_ok=True)
+            self.feuy2.write(0, 0, self.blabla.get('nomfic'), self.entete)
+            self.feuy2.write(0, 1, self.blabla.get('path'), self.entete)
+            self.feuy2.write(0, 2, self.blabla.get('theme'), self.entete)
+            self.feuy2.write(0, 3, self.blabla.get('size_X'), self.entete)
+            self.feuy2.write(0, 4, self.blabla.get('size_Y'), self.entete)
+            self.feuy2.write(0, 5, self.blabla.get('srs_type'), self.entete)
+            self.feuy2.write(0, 6, self.blabla.get('codepsg'), self.entete)
+            self.feuy2.write(0, 7, self.blabla.get('emprise'), self.entete)
+            self.feuy2.write(0, 8, self.blabla.get('date_crea'), self.entete)
+            self.feuy2.write(0, 9, self.blabla.get('date_actu'), self.entete)
+            self.feuy2.write(0, 10, self.blabla.get('num_bands'), self.entete)
+            self.feuy2.write(0, 11, self.blabla.get('format'), self.entete)
+            self.feuy2.write(0, 12, self.blabla.get('compression'), self.entete)
+            self.feuy2.write(0, 13, self.blabla.get('coloref'), self.entete)
+            self.feuy2.write(0, 14, self.blabla.get('li_depends'), self.entete)
+            self.logger.info('Sheet rasters created')
+        else:
+            pass
 
         # end of function
-        return self.book, self.feuy1, self.entete, self.url, self.erreur
+        return self.book, self.entete, self.url, self.erreur
 
-    def dictionarize(self, layer_infos, fields_info, sheet, line):
+    def dictionarize_vectors(self, layer_infos, fields_info, sheet, line):
         u""" write the infos of the layer into the Excel workbook """
         # local variables
         champs = ""
@@ -683,8 +751,8 @@ class DicoGIS(Tk):
                              + '"; "' + self.blabla.get('browse') + '")'
         sheet.write(line, 1, Formula(link), self.url)
         # Name of containing folder
-        # with a specific exception to adapt to PACIVUR database
-        if path.basename(layer_infos.get(u'folder')) != 'shp':
+        # with an exceptin if this is the format name
+        if path.basename(layer_infos.get(u'folder')) in self.li_vectors_formats:
             sheet.write(line, 2, path.basename(layer_infos.get(u'folder')))
         else:
             sheet.write(line, 2, path.basename(path.dirname(layer_infos.get(u'folder'))))
@@ -736,12 +804,10 @@ class DicoGIS(Tk):
                 self.dico_err[layer_infos.get('name')] = self.blabla.get(u'err_encod') + \
                                                          chp.decode('latin1') + \
                                                          u"\n\n"
+                self.logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
                 # decode the fucking field name
-                champs = champs +\
-                         chp.decode('utf8') +\
-                         u" (" + tipo +\
-                         u", Lg. = " + unicode(fields_info[chp][1]) +\
-                         u", Pr. = " + unicode(fields_info[chp][2]) + ") ; "
+                champs = champs + chp.decode('latin1') \
+                + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo, fields_info[chp][1], fields_info[chp][2])
                 # then continue
                 continue
 
@@ -750,6 +816,86 @@ class DicoGIS(Tk):
 
         # End of function
         return self.book, self.feuy1
+
+    def dictionarize_rasters(self, dico_raster, dico_bands, sheet, line):
+        u""" write the infos of the layer into the Excel workbook """
+        # local variables
+        champs = ""
+        theme = ""
+
+        # in case of a source error
+        if dico_raster.get('error'):
+            self.logger.warning('\tproblem detected')
+            sheet.write(line, 0, layer_infos.get('name'))
+            link = 'HYPERLINK("' + layer_infos.get(u'folder') \
+                             + '"; "' + self.blabla.get('browse') + '")'
+            sheet.write(line, 1, Formula(link), self.url)
+            sheet.write(line, 2, self.blabla.get((layer_infos.get('error')), self.erreur))
+            # Interruption of function
+            return self.book, self.feuy2
+        else:
+            pass
+
+            # self.feuy2.write(0, 5, self.blabla.get('srs_type'), self.entete)
+            # self.feuy2.write(0, 6, self.blabla.get('codepsg'), self.entete)
+            # self.feuy2.write(0, 7, self.blabla.get('emprise'), self.entete)
+            # self.feuy2.write(0, 8, self.blabla.get('date_crea'), self.entete)
+            # self.feuy2.write(0, 9, self.blabla.get('date_actu'), self.entete)
+            # self.feuy2.write(0, 10, self.blabla.get('num_bands'), self.entete)
+            # self.feuy2.write(0, 11, self.blabla.get('format'), self.entete)
+            # self.feuy2.write(0, 12, self.blabla.get('compression'), self.entete)
+            # self.feuy2.write(0, 13, self.blabla.get('coloref'), self.entete)
+            # self.feuy2.write(0, 14, self.blabla.get('li_depends'), self.entete)
+
+        # Name
+        sheet.write(line, 0, dico_raster.get('name'))
+        # Path of containing folder formatted to be a hyperlink
+        link = 'HYPERLINK("' + dico_raster.get(u'folder') \
+                             + '"; "' + self.blabla.get('browse') + '")'
+        sheet.write(line, 1, Formula(link), self.url)
+        # Name of containing folder
+        sheet.write(line, 2, path.basename(dico_raster.get(u'folder')))
+        # Name of containing folder
+        # with an exceptin if this is the format name
+        if path.basename(dico_raster.get(u'folder')) in self.li_raster_formats:
+            sheet.write(line, 2, path.basename(dico_raster.get(u'folder')))
+        else:
+            sheet.write(line, 2, path.basename(path.dirname(dico_raster.get(u'folder'))))
+        # Pixel size
+        sheet.write(line, 3, dico_raster.get(u'pixel_size_X'))
+        sheet.write(line, 4, dico_raster.get(u'pixel_size_Y'))
+
+        # # Spatial extent
+        # emprise = u"Xmin : " + unicode(layer_infos.get(u'Xmin')) +\
+        #           u", Xmax : " + unicode(layer_infos.get(u'Xmax')) +\
+        #           u", Ymin : " + unicode(layer_infos.get(u'Ymin')) +\
+        #           u", Ymax : " + unicode(layer_infos.get(u'Ymax'))
+        # sheet.write(line, 9, emprise)
+        # # Name of srs
+        # sheet.write(line, 6, layer_infos.get(u'srs'))
+        # # Type of SRS
+        # sheet.write(line, 7, layer_infos.get(u'srs_type'))
+        # # EPSG code
+        # sheet.write(line, 8, layer_infos.get(u'EPSG'))
+        # Number of bands
+        sheet.write(line, 10, dico_raster.get(u'num_bands'))
+        # # Name of objects
+        # sheet.write(line, 4, layer_infos.get(u'num_obj'))
+        # Creation date
+        sheet.write(line, 8, dico_raster.get(u'date_crea'))
+        # Last update date
+        sheet.write(line, 9, dico_raster.get(u'date_actu'))
+        # Format of data
+        sheet.write(line, 11, "{} {}".format(dico_raster.get(u'format'), dico_raster.get('format_version')))
+        # Compression rate
+        sheet.write(line, 12, dico_raster.get(u'compr_rate'))
+
+        # Dependencies
+        sheet.write(line, 14, ' | '.join(dico_raster.get(u'dependencies')))
+
+        # End of function
+        return self.book, self.feuy2
+
 
     def savedico(self):
         u""" Save the Excel file """
