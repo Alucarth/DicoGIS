@@ -27,10 +27,11 @@ from collections import OrderedDict as OD
 
 # 3rd party libraries
 from osgeo import ogr    # handler for vector spatial files
+from osgeo import osr
 
 ################################################################################
 ########### Classes #############
-###################################
+#################################
 
 class InfosOGR():
     def __init__(self, layerpath, dico_layer, dico_fields, tipo, text=''):
@@ -169,9 +170,13 @@ class InfosOGR():
         # local variables
         dicolayer[u'name'] = path.basename(layerpath)
         dicolayer[u'folder'] = path.dirname(layerpath)
-        def_couche = self.layer.GetLayerDefn()
-        dicolayer[u'num_fields'] = def_couche.GetFieldCount()
-        dicolayer[u'error'] = mess
+        try:
+            def_couche = self.layer.GetLayerDefn()
+            dicolayer[u'num_fields'] = def_couche.GetFieldCount()
+        except AttributeError:
+            mess = mess    
+        finally:
+            dicolayer[u'error'] = mess
         # End of function
         return dicolayer
 
@@ -181,12 +186,13 @@ class InfosOGR():
 
 if __name__ == '__main__':
     u""" standalone execution for tests. Paths are relative considering a test
-    within the official repository (https://github.com/Guts/DicoShapes/)"""
+    within the official repository (https://github.com/Guts/DicoGIS)"""
     # libraries import
     from os import getcwd, chdir, path
     # test files
-    li_shp = [path.join(getcwd(), r'..\test\datatest\airports.shp')]         # shapefile
-    li_tab = [path.join(getcwd(), r'..\test\datatest\airports_MI\tab\airports_MI.tab')] # MapInfo table
+    li_shp = [path.join(getcwd(), r'..\test\datatest\vectors\shp\airports.shp')]         # shapefile
+    li_tab = [path.join(getcwd(), r'..\test\datatest\vectors\tab\tab\airports_MI.tab'), \
+              path.join(getcwd(), r'..\test\datatest\vectors\tab\tab\Hydrobiologie.TAB')] # MapInfo table
     # test text dictionary
     textos = OD()
     textos['srs_comp'] = u'Compound'
