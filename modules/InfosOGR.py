@@ -114,7 +114,6 @@ class InfosOGR():
             else:
                 dico_layer[u'srs'] = unicode(self.srs.GetAttrValue('PROJECTION')).replace('_', ' ')
         except UnicodeDecodeError, e:
-            print 'youpiyo', e
             if self.srs.GetAttrValue('PROJCS') != 'unnamed':
                 dico_layer[u'srs'] = self.srs.GetAttrValue('PROJCS').decode('latin1').replace('_', ' ')
             else:
