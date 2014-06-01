@@ -68,9 +68,9 @@
 	<longueur>, Lg. = </longueur>
 	<precision>, Pr. = </precision>
 <!-- Output file: rasters -->
-	<num_bands>Nombre de bandes</num_bands>
-	<size_X>Taille du pixel (X)</size_X>
-	<size_Y>Taille du pixel (Y)</size_Y>
+	<num_bands># bandes</num_bands>
+	<size_X># colonnes</size_X>
+	<size_Y># lignes</size_Y>
 	<compression>Taux de compression</compression>
 	<coloref>Référentiel couleur</coloref>
 

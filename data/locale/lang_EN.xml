@@ -69,8 +69,8 @@
 	<precision>, Pr.=</precision>
 <!-- Output file: rasters -->
 	<num_bands># bands</num_bands>
-	<size_X>Pixel size (X)</size_X>
-	<size_Y>Pixel size (Y)</size_Y>
+	<size_X># columns</size_X>
+	<size_Y># rows</size_Y>
 	<compression>Compression rate</compression>
 	<coloref>Color system</coloref>
 <!-- SRS -->
