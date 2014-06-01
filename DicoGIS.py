@@ -708,8 +708,8 @@ class DicoGIS(Tk):
             self.feuy2.write(0, 0, self.blabla.get('nomfic'), self.entete)
             self.feuy2.write(0, 1, self.blabla.get('path'), self.entete)
             self.feuy2.write(0, 2, self.blabla.get('theme'), self.entete)
-            self.feuy2.write(0, 3, self.blabla.get('size_X'), self.entete)
-            self.feuy2.write(0, 4, self.blabla.get('size_Y'), self.entete)
+            self.feuy2.write(0, 3, self.blabla.get('size_Y'), self.entete)
+            self.feuy2.write(0, 4, self.blabla.get('size_X'), self.entete)
             self.feuy2.write(0, 5, self.blabla.get('srs_type'), self.entete)
             self.feuy2.write(0, 6, self.blabla.get('codepsg'), self.entete)
             self.feuy2.write(0, 7, self.blabla.get('emprise'), self.entete)
@@ -862,8 +862,8 @@ class DicoGIS(Tk):
         else:
             sheet.write(line, 2, path.basename(path.dirname(dico_raster.get(u'folder'))))
         # Pixel size
-        sheet.write(line, 3, dico_raster.get(u'pixel_size_X'))
-        sheet.write(line, 4, dico_raster.get(u'pixel_size_Y'))
+        sheet.write(line, 3, dico_raster.get(u'num_rows'))
+        sheet.write(line, 4, dico_raster.get(u'num_cols'))
 
         # # Spatial extent
         # emprise = u"Xmin : " + unicode(layer_infos.get(u'Xmin')) +\
