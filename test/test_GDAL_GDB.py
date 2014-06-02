@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
-from __future__ import unicode_literals
+# from __future__ import unicode_literals
 
 #-------------------------------------------------------------------------------
 # Name:         InfosGDAL
@@ -28,12 +28,41 @@ from collections import OrderedDict as OD
 
 # 3rd party libraries
 from osgeo import gdal    # handler for raster spatial files
+from osgeo import ogr
+from gdalconst import *
+gdal.AllRegister()
 
 ################################################################################
 ########### Classes #############
 #################################
 
 
-gdb = 
+################################################################################
+###### Stand alone program ########
+###################################
 
-rast = gdal.Open(rasterpath)
+if __name__ == '__main__':
+    u""" standalone execution for tests. Paths are relative considering a test
+    within the official repository (https://github.com/Guts/DicoShapes/)"""
+    # libraries import
+    from os import getcwd, chdir, path
+    # test FileGDB
+    gdb = r'..\test\datatest\GDB_Test.gdb'
+
+    # OGR: FileGDB (see: http://www.gdal.org/drv_filegdb.html)
+    try:
+        dr_gdb_f = ogr.GetDriverByName("FileGDB")
+        gdb_f = dr_gdb_f.Open(gdb, 0)
+    except AttributeError:
+        print("FileGeodatabases can't be read by this driver because FileGDB API SDK is not installed (see: http://www.esri.com/apps/products/download/#File_Geodatabase_API_1.3)")
+
+    # OGR: OpenFileGDB (see: http://www.gdal.org/drv_openfilegdb.html)
+    try:
+        dr_gdb_o = ogr.GetDriverByName("OpenFileGDB")
+        gdb_o = dr_gdb_o.Open(gdb, 0)
+    except:
+        print("FileGeodatabases can't be read by this driver. You need GDAL/OGR >= 1.11")
+
+
+
+### doc : http://gis.stackexchange.com/questions/32762/how-to-access-feature-classes-in-file-geodatabases-with-python-and-gdal
