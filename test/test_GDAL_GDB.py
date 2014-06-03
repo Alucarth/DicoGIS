@@ -37,6 +37,8 @@ gdal.AllRegister()
 #################################
 
 
+
+
 ################################################################################
 ###### Stand alone program ########
 ###################################
@@ -53,6 +55,7 @@ if __name__ == '__main__':
     try:
         dr_gdb_f = ogr.GetDriverByName("FileGDB")
         gdb_f = dr_gdb_f.Open(gdb, 0)
+        print("OGR driver FileGDB: OK!")
     except AttributeError:
         print("FileGeodatabases can't be read by this driver because FileGDB API SDK is not installed (see: http://www.esri.com/apps/products/download/#File_Geodatabase_API_1.3)")
 
@@ -60,6 +63,7 @@ if __name__ == '__main__':
     try:
         dr_gdb_o = ogr.GetDriverByName("OpenFileGDB")
         gdb_o = dr_gdb_o.Open(gdb, 0)
+        print("OGR driver OpenFileGDB: OK!")
     except:
         print("FileGeodatabases can't be read by this driver. You need GDAL/OGR >= 1.11")
 
