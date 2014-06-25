@@ -28,21 +28,7 @@ from time import localtime, strptime, strftime
 from collections import OrderedDict as OD
 
 # 3rd party libraries
-try:
-    import arcpy
-    print("Great! ArcGIS is well installed.")
-except ImportError:
-    print("ArcGIS isn't registered in the sys.path")
-    sys.path.append(r'C:\Program Files (x86)\ArcGIS\Desktop10.2\arcpy')
-    sys.path.append(r'C:\Program Files (x86)\ArcGIS\Desktop10.2\bin')
-    sys.path.append(r'C:\Program Files (x86)\ArcGIS\Desktop10.2\ArcToolbox\Scripts')
-    try:
-        from arcpy import env as enviro
-        from arcpy import ListDatasets, ListFeatureClasses, GetCount_management, ListFiles, ListFields, ListRasters, Describe
-        print("ArcGIS has been added to Python path and then imported.")
-    except:
-        print("ArcGIS isn't installed on this computer")
-        sys.exit()
+
 
 
 
@@ -59,7 +45,7 @@ def read_featureClass(featureclass):
 
 # print(sys.path)
 
-class InfosGDB():
+class Read_GDB():
     def __init__(self, gdbpath, dico_layer, dico_fields, tipo, text=''):
         u""" Uses OGR functions to extract basic informations about
         geographic vector file (handles shapefile or MapInfo tables)
@@ -160,6 +146,22 @@ if __name__ == '__main__':
     within the official repository (https://github.com/Guts/DicoGIS/)"""
     # libraries import
     from os import getcwd, chdir, path, walk
+
+    try:
+        import arcpy
+        print("Great! ArcGIS is well installed.")
+    except ImportError:
+        print("ArcGIS isn't registered in the sys.path")
+        sys.path.append(r'C:\Program Files (x86)\ArcGIS\Desktop10.2\arcpy')
+        sys.path.append(r'C:\Program Files (x86)\ArcGIS\Desktop10.2\bin')
+        sys.path.append(r'C:\Program Files (x86)\ArcGIS\Desktop10.2\ArcToolbox\Scripts')
+        try:
+            from arcpy import env as enviro
+            from arcpy import ListDatasets, ListFeatureClasses, GetCount_management, ListFiles, ListFields, ListRasters, Describe
+            print("ArcGIS has been added to Python path and then imported.")
+        except:
+            print("ArcGIS isn't installed on this computer")
+            sys.exit()
     # searching for File Geodatabase
     num_folders = 0
     li_gdb = []
@@ -212,4 +214,4 @@ if __name__ == '__main__':
     # pool.join()
 
     for gdb in li_gdb:
-        InfosGDB(gdb,dico_datasets, dico_raster, 'gdb')
+        Read_GDB(gdb,dico_datasets, dico_raster, 'gdb')

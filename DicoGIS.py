@@ -39,6 +39,10 @@ import ConfigParser         # to manipulate the options.ini file
 import logging      # log files
 from logging.handlers import RotatingFileHandler
 
+from xml.etree import ElementTree as ET     # XML parsing and writer
+
+import sys
+
 # Python 3 backported
 from collections import OrderedDict as OD   # ordered dictionary
 
@@ -54,18 +58,33 @@ except ImportError:
 
 from xlwt import Workbook, Font, XFStyle, easyxf, Formula  # excel writer
 from xlwt import Alignment, Pattern, Borders, easyfont      # excel style config
-from xml.etree import ElementTree as ET     # XML parsing and writer
+
 
 # Custom modules
-from modules import InfosRasters    # custom extractor for geographic data in PostGIS databases
-from modules import InfosOGR    # custom extractor for geographic data
-from modules import InfosOGR_PG    # custom extractor for geographic data in PostGIS databases
+from modules import Read_Rasters    # custom extractor for geographic data in PostGIS databases
+from modules import Read_SHP        # custom extractor for shapefiles
+from modules import Read_TAB        # custom extractor for MapInfo Tables
+from modules import Read_PostGIS     # custom extractor for geographic data in PostGIS databases
 
 
 # Imports depending on operating system
 if platform == 'win32':
     u""" windows """
     from os import startfile                            # to open a folder/file
+    try:
+        import arcpy
+        print("Great! ArcGIS is well installed.")
+    except ImportError:
+        print("ArcGIS isn't registered in the sys.path")
+        sys.path.append(r'C:\Program Files (x86)\ArcGIS\Desktop10.2\arcpy')
+        sys.path.append(r'C:\Program Files (x86)\ArcGIS\Desktop10.2\bin')
+        sys.path.append(r'C:\Program Files (x86)\ArcGIS\Desktop10.2\ArcToolbox\Scripts')
+        try:
+            from arcpy import env as enviro
+            from arcpy import ListDatasets, ListFeatureClasses, GetCount_management, ListFiles, ListFields, ListRasters, Describe
+            print("ArcGIS has been added to Python path and then imported.")
+        except:
+            print("ArcGIS isn't installed on this computer")
 
 ################################################################################
 ########### Variables #############
@@ -114,6 +133,7 @@ class DicoGIS(Tk):
         self.li_shp = []         # list for shapefiles path
         self.li_tab = []         # list for MapInfo tables path
         self.li_raster = []     # list for rasters paths
+        self.li_gdb = []     # list for Esri File Geodatabases
         self.li_raster_formats = (".ecw", ".tif", ".jp2")   # raster formats handled
         self.li_vectors_formats = (".shp", ".tab")          # vectors formats handled
         self.today = strftime("%Y-%m-%d")   # date of the day
@@ -403,7 +423,7 @@ class DicoGIS(Tk):
                     print unicode(full_path), e
                 if full_path[-4:].lower() == '.gdb':
                     # add complete path of shapefile
-                    li_gdb.append(path.abspath(full_path))
+                    self.li_gdb.append(path.abspath(full_path))
                     print full_path
                 else:
                     pass
@@ -486,7 +506,7 @@ class DicoGIS(Tk):
             self.dico_layer.clear()
             self.dico_fields.clear()
             # creating separated process threads
-            InfosOGR(shp, self.dico_layer, self.dico_fields, 'shape', self.blabla)
+            Read_SHP(shp, self.dico_layer, self.dico_fields, 'shape', self.blabla)
             self.logger.info('\t Infos OK')
             # getting the informations
             # writing to the Excel dictionary
@@ -508,7 +528,7 @@ class DicoGIS(Tk):
             self.dico_layer.clear()
             self.dico_fields.clear()
             # getting the informations
-            InfosOGR(tab, self.dico_layer, self.dico_fields, 'table', self.blabla)
+            Read_TAB(tab, self.dico_layer, self.dico_fields, 'table', self.blabla)
             self.logger.info('\t Infos OK')
             # writing to the Excel dictionary
             self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line)
@@ -527,7 +547,7 @@ class DicoGIS(Tk):
             self.dico_raster.clear()
             self.dico_bands.clear()
             # getting the informations
-            InfosRasters(raster, self.dico_raster, self.dico_bands, path.splitext(raster)[1], self.blabla)
+            Read_Rasters(raster, self.dico_raster, self.dico_bands, path.splitext(raster)[1], self.blabla)
             print(self.dico_raster, self.dico_bands)
             self.logger.info('\t Infos OK')
             # writing to the Excel dictionary
@@ -576,7 +596,7 @@ class DicoGIS(Tk):
             exit()
         # parsing the layers
         for layer in conn:
-            InfosOGR_PG(layer, self.dico_layer, self.dico_fields, 'pg', self.blabla)
+            Read_PostGIS(layer, self.dico_layer, self.dico_fields, 'pg', self.blabla)
             self.logger.info('Table examined: %s' % layer.GetName())
             # writing to the Excel dictionary
             self.dictionarize(self.dico_layer, self.dico_fields, self.feuy1, line)
