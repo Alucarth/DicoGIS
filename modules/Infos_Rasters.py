@@ -36,7 +36,7 @@ gdal.AllRegister()
 ########### Classes #############
 ###################################
 
-class InfosRasters():
+class Read_Rasters():
     def __init__(self, rasterpath, dico_raster, dico_bands, tipo, text=''):
         u""" Uses GDAL functions to extract basic informations about
         geographic raster file (handles ECW, GeoTIFF, JPEG2000)

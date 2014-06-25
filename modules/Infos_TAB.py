@@ -33,7 +33,7 @@ from osgeo import osr
 ########### Classes #############
 #################################
 
-class InfosOGR():
+class Read_TAB():
     def __init__(self, layerpath, dico_layer, dico_fields, tipo, text=''):
         u""" Uses OGR functions to extract basic informations about
         geographic vector file (handles shapefile or MapInfo tables)
@@ -189,7 +189,6 @@ if __name__ == '__main__':
     # libraries import
     from os import getcwd, chdir, path
     # test files
-    li_shp = [path.join(getcwd(), r'..\test\datatest\vectors\shp\airports.shp')]         # shapefile
     li_tab = [path.join(getcwd(), r'..\test\datatest\vectors\tab\tab\airports_MI.tab'), \
               path.join(getcwd(), r'..\test\datatest\vectors\tab\tab\Hydrobiologie.TAB')] # MapInfo table
     # test text dictionary
@@ -207,22 +206,13 @@ if __name__ == '__main__':
     dicouche = OD()     # dictionary where will be stored informations
     dico_fields = OD()     # dictionary for fields information
     # execution
-    for shp in li_shp:
-        """ looping on shapefiles list """
-        # reset recipient data
-        dicouche.clear()
-        dico_fields.clear()
-        # getting the informations
-        print shp
-        info_shp = InfosOGR(shp, dicouche, dico_fields, 'shape', textos)
-        print '\n', dicouche, dico_fields
     for tab in li_tab:
         """ looping on MapInfo tables list """
         # reset recipient data
         dicouche.clear()
         dico_fields.clear()
         # getting the informations
-        info_tab = InfosOGR(tab, dicouche, dico_fields, 'table', textos)
+        info_tab = Read_TAB(tab, dicouche, dico_fields, 'table', textos)
         print '\n', dicouche, dico_fields
 
 

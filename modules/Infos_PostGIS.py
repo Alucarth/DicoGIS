@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-# -*- coding: UTF-8 -*-
-#!/usr/bin/env python
-##from __future__ import unicode_literals
+#from __future__ import unicode_literals
 #-------------------------------------------------------------------------------
 # Name:         InfosOGR_PG
 # Purpose:      Use GDAL/OGR library to extract informations about
@@ -34,7 +31,7 @@ from osgeo import ogr    # spatial files
 ########### Classes #############
 ###################################
 
-class InfosOGR_PG():
+class Read_PostGIS():
     def __init__(self, layer, dico_layer, dico_fields, tipo, text=''):
         u""" Uses gdal/ogr functions to extract basic informations about
         geographic file (handles shapefile or MapInfo tables)
