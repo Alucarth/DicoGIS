@@ -71,6 +71,10 @@
 	<num_bands># bandas</num_bands>
 	<size_X># columnas</size_X>
 	<size_Y># lineas</size_Y>
+	<pixel_w>Pixel width</pixel_w>
+	<pixel_h>Pixel height</pixel_h>
+	<origin_x>X origin</origin_x>
+	<origin_y>Y origin</origin_y>
 	<compression>Rato de compresión</compression>
 	<coloref>Sistema de colores</coloref>
 <!-- SRS -->

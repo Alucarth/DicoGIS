@@ -71,6 +71,10 @@
 	<num_bands># bandes</num_bands>
 	<size_X># colonnes</size_X>
 	<size_Y># lignes</size_Y>
+	<pixel_w>Largeur de pixel</pixel_w>
+	<pixel_h>Hauteur de pixel</pixel_h>
+	<origin_x>Origine X</origin_x>
+	<origin_y>Origine Y</origin_y>
 	<compression>Taux de compression</compression>
 	<coloref>Référentiel couleur</coloref>
 
