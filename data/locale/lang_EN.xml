@@ -71,6 +71,10 @@
 	<num_bands># bands</num_bands>
 	<size_X># columns</size_X>
 	<size_Y># rows</size_Y>
+	<pixel_w>Pixel width</pixel_w>
+	<pixel_h>Pixel height</pixel_h>
+	<origin_x>X origin</origin_x>
+	<origin_y>Y origin</origin_y>
 	<compression>Compression rate</compression>
 	<coloref>Color system</coloref>
 <!-- SRS -->
