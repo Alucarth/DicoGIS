@@ -1,0 +1,727 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document id="root_doc">
+<Schema name="wc2014_MapTour" id="wc2014_MapTour">
+	<SimpleField name="OBJECTID" type="int"></SimpleField>
+	<SimpleField name="Descriptio" type="string"></SimpleField>
+	<SimpleField name="Color" type="string"></SimpleField>
+	<SimpleField name="Lat" type="float"></SimpleField>
+	<SimpleField name="Long" type="float"></SimpleField>
+	<SimpleField name="URL" type="string"></SimpleField>
+	<SimpleField name="Thumb_URL" type="string"></SimpleField>
+	<SimpleField name="icon_color" type="string"></SimpleField>
+	<SimpleField name="Transparen" type="float"></SimpleField>
+	<SimpleField name="SymbolID" type="string"></SimpleField>
+</Schema>
+<Folder><name>wc2014_MapTour</name>
+  <Placemark>
+	<name>Brazil - Crotia (12 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">1</SimpleData>
+		<SimpleData name="Descriptio">Opening match of FIFA World Cup 2014. Ground : Arena de Sao Paulo (Sao Paulo)
+</SimpleData>
+		<SimpleData name="Color">A</SimpleData>
+		<SimpleData name="Lat">-23.54553000000</SimpleData>
+		<SimpleData name="Long">-46.47337000000</SimpleData>
+		<SimpleData name="URL">http://3.bp.blogspot.com/-YYodoc3oC1w/UrlbHC67CQI/AAAAAAAAA9o/KYsf3Ub8GOE/s1600/Frm+Wikipedia.png</SimpleData>
+		<SimpleData name="Thumb_URL">http://www.fifa.com/mm/photo/tournament/destination/02/06/37/36/2063736_full-lnd.jpg</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-46.474919722796734,-23.544572109336691</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Mexico - Cameroon (12 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">2</SimpleData>
+		<SimpleData name="Descriptio">Group A's 2nd game. Ground : Arena das Dunas (Natal)
+</SimpleData>
+		<SimpleData name="Color">A</SimpleData>
+		<SimpleData name="Lat">-5.82894000000</SimpleData>
+		<SimpleData name="Long">-35.21386000000</SimpleData>
+		<SimpleData name="URL">http://s3-eu-west-1.amazonaws.com/statictb.net/evento/42477_500.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://wsantacruz.com.br/blog/wp-content/uploads/2013/11/Arena-das-Dunas-fotos-Caninde-Soares-4.jpg</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-35.21255474011614,-5.826332718457921</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Spain - Netherlands (13 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">3</SimpleData>
+		<SimpleData name="Descriptio">Netherlands wants to take revenge of EURO Cup Final 2012 from Spain. Ground : Arena Fonte Nova (Salvador)
+</SimpleData>
+		<SimpleData name="Color">B</SimpleData>
+		<SimpleData name="Lat">-12.97861000000</SimpleData>
+		<SimpleData name="Long">-38.50417000000</SimpleData>
+		<SimpleData name="URL">http://www.rnw.nl/data/files/images/lead/120710%20verslagenheid%20na%20de%200-1%20voor%20Spanje_1.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://3.bp.blogspot.com/-cLkizxwBv3I/UZtMbHevKEI/AAAAAAAA0Hk/ZZ6CxK4oUxE/s1600/Arena-Fonte-Nova-Salvador.jpg</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-38.504016803847918,-12.979194938013132</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Chile - Australia (13 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">4</SimpleData>
+		<SimpleData name="Descriptio">Group B's 2nd match.        Ground : Arena Pantanal (Cuiaba)</SimpleData>
+		<SimpleData name="Color">B</SimpleData>
+		<SimpleData name="Lat">-15.60306000000</SimpleData>
+		<SimpleData name="Long">-56.12056000000</SimpleData>
+		<SimpleData name="URL">http://3.bp.blogspot.com/-VxNa6Y1FeTE/TmxCVTX4__I/AAAAAAAAXcM/h450hp9TtZE/s1600/australia+chile.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://www.fifa.com/mm/photo/tournament/destination/01/56/66/95/1566695_full-lnd.jpg</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-56.120481298298301,-15.602566310272158</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Colombia - Greece (14 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">5</SimpleData>
+		<SimpleData name="Descriptio">Estadio Mineirao (Belo Horizonte)  Radamel Falcao is going to show all his abilities in this tournament. Ground : Estadio Mineirao (Belo Horizonte)</SimpleData>
+		<SimpleData name="Color">C</SimpleData>
+		<SimpleData name="Lat">-19.86583000000</SimpleData>
+		<SimpleData name="Long">-43.97083000000</SimpleData>
+		<SimpleData name="URL">http://www.independent.co.uk/incoming/article8942520.ece/ALTERNATES/w620/Radamel-Falcao.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://globoesporte.globo.com/ESP/Home/foto/0,,10877289,00.jpg</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-43.970712827728505,-19.86533670877893</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Cote d'Ivore - Japan (14 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">6</SimpleData>
+		<SimpleData name="Descriptio">One of the best players in the world; Didier Drogba's last World Cup. Ground : Arena Pernambuco (Recife)</SimpleData>
+		<SimpleData name="Color">C</SimpleData>
+		<SimpleData name="Lat">-8.04000000000</SimpleData>
+		<SimpleData name="Long">-35.00806000000</SimpleData>
+		<SimpleData name="URL">http://pic.lg.ua/x/6/e4db5f/b4536e69.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://www.fifa.com/mm/photo/tournament/destination/01/56/67/60/1566760_full-lnd.jpg</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-35.008060000356018,-8.039999999732066</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Uruguay - Costa Rica (14 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">7</SimpleData>
+		<SimpleData name="Descriptio">A big game between two South American country. Ground : Estadio Castelao (Fortaleza)</SimpleData>
+		<SimpleData name="Color">D</SimpleData>
+		<SimpleData name="Lat">-3.80727000000</SimpleData>
+		<SimpleData name="Long">-38.52248000000</SimpleData>
+		<SimpleData name="URL">http://www3.pictures.zimbio.com/gi/Uruguay+v+Costa+Rica+2010+FIFA+World+Cup+Qualifiers+HMecDUsBRfdl.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://pordentrodacopa2014.files.wordpress.com/2011/06/castelaoantes.jpg</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-38.521971511381686,-3.806768869108943</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>England - Italy (14 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">8</SimpleData>
+		<SimpleData name="Descriptio">Great match between, two legendary European country. Ground : Arena Amazonia (Manaus)</SimpleData>
+		<SimpleData name="Color">D</SimpleData>
+		<SimpleData name="Lat">-3.08306000000</SimpleData>
+		<SimpleData name="Long">-60.02806000000</SimpleData>
+		<SimpleData name="URL">http://static.guim.co.uk/sys-images/Guardian/Pix/pictures/2012/6/22/1340391446141/England-and-Italy-fans-008.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://www.fifa.com/mm/photo/tournament/destination/01/56/67/21/1566721_full-lnd.jpg</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-60.028395459600645,-3.082964835064964</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Switzerland - Ecuador (15 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">9</SimpleData>
+		<SimpleData name="Descriptio">Group E's 1st match. Ground : Estadio Nacional Mane Garrincha (Brasilia)</SimpleData>
+		<SimpleData name="Color">E</SimpleData>
+		<SimpleData name="Lat">-15.78350000000</SimpleData>
+		<SimpleData name="Long">-47.89916000000</SimpleData>
+		<SimpleData name="URL">http://s3-eu-west-1.amazonaws.com/statictb.net/evento/42492_500.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://www.fifa.com/mm/photo/tournament/destination/01/96/60/27/1966027_full-lnd.jpg</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-47.898099826038575,-15.78451993064963</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>France - Honduras (15 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">10</SimpleData>
+		<SimpleData name="Descriptio">Franck Ribery is the one of the best players in France. Ground : Estadio Beira - Rio (Porto Alegre)</SimpleData>
+		<SimpleData name="Color">E</SimpleData>
+		<SimpleData name="Lat">-30.06561000000</SimpleData>
+		<SimpleData name="Long">-51.23609000000</SimpleData>
+		<SimpleData name="URL">http://cdn1.memuruz.net/wp-content/uploads/2013/05/French-midfielder-Franck-007.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://www.internacional.com.br/imagens/conteudo/beirario_aerea_2009_1.jpg</SimpleData>
+		<SimpleData name="icon_color">r</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-51.236044571851707,-30.066261188647132</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Argentine - Bosnia and Herzegovina (15 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">11</SimpleData>
+		<SimpleData name="Descriptio">This World Cup is the Bosnia and Herzegovina's first World Cup in their history. Ground : Estadio do Maracana (Rio de Janeiro)</SimpleData>
+		<SimpleData name="Color">F</SimpleData>
+		<SimpleData name="Lat">-22.91217000000</SimpleData>
+		<SimpleData name="Long">-43.23016000000</SimpleData>
+		<SimpleData name="URL">http://l2.yimg.com/bt/api/res/1.2/wErjE4xbzV3wDQ4qPfFaUg--/YXBwaWQ9eW5ld3M7Y2g9MzYwO2NyPTE7Y3c9NjQwO2R4PTA7ZHk9MDtmaT11bGNyb3A7aD0zNTU7cT04NTt3PTYzMA--/http://media.zenfs.com/en_GB/Sports/Eurosport/1136059-17882217-640-360.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://upload.wikimedia.org/wikipedia/commons/3/36/Maracan%C3%A3_Stadium_in_Rio_de_Janeiro.jpg</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-43.230224656137082,-22.911508533096288</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Iran - Nigeria (16 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">12</SimpleData>
+		<SimpleData name="Descriptio">Group F's second game. Ground : Arena da Baixada (Curitiba)</SimpleData>
+		<SimpleData name="Color">F</SimpleData>
+		<SimpleData name="Lat">-25.44833000000</SimpleData>
+		<SimpleData name="Long">-49.27694000000</SimpleData>
+		<SimpleData name="URL">http://www.fifa.com/mm/photo/tournament/competition/02/20/87/84/2208784_large.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://img.estadao.com.br/fotos/B0/53/DA/B053DA2C668D429B995D25574885EA71.jpg</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-49.276363657526304,-25.447352445026553</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Germany - Portugal (16 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">13</SimpleData>
+		<SimpleData name="Descriptio">Mesut Özil vs. Cristiano Ronaldo. This match will be the one of the best match in the group stage. Arena Fonte Nova (Salvador)</SimpleData>
+		<SimpleData name="Color">G</SimpleData>
+		<SimpleData name="Lat">-12.97861000000</SimpleData>
+		<SimpleData name="Long">-38.50417000000</SimpleData>
+		<SimpleData name="URL">http://www.footandball.net/wp-content/uploads/2012/06/480480.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://3.bp.blogspot.com/-cLkizxwBv3I/UZtMbHevKEI/AAAAAAAA0Hk/ZZ6CxK4oUxE/s1600/Arena-Fonte-Nova-Salvador.jpg</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-38.504622983408396,-12.978358557888631</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Ghana - United States (16 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">14</SimpleData>
+		<SimpleData name="Descriptio">USA wants to take revenge of 2010 World Cup. Ground : Arena das Dunas (Natal)</SimpleData>
+		<SimpleData name="Color">G</SimpleData>
+		<SimpleData name="Lat">-5.82894000000</SimpleData>
+		<SimpleData name="Long">-35.21386000000</SimpleData>
+		<SimpleData name="URL">http://i.telegraph.co.uk/multimedia/archive/01667/asamoah-gyan_1667387c.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://wsantacruz.com.br/blog/wp-content/uploads/2013/11/Arena-das-Dunas-fotos-Caninde-Soares-4.jpg</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-35.213005351232319,-5.827101203131297</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Belgium - Algeria (17 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">15</SimpleData>
+		<SimpleData name="Descriptio">Group H's first game.Ground : Estadio Mineirao (Belo Horizonte)</SimpleData>
+		<SimpleData name="Color">H</SimpleData>
+		<SimpleData name="Lat">-19.86583000000</SimpleData>
+		<SimpleData name="Long">-43.97083000000</SimpleData>
+		<SimpleData name="URL">http://upload.wikimedia.org/wikipedia/commons/3/35/Flag_of_Algeria_and_Belgium.png</SimpleData>
+		<SimpleData name="Thumb_URL">http://globoesporte.globo.com/ESP/Home/foto/0,,10877289,00.jpg</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-43.971329735868416,-19.865296347275692</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Russia - South Korea (17 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">16</SimpleData>
+		<SimpleData name="Descriptio">Group H's second match. Ground : Arena Pantanal (Cuiaba)</SimpleData>
+		<SimpleData name="Color">H</SimpleData>
+		<SimpleData name="Lat">-15.60306000000</SimpleData>
+		<SimpleData name="Long">-56.12056000000</SimpleData>
+		<SimpleData name="URL">http://russiancouncil.ru/common/upload/rurk[1].jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://www.fifa.com/mm/photo/tournament/destination/01/56/66/95/1566695_full-lnd.jpg</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-56.121253773984158,-15.60243197468797</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Brazil - Mexico (17 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">17</SimpleData>
+		<SimpleData name="Descriptio">Both Brazil and Mexico have got colorful fans. Ground : Estadio Castelao (Fortaleza)</SimpleData>
+		<SimpleData name="Color">A</SimpleData>
+		<SimpleData name="Lat">-3.80727000000</SimpleData>
+		<SimpleData name="Long">-38.52248000000</SimpleData>
+		<SimpleData name="URL">http://blogs-images.forbes.com/kenrapoza/files/2012/08/soccer-flags.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://pordentrodacopa2014.files.wordpress.com/2011/06/castelaoantes.jpg</SimpleData>
+		<SimpleData name="icon_color">p</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-38.522776173704173,-3.806661817330872</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Cameroon - Crotia (18 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">18</SimpleData>
+		<SimpleData name="Descriptio">Samuel Eto'o, one of the legends in football history. Ground : Arena Amazonia (Manaus)</SimpleData>
+		<SimpleData name="Color">A</SimpleData>
+		<SimpleData name="Lat">-3.08306000000</SimpleData>
+		<SimpleData name="Long">-60.02806000000</SimpleData>
+		<SimpleData name="URL">http://lions4life.com/wp-content/uploads/2013/12/Etoo-frustrated.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://www.fifa.com/mm/photo/tournament/destination/01/56/67/21/1566721_full-lnd.jpg</SimpleData>
+		<SimpleData name="icon_color">p</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-60.027612254437024,-3.08384332559901</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Australia - Netherlands (18 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">19</SimpleData>
+		<SimpleData name="Descriptio">This should be a good game.     Ground: Estadio Beira - Rio (Porto Alegre)</SimpleData>
+		<SimpleData name="Color">B</SimpleData>
+		<SimpleData name="Lat">-30.06561000000</SimpleData>
+		<SimpleData name="Long">-51.23609000000</SimpleData>
+		<SimpleData name="URL">http://www.dutchaustralianfestival.com.au/wp-content/uploads/2012/07/Flag-Pins-Netherlands-Australia2.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://www.internacional.com.br/imagens/conteudo/beirario_aerea_2009_1.jpg</SimpleData>
+		<SimpleData name="icon_color">p</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-51.234950230697848,-30.065648361156367</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Spain- Chile (18 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">20</SimpleData>
+		<SimpleData name="Descriptio">Spain won the last World Cup in 2010. Ground : Estadio do Maracana (Rio de Janeiro)</SimpleData>
+		<SimpleData name="Color">B</SimpleData>
+		<SimpleData name="Lat">-22.91217000000</SimpleData>
+		<SimpleData name="Long">-43.23016000000</SimpleData>
+		<SimpleData name="URL">http://upload.wikimedia.org/wikipedia/commons/4/45/Spain_national_football_team_Euro_2012_final.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://upload.wikimedia.org/wikipedia/commons/3/36/Maracan%C3%A3_Stadium_in_Rio_de_Janeiro.jpg</SimpleData>
+		<SimpleData name="icon_color">p</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-43.230718182469339,-22.912407829283886</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Colombia - Cote d'Ivore (19 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">21</SimpleData>
+		<SimpleData name="Descriptio">We will watch an interesting game between these two great teams. Ground : Estadio Nacional Mane Garrincha (Brasilia)</SimpleData>
+		<SimpleData name="Color">C</SimpleData>
+		<SimpleData name="Lat">-15.78350000000</SimpleData>
+		<SimpleData name="Long">-47.89916000000</SimpleData>
+		<SimpleData name="URL">http://www.crossed-flag-pins.com/Friendship-Pins/Colombia/Flag-Pins-Colombia-Cote-d-Ivoire.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://www.fifa.com/mm/photo/tournament/destination/01/96/60/27/1966027_full-lnd.jpg</SimpleData>
+		<SimpleData name="icon_color">p</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-47.900224135971314,-15.782816419390434</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Japan - Greece (19 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">22</SimpleData>
+		<SimpleData name="Descriptio">Group C's fourth match. Ground : Arena das Dunas (Natal)</SimpleData>
+		<SimpleData name="Color">C</SimpleData>
+		<SimpleData name="Lat">-5.82894000000</SimpleData>
+		<SimpleData name="Long">-35.21386000000</SimpleData>
+		<SimpleData name="URL">http://s3-eu-west-1.amazonaws.com/statictb.net/evento/42478_500.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://wsantacruz.com.br/blog/wp-content/uploads/2013/11/Arena-das-Dunas-fotos-Caninde-Soares-4.jpg</SimpleData>
+		<SimpleData name="icon_color">p</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-35.211664247361512,-5.826834368244831</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Uruguay - England (19 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">23</SimpleData>
+		<SimpleData name="Descriptio">Both Uruguay and England won the World Cup. Ground : Arena de Sao Paulo (Sao Paulo)</SimpleData>
+		<SimpleData name="Color">D</SimpleData>
+		<SimpleData name="Lat">-23.54553000000</SimpleData>
+		<SimpleData name="Long">-46.47337000000</SimpleData>
+		<SimpleData name="URL">http://cdn.sneakerreport.com/assets//2013/12/Uruguay-vs-England.png</SimpleData>
+		<SimpleData name="Thumb_URL">http://www.fifa.com/mm/photo/tournament/destination/02/06/37/36/2063736_full-lnd.jpg</SimpleData>
+		<SimpleData name="icon_color">p</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-46.473546432289289,-23.545914669139623</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Italy - Costa Rica (20 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">24</SimpleData>
+		<SimpleData name="Descriptio">Mario Balotelli played well in EURO 2012. Ground : Arena Pernambuco (Recife)</SimpleData>
+		<SimpleData name="Color">D</SimpleData>
+		<SimpleData name="Lat">-8.04000000000</SimpleData>
+		<SimpleData name="Long">-35.00806000000</SimpleData>
+		<SimpleData name="URL">http://i4.mirror.co.uk/incoming/article1568164.ece/ALTERNATES/s615b/Mario%20Balotelli-1568164.png</SimpleData>
+		<SimpleData name="Thumb_URL">http://www.fifa.com/mm/photo/tournament/destination/01/56/67/60/1566760_full-lnd.jpg</SimpleData>
+		<SimpleData name="icon_color">p</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-35.008889245974558,-8.04116940189031</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Switzerland - France (20 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">25</SimpleData>
+		<SimpleData name="Descriptio">Group E's third match. Ground : Arena Fonte Nova (Salvador)</SimpleData>
+		<SimpleData name="Color">E</SimpleData>
+		<SimpleData name="Lat">-12.97861000000</SimpleData>
+		<SimpleData name="Long">-38.50417000000</SimpleData>
+		<SimpleData name="URL">http://www.thakkartravels.com/wp-content/uploads/2012/11/France-with-Swiss-flag.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://3.bp.blogspot.com/-cLkizxwBv3I/UZtMbHevKEI/AAAAAAAA0Hk/ZZ6CxK4oUxE/s1600/Arena-Fonte-Nova-Salvador.jpg</SimpleData>
+		<SimpleData name="icon_color">p</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-38.504612254828942,-12.979226302333387</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Honduras - Ecuador (20 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">26</SimpleData>
+		<SimpleData name="Descriptio">Group E's fourth game. Ground : Arena da Baixada (Curitiba)</SimpleData>
+		<SimpleData name="Color">E</SimpleData>
+		<SimpleData name="Lat">-25.44833000000</SimpleData>
+		<SimpleData name="Long">-49.27694000000</SimpleData>
+		<SimpleData name="URL">http://nimg.sulekha.com/sports/original700/honduras-ecuador-soccer-2011-2-9-22-10-28.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://img.estadao.com.br/fotos/B0/53/DA/B053DA2C668D429B995D25574885EA71.jpg</SimpleData>
+		<SimpleData name="icon_color">p</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-49.278144643933878,-25.447943406937981</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Argentine - Iran (21 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">27</SimpleData>
+		<SimpleData name="Descriptio">Lionel Messi is the one of the greatest player in the world. He wants win World Cup. Ground :  Estadio Mineirao (Belo Horizonte)</SimpleData>
+		<SimpleData name="Color">F</SimpleData>
+		<SimpleData name="Lat">-19.86583000000</SimpleData>
+		<SimpleData name="Long">-43.97083000000</SimpleData>
+		<SimpleData name="URL">http://www.wallibs.com/gudang/lionel-messi-argentina-2013-wallpaper-hd.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://globoesporte.globo.com/ESP/Home/foto/0,,10877289,00.jpg</SimpleData>
+		<SimpleData name="icon_color">p</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-43.971597956642569,-19.8663760175398</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Nigeria - Bosnia and Herzegovina (21 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">28</SimpleData>
+		<SimpleData name="Descriptio">Group F's fourth match. Ground : Arena Pantanal (Cuiaba)</SimpleData>
+		<SimpleData name="Color">F</SimpleData>
+		<SimpleData name="Lat">-15.60306000000</SimpleData>
+		<SimpleData name="Long">-56.12056000000</SimpleData>
+		<SimpleData name="URL">http://www.newsbrazil2014.com/wp-content/uploads/2013/12/Nigeria-v-Bosnia-and-Herzegovina.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://www.fifa.com/mm/photo/tournament/destination/01/56/66/95/1566695_full-lnd.jpg</SimpleData>
+		<SimpleData name="icon_color">p</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-56.121146486393144,-15.603754657623082</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Nigeria - Bosnia and Herzegovina (21 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">29</SimpleData>
+		<SimpleData name="Descriptio">Group F's fourth match. Ground : Arena Pantanal (Cuiaba)</SimpleData>
+		<SimpleData name="Color">G</SimpleData>
+		<SimpleData name="Lat">-3.80727000000</SimpleData>
+		<SimpleData name="Long">-38.52248000000</SimpleData>
+		<SimpleData name="URL">http://www.worldfuturecouncil.org/fileadmin/user_upload/_Media/Power_Kick/Germany_vs_Ghana_by_NBertrams.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://pordentrodacopa2014.files.wordpress.com/2011/06/castelaoantes.jpg</SimpleData>
+		<SimpleData name="icon_color">p</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-38.522035883756622,-3.807807269679547</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>United States - Portugal (22 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">30</SimpleData>
+		<SimpleData name="Descriptio">Luis Figo was the one of the best player in Portugal football history. Ground : Arena Amazonia (Manaus)</SimpleData>
+		<SimpleData name="Color">G</SimpleData>
+		<SimpleData name="Lat">-3.08306000000</SimpleData>
+		<SimpleData name="Long">-60.02806000000</SimpleData>
+		<SimpleData name="URL">http://i.telegraph.co.uk/multimedia/archive/01537/landon-donovan-lui_1537159i.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://www.fifa.com/mm/photo/tournament/destination/01/56/67/21/1566721_full-lnd.jpg</SimpleData>
+		<SimpleData name="icon_color">p</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-60.028427646237283,-3.083746906412083</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>United States - Portugal (22 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">31</SimpleData>
+		<SimpleData name="Descriptio">Luis Figo was the one of the best player in Portugal football history. Ground : Arena Amazonia (Manaus)</SimpleData>
+		<SimpleData name="Color">H</SimpleData>
+		<SimpleData name="Lat">-22.91217000000</SimpleData>
+		<SimpleData name="Long">-43.23016000000</SimpleData>
+		<SimpleData name="URL">http://www.crossed-flag-pins.com/Friendship-Pins/Belgium/Flag-Pins-Belgium-Russia.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://upload.wikimedia.org/wikipedia/commons/3/36/Maracan%C3%A3_Stadium_in_Rio_de_Janeiro.jpg</SimpleData>
+		<SimpleData name="icon_color">p</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-43.229613112736047,-22.911854416951382</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>South Korea - Algeria (22 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">32</SimpleData>
+		<SimpleData name="Descriptio">Group H's fouth match. Ground : Estadio Beira - Rio (Porto Alegre)</SimpleData>
+		<SimpleData name="Color">H</SimpleData>
+		<SimpleData name="Lat">-30.06561000000</SimpleData>
+		<SimpleData name="Long">-51.23609000000</SimpleData>
+		<SimpleData name="URL">http://i.eurosport.com/2013/01/12/935728-15464634-640-360.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://www.internacional.com.br/imagens/conteudo/beirario_aerea_2009_1.jpg</SimpleData>
+		<SimpleData name="icon_color">p</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-51.236532734343385,-30.065211951799952</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Cameroon - Brazil (23 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">33</SimpleData>
+		<SimpleData name="Descriptio">Brazil won the World Cup for five times. Ground : Estadio Nacional Mane Garrincha (Brasilia)</SimpleData>
+		<SimpleData name="Color">A</SimpleData>
+		<SimpleData name="Lat">-15.78350000000</SimpleData>
+		<SimpleData name="Long">-47.89916000000</SimpleData>
+		<SimpleData name="URL">http://www.arsenal.com/assets/_files/scaled/510x250/aug_08/gun__1219157891_song_cameroon_brazil.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://www.fifa.com/mm/photo/tournament/destination/01/96/60/27/1966027_full-lnd.jpg</SimpleData>
+		<SimpleData name="icon_color">g</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-47.898158834572961,-15.782764797980381</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Crotia - Mexico (23 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">34</SimpleData>
+		<SimpleData name="Descriptio">Last match of Group A. Ground : Arena Pernambuco (Recife)</SimpleData>
+		<SimpleData name="Color">A</SimpleData>
+		<SimpleData name="Lat">-8.04000000000</SimpleData>
+		<SimpleData name="Long">-35.00806000000</SimpleData>
+		<SimpleData name="URL">http://www.world-cup-info.com/photos/2002/1st-17-croatia-mexico-blanco.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://www.fifa.com/mm/photo/tournament/destination/01/56/67/60/1566760_full-lnd.jpg</SimpleData>
+		<SimpleData name="icon_color">g</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-35.00901799162277,-8.04003270166308</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Australia - Spain (23 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">35</SimpleData>
+		<SimpleData name="Descriptio">Spain wants to win World Cup again. Ground : Arena da Baixada (Curitiba)</SimpleData>
+		<SimpleData name="Color">B</SimpleData>
+		<SimpleData name="Lat">-25.44833000000</SimpleData>
+		<SimpleData name="Long">-49.27694000000</SimpleData>
+		<SimpleData name="URL">http://impressions.planet-bpm.com/wp-content/uploads//2011/05/spain-australia.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://img.estadao.com.br/fotos/B0/53/DA/B053DA2C668D429B995D25574885EA71.jpg</SimpleData>
+		<SimpleData name="icon_color">g</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-49.275816486500219,-25.448524678345684</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Netherlands - Chile (23 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">36</SimpleData>
+		<SimpleData name="Descriptio">Last game for Group B.Ground : Arena de Sao Paulo (Sao Paulo)</SimpleData>
+		<SimpleData name="Color">B</SimpleData>
+		<SimpleData name="Lat">-23.54553000000</SimpleData>
+		<SimpleData name="Long">-46.47337000000</SimpleData>
+		<SimpleData name="URL">http://www.newsbrazil2014.com/wp-content/uploads/2013/12/net-chi.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://www.fifa.com/mm/photo/tournament/destination/02/06/37/36/2063736_full-lnd.jpg</SimpleData>
+		<SimpleData name="icon_color">g</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-46.473675177937501,-23.544631123495826</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Japan- Colombia (24 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">37</SimpleData>
+		<SimpleData name="Descriptio">Group C's fifth game. Ground : Arena Pantanal (Cuiaba)</SimpleData>
+		<SimpleData name="Color">C</SimpleData>
+		<SimpleData name="Lat">-15.60306000000</SimpleData>
+		<SimpleData name="Long">-56.12056000000</SimpleData>
+		<SimpleData name="URL">http://www.newsbrazil2014.com/wp-content/uploads/2013/12/Japan-v-Colombia.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://www.fifa.com/mm/photo/tournament/destination/01/56/66/95/1566695_full-lnd.jpg</SimpleData>
+		<SimpleData name="icon_color">g</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-56.120449111661671,-15.603702990866257</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Greece - Cote d'Ivore (24 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">38</SimpleData>
+		<SimpleData name="Descriptio">Group C's last match. Ground : Estadio Castelao (Fortaleza)</SimpleData>
+		<SimpleData name="Color">C</SimpleData>
+		<SimpleData name="Lat">-3.80727000000</SimpleData>
+		<SimpleData name="Long">-38.52248000000</SimpleData>
+		<SimpleData name="URL">http://www.crossed-flag-pins.com/Friendship-Pins/Greece/Flag-Pins-Greece-Cote-d-Ivoire.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://pordentrodacopa2014.files.wordpress.com/2011/06/castelaoantes.jpg</SimpleData>
+		<SimpleData name="icon_color">g</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-38.522797631761357,-3.807635986855565</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Italy - Uruguay (24 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">39</SimpleData>
+		<SimpleData name="Descriptio">Buffon vs. Muslera. Two great goalkeeper. Ground : Arena das Dunas (Natal)</SimpleData>
+		<SimpleData name="Color">D</SimpleData>
+		<SimpleData name="Lat">-5.82894000000</SimpleData>
+		<SimpleData name="Long">-35.21386000000</SimpleData>
+		<SimpleData name="URL">http://www3.pictures.zimbio.com/gi/Gianluigi+Buffon+Fernando+Muslera+Uruguay+c7n6QeNtrNCl.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://wsantacruz.com.br/blog/wp-content/uploads/2013/11/Arena-das-Dunas-fotos-Caninde-Soares-4.jpg</SimpleData>
+		<SimpleData name="icon_color">g</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-35.211819814907471,-5.827656219682159</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Costa Rica - England (24 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">40</SimpleData>
+		<SimpleData name="Descriptio">England wants to win World Cup. Ground : Estadio Mineirao (Belo Horizonte)</SimpleData>
+		<SimpleData name="Color">D</SimpleData>
+		<SimpleData name="Lat">-19.86583000000</SimpleData>
+		<SimpleData name="Long">-43.97083000000</SimpleData>
+		<SimpleData name="URL">http://s3-eu-west-1.amazonaws.com/statictb.net/evento/42521_500.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://globoesporte.globo.com/ESP/Home/foto/0,,10877289,00.jpg</SimpleData>
+		<SimpleData name="icon_color">g</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-43.970938133286609,-19.866446649893987</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Honduras - Switzerland (25 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">41</SimpleData>
+		<SimpleData name="Descriptio">Respect and Fairplay are the keywords of World Cups. Ground : Arena Amazonia (Manaus)</SimpleData>
+		<SimpleData name="Color">E</SimpleData>
+		<SimpleData name="Lat">-3.08306000000</SimpleData>
+		<SimpleData name="Long">-60.02806000000</SimpleData>
+		<SimpleData name="URL">http://www.fifa.sportsportal.org/wp-content/uploads/Switzerland-vs-honduras.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://www.fifa.com/mm/photo/tournament/destination/01/56/67/21/1566721_full-lnd.jpg</SimpleData>
+		<SimpleData name="icon_color">g</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-60.027655169653102,-3.08281484873811</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Ecuador - France (25 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">42</SimpleData>
+		<SimpleData name="Descriptio">Group E's last match. Ground : Estadio do Maracana (Rio de Janeiro)</SimpleData>
+		<SimpleData name="Color">E</SimpleData>
+		<SimpleData name="Lat">-22.91217000000</SimpleData>
+		<SimpleData name="Long">-43.23016000000</SimpleData>
+		<SimpleData name="URL">http://www.crossed-flag-pins.com/Friendship-Pins/Ecuador/Flag-Pins-Ecuador-France.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://upload.wikimedia.org/wikipedia/commons/3/36/Maracan%C3%A3_Stadium_in_Rio_de_Janeiro.jpg</SimpleData>
+		<SimpleData name="icon_color">g</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-43.230133460966073,-22.912684534602874</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Nigeria - Argentina (25 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">43</SimpleData>
+		<SimpleData name="Descriptio">Lionel Messi is going to show all his abilities in this World Cup. Ground : Estadio Beira - Rio (Porto Alegre)</SimpleData>
+		<SimpleData name="Color">F</SimpleData>
+		<SimpleData name="Lat">-30.06561000000</SimpleData>
+		<SimpleData name="Long">-51.23609000000</SimpleData>
+		<SimpleData name="URL">http://1.bp.blogspot.com/-n6-DAO2BGNU/TeTLNwyvnnI/AAAAAAAAC2U/0w6miOQBN98/s1600/Messi%2Bvs%2BNigeria.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://www.internacional.com.br/imagens/conteudo/beirario_aerea_2009_1.jpg</SimpleData>
+		<SimpleData name="icon_color">g</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-51.235551045519443,-30.064719828037788</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Bosnia and Herzigovina - Iran (25 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">44</SimpleData>
+		<SimpleData name="Descriptio">Group F's last match. Ground : Arena Fonte Nova (Salvador)</SimpleData>
+		<SimpleData name="Color">F</SimpleData>
+		<SimpleData name="Lat">-12.97861000000</SimpleData>
+		<SimpleData name="Long">-38.50417000000</SimpleData>
+		<SimpleData name="URL">http://www.crossed-flag-pins.com/Friendship-Pins/Bosnia-and-Herzegovina/Flag-Pins-Bosnia-and-Herzegovina-Iran.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://3.bp.blogspot.com/-cLkizxwBv3I/UZtMbHevKEI/AAAAAAAA0Hk/ZZ6CxK4oUxE/s1600/Arena-Fonte-Nova-Salvador.jpg</SimpleData>
+		<SimpleData name="icon_color">g</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-38.503930973415777,-12.97833764885282</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>United States - Germany (26 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">45</SimpleData>
+		<SimpleData name="Descriptio">Group G's fifth match. Ground : Arena Pernambuco (Recife)</SimpleData>
+		<SimpleData name="Color">G</SimpleData>
+		<SimpleData name="Lat">-8.04000000000</SimpleData>
+		<SimpleData name="Long">-35.00806000000</SimpleData>
+		<SimpleData name="URL">http://junge-transatlantiker.de/wp-content/uploads/2012/11/Deutschland-USA3.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://www.fifa.com/mm/photo/tournament/destination/01/56/67/60/1566760_full-lnd.jpg</SimpleData>
+		<SimpleData name="icon_color">g</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-35.008057760856005,-8.041233142228425</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Portugal - Ghana (26 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">46</SimpleData>
+		<SimpleData name="Descriptio">Group G's last match. Ground: Estadio Nacional Mane Garrincha (Brasilia)
+</SimpleData>
+		<SimpleData name="Color">G</SimpleData>
+		<SimpleData name="Lat">-15.78350000000</SimpleData>
+		<SimpleData name="Long">-47.89916000000</SimpleData>
+		<SimpleData name="URL">http://www.crossed-flag-pins.com/Friendship-Pins/Portugal/Flag-Pins-Portugal-Ghana.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://www.fifa.com/mm/photo/tournament/destination/01/96/60/27/1966027_full-lnd.jpg</SimpleData>
+		<SimpleData name="icon_color">g</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-47.900481628166048,-15.784323769832682</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>South Korea - Belgium (26 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">47</SimpleData>
+		<SimpleData name="Descriptio">South Korea National football team. Ground : Arena de Sao Paulo (Sao Paulo)</SimpleData>
+		<SimpleData name="Color">H</SimpleData>
+		<SimpleData name="Lat">-23.54553000000</SimpleData>
+		<SimpleData name="Long">-46.47337000000</SimpleData>
+		<SimpleData name="URL">http://i0.wp.com/www.footballmatchpreviews.com/wp-content/uploads/2013/03/South-Korea-National-Football-Team.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://www.fifa.com/mm/photo/tournament/destination/02/06/37/36/2063736_full-lnd.jpg</SimpleData>
+		<SimpleData name="icon_color">g</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-46.474957274172255,-23.54592450528326</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Algeria - Russia (26 June 2014)</name>
+	<ExtendedData><SchemaData schemaUrl="#wc2014_MapTour">
+		<SimpleData name="OBJECTID">48</SimpleData>
+		<SimpleData name="Descriptio">Group Stage's last match. Ground : Arena da Baixada (Curitiba)</SimpleData>
+		<SimpleData name="Color">H</SimpleData>
+		<SimpleData name="Lat">-25.44833000000</SimpleData>
+		<SimpleData name="Long">-49.27694000000</SimpleData>
+		<SimpleData name="URL">http://www.7elm3aber.com/vb/imgcache/8/25973-7elm3aber.jpg</SimpleData>
+		<SimpleData name="Thumb_URL">http://img.estadao.com.br/fotos/B0/53/DA/B053DA2C668D429B995D25574885EA71.jpg</SimpleData>
+		<SimpleData name="icon_color">g</SimpleData>
+		<SimpleData name="Transparen">0.00000000000</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-49.277484820577897,-25.449009069717803</coordinates></Point>
+  </Placemark>
+</Folder>
+</Document></kml>
