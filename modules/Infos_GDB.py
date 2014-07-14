@@ -146,22 +146,6 @@ if __name__ == '__main__':
     within the official repository (https://github.com/Guts/DicoGIS/)"""
     # libraries import
     from os import getcwd, chdir, path, walk
-
-    try:
-        import arcpy
-        print("Great! ArcGIS is well installed.")
-    except ImportError:
-        print("ArcGIS isn't registered in the sys.path")
-        sys.path.append(r'C:\Program Files (x86)\ArcGIS\Desktop10.2\arcpy')
-        sys.path.append(r'C:\Program Files (x86)\ArcGIS\Desktop10.2\bin')
-        sys.path.append(r'C:\Program Files (x86)\ArcGIS\Desktop10.2\ArcToolbox\Scripts')
-        try:
-            from arcpy import env as enviro
-            from arcpy import ListDatasets, ListFeatureClasses, GetCount_management, ListFiles, ListFields, ListRasters, Describe
-            print("ArcGIS has been added to Python path and then imported.")
-        except:
-            print("ArcGIS isn't installed on this computer")
-            sys.exit()
     # searching for File Geodatabase
     num_folders = 0
     li_gdb = []
