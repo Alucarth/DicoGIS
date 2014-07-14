@@ -11,7 +11,7 @@ from __future__ import unicode_literals
 #
 # Python:       2.7.x
 # Created:      14/02/2013
-# Updated:      03/05/3014
+# Updated:      03/07/3014
 #
 # Licence:      GPL 3
 #-------------------------------------------------------------------------------
@@ -24,7 +24,7 @@ from Tkinter import Tk, StringVar, IntVar, Image    # GUI
 from Tkinter import N, S, E, W, PhotoImage, ACTIVE, DISABLED, END
 from tkFileDialog import askdirectory, asksaveasfilename    # dialogs
 from tkMessageBox import showinfo as info
-from ttk import Combobox, Progressbar, Style, Labelframe, Frame, Label, Button, Entry, Radiobutton       # advanced graphic widgets
+from ttk import Combobox, Progressbar, Style, Labelframe, Frame, Label, Button, Entry, Radiobutton, Checkbutton       # advanced graphic widgets
 import tkFont
 
 from sys import exit, platform
@@ -64,6 +64,9 @@ from xlwt import Alignment, Pattern, Borders, easyfont      # excel style config
 from modules import Read_Rasters    # custom extractor for geographic data in PostGIS databases
 from modules import Read_SHP        # custom extractor for shapefiles
 from modules import Read_TAB        # custom extractor for MapInfo Tables
+from modules import Read_KML        # custom extractor for KML
+from modules import Read_GML        # custom extractor for GML
+from modules import Read_GeoJSON        # custom extractor for GeoJSON
 from modules import Read_PostGIS     # custom extractor for geographic data in PostGIS databases
 
 
@@ -145,6 +148,14 @@ class DicoGIS(Tk):
         li_lang = [lg[5:-4] for lg in listdir(r'data/locale')] # available languages
         self.blabla = OD()      # texts dictionary
 
+        # formats options
+        self.opt_shp = IntVar()        # able/disable handling shapefiles
+        self.opt_tab = IntVar()        # able/disable handling MapInfo tables
+        self.opt_kml = IntVar()        # able/disable handling KML
+        self.opt_gml = IntVar()        # able/disable handling GML
+        self.opt_geoj = IntVar()       # able/disable handling GeoJSON
+        self.opt_rast = IntVar()       # able/disable handling rasters
+
         # GUI fonts
         ft_tit = tkFont.Font(family="Times", size=10, weight=tkFont.BOLD)
 
@@ -161,6 +172,28 @@ class DicoGIS(Tk):
                                        text = self.blabla.get('gui_prog'))
 
             ## Frame 1: path of geofiles
+        # format choosen
+        caz_shp = Checkbutton(self,
+                              text = u'.shp',
+                              variable = self.opt_shp,
+                              command = lambda:self.catalog_dependance())
+        # caz_xls = Checkbutton(self.tab_options,
+        #                       text = u'Excel 2003 (.xls)',
+        #                       variable = self.def_xls)
+        # caz_xml = Checkbutton(self.tab_options,
+        #                       text = u'XML (ISO 19139)',
+        #                       variable = self.def_xml)
+        # self.caz_cat = Checkbutton(self.tab_options,
+        #                       text = self.blabla.get('tab2_merge'),
+        #                       variable = self.def_cat)
+        # caz_odt = Checkbutton(self.tab_options,
+        #                       text = u'Open Document Text (.odt)',
+        #                       variable = self.def_odt)
+        # # widgets placement
+        # caz_doc.grid(row = 1,
+        #              column = 0,
+        #              sticky = N+S+W+E,
+        #              padx = 2, pady = 2)
         # target folder
         self.labtarg = Label(self.FrPath, text = self.blabla.get('gui_path'))
         self.target = Entry(master=self.FrPath, width = 35)
@@ -399,6 +432,8 @@ class DicoGIS(Tk):
         # reseting global variables
         self.li_shp = []
         self.li_tab = []
+        self.li_kml = []
+        self.li_geoj = []
         self.li_raster = []
         self.browsetarg.config(state = DISABLED)
         # Looping in folders structure
@@ -442,13 +477,19 @@ class DicoGIS(Tk):
         (path.isfile(full_path[:-4] + '.id') or path.isfile(full_path[:-4] + '.ID')):
                     # add complete path of MapInfo file
                     self.li_tab.append(full_path)
+                elif path.splitext(full_path.lower())[1] == '.kml':
+                    # add complete path of KML file
+                    self.li_kml.append(full_path)
+                elif path.splitext(full_path.lower())[1] == '.geojson':
+                    # add complete path of KML file
+                    self.li_geoj.append(full_path)
                 elif path.splitext(full_path.lower())[1] in self.li_raster_formats:
                     # add complete path of MapInfo file
                     self.li_raster.append(full_path)
                 else:
                     continue
         self.prog_layers.stop()
-        self.logger.info('End of folders parsing: %s folders explored', str(self.num_folders))
+        self.logger.info('End of folders parsing: {0} folders explored'.format(self.num_folders))
         # Lists ordering and tupling
         self.li_shp.sort()
         self.li_shp = tuple(self.li_shp)
@@ -456,15 +497,23 @@ class DicoGIS(Tk):
         self.li_tab = tuple(self.li_tab)
         self.li_raster.sort()
         self.li_raster = tuple(self.li_raster)
-        print("\n".join(self.li_raster))
+        self.li_kml.sort()
+        self.li_kml = tuple(self.li_kml)
+        self.li_geoj.sort()
+        self.li_geoj = tuple(self.li_geoj)
         # setting the label text and activing the buttons
-        self.status.set(unicode(len(self.li_shp)) + u' shapefiles - '
-                        + unicode(len(self.li_tab)) + u' tables (MapInfo) - '
-                        + unicode(self.num_folders) + self.blabla.get('log_numfold'))
+        self.status.set('{0} shapefiles - {1} tables (MapInfo) - {2} KML - \
+                        {3} rasters - in {4}{5}'.format(len(self.li_shp), 
+                                                      len(self.li_tab), 
+                                                      len(self.li_kml),
+                                                      len(self.li_raster),
+                                                      self.num_folders,
+                                                      self.blabla.get('log_numfold')))
+
         self.browsetarg.config(state = ACTIVE)
         self.val.config(state = ACTIVE)
         # End of function
-        return foldertarget, self.li_shp, self.li_tab
+        return foldertarget, self.li_shp, self.li_tab, self.li_kml, self.li_raster
 
 
     def process(self):
@@ -496,7 +545,7 @@ class DicoGIS(Tk):
         line_vectors = 1    # line rank of vectors dictionary
         line_rasters = 1    # line rank of rasters dictionary
 
-        self.logger.info('\tProcessing shapefiles: start')
+        self.logger.info('\n\tProcessing shapefiles: start')
         for shp in self.li_shp:
             """ looping on shapefiles list """
             self.status.set(path.basename(shp))
@@ -517,7 +566,7 @@ class DicoGIS(Tk):
             self.prog_layers["value"] = self.prog_layers["value"] +1
             self.update()
 
-        self.logger.info('\tProcessing MapInfo tables: start')
+        self.logger.info('\n\tProcessing MapInfo tables: start')
         for tab in self.li_tab:
             """ looping on MapInfo tables list """
             self.status.set(path.basename(tab))
@@ -537,7 +586,47 @@ class DicoGIS(Tk):
             self.prog_layers["value"] = self.prog_layers["value"] +1
             self.update()
 
-        self.logger.info('\tProcessing rasters: start')
+        self.logger.info('\n\tProcessing KML: start')
+        for kml in self.li_kml:
+            """ looping on KML list """
+            self.status.set(path.basename(kml))
+            self.logger.info('\n' + kml)
+            # reset recipient data
+            self.dico_layer.clear()
+            self.dico_fields.clear()
+            # getting the informations
+            Read_KML(kml, self.dico_layer, self.dico_fields, 'kml', self.blabla)
+            self.logger.info('\t Infos OK')
+            # writing to the Excel dictionary
+            self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
+            self.logger.info('\t Wrote into the dictionary')
+            # increment the line number
+            line_vectors = line_vectors +1
+            # increment the progress bar
+            self.prog_layers["value"] = self.prog_layers["value"] +1
+            self.update()
+
+        self.logger.info('\n\tProcessing GeoJSON: start')
+        for geojson in self.li_geoj:
+            """ looping on GeoJSON list """
+            self.status.set(path.basename(geojson))
+            self.logger.info('\n' + geojson)
+            # reset recipient data
+            self.dico_layer.clear()
+            self.dico_fields.clear()
+            # getting the informations
+            Read_GeoJSON(geojson, self.dico_layer, self.dico_fields, 'geojson', self.blabla)
+            self.logger.info('\t Infos OK')
+            # writing to the Excel dictionary
+            self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
+            self.logger.info('\t Wrote into the dictionary')
+            # increment the line number
+            line_vectors = line_vectors +1
+            # increment the progress bar
+            self.prog_layers["value"] = self.prog_layers["value"] +1
+            self.update()
+
+        self.logger.info('\n\tProcessing rasters: start')
         for raster in self.li_raster:
             """ looping on rasters list """
             self.status.set(path.basename(raster))
