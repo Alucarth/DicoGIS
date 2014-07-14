@@ -36,8 +36,18 @@ gdal.AllRegister()
 ########### Classes #############
 #################################
 
+class Read_GDB_f():
+    def __init__(self, gdb):
+        """ """
+        print "\tLet's play with OGR FileGDB driver\n\n".upper()
+        print(dir(gdb))
+        print(gdb.GetName())
+        print(gdb.LayerCount())
 
-
+class Read_GDB_o():
+    def __init__(self, gdb):
+        """ """
+        print "\Let's play with OGR OpenGDB driver".upper()
 
 ################################################################################
 ###### Stand alone program ########
@@ -45,7 +55,7 @@ gdal.AllRegister()
 
 if __name__ == '__main__':
     u""" standalone execution for tests. Paths are relative considering a test
-    within the official repository (https://github.com/Guts/DicoShapes/)"""
+    within the official repository (https://github.com/Guts/DicoGIS)"""
     # libraries import
     from os import getcwd, chdir, path
     # test FileGDB
@@ -54,18 +64,21 @@ if __name__ == '__main__':
     # OGR: FileGDB (see: http://www.gdal.org/drv_filegdb.html)
     try:
         dr_gdb_f = ogr.GetDriverByName("FileGDB")
-        gdb_f = dr_gdb_f.Open(gdb, 0)
+        gdb = dr_gdb_f.Open(gdb, 0)
         print("OGR driver FileGDB: OK!")
+        Read_GDB_f(gdb)
     except AttributeError:
-        print("FileGeodatabases can't be read by this driver because FileGDB API SDK is not installed (see: http://www.esri.com/apps/products/download/#File_Geodatabase_API_1.3)")
+        print("FileGeodatabases can't be read by this driver: {0}.\
+        See: http://www.esri.com/apps/products/download/#File_Geodatabase_API_1.3".format("FileGDB"))
 
     # OGR: OpenFileGDB (see: http://www.gdal.org/drv_openfilegdb.html)
     try:
         dr_gdb_o = ogr.GetDriverByName("OpenFileGDB")
-        gdb_o = dr_gdb_o.Open(gdb, 0)
+        gdb = dr_gdb_o.Open(gdb, 0)
         print("OGR driver OpenFileGDB: OK!")
+        Read_GDB_o(gdb)
     except:
-        print("FileGeodatabases can't be read by this driver. You need GDAL/OGR >= 1.11")
+        print("FileGeodatabases can't be read by this driver: {0}.\nYou need GDAL/OGR >= 1.11".format("OpenFileGDB"))
 
 
 
