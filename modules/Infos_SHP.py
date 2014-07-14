@@ -11,7 +11,7 @@
 #
 # Python:       2.7.x
 # Created:      18/02/2013
-# Updated:      21/05/2013
+# Updated:      21/06/2014
 # Licence:      GPL 3
 #-------------------------------------------------------------------------------
 
@@ -61,19 +61,11 @@ class Read_SHP():
             self.erratum(dico_layer, layerpath, u'err_nobjet')
             self.alert = self.alert +1
             return None
-        try:
-            obj = self.layer.GetFeature(0)        # get the first object (shp)
-            self.geom = obj.GetGeometryRef()       # get the geometry
-        except AttributeError, e:
-            try:
-                print '\t', e
-                obj = self.layer.GetFeature(1)        # get the first object (tab)
-                self.geom = obj.GetGeometryRef()      # get the geometry
-            except:
-                print 'error not recognized'
-                self.erratum(dico_layer, layerpath, u'err_nobjet')
-                self.alert = self.alert +1
-                return None
+
+
+        obj = self.layer.GetFeature(0)        # get the first object (shp)
+        self.geom = obj.GetGeometryRef()       # get the geometry
+
         self.def_couche = self.layer.GetLayerDefn()  # get layer definitions
         self.srs = self.layer.GetSpatialRef()   # get spatial system reference
         self.srs.AutoIdentifyEPSG()     # try to determine the EPSG code
@@ -202,15 +194,15 @@ if __name__ == '__main__':
     textos['geom_ligne'] = u'Line'
     textos['geom_polyg'] = u'Polygon'
     # recipient datas
-    dicouche = OD()     # dictionary where will be stored informations
+    dico_layer = OD()     # dictionary where will be stored informations
     dico_fields = OD()     # dictionary for fields information
     # execution
     for shp in li_shp:
         """ looping on shapefiles list """
         # reset recipient data
-        dicouche.clear()
+        dico_layer.clear()
         dico_fields.clear()
         # getting the informations
         print shp
-        info_shp = Read_SHP(shp, dicouche, dico_fields, 'shape', textos)
-        print '\n', dicouche, dico_fields
+        info_shp = Read_SHP(shp, dico_layer, dico_fields, 'shape', textos)
+        print '\n', dico_layer, dico_fields

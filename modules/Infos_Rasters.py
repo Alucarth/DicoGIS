@@ -12,7 +12,7 @@
 #
 # Python:       2.7.x
 # Created:      18/02/2014
-# Updated:      28/05/2014
+# Updated:      28/06/2014
 # Licence:      GPL 3
 #-------------------------------------------------------------------------------
 
@@ -108,8 +108,8 @@ class Read_Rasters():
         geotransform = self.rast.GetGeoTransform()
         dico_raster[u'xOrigin'] = geotransform[0]
         dico_raster[u'yOrigin'] = geotransform[3]
-        dico_raster[u'pixelWidth'] = geotransform[1]
-        dico_raster[u'pixelHeight'] = geotransform[5]
+        dico_raster[u'pixelWidth'] = round(geotransform[1], 3)
+        dico_raster[u'pixelHeight'] = round(geotransform[5],3)
         dico_raster[u'orientation'] = geotransform[2]
 
         # projection
