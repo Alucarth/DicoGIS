@@ -48,6 +48,30 @@ class Read_GDB_o():
     def __init__(self, gdb):
         """ """
         print "\Let's play with OGR OpenGDB driver".upper()
+        print(dir(gdb))
+        print(gdb.GetLayerCount())
+        for index in range(gdb.GetLayerCount()):
+            layer = gdb.GetLayerByIndex(index)
+            print(layer.GetName())
+            print(layer.GetExtent())
+            print(layer.GetFIDColumn())
+            print(layer.GetFeatureCount())
+            print(layer.GetGeomType())
+            print(layer.GetGeometryColumn())
+            layer_def = layer.GetLayerDefn()
+            print(dir(layer_def))
+            print(layer_def.GetFieldCount())
+            # print(layer_def.GetFieldDefn())
+            print(layer_def.GetGeomFieldCount())
+            # print(layer_def.GetGeomFieldDefn())
+            print(layer_def.GetGeomType())
+            # print(layer.GetName())
+            print(dir(layer))
+            style_table = layer.GetStyleTable()
+            print(style_table)
+            
+
+
 
 ################################################################################
 ###### Stand alone program ########
