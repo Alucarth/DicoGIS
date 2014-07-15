@@ -3,7 +3,7 @@
 # from __future__ import unicode_literals
 
 #-------------------------------------------------------------------------------
-# Name:         InfosGDAL
+# Name:         Infos Geospatial PDF
 # Purpose:      Use GDAL/OGR library to extract informations about
 #                   geographic data. It permits a more friendly use as
 #                   submodule.
@@ -36,8 +36,8 @@ gdal.AllRegister()
 ########### Classes #############
 ###################################
 
-class Read_Rasters():
-    def __init__(self, rasterpath, dico_raster, dico_bands, tipo, text=''):
+class Read_GeoPDF():
+    def __init__(self, pdfpath, dico_raster, dico_bands, tipo, text=''):
         u""" Uses GDAL functions to extract basic informations about
         geographic raster file (handles ECW, GeoTIFF, JPEG2000)
         and store into dictionaries.
@@ -52,32 +52,32 @@ class Read_Rasters():
         # variables
         self.alert = 0
 
-        print rasterpath
+        print pdfpath
         # opening file
-        self.rast = gdal.Open(rasterpath, GA_ReadOnly)
+        self.rast = gdal.Open(pdfpath, GA_ReadOnly)
         
         # check if raster is GDAL friendly
         if self.rast is None:
-            print("\n\tUnable to open " + rasterpath)
+            print("\n\tUnable to open " + pdfpath)
             print("Please check compatibility.")
             self.alert += 1
 
         # basic informations
         dico_raster[u'format'] = tipo
-        self.infos_basics(rasterpath, dico_raster, text)
+        self.infos_basics(pdfpath, dico_raster, text)
         # geometry information
         self.infos_geom(dico_raster, text)
         # bands information
         for band in range(1, dico_raster.get('num_bands')):
             self.infos_bands(band, dico_bands)
 
-    def infos_basics(self, rasterpath, dico_raster, txt):
+    def infos_basics(self, pdfpath, dico_raster, txt):
         u""" get the global informations about the raster """
         # files and folder
-        dico_raster[u'name'] = path.basename(rasterpath)
-        dico_raster[u'folder'] = path.dirname(rasterpath)
+        dico_raster[u'name'] = path.basename(pdfpath)
+        dico_raster[u'folder'] = path.dirname(pdfpath)
         dico_raster[u'title'] = dico_raster[u'name'][:-4].replace('_', ' ').capitalize()
-        dico_raster[u'dependencies'] = [path.basename(filedepend) for filedepend in self.rast.GetFileList() if filedepend != rasterpath]
+        dico_raster[u'dependencies'] = [path.basename(filedepend) for filedepend in self.rast.GetFileList() if filedepend != pdfpath]
         # format
         dico_raster[u'compr_rate'] = self.rast.GetMetadata().get('COMPRESSION_RATE_TARGET')
         dico_raster[u'color_ref'] = self.rast.GetMetadata().get('COLORSPACE')
@@ -94,9 +94,9 @@ class Read_Rasters():
 
         # basic dates
         dico_raster[u'date_actu'] = strftime('%Y-%m-%d',
-                                            localtime(path.getmtime(rasterpath)))
+                                            localtime(path.getmtime(pdfpath)))
         dico_raster[u'date_crea'] = strftime('%Y-%m-%d',
-                                            localtime(path.getctime(rasterpath)))
+                                            localtime(path.getctime(pdfpath)))
 
         # end of function
         return dico_raster
@@ -182,12 +182,9 @@ if __name__ == '__main__':
     # libraries import
     from os import getcwd, chdir, path
     # test files
-    li_ecw = [r'C:\\Users\julien.moura\Documents\GIS Database\ECW\0468_6740.ecw']    # ECW
-    li_gtif = [r'..\test\datatest\rasters\GeoTiff\BDP_07_0621_0049_020_LZ1.tif', r'..\test\datatest\rasters\GeoTiff\TrueMarble_16km_2700x1350.tif']    # GeoTIFF
-    li_jpg2 = [r'..\test\datatest\rasters\JPEG2000\image_jpg2000.jp2']  # JPEG2000
-
-    li_rasters = (li_ecw[0], li_gtif[0], li_gtif[1], li_jpg2[0])
-
+    li_pdf = [r'C:\Users\julien.moura\Documents\GIS Database\GeoPDF\US_Country_Populations.pdf',
+              r'\\nas.hq.isogeo.fr\SIG\SIG_DATA_SERVICE\TEST\07_PDF\NC_Windsor_North_20110909_TM_geo.pdf']
+    
     # test text dictionary
     textos = OD()
     textos['srs_comp'] = u'Compound'
@@ -200,18 +197,18 @@ if __name__ == '__main__':
     textos['geom_ligne'] = u'Line'
     textos['geom_polyg'] = u'Polygon'
     # recipient datas
-    dico_raster = OD()     # dictionary where will be stored informations
+    dico_pdf = OD()     # dictionary where will be stored informations
     dico_bands = OD()     # dictionary for fields information
     # execution
-    for raster in li_rasters:
-        """ looping on raster files """
+    for pdf in li_pdf:
+        """ looping on pdf files """
         # reset recipient data
-        dico_raster.clear()
+        dico_pdf.clear()
         dico_bands.clear()
         # getting the informations
-        if not path.isfile(raster):
-            print("\n\t==> File doesn't exist: " + raster)
+        if not path.isfile(pdf):
+            print("\n\t==> File doesn't exist: " + pdf)
             continue
-        print "\n======================\n\t", path.basename(raster)
-        info_raster = Read_Rasters(raster, dico_raster, dico_bands, path.splitext(raster)[1], textos)
-        print '\n', dico_raster, dico_bands
+        print "\n======================\n\t", path.basename(pdf)
+        info_pdf = Read_GeoPDF(pdf, dico_pdf, dico_bands, path.splitext(pdf)[1], textos)
+        print '\n', dico_pdf, dico_bands

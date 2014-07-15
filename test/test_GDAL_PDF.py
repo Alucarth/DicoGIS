@@ -36,8 +36,9 @@ gdal.AllRegister()
 ########### Classes #############
 #################################
 
-in_geopdf = r'\\nas.hq.isogeo.fr\SIG\SIG_DATA_SERVICE\TEST\07_PDF\NC_Windsor_North_20110909_TM_geo.pdf'
+li_pdf = [r'C:\Users\julien.moura\Documents\GIS Database\GeoPDF\US_Country_Populations.pdf',
+		  r'\\nas.hq.isogeo.fr\SIG\SIG_DATA_SERVICE\TEST\07_PDF\NC_Windsor_North_20110909_TM_geo.pdf']
 
-geopdf = gdal.Open(in_geopdf)
-
-print(dir(geopdf))
+for pdf in li_pdf:
+	geopdf = gdal.Open(in_geopdf)
+	print(dir(geopdf))
