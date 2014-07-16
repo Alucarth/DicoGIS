@@ -36,3 +36,4 @@ pip-log.txt
 # geodatabase
 \test\datatestGDB*
 *.xls
+options.ini
