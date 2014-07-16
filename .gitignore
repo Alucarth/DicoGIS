@@ -35,4 +35,3 @@ pip-log.txt
 
 # geodatabase
 \test\datatestGDB*
-*.xls

@@ -14,7 +14,6 @@
 	<gui_quit>Salir</gui_quit>
 	<gui_fr1> Carpeta </gui_fr1>
 	<gui_fr2> Base de datos </gui_fr2>
-	<gui_fr3> Formatos </gui_fr3>
 	<gui_path>Ruta de la carpeta: </gui_path>
 	<gui_fic>Nombre del diccionario: </gui_fic>
 	<gui_host>Servidor: </gui_host>
