@@ -14,6 +14,7 @@
 	<gui_quit>Quit</gui_quit>
 	<gui_fr1> Folders structure target </gui_fr1>
 	<gui_fr2> Database target </gui_fr2>
+	<gui_fr3> Formats </gui_fr3>
 	<gui_path>Folder path: </gui_path>
 	<gui_fic>Name of output file: </gui_fic>
 	<gui_host>Host: </gui_host>
