@@ -16,8 +16,6 @@ from __future__ import unicode_literals
 # Licence:      GPL 3
 #-------------------------------------------------------------------------------
 
-DGversion = "2.0-beta.2"
-
 ################################################################################
 ########### Libraries #############
 ###################################
@@ -90,8 +88,6 @@ if platform == 'win32':
             print("ArcGIS has been added to Python path and then imported.")
         except:
             print("ArcGIS isn't installed on this computer")
-else:
-    pass
 
 ################################################################################
 ########### Variables #############
@@ -152,75 +148,52 @@ class DicoGIS(Tk):
         li_lang = [lg[5:-4] for lg in listdir(r'data/locale')] # available languages
         self.blabla = OD()      # texts dictionary
 
+        # formats options
+        self.opt_shp = IntVar()        # able/disable handling shapefiles
+        self.opt_tab = IntVar()        # able/disable handling MapInfo tables
+        self.opt_kml = IntVar()        # able/disable handling KML
+        self.opt_gml = IntVar()        # able/disable handling GML
+        self.opt_geoj = IntVar()       # able/disable handling GeoJSON
+        self.opt_rast = IntVar()       # able/disable handling rasters
+
         # GUI fonts
         ft_tit = tkFont.Font(family="Times", size=10, weight=tkFont.BOLD)
 
         # fillfulling
+        self.load_settings()
         self.load_texts(self.def_lang)
 
         # Frames
         self.FrPath = Labelframe(self, name ='files',
                                        text = self.blabla.get('gui_fr1'))
-        self.FrFilters = Labelframe(self, name ='filters',
-                                          text = self.blabla.get('gui_fr1'))
         self.FrDb = Labelframe(self, name ='database',
                                        text = self.blabla.get('gui_fr2'))
         self.FrProg = Labelframe(self, name ='progression',
                                        text = self.blabla.get('gui_prog'))
 
             ## Frame 1: path of geofiles
-        # formats options
-        self.opt_shp = IntVar(self.FrFilters) # able/disable handling shapefiles
-        self.opt_tab = IntVar(self.FrFilters) # able/disable handling MapInfo tables
-        self.opt_kml = IntVar(self.FrFilters) # able/disable handling KML
-        self.opt_gml = IntVar(self.FrFilters) # able/disable handling GML
-        self.opt_geoj = IntVar(self.FrFilters) # able/disable handling GeoJSON
-        self.opt_rast = IntVar(self.FrFilters) # able/disable handling rasters
-
-        # format choosen: check buttons
-        caz_shp = Checkbutton(self.FrFilters,
+        # format choosen
+        caz_shp = Checkbutton(self,
                               text = u'.shp',
-                              variable = self.opt_shp)
-        caz_tab = Checkbutton(self.FrFilters,
-                              text = u'.tab',
-                              variable = self.opt_tab)
-        caz_kml = Checkbutton(self.FrFilters,
-                              text = u'.kml',
-                              variable = self.opt_kml)
-        caz_gml = Checkbutton(self.FrFilters,
-                              text = u'.gml',
-                              variable = self.opt_gml)
-        caz_geoj = Checkbutton(self.FrFilters,
-                              text = u'.geojson',
-                              variable = self.opt_geoj)
-        caz_rast = Checkbutton(self.FrFilters,
-                              text = u'rasters ({0})'.format(', '.join(self.li_raster_formats)),
-                              variable = self.opt_rast)
-        # widgets placement
-        caz_shp.grid(row = 1,
-                     column = 0,
-                     sticky = N+S+W+E,
-                     padx = 2, pady = 2)
-        caz_tab.grid(row = 1,
-                     column = 1,
-                     sticky = N+S+W+E,
-                     padx = 2, pady = 2)
-        caz_kml.grid(row = 1,
-                     column = 2,
-                     sticky = N+S+W+E,
-                     padx = 2, pady = 2)
-        caz_gml.grid(row = 1,
-                     column = 3,
-                     sticky = N+S+W+E,
-                     padx = 2, pady = 2)
-        caz_geoj.grid(row = 1,
-                     column = 4,
-                     sticky = N+S+W+E,
-                     padx = 2, pady = 2)
-        caz_rast.grid(row = 1,
-                     column = 5,
-                     sticky = N+S+W+E,
-                     padx = 2, pady = 2)
+                              variable = self.opt_shp,
+                              command = lambda:self.catalog_dependance())
+        # caz_xls = Checkbutton(self.tab_options,
+        #                       text = u'Excel 2003 (.xls)',
+        #                       variable = self.def_xls)
+        # caz_xml = Checkbutton(self.tab_options,
+        #                       text = u'XML (ISO 19139)',
+        #                       variable = self.def_xml)
+        # self.caz_cat = Checkbutton(self.tab_options,
+        #                       text = self.blabla.get('tab2_merge'),
+        #                       variable = self.def_cat)
+        # caz_odt = Checkbutton(self.tab_options,
+        #                       text = u'Open Document Text (.odt)',
+        #                       variable = self.def_odt)
+        # # widgets placement
+        # caz_doc.grid(row = 1,
+        #              column = 0,
+        #              sticky = N+S+W+E,
+        #              padx = 2, pady = 2)
         # target folder
         self.labtarg = Label(self.FrPath, text = self.blabla.get('gui_path'))
         self.target = Entry(master=self.FrPath, width = 35)
@@ -293,7 +266,7 @@ class DicoGIS(Tk):
         self.icone = PhotoImage(file = r'data/img/DicoGIS_logo.gif')
         Label(self, borderwidth = 2,
                     image = self.icone).grid(row = 1,
-                                             rowspan = 4,
+                                             rowspan = 3,
                                              column = 0,
                                              padx = 2,
                                              pady = 2,
@@ -303,7 +276,7 @@ class DicoGIS(Tk):
         s.configure('Kim.TButton', foreground='DodgerBlue', borderwidth = 0)
         Button(self, text = 'by Julien M.\n      2014',
                      style = 'Kim.TButton',
-                     command = lambda: open_new('https://github.com/Guts')).grid(row = 5,
+                     command = lambda: open_new('https://github.com/Guts')).grid(row = 4,
                                                                                  padx = 2,
                                                                                  pady = 2,
                                                                                  sticky = W+E)
@@ -335,38 +308,24 @@ class DicoGIS(Tk):
         self.ddl_lang.grid(row=1, column = 1, sticky = N+S+E, padx = 2, pady = 2)
         rd_file.grid(row=2, column = 1, sticky = N+S+W, padx = 2, pady = 2)
         rd_pg.grid(row=2, column = 1, sticky = N+S+E, padx = 2, pady = 2)
-        self.val.grid(row = 6, column = 1, columnspan = 2,
+        self.val.grid(row = 5, column = 1, columnspan = 2,
                             sticky = N+S+W+E, padx = 2, pady = 2)
-        self.can.grid(row = 6, column = 0, sticky = N+S+W+E, padx = 2, pady = 2)
+        self.can.grid(row = 5, column = 0, sticky = N+S+W+E, padx = 2, pady = 2)
         # Frames placement
+        self.FrProg.grid(row = 4, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
         rd_file.invoke()    # to provoc the type (frame 2) placement
-        self.FrProg.grid(row = 5, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
-
-        # loading previous options
-        self.load_settings()
 
 
     def load_settings(self):
         u""" load settings from last execution """
         confile = 'options.ini'
         config = ConfigParser.RawConfigParser()
-        try:
-            config.read(confile)
-            # basics
-            self.def_lang = config.get('basics', 'def_codelang')
-            self.def_rep = config.get('basics', 'def_rep')
-            # filters
-            self.opt_shp.set(config.get('filters', 'def_shp'))
-            self.opt_tab.set(config.get('filters', 'def_tab'))
-            self.opt_kml.set(config.get('filters', 'def_kml'))
-            self.opt_gml.set(config.get('filters', 'def_gml'))
-            self.opt_geoj.set(config.get('filters', 'def_geoj'))
-            self.opt_rast.set(config.get('filters', 'def_rast'))
-            # log
-            self.logger.info('Last options loaded')
-        except:
-            # log
-            self.logger.info('1st use.')
+        config.read(confile)
+        # basics
+        self.def_lang = config.get('basics', 'def_codelang')
+        self.def_rep = config.get('basics', 'def_rep')
+        # log
+        self.logger.info('Last options loaded')
         # End of function
         return self.def_rep, self.def_lang
 
@@ -375,27 +334,13 @@ class DicoGIS(Tk):
         confile = 'options.ini'
         config = ConfigParser.RawConfigParser()
         # add sections
-        config.add_section('config')
         config.add_section('basics')
-        config.add_section('filters')
-        # config
-        config.set('config', 'DicoGIS_version', DGversion)
-        config.set('config', 'OS', platform)
         # basics
         config.set('basics', 'def_codelang', self.ddl_lang.get())
         config.set('basics', 'def_rep', self.target.get())
-        # filters
-        config.set('filters', 'def_shp', self.opt_shp.get())
-        config.set('filters', 'def_tab', self.opt_tab.get())
-        config.set('filters', 'def_kml', self.opt_kml.get())
-        config.set('filters', 'def_gml', self.opt_gml.get())
-        config.set('filters', 'def_geoj', self.opt_geoj.get())
-        config.set('filters', 'def_rast', self.opt_rast.get())
         # Writing the configuration file
         with open(confile, 'wb') as configfile:
             config.write(configfile)
-        # log
-        self.logger.info('Options saved')
         # End of function
         return config
 
@@ -444,14 +389,10 @@ class DicoGIS(Tk):
             self.logger.info('Type switched to: files structure')
             self.FrDb.grid_forget()
             self.status.set('')
-            self.FrFilters.grid(row = 3, column = 1, padx = 2, pady = 2,
-                                sticky = N+S+W+E)
-            self.FrPath.grid(row = 4, column = 1, padx = 2, pady = 2,
-                             sticky = N+S+W+E)
+            self.FrPath.grid(row = 3, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
         elif self.typo.get() == 2:
             self.logger.info('Type switched to: database')
             self.FrPath.grid_forget()
-            self.Filters.grid_forget()
             self.status.set('')
             self.FrDb.grid(row = 3, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
         # End of function
@@ -604,127 +545,107 @@ class DicoGIS(Tk):
         line_vectors = 1    # line rank of vectors dictionary
         line_rasters = 1    # line rank of rasters dictionary
 
-        if self.opt_shp.get():
-            self.logger.info('\n\tProcessing shapefiles: start')
-            for shp in self.li_shp:
-                """ looping on shapefiles list """
-                self.status.set(path.basename(shp))
-                self.logger.info('\n' + shp)
-                # reset recipient data
-                self.dico_layer.clear()
-                self.dico_fields.clear()
-                # creating separated process threads
-                Read_SHP(shp, self.dico_layer, self.dico_fields, 'shape', self.blabla)
-                self.logger.info('\t Infos OK')
-                # getting the informations
-                # writing to the Excel dictionary
-                self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
-                self.logger.info('\t Wrote into the dictionary')
-                # increment the line number
-                line_vectors = line_vectors +1
-                # increment the progress bar
-                self.prog_layers["value"] = self.prog_layers["value"] +1
-                self.update()
-        else:
-            self.logger.info('\tIgnoring {0} shapefiles'.format(len(self.li_shp)))
-            pass
+        self.logger.info('\n\tProcessing shapefiles: start')
+        for shp in self.li_shp:
+            """ looping on shapefiles list """
+            self.status.set(path.basename(shp))
+            self.logger.info('\n' + shp)
+            # reset recipient data
+            self.dico_layer.clear()
+            self.dico_fields.clear()
+            # creating separated process threads
+            Read_SHP(shp, self.dico_layer, self.dico_fields, 'shape', self.blabla)
+            self.logger.info('\t Infos OK')
+            # getting the informations
+            # writing to the Excel dictionary
+            self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
+            self.logger.info('\t Wrote into the dictionary')
+            # increment the line number
+            line_vectors = line_vectors +1
+            # increment the progress bar
+            self.prog_layers["value"] = self.prog_layers["value"] +1
+            self.update()
 
-        if self.opt_tab.get():
-            self.logger.info('\n\tProcessing MapInfo tables: start')
-            for tab in self.li_tab:
-                """ looping on MapInfo tables list """
-                self.status.set(path.basename(tab))
-                self.logger.info('\n' + tab)
-                # reset recipient data
-                self.dico_layer.clear()
-                self.dico_fields.clear()
-                # getting the informations
-                Read_TAB(tab, self.dico_layer, self.dico_fields, 'table', self.blabla)
-                self.logger.info('\t Infos OK')
-                # writing to the Excel dictionary
-                self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
-                self.logger.info('\t Wrote into the dictionary')
-                # increment the line number
-                line_vectors = line_vectors +1
-                # increment the progress bar
-                self.prog_layers["value"] = self.prog_layers["value"] +1
-                self.update()
-        else:
-            self.logger.info('\tIgnoring {0} MapInfo tables'.format(len(self.li_tab)))
-            pass
+        self.logger.info('\n\tProcessing MapInfo tables: start')
+        for tab in self.li_tab:
+            """ looping on MapInfo tables list """
+            self.status.set(path.basename(tab))
+            self.logger.info('\n' + tab)
+            # reset recipient data
+            self.dico_layer.clear()
+            self.dico_fields.clear()
+            # getting the informations
+            Read_TAB(tab, self.dico_layer, self.dico_fields, 'table', self.blabla)
+            self.logger.info('\t Infos OK')
+            # writing to the Excel dictionary
+            self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
+            self.logger.info('\t Wrote into the dictionary')
+            # increment the line number
+            line_vectors = line_vectors +1
+            # increment the progress bar
+            self.prog_layers["value"] = self.prog_layers["value"] +1
+            self.update()
 
-        if self.opt_kml.get():
-            self.logger.info('\n\tProcessing KML: start')
-            for kml in self.li_kml:
-                """ looping on KML list """
-                self.status.set(path.basename(kml))
-                self.logger.info('\n' + kml)
-                # reset recipient data
-                self.dico_layer.clear()
-                self.dico_fields.clear()
-                # getting the informations
-                Read_KML(kml, self.dico_layer, self.dico_fields, 'kml', self.blabla)
-                self.logger.info('\t Infos OK')
-                # writing to the Excel dictionary
-                self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
-                self.logger.info('\t Wrote into the dictionary')
-                # increment the line number
-                line_vectors = line_vectors +1
-                # increment the progress bar
-                self.prog_layers["value"] = self.prog_layers["value"] +1
-                self.update()
-        else:
-            self.logger.info('\tIgnoring {0} KML'.format(len(self.li_kml)))
-            pass
+        self.logger.info('\n\tProcessing KML: start')
+        for kml in self.li_kml:
+            """ looping on KML list """
+            self.status.set(path.basename(kml))
+            self.logger.info('\n' + kml)
+            # reset recipient data
+            self.dico_layer.clear()
+            self.dico_fields.clear()
+            # getting the informations
+            Read_KML(kml, self.dico_layer, self.dico_fields, 'kml', self.blabla)
+            self.logger.info('\t Infos OK')
+            # writing to the Excel dictionary
+            self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
+            self.logger.info('\t Wrote into the dictionary')
+            # increment the line number
+            line_vectors = line_vectors +1
+            # increment the progress bar
+            self.prog_layers["value"] = self.prog_layers["value"] +1
+            self.update()
 
-        if self.opt_geoj.get():
-            self.logger.info('\n\tProcessing GeoJSON: start')
-            for geojson in self.li_geoj:
-                """ looping on GeoJSON list """
-                self.status.set(path.basename(geojson))
-                self.logger.info('\n' + geojson)
-                # reset recipient data
-                self.dico_layer.clear()
-                self.dico_fields.clear()
-                # getting the informations
-                Read_GeoJSON(geojson, self.dico_layer, self.dico_fields, 'geojson', self.blabla)
-                self.logger.info('\t Infos OK')
-                # writing to the Excel dictionary
-                self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
-                self.logger.info('\t Wrote into the dictionary')
-                # increment the line number
-                line_vectors = line_vectors +1
-                # increment the progress bar
-                self.prog_layers["value"] = self.prog_layers["value"] +1
-                self.update()
-        else:
-            self.logger.info('\tIgnoring {0} GeoJSON'.format(len(self.li_geoj)))
-            pass
+        self.logger.info('\n\tProcessing GeoJSON: start')
+        for geojson in self.li_geoj:
+            """ looping on GeoJSON list """
+            self.status.set(path.basename(geojson))
+            self.logger.info('\n' + geojson)
+            # reset recipient data
+            self.dico_layer.clear()
+            self.dico_fields.clear()
+            # getting the informations
+            Read_GeoJSON(geojson, self.dico_layer, self.dico_fields, 'geojson', self.blabla)
+            self.logger.info('\t Infos OK')
+            # writing to the Excel dictionary
+            self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
+            self.logger.info('\t Wrote into the dictionary')
+            # increment the line number
+            line_vectors = line_vectors +1
+            # increment the progress bar
+            self.prog_layers["value"] = self.prog_layers["value"] +1
+            self.update()
 
-        if self.opt_rast.get():
-            self.logger.info('\n\tProcessing rasters: start')
-            for raster in self.li_raster:
-                """ looping on rasters list """
-                self.status.set(path.basename(raster))
-                self.logger.info('\n' + raster)
-                # reset recipient data
-                self.dico_raster.clear()
-                self.dico_bands.clear()
-                # getting the informations
-                Read_Rasters(raster, self.dico_raster, self.dico_bands, path.splitext(raster)[1], self.blabla)
-                print(self.dico_raster, self.dico_bands)
-                self.logger.info('\t Infos OK')
-                # writing to the Excel dictionary
-                self.dictionarize_rasters(self.dico_raster, self.dico_bands, self.feuy2, line_rasters)
-                self.logger.info('\t Wrote into the dictionary')
-                # increment the line number
-                line_rasters = line_rasters +1
-                # increment the progress bar
-                self.prog_layers["value"] = self.prog_layers["value"] +1
-                self.update()
-        else:
-            self.logger.info('\tIgnoring {0} rasters'.format(len(self.li_raster)))
-            pass
+        self.logger.info('\n\tProcessing rasters: start')
+        for raster in self.li_raster:
+            """ looping on rasters list """
+            self.status.set(path.basename(raster))
+            self.logger.info('\n' + raster)
+            # reset recipient data
+            self.dico_raster.clear()
+            self.dico_bands.clear()
+            # getting the informations
+            Read_Rasters(raster, self.dico_raster, self.dico_bands, path.splitext(raster)[1], self.blabla)
+            print(self.dico_raster, self.dico_bands)
+            self.logger.info('\t Infos OK')
+            # writing to the Excel dictionary
+            self.dictionarize_rasters(self.dico_raster, self.dico_bands, self.feuy2, line_rasters)
+            self.logger.info('\t Wrote into the dictionary')
+            # increment the line number
+            line_rasters = line_rasters +1
+            # increment the progress bar
+            self.prog_layers["value"] = self.prog_layers["value"] +1
+            self.update()
 
         # saving dictionary
         self.savedico()
@@ -1170,6 +1091,5 @@ class DicoGIS(Tk):
 ###################################
 
 if __name__ == '__main__':
-    """ standalone execution """
     app = DicoGIS()
     app.mainloop()

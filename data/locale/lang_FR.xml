@@ -14,7 +14,6 @@
 	<gui_quit>Quitter</gui_quit>
 	<gui_fr1> Arborescence cible </gui_fr1>
 	<gui_fr2> Base de données cible </gui_fr2>
-	<gui_fr3> Formats </gui_fr3>
 	<gui_path>Chemin du dossier : </gui_path>
 	<gui_fic>Nom du fichier en sortie : </gui_fic>
 	<gui_host>Hôte : </gui_host>
