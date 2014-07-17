@@ -87,7 +87,8 @@
 	<srs_vert>Vertical</srs_vert>
 <!-- Gestion erreurs -->
 	<nofolder>Ninguna carpeta seleccionada</nofolder>
-	<nodata>Ningún dato compatible (.shp / .tab) encontrado.</nodata>
+	<nodata>Ningún dato compatible encontrado.</nodata>
+	<noformat>Ningún formato seleccionado</noformat>
 	<err_encod>El nombre del atributo esta mal formateado. (caracteres especiales) : </err_encod>
 	<err_nobjet> Este dato no tiene ningún objeto. Nopuede ser procesado!</err_nobjet>
 </lang>	

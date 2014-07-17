@@ -25,7 +25,7 @@ DGversion = "2.0-beta.2"
 from Tkinter import Tk, StringVar, IntVar, Image    # GUI
 from Tkinter import N, S, E, W, PhotoImage, ACTIVE, DISABLED, END
 from tkFileDialog import askdirectory, asksaveasfilename    # dialogs
-from tkMessageBox import showinfo as info
+from tkMessageBox import showinfo as info, showerror as avert
 from ttk import Combobox, Progressbar, Style, Labelframe, Frame, Label, Button, Entry, Radiobutton, Checkbutton       # advanced graphic widgets
 import tkFont
 
@@ -162,7 +162,7 @@ class DicoGIS(Tk):
         self.FrPath = Labelframe(self, name ='files',
                                        text = self.blabla.get('gui_fr1'))
         self.FrFilters = Labelframe(self, name ='filters',
-                                          text = self.blabla.get('gui_fr1'))
+                                          text = self.blabla.get('gui_fr3'))
         self.FrDb = Labelframe(self, name ='database',
                                        text = self.blabla.get('gui_fr2'))
         self.FrProg = Labelframe(self, name ='progression',
@@ -444,9 +444,9 @@ class DicoGIS(Tk):
             self.logger.info('Type switched to: files structure')
             self.FrDb.grid_forget()
             self.status.set('')
-            self.FrFilters.grid(row = 3, column = 1, padx = 2, pady = 2,
+            self.FrPath.grid(row = 3, column = 1, padx = 2, pady = 2,
                                 sticky = N+S+W+E)
-            self.FrPath.grid(row = 4, column = 1, padx = 2, pady = 2,
+            self.FrFilters.grid(row = 4, column = 1, padx = 2, pady = 2,
                              sticky = N+S+W+E)
         elif self.typo.get() == 2:
             self.logger.info('Type switched to: database')
@@ -492,6 +492,7 @@ class DicoGIS(Tk):
         self.li_shp = []
         self.li_tab = []
         self.li_kml = []
+        self.li_gml = []
         self.li_geoj = []
         self.li_raster = []
         self.browsetarg.config(state = DISABLED)
@@ -528,27 +529,44 @@ class DicoGIS(Tk):
         (path.isfile('%s.dbf' % full_path[:-4]) or path.isfile('%s.DBF' % full_path[:-4])) and \
         (path.isfile('%s.shx' % full_path[:-4]) or path.isfile('%s.SHX' % full_path[:-4])) and \
         (path.isfile('%s.prj' % full_path[:-4]) or path.isfile('%s.PRJ' % full_path[:-4])):
+                    """ listing compatible shapefiles """
                     # add complete path of shapefile
                     self.li_shp.append(full_path)
                 elif path.splitext(full_path.lower())[1] == '.tab' and \
         (path.isfile(full_path[:-4] + '.dat') or path.isfile(full_path[:-4] + '.DAT')) and \
         (path.isfile(full_path[:-4] + '.map') or path.isfile(full_path[:-4] + '.MAP')) and \
         (path.isfile(full_path[:-4] + '.id') or path.isfile(full_path[:-4] + '.ID')):
+                    """ listing MapInfo tables """
                     # add complete path of MapInfo file
                     self.li_tab.append(full_path)
                 elif path.splitext(full_path.lower())[1] == '.kml':
+                    """ listing KML """
                     # add complete path of KML file
                     self.li_kml.append(full_path)
+                elif path.splitext(full_path.lower())[1] == '.gml':
+                    """ listing GML """
+                    # add complete path of KML file
+                    self.li_gml.append(full_path)
                 elif path.splitext(full_path.lower())[1] == '.geojson':
+                    """ listing GeoJSON """
                     # add complete path of KML file
                     self.li_geoj.append(full_path)
                 elif path.splitext(full_path.lower())[1] in self.li_raster_formats:
+                    """ listing compatible rasters """
                     # add complete path of MapInfo file
                     self.li_raster.append(full_path)
                 else:
                     continue
+
+        # end of listing
         self.prog_layers.stop()
-        self.logger.info('End of folders parsing: {0} folders explored'.format(self.num_folders))
+        self.logger.info('End of folders parsing: {0} shapefiles - {1} tables (MapInfo) - {2} KML - {3} GML - {4} GeoJSON\n{5} rasters - in {6}{7}'.format(len(self.li_shp),                                                                                                                                   len(self.li_tab), 
+                                                                                                                                                          len(self.li_kml),
+                                                                                                                                                          len(self.li_gml),
+                                                                                                                                                          len(self.li_geoj),
+                                                                                                                                                          len(self.li_raster),
+                                                                                                                                                          self.num_folders,
+                                                                                                                                                          self.blabla.get('log_numfold')))
         # Lists ordering and tupling
         self.li_shp.sort()
         self.li_shp = tuple(self.li_shp)
@@ -558,16 +576,19 @@ class DicoGIS(Tk):
         self.li_raster = tuple(self.li_raster)
         self.li_kml.sort()
         self.li_kml = tuple(self.li_kml)
+        self.li_gml.sort()
+        self.li_gml = tuple(self.li_gml)
         self.li_geoj.sort()
         self.li_geoj = tuple(self.li_geoj)
         # setting the label text and activing the buttons
-        self.status.set('{0} shapefiles - {1} tables (MapInfo) - {2} KML - \
-                        {3} rasters - in {4}{5}'.format(len(self.li_shp), 
-                                                      len(self.li_tab), 
-                                                      len(self.li_kml),
-                                                      len(self.li_raster),
-                                                      self.num_folders,
-                                                      self.blabla.get('log_numfold')))
+        self.status.set('{0} shapefiles - {1} tables (MapInfo) - {2} KML - {3} GML - {4} GeoJSON\n{5} rasters - in {6}{7}'.format(len(self.li_shp), 
+                                                                                                                                  len(self.li_tab), 
+                                                                                                                                  len(self.li_kml),
+                                                                                                                                  len(self.li_gml),
+                                                                                                                                  len(self.li_geoj),
+                                                                                                                                  len(self.li_raster),
+                                                                                                                                  self.num_folders,
+                                                                                                                                  self.blabla.get('log_numfold')))
 
         self.browsetarg.config(state = ACTIVE)
         self.val.config(state = ACTIVE)
@@ -576,22 +597,34 @@ class DicoGIS(Tk):
 
 
     def process(self):
-        print 'process initialized'
+        """ check needed info and launch different processes """
         if self.typo.get() == 1:
             self.logger.info('=> files process started')
             self.process_files()
         elif self.typo.get() == 2:
             self.logger.info('=> DB process started')
             self.process_db()
+        else:
+            pass
         # end of function
         return self.typo.get()
 
 
     def process_files(self):
         u""" launch the different processes """
+        # check if at least a format has been choosen
+        if (self.opt_shp.get() + self.opt_tab.get() + self.opt_kml.get() + 
+            self.opt_gml.get() + self.opt_geoj.get() + self.opt_rast.get()):
+            pass
+        else:
+            avert('DicoGIS - User error', self.blabla.get('noformat'))
+            return
         # check if there are some layers into the folder structure
-        if len(self.li_shp) + len(self.li_tab) == 0:
-            erreurStop(self.blabla.get('nodata'))
+        if (len(self.li_shp) + len(self.li_tab) + len(self.li_kml) + 
+            len(self.li_gml) + len(self.li_geoj) + len(self.li_raster)):
+            pass
+        else:
+            avert('DicoGIS - User error', self.blabla.get('nodata'))
             return
         # creating the Excel workbook
         self.configexcel()
@@ -675,6 +708,30 @@ class DicoGIS(Tk):
                 self.update()
         else:
             self.logger.info('\tIgnoring {0} KML'.format(len(self.li_kml)))
+            pass
+
+        if self.opt_gml.get():
+            self.logger.info('\n\tProcessing GML: start')
+            for gml in self.li_gml:
+                """ looping on GML list """
+                self.status.set(path.basename(gml))
+                self.logger.info('\n' + gml)
+                # reset recipient data
+                self.dico_layer.clear()
+                self.dico_fields.clear()
+                # getting the informations
+                Read_GML(gml, self.dico_layer, self.dico_fields, 'gml', self.blabla)
+                self.logger.info('\t Infos OK')
+                # writing to the Excel dictionary
+                self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
+                self.logger.info('\t Wrote into the dictionary')
+                # increment the line number
+                line_vectors = line_vectors +1
+                # increment the progress bar
+                self.prog_layers["value"] = self.prog_layers["value"] +1
+                self.update()
+        else:
+            self.logger.info('\tIgnoring {0} GML'.format(len(self.li_gml)))
             pass
 
         if self.opt_geoj.get():
@@ -1160,7 +1217,7 @@ class DicoGIS(Tk):
 
     def erreurStop(self, mess):
         u""" In case of error, close the GUI and stop the program """
-        info(title = u'Erreur', message = mess)
+        avert(title = u'Erreur', message = mess)
         self.logger.error(mess)
         self.root.destroy()
         exit()

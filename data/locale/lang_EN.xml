@@ -88,6 +88,7 @@
 <!-- Gestion erreurs -->
 	<nofolder>Any folder selected</nofolder>
 	<nodata>Any compatible geographic data (.shp / .tab) has been found.</nodata>
+	<noformat>Any format selected</noformat>
 	<err_encod>Field name is not correctly formatted (encoding issue): </err_encod>
 	<err_nobjet> This data doesn't have any object, so can't be processed!</err_nobjet>
 </lang>
