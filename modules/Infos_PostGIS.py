@@ -190,5 +190,5 @@ if __name__ == '__main__':
         exit()
     # parsing the layers
     for layer in conn:
-        InfosOGR_PG(layer, dico_layer, dico_fields, 'pg', textos)
+        Read_PostGIS(layer, dico_layer, dico_fields, 'pg', textos)
         print dico_layer
