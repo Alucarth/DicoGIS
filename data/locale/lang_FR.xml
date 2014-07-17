@@ -88,7 +88,8 @@
 	<srs_vert>Verticale</srs_vert>
 <!-- Gestion erreurs -->
 	<nofolder>Aucun dossier sélectionné</nofolder>
-	<nodata>Aucune donnée géographique compatible (.shp / .tab) trouvée.</nodata>
+	<nodata>Aucune donnée géographique compatible trouvée.</nodata>
+	<noformat>Aucun format sélectionné</noformat>
 	<err_encod>Le nom du champ n'est pas bien formaté (caractères spéciaux) : </err_encod>
 	<err_nobjet> Cette donnée n'a aucun objet. Traitement impossible !</err_nobjet>
 </lang>
