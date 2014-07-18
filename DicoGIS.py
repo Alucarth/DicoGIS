@@ -362,6 +362,11 @@ class DicoGIS(Tk):
             self.opt_gml.set(config.get('filters', 'def_gml'))
             self.opt_geoj.set(config.get('filters', 'def_geoj'))
             self.opt_rast.set(config.get('filters', 'def_rast'))
+            # database settings
+            self.host.set(config.get('database', 'host'))
+            self.port.set(config.get('database', 'port'))
+            self.dbnb.set(config.get('database', 'db_name'))
+            self.user.set(config.get('database', 'user'))
             # log
             self.logger.info('Last options loaded')
         except:
@@ -378,6 +383,7 @@ class DicoGIS(Tk):
         config.add_section('config')
         config.add_section('basics')
         config.add_section('filters')
+        config.add_section('database')
         # config
         config.set('config', 'DicoGIS_version', DGversion)
         config.set('config', 'OS', platform)
@@ -391,6 +397,11 @@ class DicoGIS(Tk):
         config.set('filters', 'def_gml', self.opt_gml.get())
         config.set('filters', 'def_geoj', self.opt_geoj.get())
         config.set('filters', 'def_rast', self.opt_rast.get())
+        # databse settings
+        config.set('database', 'host', self.host.get())
+        config.set('database', 'port', self.port.get())
+        config.set('database', 'db_name', self.dbnb.get())
+        config.set('database', 'user', self.user.get())
         # Writing the configuration file
         with open(confile, 'wb') as configfile:
             config.write(configfile)
@@ -451,7 +462,7 @@ class DicoGIS(Tk):
         elif self.typo.get() == 2:
             self.logger.info('Type switched to: database')
             self.FrPath.grid_forget()
-            self.Filters.grid_forget()
+            self.FrFilters.grid_forget()
             self.status.set('')
             self.FrDb.grid(row = 3, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
         # End of function
@@ -824,7 +835,7 @@ class DicoGIS(Tk):
             Read_PostGIS(layer, self.dico_layer, self.dico_fields, 'pg', self.blabla)
             self.logger.info('Table examined: %s' % layer.GetName())
             # writing to the Excel dictionary
-            self.dictionarize(self.dico_layer, self.dico_fields, self.feuy1, line)
+            self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line)
             self.logger.info('\t Wrote into the dictionary')
             # increment the line number
             line = line +1
@@ -926,7 +937,7 @@ class DicoGIS(Tk):
                              'font: colour red, bold True;')
 
         # columns headers
-        if (self.li_tab + self.li_shp) > 0:
+        if (len(self.li_tab) + len(self.li_shp) + len(self.li_gml) + len(self.li_geoj) + len(self.li_kml) + self.typo.get()) > 0:
             """ adding a new sheet for vectors informations """
             self.feuy1 = self.book.add_sheet(u'Vectors', cell_overwrite_ok=True)
             self.feuy1.write(0, 0, self.blabla.get('nomfic'), self.entete)
@@ -944,6 +955,11 @@ class DicoGIS(Tk):
             self.feuy1.write(0, 12, self.blabla.get('format'), self.entete)
             self.feuy1.write(0, 13, self.blabla.get('li_chps'), self.entete)
             self.logger.info('Sheet vectors adedd')
+            # tunning headers
+            lg_shp_names = [len(lg) for lg in self.li_shp]
+            lg_tab_names = [len(lg) for lg in self.li_tab]
+            self.feuy1.col(0).width = max(lg_shp_names + lg_tab_names)*100
+            self.feuy1.col(1).width = len(self.blabla.get('browse'))*256
         else:
             pass
 
@@ -970,21 +986,12 @@ class DicoGIS(Tk):
             self.feuy2.write(0, 17, self.blabla.get('coloref'), self.entete)
             self.feuy2.write(0, 18, self.blabla.get('li_depends'), self.entete)
             self.logger.info('Sheet rasters created')
+            # tunning headers
+            lg_rast_names = [len(lg) for lg in self.li_raster]
+            self.feuy2.col(0).width = max(lg_rast_names)*100
+            self.feuy2.col(1).width = len(self.blabla.get('browse'))*256
         else:
-            pass
-
-        ## tunning headers
-        # filename max length
-        lg_shp_names = [len(lg) for lg in self.li_shp]
-        lg_tab_names = [len(lg) for lg in self.li_tab]
-        lg_rast_names = [len(lg) for lg in self.li_raster]
-        self.feuy1.col(0).width = max(lg_shp_names + lg_tab_names)*100
-        self.feuy2.col(0).width = max(lg_rast_names)*100
-
-        # reach label
-        self.feuy1.col(1).width = len(self.blabla.get('browse'))*256
-        self.feuy2.col(1).width = len(self.blabla.get('browse'))*256
-        
+            pass    
 
         # end of function
         return self.book, self.entete, self.url, self.erreur
