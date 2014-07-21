@@ -91,5 +91,6 @@
 	<nodata>Aucune donnée géographique compatible trouvée.</nodata>
 	<noformat>Aucun format sélectionné</noformat>
 	<err_encod>Le nom du champ n'est pas bien formaté (caractères spéciaux) : </err_encod>
+	<err_pg_empty_field>Champ requis</err_pg_empty_field>
 	<err_nobjet> Cette donnée n'a aucun objet. Traitement impossible !</err_nobjet>
 </lang>

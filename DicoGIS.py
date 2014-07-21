@@ -141,6 +141,9 @@ class DicoGIS(Tk):
         self.li_tab = []         # list for MapInfo tables path
         self.li_raster = []     # list for rasters paths
         self.li_gdb = []     # list for Esri File Geodatabases
+        self.li_kml = []    # list for KML path
+        self.li_gml = []    # list for GML tables path
+        self.li_geoj = []   # list for GeoJSON tables path
         self.li_raster_formats = (".ecw", ".tif", ".jp2")   # raster formats handled
         self.li_vectors_formats = (".shp", ".tab")          # vectors formats handled
         self.today = strftime("%Y-%m-%d")   # date of the day
@@ -614,7 +617,7 @@ class DicoGIS(Tk):
             self.process_files()
         elif self.typo.get() == 2:
             self.logger.info('=> DB process started')
-            self.process_db()
+            self.check_fields()
         else:
             pass
         # end of function
@@ -822,14 +825,14 @@ class DicoGIS(Tk):
         line = 1    # line of dictionary
         self.logger.info('\tPostGIS table processing...')
         try:
-            conn = ogr.Open("PG: host=%s port=%s dbname=%s user=%s password=%s" %(self.host.get(),
-                                                                                  self.port.get(),
-                                                                                  self.dbnb.get(), 
-                                                                                  self.user.get(), 
-                                                                                  self.pswd.get()))
+            conn = ogr.Open("PG: host={0} port={1} dbname={2} user={3} password={4}".format(
+                            self.host.get(), self.port.get(), self.dbnb.get(), self.user.get(), 
+                            self.pswd.get()))
+            self.logger.info('Connection to database {0} successed.'.format(self.dbnb.get()))
         except:
-            self.logger.info('Connection to database failed. Check your connection settings.')
-            exit()
+            self.logger.warning('Connection to database failed. Check your connection settings.')
+            avert(title="PostGIS connection failed", message="Oups! Houston we have a problem trying to connect the spatial database!")
+            return
         # parsing the layers
         for layer in conn:
             Read_PostGIS(layer, self.dico_layer, self.dico_fields, 'pg', self.blabla)
@@ -858,26 +861,48 @@ class DicoGIS(Tk):
 
     def check_fields(self):
         u""" Check if fields are not empty """
-        # error message
-        msj = u'Any fields should be empty'
+        # error counter
         # checking empty fields
-        if self.host.get() == u'':
-            self.H.configure(background = 'red')
-        if self.port.get() == 0:
-            self.P.configure(background = 'red')
-        if self.dbnb.get() == u'':
-            self.D.configure(background = 'red')
-        if self.user.get() == u'':
-            self.U.configure(background = 'red')
-        if self.pswd.get() == u'':
-            self.M.configure(background = 'red')
-
-        # Acción según si hay error(es) o no
-        if err != 0:
-            showerror(title = u'Error: campo(s) vacío(s)',
-                      message = msj)
+        if self.host.get() == u'' or self.host.get() == self.blabla.get("err_pg_empty_field"):
+            self.ent_H.configure(foreground="red")
+            self.ent_H.delete(0, END)
+            self.ent_H.insert(0, self.blabla.get("err_pg_empty_field"))
+            return
+        else:
+            pass
+        if not self.ent_P.get():
+            self.ent_P.configure(foreground = 'red')
+            self.ent_P.delete(0, END)
+            self.ent_P.insert(0, 0000)
+            return
+        else:
+            pass
+        if self.dbnb.get() == u'' or self.host.get() == self.blabla.get("err_pg_empty_field"):
+            self.ent_D.configure(foreground = 'red')
+            self.ent_D.delete(0, END)
+            self.ent_D.insert(0, self.blabla.get("err_pg_empty_field"))
+            return
+        else:
+            pass
+        if self.user.get() == u'' or self.host.get() == self.blabla.get("err_pg_empty_field"):
+            self.ent_U.configure(foreground = 'red')
+            self.ent_U.delete(0, END)
+            self.ent_U.insert(0, self.blabla.get("err_pg_empty_field"))
+            return
+        else:
+            pass
+        if self.pswd.get() == u'' or self.pswd.get() == self.blabla.get("err_pg_empty_field"):
+            self.ent_M.configure(foreground="red")
+            self.ent_M.delete(0, END)
+            self.ent_M.insert(0, self.blabla.get("err_pg_empty_field"))
+            return
+        else:
+            pass
+        # no error detected: let's test connection
+        self.logger.info("Required fields are OK.")
+        self.test_connection()
         # End of function
-        return err
+        return
 
     def test_connection(self):
         u""" testing database connection settings """
@@ -898,7 +923,7 @@ class DicoGIS(Tk):
                 return
             # change the confirmation button
             self.val.config(text = '¡D A L E!')
-            showinfo(title = u'Connection successed',
+            avert(title = u'Connection successed',
                      message = u'Test of connection settings successed')
             self.ok = 1
 
@@ -937,8 +962,9 @@ class DicoGIS(Tk):
                              'font: colour red, bold True;')
 
         # columns headers
-        if (len(self.li_tab) + len(self.li_shp) + len(self.li_gml) + len(self.li_geoj) + len(self.li_kml) + self.typo.get()) > 0:
+        if (len(self.li_tab) + len(self.li_shp) + len(self.li_gml) + len(self.li_geoj) + len(self.li_kml)) >0 and self.typo.get() == 1:
             """ adding a new sheet for vectors informations """
+            print self.typo.get()
             self.feuy1 = self.book.add_sheet(u'Vectors', cell_overwrite_ok=True)
             self.feuy1.write(0, 0, self.blabla.get('nomfic'), self.entete)
             self.feuy1.write(0, 1, self.blabla.get('path'), self.entete)
@@ -963,7 +989,7 @@ class DicoGIS(Tk):
         else:
             pass
 
-        if self.li_raster > 0:
+        if len(self.li_raster) > 0:
             """ adding a new sheet for rasters informations """
             self.feuy2 = self.book.add_sheet(u'Rasters', cell_overwrite_ok=True)
             self.feuy2.write(0, 0, self.blabla.get('nomfic'), self.entete)
