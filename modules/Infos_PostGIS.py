@@ -185,10 +185,13 @@ if __name__ == '__main__':
                                                                       test_user, 
                                                                       test_pwd))
         print "Access granted : connecting people!"
+        print(conn.GetLayerCount())
+        print dir(conn)
     except:
         print 'Connection to database failed. Check your connection settings.'
         exit()
     # parsing the layers
     for layer in conn:
         Read_PostGIS(layer, dico_layer, dico_fields, 'pg', textos)
-        print dico_layer
+        print("\n")
+        print(dico_layer)
