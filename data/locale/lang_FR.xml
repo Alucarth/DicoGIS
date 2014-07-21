@@ -92,5 +92,6 @@
 	<noformat>Aucun format sélectionné</noformat>
 	<err_encod>Le nom du champ n'est pas bien formaté (caractères spéciaux) : </err_encod>
 	<err_pg_empty_field>Champ requis</err_pg_empty_field>
+	<err_pg_conn_fail>La connexion a échoué</err_pg_conn_fail>
 	<err_nobjet> Cette donnée n'a aucun objet. Traitement impossible !</err_nobjet>
 </lang>

@@ -92,4 +92,5 @@
 	<err_encod>El nombre del atributo esta mal formateado. (caracteres especiales) : </err_encod>
 	<err_nobjet> Este dato no tiene ningún objeto. Nopuede ser procesado!</err_nobjet>
 	<err_pg_empty_field>campo requerido</err_pg_empty_field>
+	<err_pg_conn_fail>Conexión fracasó</err_pg_conn_fail>
 </lang>	
