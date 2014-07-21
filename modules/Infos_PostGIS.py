@@ -26,6 +26,9 @@ from collections import OrderedDict as OD
 
 # 3rd party libraries
 from osgeo import ogr    # spatial files
+from osgeo import gdal
+
+gdal.SetConfigOption("PG_LIST_ALL_TABLES", "YES")
 
 ################################################################################
 ########### Classes #############
@@ -184,14 +187,19 @@ if __name__ == '__main__':
                                                                       test_db, 
                                                                       test_user, 
                                                                       test_pwd))
-        print "Access granted : connecting people!"
+        print("Access granted : connecting people!")
         print(conn.GetLayerCount())
-        print dir(conn)
-    except:
-        print 'Connection to database failed. Check your connection settings.'
+        sql_version = "SELECT version();"
+        version = conn.ExecuteSQL(sql_version)
+        print(conn.GetDriver().GetName())
+        print(dir(conn))
+    except Exception, e:
+        print 'Connection to database failed. Check your connection settings: {0}'.format(str(e))
         exit()
     # parsing the layers
     for layer in conn:
-        Read_PostGIS(layer, dico_layer, dico_fields, 'pg', textos)
         print("\n")
+        print layer.GetName()
+        # if "_current"
+        Read_PostGIS(layer, dico_layer, dico_fields, 'pg', textos)
         print(dico_layer)
