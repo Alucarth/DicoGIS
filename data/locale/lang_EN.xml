@@ -91,4 +91,5 @@
 	<noformat>Any format selected</noformat>
 	<err_encod>Field name is not correctly formatted (encoding issue): </err_encod>
 	<err_nobjet> This data doesn't have any object, so can't be processed!</err_nobjet>
+	<err_pg_empty_field>required field</err_pg_empty_field>
 </lang>
