@@ -26,8 +26,9 @@ from Tkinter import Tk, StringVar, IntVar, Image    # GUI
 from Tkinter import N, S, E, W, PhotoImage, ACTIVE, DISABLED, END
 from tkFileDialog import askdirectory, asksaveasfilename    # dialogs
 from tkMessageBox import showinfo as info, showerror as avert
-from ttk import Combobox, Progressbar, Style, Labelframe, Frame, Label, Button, Entry, Radiobutton, Checkbutton       # advanced graphic widgets
-import tkFont
+from ttk import Combobox, Progressbar, Style, Labelframe, Frame
+from ttk import Label, Button, Entry, Radiobutton, Checkbutton       # advanced graphic widgets
+import tkFont   # font library
 
 from sys import exit, platform
 from os import  listdir, walk, path         # files and folder managing
@@ -57,6 +58,9 @@ except ImportError:
     import gdal
     import ogr
     import osr
+
+from gdalconst import *
+gdal.AllRegister()
 
 from xlwt import Workbook, Font, XFStyle, easyxf, Formula  # excel writer
 from xlwt import Alignment, Pattern, Borders, easyfont      # excel style config
@@ -245,12 +249,16 @@ class DicoGIS(Tk):
 
             ## Frame 2: Database
         # variables
+        self.opt_pgvw = IntVar(self.FrDb) # able/disable handling PostGIS views
         self.host = StringVar(self.FrDb, 'localhost')
         self.port = IntVar(self.FrDb, 5432)
         self.dbnb = StringVar(self.FrDb)
         self.user = StringVar(self.FrDb, 'postgres')
         self.pswd = StringVar(self.FrDb)
         # Form widgets
+        caz_pgvw = Checkbutton(self.FrDb,
+                              text = u'See views?',
+                              variable = self.opt_pgvw)
         self.ent_H = Entry(self.FrDb, textvariable = self.host)
         self.ent_P = Entry(self.FrDb, textvariable = self.port, width = 5)
         self.ent_D = Entry(self.FrDb, textvariable = self.dbnb)
@@ -273,6 +281,7 @@ class DicoGIS(Tk):
         self.lb_D.grid(row = 2, column = 0, sticky = N+S+W, padx = 2, pady = 2)
         self.lb_U.grid(row = 2, column = 2, sticky = N+S+W, padx = 2, pady = 2)
         self.lb_M.grid(row = 3, column = 0, sticky = N+S+W+E, padx = 2, pady = 2)
+        caz_pgvw.grid(row = 4, column = 0, sticky = N+S+W+E, padx = 2, pady = 2)
 
             ## Frame 3: Progression bar
         # variables
@@ -818,9 +827,6 @@ class DicoGIS(Tk):
         # creating the Excel workbook
         self.configexcel()
         self.logger.info('Excel file created')
-        # # configuring the progression bar
-        # self.prog_layers["maximum"] = len(self.li_shp) + len(self.li_tab)
-        # self.prog_layers["value"]
         # getting the info from shapefiles and compile it in the excel
         line = 1    # line of dictionary
         self.logger.info('\tPostGIS table processing...')
@@ -860,7 +866,7 @@ class DicoGIS(Tk):
         return
 
     def check_fields(self):
-        u""" Check if fields are not empty """
+        u""" Check if required fields are not empty """
         # error counter
         # checking empty fields
         if self.host.get() == u'' or self.host.get() == self.blabla.get("err_pg_empty_field"):
@@ -905,35 +911,32 @@ class DicoGIS(Tk):
         return
 
     def test_connection(self):
-        u""" testing database connection settings """
+        u""" testing database connection settings using OGR specific exceptions """
+        ogr.UseExceptions()
+        # checking if user chose to list PostGIS views
+        if self.opt_pgvw.get():
+            gdal.SetConfigOption(str("PG_LIST_ALL_TABLES"), str("YES"))
+            self.logger.info("PostgreSQL views enabled.")
+        else:
+            self.logger.info("PostgreSQL views disabled.")
+        # testing connection settings
         try:
-            conn = ogr.Open(host = self.host.get(), dbname = self.dbnb.get(),
-                            port = self.port.get(), user = self.user.get(),
-                            password = self.pswd.get())
-            curs = conn.cursor()
-            # check PostgreSQL and PostGIS versions
-            try:
-                curs.execute('SELECT version()')
-                ver = curs.fetchone()
-                self.logger.info('Connection successed: connecting people!')
-                self.logger.info('Database version: %s' %ver)
-            except DatabaseError, e:
-                showerror(title = u'Connection issue',
-                message = 'Connection aborted. Error:\n' + str(e))
-                return
-            # change the confirmation button
-            self.val.config(text = '¡D A L E!')
-            avert(title = u'Connection successed',
-                     message = u'Test of connection settings successed')
-            self.ok = 1
-
-        except pg.OperationalError, e:
-            showerror(title = u'Connection issue',
-                      message = 'Connection aborted. Error:\n' + str(e))
+            conn = ogr.Open("PG: host={0} port={1} dbname={2} user={3} password={4}".format(
+                            self.host.get(), self.port.get(), self.dbnb.get(), self.user.get(), 
+                            self.pswd.get()))
+        except Exception, e:
+            self.logger.warning("Connection failed: {0}.".format(e))
+            avert(title = self.blabla.get("err_pg_conn_fail"), message = unicode(e))
             return
 
-        except ImportError , e:
-            return None
+        # if connection successed
+        self.status.set("{} tables".format(conn.GetLayerCount()))
+        self.logger.info('Connection to database {0} successed.\
+                          {1} tables found.'.format(self.dbnb.get(),
+                                                    conn.GetLayerCount()))
+        self.process_db()
+        # end of function
+        return
 
 
     def configexcel(self):
