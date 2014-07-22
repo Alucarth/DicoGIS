@@ -42,9 +42,12 @@ import ConfigParser         # to manipulate the options.ini file
 import logging      # log files
 from logging.handlers import RotatingFileHandler
 
+import sys
+import subprocess
+
 from xml.etree import ElementTree as ET     # XML parsing and writer
 
-import sys
+
 
 # Python 3 backported
 from collections import OrderedDict as OD   # ordered dictionary
