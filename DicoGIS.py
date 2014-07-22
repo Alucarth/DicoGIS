@@ -23,7 +23,7 @@ DGversion = "2.0-beta.2"
 ###################################
 # Standard library
 from Tkinter import Tk, StringVar, IntVar, Image    # GUI
-from Tkinter import N, S, E, W, PhotoImage, ACTIVE, DISABLED, END
+from Tkinter import N, S, E, W, PhotoImage, ACTIVE, DISABLED, END, LEFT, RIGHT
 from tkFileDialog import askdirectory, asksaveasfilename    # dialogs
 from tkMessageBox import showinfo as info, showerror as avert
 from ttk import Combobox, Progressbar, Style, Labelframe, Frame
@@ -32,7 +32,7 @@ import tkFont   # font library
 
 from sys import exit, platform
 from os import  listdir, walk, path         # files and folder managing
-from os import environ as env
+from os import environ as env, access, R_OK
 from time import strftime
 from webbrowser import open_new
 import threading    # handling various subprocess
@@ -174,7 +174,8 @@ class DicoGIS(Tk):
                                        text = self.blabla.get('gui_fr2'))
         self.FrProg = Labelframe(self, name ='progression',
                                        text = self.blabla.get('gui_prog'))
-
+        self.FrOutp = Labelframe(self, name ='output',
+                                       text = self.blabla.get('gui_fr4'))
             ## Frame 1: path of geofiles
         # formats options
         self.opt_shp = IntVar(self.FrFilters) # able/disable handling shapefiles
@@ -236,15 +237,10 @@ class DicoGIS(Tk):
                                  command = lambda:self.setpathtarg(),
                                  takefocus = True)
         self.browsetarg.focus_force()               # force the focus on
-        self.nameoutput = Label(self.FrPath,
-                                 text = self.blabla.get('gui_fic'))
-        self.output = Entry(self.FrPath, width = 35)
         # widgets placement
         self.labtarg.grid(row = 1, column = 1, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
         self.target.grid(row = 1, column = 2, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
         self.browsetarg.grid(row = 1, column = 3, sticky = N+S+W+E, padx = 2, pady = 2)
-        self.nameoutput.grid(row = 3, column= 1, sticky = N+S+W+E, padx = 2, pady = 2)
-        self.output.grid(row = 3, column= 2, columnspan = 2, sticky = N+S+W+E, padx = 2, pady = 2)
 
 
             ## Frame 2: Database
@@ -293,6 +289,17 @@ class DicoGIS(Tk):
                            foreground = 'DodgerBlue').pack()
         # widgets placement
         self.prog_layers.pack(expand=1, fill='both')
+
+            ## Frame 4: Output configuration
+        # widgets
+        self.nameoutput = Label(self.FrOutp,
+                                text = self.blabla.get('gui_fic'))
+        self.output = Entry(self.FrOutp, width = 35)
+        # widgets placement
+        self.nameoutput.grid(row = 0, column= 1, 
+                             sticky = N+S+W+E, padx = 2, pady = 2)
+        self.output.grid(row = 0, column= 2, columnspan = 2, 
+                         sticky = N+S+W+E, padx = 2, pady = 2)
 
             ## Main frame
         self.typo = IntVar(self, 1)    # type value (files or database)
@@ -347,12 +354,13 @@ class DicoGIS(Tk):
         self.ddl_lang.grid(row=1, column = 1, sticky = N+S+E, padx = 2, pady = 2)
         rd_file.grid(row=2, column = 1, sticky = N+S+W, padx = 2, pady = 2)
         rd_pg.grid(row=2, column = 1, sticky = N+S+E, padx = 2, pady = 2)
-        self.val.grid(row = 6, column = 1, columnspan = 2,
+        self.val.grid(row = 7, column = 1, columnspan = 2,
                             sticky = N+S+W+E, padx = 2, pady = 2)
-        self.can.grid(row = 6, column = 0, sticky = N+S+W+E, padx = 2, pady = 2)
+        self.can.grid(row = 7, column = 0, sticky = N+S+W+E, padx = 2, pady = 2)
         # Frames placement
         rd_file.invoke()    # to provoc the type (frame 2) placement
         self.FrProg.grid(row = 5, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
+        self.FrOutp.grid(row = 6, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
 
         # loading previous options
         self.load_settings()
@@ -498,8 +506,9 @@ class DicoGIS(Tk):
                 return
         # set the default output file
         self.output.delete(0, END)
-        self.output.insert(0, "DicoGIS_" + path.split(self.target.get())[1]
-                            + "_" + self.today + ".xls"  )
+        self.output.insert(0, "DicoGIS_{0}_{1}.xls".format(
+                                            path.split(self.target.get())[1],
+                                            self.today ))
         # calculate number of shapefiles and MapInfo files in a separated thread
 
         proc = threading.Thread(target = self.ligeofiles, args = (foldername, ))
@@ -813,8 +822,7 @@ class DicoGIS(Tk):
         self.save_settings()
 
         # quit and exit
-        if platform == 'win32':
-            startfile(self.output.get())
+        self.open_dir_file(self.output.get())
         self.destroy()
         exit()
 
@@ -822,7 +830,7 @@ class DicoGIS(Tk):
         return
 
 
-    def process_db(self):
+    def process_db(self, conn):
         u""" launch the different processes """
         # creating the Excel workbook
         self.configexcel()
@@ -830,26 +838,17 @@ class DicoGIS(Tk):
         # getting the info from shapefiles and compile it in the excel
         line = 1    # line of dictionary
         self.logger.info('\tPostGIS table processing...')
-        try:
-            conn = ogr.Open("PG: host={0} port={1} dbname={2} user={3} password={4}".format(
-                            self.host.get(), self.port.get(), self.dbnb.get(), self.user.get(), 
-                            self.pswd.get()))
-            self.logger.info('Connection to database {0} successed.'.format(self.dbnb.get()))
-        except:
-            self.logger.warning('Connection to database failed. Check your connection settings.')
-            avert(title="PostGIS connection failed", message="Oups! Houston we have a problem trying to connect the spatial database!")
-            return
         # parsing the layers
         for layer in conn:
             Read_PostGIS(layer, self.dico_layer, self.dico_fields, 'pg', self.blabla)
             self.logger.info('Table examined: %s' % layer.GetName())
             # writing to the Excel dictionary
-            self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line)
+            self.dictionarize_pg(self.dico_layer, self.dico_fields, self.feuy3, line)
             self.logger.info('\t Wrote into the dictionary')
             # increment the line number
             line = line +1
             # increment the progress bar
-            #self.prog_layers["value"] = self.prog_layers["value"] +1
+            self.prog_layers["value"] = self.prog_layers["value"] +1
             self.update()
         # saving dictionary
         self.savedico()
@@ -918,6 +917,7 @@ class DicoGIS(Tk):
             gdal.SetConfigOption(str("PG_LIST_ALL_TABLES"), str("YES"))
             self.logger.info("PostgreSQL views enabled.")
         else:
+            gdal.SetConfigOption(str("PG_LIST_ALL_TABLES"), str("NO"))
             self.logger.info("PostgreSQL views disabled.")
         # testing connection settings
         try:
@@ -934,9 +934,15 @@ class DicoGIS(Tk):
         self.logger.info('Connection to database {0} successed.\
                           {1} tables found.'.format(self.dbnb.get(),
                                                     conn.GetLayerCount()))
-        self.process_db()
+        # set the default output file
+        self.output.delete(0, END)
+        self.output.insert(0, "DicoGIS_{0}-{1}_{2}.xls".format(self.dbnb.get(), 
+                                                               self.host.get(), 
+                                                               self.today))
+        # launching the process
+        self.process_db(conn)
         # end of function
-        return
+        return conn
 
 
     def configexcel(self):
@@ -965,7 +971,7 @@ class DicoGIS(Tk):
                              'font: colour red, bold True;')
 
         # columns headers
-        if (len(self.li_tab) + len(self.li_shp) + len(self.li_gml) + len(self.li_geoj) + len(self.li_kml)) >0 and self.typo.get() == 1:
+        if self.typo.get() == 1 and (len(self.li_tab) + len(self.li_shp) + len(self.li_gml) + len(self.li_geoj) + len(self.li_kml)) >0:
             """ adding a new sheet for vectors informations """
             print self.typo.get()
             self.feuy1 = self.book.add_sheet(u'Vectors', cell_overwrite_ok=True)
@@ -992,7 +998,7 @@ class DicoGIS(Tk):
         else:
             pass
 
-        if len(self.li_raster) > 0:
+        if self.typo.get() == 1 and len(self.li_raster) > 0:
             """ adding a new sheet for rasters informations """
             self.feuy2 = self.book.add_sheet(u'Rasters', cell_overwrite_ok=True)
             self.feuy2.write(0, 0, self.blabla.get('nomfic'), self.entete)
@@ -1021,6 +1027,31 @@ class DicoGIS(Tk):
             self.feuy2.col(1).width = len(self.blabla.get('browse'))*256
         else:
             pass    
+
+        if self.typo.get() == 2:
+            """ adding a new sheet for rasters informations """
+            self.feuy3 = self.book.add_sheet(u'PostGIS', cell_overwrite_ok=True)
+            self.feuy3.write(0, 0, self.blabla.get('nomfic'), self.entete)
+            self.feuy3.write(0, 1, self.blabla.get('path'), self.entete)
+            self.feuy3.write(0, 2, self.blabla.get('theme'), self.entete)
+            self.feuy3.write(0, 3, self.blabla.get('num_attrib'), self.entete)
+            self.feuy3.write(0, 4, self.blabla.get('num_objets'), self.entete)
+            self.feuy3.write(0, 5, self.blabla.get('geometrie'), self.entete)
+            self.feuy3.write(0, 6, self.blabla.get('srs'), self.entete)
+            self.feuy3.write(0, 7, self.blabla.get('srs_type'), self.entete)
+            self.feuy3.write(0, 8, self.blabla.get('codepsg'), self.entete)
+            self.feuy3.write(0, 9, self.blabla.get('emprise'), self.entete)
+            self.feuy3.write(0, 10, self.blabla.get('date_crea'), self.entete)
+            self.feuy3.write(0, 11, self.blabla.get('date_actu'), self.entete)
+            self.feuy3.write(0, 12, self.blabla.get('format'), self.entete)
+            self.feuy3.write(0, 13, self.blabla.get('li_chps'), self.entete)
+            self.logger.info('Sheet PostGIS created')
+            # tunning headers
+            # lg_rast_names = [len(lg) for lg in self.li_raster]
+            # self.feuy3.col(0).width = max(lg_rast_names)*100
+            # self.feuy3.col(1).width = len(self.blabla.get('browse'))*256
+        else:
+            pass  
 
         # end of function
         return self.book, self.entete, self.url, self.erreur
@@ -1196,6 +1227,96 @@ class DicoGIS(Tk):
 
         # End of function
         return line, sheet
+
+    def dictionarize_pg(self, layer_infos, fields_info, sheet, line):
+        u""" write the infos of the layer into the Excel workbook """
+        # local variables
+        champs = ""
+        theme = ""
+
+        # in case of a source error
+        if layer_infos.get('error'):
+            self.logger.warning('\tproblem detected')
+            sheet.write(line, 0, layer_infos.get('name'))
+            link = 'HYPERLINK("' + layer_infos.get(u'folder') \
+                             + '"; "' + self.blabla.get('browse') + '")'
+            sheet.write(line, 1, Formula(link), self.url)
+            sheet.write(line, 2, self.blabla.get((layer_infos.get('error')), self.erreur))
+            # Interruption of function
+            return self.book, self.feuy1
+
+        # Name
+        sheet.write(line, 0, layer_infos.get('name'))
+        # Path of containing folder formatted to be a hyperlink
+        link = 'HYPERLINK("' + layer_infos.get(u'folder') \
+                             + '"; "' + self.blabla.get('browse') + '")'
+        sheet.write(line, 1, Formula(link), self.url)
+        # Name of containing folder
+        # with an exceptin if this is the format name
+        if path.basename(layer_infos.get(u'folder')) in self.li_vectors_formats:
+            sheet.write(line, 2, path.basename(layer_infos.get(u'folder')))
+        else:
+            sheet.write(line, 2, path.basename(path.dirname(layer_infos.get(u'folder'))))
+
+        # Geometry type
+        sheet.write(line, 5, layer_infos.get(u'type_geom'))
+        # Spatial extent
+        emprise = u"Xmin : " + unicode(layer_infos.get(u'Xmin')) +\
+                  u", Xmax : " + unicode(layer_infos.get(u'Xmax')) +\
+                  u", Ymin : " + unicode(layer_infos.get(u'Ymin')) +\
+                  u", Ymax : " + unicode(layer_infos.get(u'Ymax'))
+        sheet.write(line, 9, emprise)
+        # Name of srs
+        sheet.write(line, 6, layer_infos.get(u'srs'))
+        # Type of SRS
+        sheet.write(line, 7, layer_infos.get(u'srs_type'))
+        # EPSG code
+        sheet.write(line, 8, layer_infos.get(u'EPSG'))
+        # Number of fields
+        sheet.write(line, 3, layer_infos.get(u'num_fields'))
+        # Name of objects
+        sheet.write(line, 4, layer_infos.get(u'num_obj'))
+        # Creation date
+        sheet.write(line, 10, layer_infos.get(u'date_crea'))
+        # Last update date
+        sheet.write(line, 11, layer_infos.get(u'date_actu'))
+        # Format of data
+        sheet.write(line, 12, layer_infos.get(u'type'))
+        # Field informations
+        for chp in fields_info.keys():
+            # field type
+            if fields_info[chp][0] == 'Integer':
+                tipo = self.blabla.get(u'entier')
+            elif fields_info[chp][0] == 'Real':
+                tipo = self.blabla.get(u'reel')
+            elif fields_info[chp][0] == 'String':
+                tipo = self.blabla.get(u'string')
+            elif fields_info[chp][0] == 'Date':
+                tipo = self.blabla.get(u'date')
+            # concatenation of field informations
+            try:
+                champs = champs + chp +\
+                         u" (" + tipo + self.blabla.get(u'longueur') +\
+                         unicode(fields_info[chp][1]) +\
+                         self.blabla.get(u'precision') +\
+                         unicode(fields_info[chp][2]) + u") ; "
+            except UnicodeDecodeError:
+                # write a notification into the log file
+                self.dico_err[layer_infos.get('name')] = self.blabla.get(u'err_encod') + \
+                                                         chp.decode('latin1') + \
+                                                         u"\n\n"
+                self.logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
+                # decode the fucking field name
+                champs = champs + chp.decode('latin1') \
+                + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo, fields_info[chp][1], fields_info[chp][2])
+                # then continue
+                continue
+
+        # Once all fieds explored, write them
+        sheet.write(line, 13, champs)
+
+        # End of function
+        return self.book, self.feuy3
 
 
     def savedico(self):
