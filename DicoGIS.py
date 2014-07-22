@@ -92,8 +92,7 @@ if platform == 'win32':
         sys.path.append(r'C:\Program Files (x86)\ArcGIS\Desktop10.2\bin')
         sys.path.append(r'C:\Program Files (x86)\ArcGIS\Desktop10.2\ArcToolbox\Scripts')
         try:
-            from arcpy import env as enviro
-            from arcpy import ListDatasets, ListFeatureClasses, GetCount_management, ListFiles, ListFields, ListRasters, Describe
+            import arcpy
             print("ArcGIS has been added to Python path and then imported.")
         except:
             print("ArcGIS isn't installed on this computer")
@@ -315,7 +314,7 @@ class DicoGIS(Tk):
         self.icone = PhotoImage(file = r'data/img/DicoGIS_logo.gif')
         Label(self, borderwidth = 2,
                     image = self.icone).grid(row = 1,
-                                             rowspan = 4,
+                                             rowspan = 5,
                                              column = 0,
                                              padx = 2,
                                              pady = 2,
@@ -325,7 +324,7 @@ class DicoGIS(Tk):
         s.configure('Kim.TButton', foreground='DodgerBlue', borderwidth = 0)
         Button(self, text = 'by Julien M.\n      2014',
                      style = 'Kim.TButton',
-                     command = lambda: open_new('https://github.com/Guts')).grid(row = 5,
+                     command = lambda: open_new('https://github.com/Guts')).grid(row = 6,
                                                                                  padx = 2,
                                                                                  pady = 2,
                                                                                  sticky = W+E)
@@ -379,17 +378,18 @@ class DicoGIS(Tk):
             self.def_lang = config.get('basics', 'def_codelang')
             self.def_rep = config.get('basics', 'def_rep')
             # filters
-            self.opt_shp.set(config.get('filters', 'def_shp'))
-            self.opt_tab.set(config.get('filters', 'def_tab'))
-            self.opt_kml.set(config.get('filters', 'def_kml'))
-            self.opt_gml.set(config.get('filters', 'def_gml'))
-            self.opt_geoj.set(config.get('filters', 'def_geoj'))
-            self.opt_rast.set(config.get('filters', 'def_rast'))
+            self.opt_shp.set(config.get('filters', 'opt_shp'))
+            self.opt_tab.set(config.get('filters', 'opt_tab'))
+            self.opt_kml.set(config.get('filters', 'opt_kml'))
+            self.opt_gml.set(config.get('filters', 'opt_gml'))
+            self.opt_geoj.set(config.get('filters', 'opt_geoj'))
+            self.opt_rast.set(config.get('filters', 'opt_rast'))
             # database settings
             self.host.set(config.get('database', 'host'))
             self.port.set(config.get('database', 'port'))
             self.dbnb.set(config.get('database', 'db_name'))
             self.user.set(config.get('database', 'user'))
+            self.opt_pgvw.set(config.get('database', 'opt_views'))
             # log
             self.logger.info('Last options loaded')
         except:
@@ -414,17 +414,18 @@ class DicoGIS(Tk):
         config.set('basics', 'def_codelang', self.ddl_lang.get())
         config.set('basics', 'def_rep', self.target.get())
         # filters
-        config.set('filters', 'def_shp', self.opt_shp.get())
-        config.set('filters', 'def_tab', self.opt_tab.get())
-        config.set('filters', 'def_kml', self.opt_kml.get())
-        config.set('filters', 'def_gml', self.opt_gml.get())
-        config.set('filters', 'def_geoj', self.opt_geoj.get())
-        config.set('filters', 'def_rast', self.opt_rast.get())
+        config.set('filters', 'opt_shp', self.opt_shp.get())
+        config.set('filters', 'opt_tab', self.opt_tab.get())
+        config.set('filters', 'opt_kml', self.opt_kml.get())
+        config.set('filters', 'opt_gml', self.opt_gml.get())
+        config.set('filters', 'opt_geoj', self.opt_geoj.get())
+        config.set('filters', 'opt_rast', self.opt_rast.get())
         # databse settings
         config.set('database', 'host', self.host.get())
         config.set('database', 'port', self.port.get())
         config.set('database', 'db_name', self.dbnb.get())
         config.set('database', 'user', self.user.get())
+        config.set('database', 'opt_views', self.opt_pgvw.get())
         # Writing the configuration file
         with open(confile, 'wb') as configfile:
             config.write(configfile)
