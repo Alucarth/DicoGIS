@@ -35,7 +35,7 @@ from modules import *
 sys.argv.append('py2exe')
 
 # version
-num_version = "v2.0-beta.1"
+num_version = "v2.0-beta.2"
 
 # Specific data for gdal
 gdal_dir = r'data/gdal'
