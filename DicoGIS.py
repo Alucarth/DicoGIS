@@ -30,7 +30,7 @@ from ttk import Combobox, Progressbar, Style, Labelframe, Frame
 from ttk import Label, Button, Entry, Radiobutton, Checkbutton       # advanced graphic widgets
 import tkFont   # font library
 
-from sys import exit, platform
+from sys import exit, platform as opersys
 from os import  listdir, walk, path         # files and folder managing
 from os import environ as env, access, R_OK
 from time import strftime
@@ -38,6 +38,8 @@ from webbrowser import open_new
 import threading    # handling various subprocess
 
 import ConfigParser         # to manipulate the options.ini file
+
+import platform
 
 import logging      # log files
 from logging.handlers import RotatingFileHandler
@@ -64,6 +66,8 @@ except ImportError:
 
 from gdalconst import *
 gdal.AllRegister()
+ogr.UseExceptions()
+gdal.UseExceptions()
 
 from xlwt import Workbook, Font, XFStyle, easyxf, Formula  # excel writer
 from xlwt import Alignment, Pattern, Borders, easyfont      # excel style config
@@ -80,7 +84,7 @@ from modules import Read_PostGIS     # custom extractor for geographic data in P
 
 
 # Imports depending on operating system
-if platform == 'win32':
+if opersys == 'win32':
     u""" windows """
     from os import startfile                            # to open a folder/file
     try:
@@ -116,33 +120,34 @@ class DicoGIS(Tk):
         logfile.setLevel(logging.DEBUG)
         logfile.setFormatter(log_form)
         self.logger.addHandler(logfile)
-        self.logger.info('\t ====== DicoGIS ======')  # first write
+        self.logger.info('\t\t ============== DicoGIS =============')  # first write
 
         # basics settings
         Tk.__init__(self)               # constructor of parent graphic class
         self.title(u'DicoGIS')
-        if platform == 'win32':
-            self.logger.info('Operating system: Windows')
+        if opersys == 'win32':
+            self.logger.info('Operating system: {0}'.format(platform.platform()))
             self.iconbitmap('DicoGIS.ico')    # windows icon
             self.uzer = env.get(u'USERNAME')
-        elif platform == 'linux2':
-            self.logger.info('Operating system: Linux')
+        elif opersys == 'linux2':
+            self.logger.info('Operating system: {0}'.format(platform.platform()))
             self.uzer = env.get(u'USER')
             icon = Image("photo", file = r'data/img/DicoGIS_logo.gif')
             self.call('wm','iconphoto', self._w, icon)
             self.style = Style().theme_use('clam')
-        elif platform == 'darwin':
-            self.logger.info('Operating system: Mac')
+        elif opersys == 'darwin':
+            self.logger.info('Operating system: {0}'.format(platform.platform()))
             self.uzer = env.get(u'USER')
         else:
             self.logger.warning('Operating system unknown')
+            self.logger.info('Operating system: {0}'.format(platform.platform()))
         self.resizable(width = False, height = False)
         self.focus_force()
 
         # variables
         self.num_folders = 0
         self.def_rep = ""       # default folder to search for
-        self.def_lang = 'FR'    # default language to start
+        self.def_lang = 'EN'    # default language to start
         self.li_shp = []         # list for shapefiles path
         self.li_tab = []         # list for MapInfo tables path
         self.li_raster = []     # list for rasters paths
@@ -409,7 +414,7 @@ class DicoGIS(Tk):
         config.add_section('database')
         # config
         config.set('config', 'DicoGIS_version', DGversion)
-        config.set('config', 'OS', platform)
+        config.set('config', 'OS', platform.platform())
         # basics
         config.set('basics', 'def_codelang', self.ddl_lang.get())
         config.set('basics', 'def_rep', self.target.get())
@@ -682,10 +687,15 @@ class DicoGIS(Tk):
                 # reset recipient data
                 self.dico_layer.clear()
                 self.dico_fields.clear()
-                # creating separated process threads
-                Read_SHP(shp, self.dico_layer, self.dico_fields, 'shape', self.blabla)
-                self.logger.info('\t Infos OK')
                 # getting the informations
+                try:
+                    Read_SHP(shp, self.dico_layer, self.dico_fields, 'shape', self.blabla)
+                    self.logger.info('\t Infos OK')
+                except AttributeError, e:
+                    self.logger.error(e)
+                    continue
+                except Exception, e:
+                    self.logger.error(e)
                 # writing to the Excel dictionary
                 self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
                 self.logger.info('\t Wrote into the dictionary')
@@ -708,8 +718,14 @@ class DicoGIS(Tk):
                 self.dico_layer.clear()
                 self.dico_fields.clear()
                 # getting the informations
-                Read_TAB(tab, self.dico_layer, self.dico_fields, 'table', self.blabla)
-                self.logger.info('\t Infos OK')
+                try:
+                    Read_TAB(tab, self.dico_layer, self.dico_fields, 'table', self.blabla)
+                    self.logger.info('\t Infos OK')
+                except AttributeError, e:
+                    self.logger.error(e)
+                    continue
+                except Exception, e:
+                    self.logger.error(e)
                 # writing to the Excel dictionary
                 self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
                 self.logger.info('\t Wrote into the dictionary')
@@ -732,8 +748,14 @@ class DicoGIS(Tk):
                 self.dico_layer.clear()
                 self.dico_fields.clear()
                 # getting the informations
-                Read_KML(kml, self.dico_layer, self.dico_fields, 'kml', self.blabla)
-                self.logger.info('\t Infos OK')
+                try:
+                    Read_KML(kml, self.dico_layer, self.dico_fields, 'kml', self.blabla)
+                    self.logger.info('\t Infos OK')
+                except AttributeError, e:
+                    self.logger.error(e)
+                    continue
+                except Exception, e:
+                    self.logger.error(e)
                 # writing to the Excel dictionary
                 self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
                 self.logger.info('\t Wrote into the dictionary')
@@ -756,8 +778,14 @@ class DicoGIS(Tk):
                 self.dico_layer.clear()
                 self.dico_fields.clear()
                 # getting the informations
-                Read_GML(gml, self.dico_layer, self.dico_fields, 'gml', self.blabla)
-                self.logger.info('\t Infos OK')
+                try:
+                    Read_GML(gml, self.dico_layer, self.dico_fields, 'gml', self.blabla)
+                    self.logger.info('\t Infos OK')
+                except AttributeError, e:
+                    self.logger.error(e)
+                    continue
+                except Exception, e:
+                    self.logger.error(e)
                 # writing to the Excel dictionary
                 self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
                 self.logger.info('\t Wrote into the dictionary')
@@ -780,8 +808,14 @@ class DicoGIS(Tk):
                 self.dico_layer.clear()
                 self.dico_fields.clear()
                 # getting the informations
-                Read_GeoJSON(geojson, self.dico_layer, self.dico_fields, 'geojson', self.blabla)
-                self.logger.info('\t Infos OK')
+                try:
+                    Read_GeoJSON(geojson, self.dico_layer, self.dico_fields, 'geojson', self.blabla)
+                    self.logger.info('\t Infos OK')
+                except AttributeError, e:
+                    self.logger.error(e)
+                    continue
+                except Exception, e:
+                    self.logger.error(e)
                 # writing to the Excel dictionary
                 self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
                 self.logger.info('\t Wrote into the dictionary')
@@ -804,9 +838,15 @@ class DicoGIS(Tk):
                 self.dico_raster.clear()
                 self.dico_bands.clear()
                 # getting the informations
-                Read_Rasters(raster, self.dico_raster, self.dico_bands, path.splitext(raster)[1], self.blabla)
-                print(self.dico_raster, self.dico_bands)
-                self.logger.info('\t Infos OK')
+                try:
+                    Read_Rasters(raster, self.dico_raster, self.dico_bands, path.splitext(raster)[1], self.blabla)
+                    self.logger.info('\t Infos OK')
+                #   print(self.dico_raster, self.dico_bands)
+                except AttributeError, e:
+                    self.logger.error(e)
+                    continue
+                except Exception, e:
+                    self.logger.error(e)
                 # writing to the Excel dictionary
                 self.dictionarize_rasters(self.dico_raster, self.dico_bands, self.feuy2, line_rasters)
                 self.logger.info('\t Wrote into the dictionary')
@@ -915,7 +955,6 @@ class DicoGIS(Tk):
 
     def test_connection(self):
         u""" testing database connection settings using OGR specific exceptions """
-        ogr.UseExceptions()
         # checking if user chose to list PostGIS views
         if self.opt_pgvw.get():
             gdal.SetConfigOption(str("PG_LIST_ALL_TABLES"), str("YES"))
@@ -1070,18 +1109,20 @@ class DicoGIS(Tk):
         if layer_infos.get('error'):
             self.logger.warning('\tproblem detected')
             sheet.write(line, 0, layer_infos.get('name'))
-            link = 'HYPERLINK("' + layer_infos.get(u'folder') \
-                             + '"; "' + self.blabla.get('browse') + '")'
+            link = 'HYPERLINK("{0}"; "{1}")'.format(layer_infos.get(u'folder'),
+                                                    self.blabla.get('browse'))
             sheet.write(line, 1, Formula(link), self.url)
             sheet.write(line, 2, self.blabla.get((layer_infos.get('error')), self.erreur))
             # Interruption of function
             return self.book, self.feuy1
+        else:
+            pass
 
         # Name
         sheet.write(line, 0, layer_infos.get('name'))
         # Path of containing folder formatted to be a hyperlink
-        link = 'HYPERLINK("' + layer_infos.get(u'folder') \
-                             + '"; "' + self.blabla.get('browse') + '")'
+        link = 'HYPERLINK("{0}"; "{1}")'.format(layer_infos.get(u'folder'),
+                                                self.blabla.get('browse'))
         sheet.write(line, 1, Formula(link), self.url)
         # Name of containing folder
         # with an exceptin if this is the format name
@@ -1338,10 +1379,11 @@ class DicoGIS(Tk):
         self.book.save(saved)
         self.output.delete(0, END)
         self.output.insert(0, saved)
-        # notification
-        total_files = unicode(len(self.li_shp) + len(self.li_tab))
-        info(title=self.blabla.get('info_end'),
-             message = self.blabla.get('info_end2'))
+
+        # # notification
+        # total_files = unicode(len(self.li_shp) + len(self.li_tab))
+        # info(title=self.blabla.get('info_end'),
+        #      message = self.blabla.get('info_end2'))
 
         # End of function
         return self.book, saved
@@ -1358,20 +1400,20 @@ class DicoGIS(Tk):
             raise IOError('Cannot access file: %s' % target)
 
         # open the directory or the file according to the os
-        if platform == 'win32': # Windows
+        if opersys == 'win32': # Windows
             proc = startfile(target)
 
-        elif platform.startswith('linux'): # Linux:
+        elif opersys.startswith('linux'): # Linux:
             proc = subprocess.Popen(['xdg-open', target],
                                      stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        elif platform == 'darwin': # Mac:
+        elif opersys == 'darwin': # Mac:
             proc = subprocess.Popen(['open', '--', target],
                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         else:
             raise NotImplementedError(
-                "Your `%s` isn't a supported operating system`." % platform)
+                "Your `%s` isn't a supported operating system`." % opersys)
 
         # end of function
         return proc
