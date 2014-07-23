@@ -112,12 +112,12 @@ class Read_Rasters():
         dico_raster[u'pixelHeight'] = round(geotransform[5],3)
         dico_raster[u'orientation'] = geotransform[2]
 
-        # projection
+            ## SRS
+        # using osr to get the srs
         srs = osr.SpatialReference()
         srs.ImportFromWkt(self.rast.GetProjectionRef())
-        print(srs)
         srs.AutoIdentifyEPSG()
-        # srs type
+        # srs types
         srsmetod = [
                     (srs.IsCompound(), txt.get('srs_comp')),
                     (srs.IsGeocentric(), txt.get('srs_geoc')),
@@ -126,13 +126,20 @@ class Read_Rasters():
                     (srs.IsProjected(), txt.get('srs_proj')),
                     (srs.IsVertical(), txt.get('srs_vert'))
                     ]
+        # searching for a match with one of srs types
         for srsmet in srsmetod:
             if srsmet[0] == 1:
                 typsrs = srsmet[1]
             else:
                 continue
-        dico_raster[u'srs_type'] = unicode(typsrs)
-        #1 Handling exception in srs names'encoding
+        # in case of not match
+        try:
+            dico_raster[u'srs_type'] = unicode(typsrs)
+        except UnboundLocalError:
+            typsrs = txt.get('srs_nr')
+            dico_raster[u'srs_type'] = unicode(typsrs)
+
+        # Handling exception in srs names'encoding
         try:
             if srs.GetAttrValue('PROJCS') != None:
                 dico_raster[u'srs'] = unicode(srs.GetAttrValue('PROJCS')).replace('_', ' ')

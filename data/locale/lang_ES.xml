@@ -86,6 +86,7 @@
 	<srs_loca>Local</srs_loca>
 	<srs_proj>Projectada</srs_proj>
 	<srs_vert>Vertical</srs_vert>
+	<srs_nr>Sin información</srs_nr>
 <!-- Gestion erreurs -->
 	<nofolder>Ninguna carpeta seleccionada</nofolder>
 	<nodata>Ningún dato compatible encontrado.</nodata>

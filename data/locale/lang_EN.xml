@@ -86,6 +86,7 @@
 	<srs_loca>Local</srs_loca>
 	<srs_proj>Projected</srs_proj>
 	<srs_vert>Vertical</srs_vert>
+	<srs_nr>Not specified</srs_nr>
 <!-- Gestion erreurs -->
 	<nofolder>Any folder selected</nofolder>
 	<nodata>Any compatible geographic data (.shp / .tab) has been found.</nodata>
