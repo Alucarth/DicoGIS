@@ -89,10 +89,18 @@ class Read_SHP():
                     (self.srs.IsProjected(), txt.get('srs_proj')),
                     (self.srs.IsVertical(), txt.get('srs_vert'))
                     ]
+        # searching for a match with one of srs types
         for srsmet in srsmetod:
             if srsmet[0] == 1:
                 typsrs = srsmet[1]
-        dico_layer[u'srs_type'] = unicode(typsrs)
+            else:
+                continue
+        # in case of not match
+        try:
+            dico_layer[u'srs_type'] = unicode(typsrs)
+        except UnboundLocalError:
+            typsrs = txt.get('srs_nr')
+            dico_layer[u'srs_type'] = unicode(typsrs)
         # Storing into the dictionary
         dico_layer[u'name'] = path.basename(layerpath)
         dico_layer[u'folder'] = path.dirname(layerpath)
