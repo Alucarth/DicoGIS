@@ -55,8 +55,18 @@ class Read_PostGIS():
             print "Houston, we've a problem with the source"
             self.alert = self.alert +1
             return None
+        try:
+            obj = layer.GetFeature(1)          # get the first object (shp)
+        except RuntimeError, e:
+            if u'permission denied' in str(e):
+                print 'yop'
+                mess = str(e).split('\n')[0]
+                self.erratum(dico_layer, layer, mess)
+                self.alert = self.alert +1
+                return None
+            else:
+                pass
 
-        obj = layer.GetFeature(1)          # get the first object (shp)
         self.geom = obj.GetGeometryRef()        # get the geometry
         self.def_couche = layer.GetLayerDefn() # get layer definitions
         self.srs = layer.GetSpatialRef()   # get spatial system reference
@@ -87,10 +97,15 @@ class Read_PostGIS():
         dico_layer[u'srs_type'] = unicode(typsrs)
         # Storing into the dictionary
         dico_layer[u'name'] = layer.GetName()
-        dico_layer[u'folder'] = 'PostGIS database'
         dico_layer[u'title'] = layer.GetName().capitalize()
         dico_layer[u'num_obj'] = layer.GetFeatureCount()
         dico_layer[u'num_fields'] = self.def_couche.GetFieldCount()
+        # schema name
+        try:
+            layer.GetName().split('.')[1]
+            dico_layer[u'folder'] = layer.GetName().split('.')[0]
+        except IndexError:
+            dico_layer[u'folder'] = 'public'
         # Handling exception in srs names'encoding
         try:
             if self.srs.GetAttrValue('PROJCS') != 'unnamed':
@@ -146,7 +161,13 @@ class Read_PostGIS():
         u""" errors handling """
         # local variables
         dicolayer[u'name'] = layer.GetName()
-        dicolayer[u'folder'] = 'PostGIS table'
+        # schema name
+        try:
+            layer.GetName().split('.')[1]
+            dicolayer[u'folder'] = layer.GetName().split('.')[0]
+        except IndexError:
+            dicolayer[u'folder'] = 'public'
+        # layer definition
         def_couche = layer.GetLayerDefn()
         dicolayer[u'num_fields'] = def_couche.GetFieldCount()
         dicolayer[u'error'] = mess
@@ -187,16 +208,22 @@ if __name__ == '__main__':
                                                                       test_user, 
                                                                       test_pwd))
         print("Access granted : connecting people!")
-        print(conn.GetLayerCount())
+        print("Layer count: {0}".format(conn.GetLayerCount()))
         sql_version = "SELECT version();"
         version = conn.ExecuteSQL(sql_version)
-        print(conn.GetDriver().GetName())
+        # schemas list
+        sql_schemas =  "select nspname from pg_catalog.pg_namespace;"
+        schemas = conn.ExecuteSQL(sql_schemas)
+  
+        print("Driver name: {0}".format(conn.GetDriver().GetName()))
         print(dir(conn))
     except Exception, e:
         print 'Connection to database failed. Check your connection settings: {0}'.format(str(e))
         exit()
     # parsing the layers
     for layer in conn:
+        dico_layer.clear()
+        dico_fields.clear()
         print("\n")
         print layer.GetName()
         # if "_current"
