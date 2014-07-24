@@ -11,7 +11,7 @@
 #
 # Python:       2.7.x
 # Created:      18/06/2013
-# Updated:      13/08/2013
+# Updated:      13/07/2014
 # Licence:      GPL 3
 #-------------------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ from collections import OrderedDict as OD
 from osgeo import ogr    # spatial files
 from osgeo import gdal
 
-gdal.SetConfigOption("PG_LIST_ALL_TABLES", "YES")
+# gdal.SetConfigOption("PG_LIST_ALL_TABLES", "YES")
 
 ################################################################################
 ########### Classes #############
@@ -46,6 +46,8 @@ class Read_PostGIS():
         tipo = feature type to read
         text = dictionary of texts to display
         """
+        # handling ogr specific exceptions
+        ogr.UseExceptions()
         # Creating variables
         self.alert = 0
 
@@ -102,9 +104,6 @@ class Read_PostGIS():
             else:
                 dico_layer[u'srs'] = self.srs.GetAttrValue('PROJECTION').decode('latin1').replace('_', ' ')
         dico_layer[u'EPSG'] = unicode(self.srs.GetAttrValue("AUTHORITY", 1))
-        # Getting basic dates
-        dico_layer[u'date_actu'] = '0000-00-00' # looking for a solution to get the last update of a pg table
-        dico_layer[u'date_crea'] = '0000-00-00' # looking for a solution to get the last update of a pg table
         # EPSG code
         if dico_layer[u'EPSG'] == u'4326' and dico_layer[u'srs'] == u'None':
             print dico_layer[u'srs']
