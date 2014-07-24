@@ -692,6 +692,11 @@ class DicoGIS(Tk):
                     Read_SHP(shp, self.dico_layer, self.dico_fields, 'shape', self.blabla)
                     self.logger.info('\t Infos OK')
                 except AttributeError, e:
+                    """ empty files """
+                    self.logger.error(e)
+                    continue
+                except RuntimeError,e:
+                    """ corrupt files """
                     self.logger.error(e)
                     continue
                 except Exception, e:
@@ -724,6 +729,10 @@ class DicoGIS(Tk):
                 except AttributeError, e:
                     self.logger.error(e)
                     continue
+                except RuntimeError,e:
+                    self.logger.error(e)
+                    continue
+                    continue
                 except Exception, e:
                     self.logger.error(e)
                 # writing to the Excel dictionary
@@ -752,6 +761,9 @@ class DicoGIS(Tk):
                     Read_KML(kml, self.dico_layer, self.dico_fields, 'kml', self.blabla)
                     self.logger.info('\t Infos OK')
                 except AttributeError, e:
+                    self.logger.error(e)
+                    continue
+                except RuntimeError,e:
                     self.logger.error(e)
                     continue
                 except Exception, e:
@@ -784,6 +796,9 @@ class DicoGIS(Tk):
                 except AttributeError, e:
                     self.logger.error(e)
                     continue
+                except RuntimeError,e:
+                    self.logger.error(e)
+                    continue
                 except Exception, e:
                     self.logger.error(e)
                 # writing to the Excel dictionary
@@ -812,6 +827,9 @@ class DicoGIS(Tk):
                     Read_GeoJSON(geojson, self.dico_layer, self.dico_fields, 'geojson', self.blabla)
                     self.logger.info('\t Infos OK')
                 except AttributeError, e:
+                    self.logger.error(e)
+                    continue
+                except RuntimeError,e:
                     self.logger.error(e)
                     continue
                 except Exception, e:
@@ -843,6 +861,9 @@ class DicoGIS(Tk):
                     self.logger.info('\t Infos OK')
                 #   print(self.dico_raster, self.dico_bands)
                 except AttributeError, e:
+                    self.logger.error(e)
+                    continue
+                except RuntimeError,e:
                     self.logger.error(e)
                     continue
                 except Exception, e:
@@ -1010,8 +1031,7 @@ class DicoGIS(Tk):
         # hyperlinks style
         self.url = easyxf(u'font: underline single')
         # errors style
-        self.erreur = easyxf('pattern: pattern solid;'
-                             'font: colour red, bold True;')
+        self.erreur = easyxf('font: colour red, bold True;')
 
         # columns headers
         if self.typo.get() == 1 and (len(self.li_tab) + len(self.li_shp) + len(self.li_gml) + len(self.li_geoj) + len(self.li_kml)) >0:
