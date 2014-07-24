@@ -47,6 +47,8 @@ class Read_TAB():
         text = dictionary of text in the selected language
 
         """
+        # handling ogr specific exceptions
+        ogr.UseExceptions()
         # Creating variables
         self.alert = 0
         source = ogr.Open(layerpath, 0)     # OGR driver

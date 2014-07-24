@@ -49,6 +49,8 @@ class Read_GeoPDF():
         tipo = format
         text = dictionary of text in the selected language
         """
+        # handling gdal specific exceptions
+        gdal.UseExceptions()
         # variables
         self.alert = 0
 

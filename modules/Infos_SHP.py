@@ -11,7 +11,7 @@
 #
 # Python:       2.7.x
 # Created:      18/02/2013
-# Updated:      21/06/2014
+# Updated:      21/07/2014
 # Licence:      GPL 3
 #-------------------------------------------------------------------------------
 
@@ -59,6 +59,9 @@ class Read_SHP():
             self.erratum(dico_layer, layerpath, u'err_corrupt')
             self.alert = self.alert +1
             return None
+        except Exception, e:
+            print e
+            return None
 
         if not source:
             u""" if layer doesn't have any object, return an error """
@@ -77,8 +80,19 @@ class Read_SHP():
         self.geom = obj.GetGeometryRef()       # get the geometry
 
         self.def_couche = self.layer.GetLayerDefn()  # get layer definitions
-        self.srs = self.layer.GetSpatialRef()   # get spatial system reference
-        self.srs.AutoIdentifyEPSG()     # try to determine the EPSG code
+        
+        try:
+            self.srs = self.layer.GetSpatialRef()   # get spatial system reference
+            self.srs.AutoIdentifyEPSG()     # try to determine the EPSG code
+        except AttributeError, e:
+            if not path.isfile('%s.prj' % layerpath[:-4])\
+                or path.isfile('%s.PRJ' % layerpath[:-4]):
+                self.erratum(dico_layer, layerpath, u'err_noprj')
+                self.alert = self.alert +1
+                return
+            else:
+                pass
+
 
         # basic information
         dico_layer[u'type'] = tipo
@@ -183,7 +197,7 @@ class Read_SHP():
             def_couche = self.layer.GetLayerDefn()
             dicolayer[u'num_fields'] = def_couche.GetFieldCount()
         except AttributeError:
-            mess = mess    
+            mess = mess
         finally:
             dicolayer[u'error'] = mess
         # End of function
