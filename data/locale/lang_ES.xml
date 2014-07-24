@@ -79,6 +79,9 @@
 	<origin_y>Y origin</origin_y>
 	<compression>Rato de compresión</compression>
 	<coloref>Sistema de colores</coloref>
+<!-- Output file: PostGIS -->
+	<schema>Esquema</schema>
+	<conn_chain>Cadena de conexión</conn_chain>
 <!-- SRS -->
 	<srs_comp>Compuesta (2D +)</srs_comp>
 	<srs_geoc>Geocéntrica</srs_geoc>

@@ -79,6 +79,9 @@
 	<origin_y>Y origin</origin_y>
 	<compression>Compression rate</compression>
 	<coloref>Color system</coloref>
+<!-- Output file: PostGIS -->
+	<schema>Schema</schema>
+	<conn_chain>DB connection</conn_chain>
 <!-- SRS -->
 	<srs_comp>Compound</srs_comp>
 	<srs_geoc>Geocentric</srs_geoc>
