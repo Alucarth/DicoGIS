@@ -29,6 +29,8 @@ from collections import OrderedDict as OD
 from osgeo import ogr    # handler for vector spatial files
 from osgeo import osr
 
+
+
 ################################################################################
 ########### Classes #############
 #################################
@@ -47,9 +49,17 @@ class Read_SHP():
         text = dictionary of text in the selected language
 
         """
+        # handling ogr specific exceptions
+        ogr.UseExceptions()
         # Creating variables
         self.alert = 0
-        source = ogr.Open(layerpath, 0)     # OGR driver
+        try:
+            source = ogr.Open(layerpath, 0)     # OGR driver
+        except RuntimeError:
+            self.erratum(dico_layer, layerpath, u'err_corrupt')
+            self.alert = self.alert +1
+            return None
+
         if not source:
             u""" if layer doesn't have any object, return an error """
             print 'no compatible source'
@@ -189,7 +199,7 @@ if __name__ == '__main__':
     # libraries import
     from os import getcwd, chdir, path
     # test files
-    li_shp = [path.join(getcwd(), r'..\test\datatest\vectors\shp\airports.shp')]         # shapefile
+    li_shp = [path.join(getcwd(), r'..\test\datatest\vectors\shp\airports.shp'), path.join(getcwd(), r'..\test\datatest\vectors\shp\itineraires_rando.shp')]         # shapefile
     # test text dictionary
     textos = OD()
     textos['srs_comp'] = u'Compound'
@@ -211,6 +221,6 @@ if __name__ == '__main__':
         dico_layer.clear()
         dico_fields.clear()
         # getting the informations
-        print shp
+        print('\n{0}'.format(shp))
         info_shp = Read_SHP(shp, dico_layer, dico_fields, 'shape', textos)
         print '\n', dico_layer, dico_fields
