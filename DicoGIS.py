@@ -415,7 +415,10 @@ class DicoGIS(Tk):
         config.set('config', 'OS', platform.platform())
         # basics
         config.set('basics', 'def_codelang', self.ddl_lang.get())
-        config.set('basics', 'def_rep', self.target.get())
+        if self.target.get():
+            config.set('basics', 'def_rep', self.target.get())
+        else:
+            config.set('basics', 'def_rep', self.def_rep)
         # filters
         config.set('filters', 'opt_shp', self.opt_shp.get())
         config.set('filters', 'opt_tab', self.opt_tab.get())
@@ -905,8 +908,13 @@ class DicoGIS(Tk):
         # getting the info from shapefiles and compile it in the excel
         line = 1    # line of dictionary
         self.logger.info('\tPostGIS table processing...')
+        # setting progress bar
+        self.prog_layers["maximum"] = conn.GetLayerCount()
         # parsing the layers
         for layer in conn:
+            # reset recipient data
+            self.dico_layer.clear()
+            self.dico_fields.clear()
             Read_PostGIS(layer, self.dico_layer, self.dico_fields, 'pg', self.blabla)
             self.logger.info('Table examined: %s' % layer.GetName())
             # writing to the Excel dictionary
@@ -1089,8 +1097,8 @@ class DicoGIS(Tk):
             """ adding a new sheet for rasters informations """
             self.feuy3 = self.book.add_sheet(u'PostGIS', cell_overwrite_ok=True)
             self.feuy3.write(0, 0, self.blabla.get('nomfic'), self.entete)
-            self.feuy3.write(0, 1, self.blabla.get('path'), self.entete)
-            self.feuy3.write(0, 2, self.blabla.get('theme'), self.entete)
+            self.feuy3.write(0, 1, self.blabla.get('conn_chain'), self.entete)
+            self.feuy3.write(0, 2, self.blabla.get('schema'), self.entete)
             self.feuy3.write(0, 3, self.blabla.get('num_attrib'), self.entete)
             self.feuy3.write(0, 4, self.blabla.get('num_objets'), self.entete)
             self.feuy3.write(0, 5, self.blabla.get('geometrie'), self.entete)
@@ -1300,30 +1308,28 @@ class DicoGIS(Tk):
         # local variables
         champs = ""
         theme = ""
-
         # in case of a source error
         if layer_infos.get('error'):
             self.logger.warning('\tproblem detected')
             sheet.write(line, 0, layer_infos.get('name'))
-            link = 'HYPERLINK("' + layer_infos.get(u'folder') \
-                             + '"; "' + self.blabla.get('browse') + '")'
-            sheet.write(line, 1, Formula(link), self.url)
-            sheet.write(line, 2, self.blabla.get((layer_infos.get('error')), self.xls_erreur))
+            sheet.write(line, 1, "{0}:{1}-{2}".format(self.host.get(),
+                                                      self.port.get(),
+                                                      self.dbnb.get()), 
+                                 self.xls_erreur)
+            sheet.write(line, 2, layer_infos.get('error'), self.xls_erreur)
             # Interruption of function
-            return self.book, self.feuy1
+            return sheet
+        else:
+            pass
 
         # Name
         sheet.write(line, 0, layer_infos.get('name'))
-        # Path of containing folder formatted to be a hyperlink
-        link = 'HYPERLINK("' + layer_infos.get(u'folder') \
-                             + '"; "' + self.blabla.get('browse') + '")'
-        sheet.write(line, 1, Formula(link), self.url)
+        # Connection chain to reach database
+        sheet.write(line, 1, "{0}:{1}-{2}".format(self.host.get(),
+                                                  self.port.get(),
+                                                  self.dbnb.get()))
         # Name of containing folder
-        # with an exceptin if this is the format name
-        if path.basename(layer_infos.get(u'folder')) in self.li_vectors_formats:
-            sheet.write(line, 2, path.basename(layer_infos.get(u'folder')))
-        else:
-            sheet.write(line, 2, path.basename(path.dirname(layer_infos.get(u'folder'))))
+        sheet.write(line, 2, path.basename(layer_infos.get(u'folder')))
 
         # Geometry type
         sheet.write(line, 5, layer_infos.get(u'type_geom'))
