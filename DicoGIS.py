@@ -11,7 +11,7 @@ from __future__ import unicode_literals
 #
 # Python:       2.7.x
 # Created:      14/02/2013
-# Updated:      03/07/3014
+# Updated:      24/07/2014
 #
 # Licence:      GPL 3
 #-------------------------------------------------------------------------------
@@ -69,9 +69,7 @@ gdal.AllRegister()
 ogr.UseExceptions()
 gdal.UseExceptions()
 
-from xlwt import Workbook, Font, XFStyle, easyxf, Formula  # excel writer
-from xlwt import Alignment, Pattern, Borders, easyfont      # excel style config
-
+from xlwt import Workbook, easyxf, Formula  # excel writer
 
 # Custom modules
 from modules import Read_Rasters    # custom extractor for geographic data in PostGIS databases
@@ -554,7 +552,6 @@ class DicoGIS(Tk):
                 if full_path[-4:].lower() == '.gdb':
                     # add complete path of shapefile
                     self.li_gdb.append(path.abspath(full_path))
-                    print full_path
                 else:
                     pass
             for f in files:
@@ -568,8 +565,7 @@ class DicoGIS(Tk):
                 # Looping on files contained
                 if path.splitext(full_path.lower())[1].lower() == '.shp' and \
         (path.isfile('%s.dbf' % full_path[:-4]) or path.isfile('%s.DBF' % full_path[:-4])) and \
-        (path.isfile('%s.shx' % full_path[:-4]) or path.isfile('%s.SHX' % full_path[:-4])) and \
-        (path.isfile('%s.prj' % full_path[:-4]) or path.isfile('%s.PRJ' % full_path[:-4])):
+        (path.isfile('%s.shx' % full_path[:-4]) or path.isfile('%s.SHX' % full_path[:-4])):
                     """ listing compatible shapefiles """
                     # add complete path of shapefile
                     self.li_shp.append(full_path)
@@ -701,6 +697,7 @@ class DicoGIS(Tk):
                     continue
                 except Exception, e:
                     self.logger.error(e)
+                    continue
                 # writing to the Excel dictionary
                 self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
                 self.logger.info('\t Wrote into the dictionary')
@@ -732,9 +729,9 @@ class DicoGIS(Tk):
                 except RuntimeError,e:
                     self.logger.error(e)
                     continue
-                    continue
                 except Exception, e:
                     self.logger.error(e)
+                    continue
                 # writing to the Excel dictionary
                 self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
                 self.logger.info('\t Wrote into the dictionary')
@@ -768,6 +765,7 @@ class DicoGIS(Tk):
                     continue
                 except Exception, e:
                     self.logger.error(e)
+                    continue
                 # writing to the Excel dictionary
                 self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
                 self.logger.info('\t Wrote into the dictionary')
@@ -801,6 +799,7 @@ class DicoGIS(Tk):
                     continue
                 except Exception, e:
                     self.logger.error(e)
+                    continue
                 # writing to the Excel dictionary
                 self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
                 self.logger.info('\t Wrote into the dictionary')
@@ -834,6 +833,7 @@ class DicoGIS(Tk):
                     continue
                 except Exception, e:
                     self.logger.error(e)
+                    continue
                 # writing to the Excel dictionary
                 self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
                 self.logger.info('\t Wrote into the dictionary')
@@ -868,6 +868,7 @@ class DicoGIS(Tk):
                     continue
                 except Exception, e:
                     self.logger.error(e)
+                    continue
                 # writing to the Excel dictionary
                 self.dictionarize_rasters(self.dico_raster, self.dico_bands, self.feuy2, line_rasters)
                 self.logger.info('\t Wrote into the dictionary')
@@ -885,6 +886,7 @@ class DicoGIS(Tk):
         self.logger.info('\n\tWorkbook saved: %s', self.output.get())
         # saving settings
         self.save_settings()
+        self.bell()
 
         # quit and exit
         self.open_dir_file(self.output.get())
@@ -1015,23 +1017,15 @@ class DicoGIS(Tk):
         self.book = Workbook(encoding = 'utf8')
         self.logger.info('Workbook created')
         # Some customization: fonts and styles
-        # first line style
-        self.entete = easyxf()
-            # font
-        font1 = Font()
-        font1.name = 'Times New Roman'
-        font1.bold = True
-            # alignment
-        alig1 = Alignment()
-        alig1.horz = 2
-            # assign
-        self.entete.font = font1
-        self.entete.alignment = alig1
-
+        # headers style
+        self.entete = easyxf('pattern: pattern solid, fore_colour black;'
+                            'font: colour white, bold True, height 220;'
+                            'align: horiz center')
         # hyperlinks style
         self.url = easyxf(u'font: underline single')
         # errors style
-        self.erreur = easyxf('font: colour red, bold True;')
+        self.xls_erreur = easyxf('pattern: pattern solid, fore_colour red;'
+                                 'font: colour white, bold True;')
 
         # columns headers
         if self.typo.get() == 1 and (len(self.li_tab) + len(self.li_shp) + len(self.li_gml) + len(self.li_geoj) + len(self.li_kml)) >0:
@@ -1117,7 +1111,7 @@ class DicoGIS(Tk):
             pass  
 
         # end of function
-        return self.book, self.entete, self.url, self.erreur
+        return self.book, self.entete, self.url, self.xls_erreur
 
     def dictionarize_vectors(self, layer_infos, fields_info, sheet, line):
         u""" write the infos of the layer into the Excel workbook """
@@ -1125,14 +1119,22 @@ class DicoGIS(Tk):
         champs = ""
         theme = ""
 
+                # errors style
+        xls_erreur = easyxf('pattern: pattern solid, fore_colour black;'
+                            'font: colour white, bold True;')
+
         # in case of a source error
         if layer_infos.get('error'):
+            sheet.row(line).set_style(self.xls_erreur)
+            err_mess = self.blabla.get(layer_infos.get('error'))
             self.logger.warning('\tproblem detected')
-            sheet.write(line, 0, layer_infos.get('name'))
+            sheet.write(line, 0, layer_infos.get('name'), self.xls_erreur)
+            sheet.write(line, 2, err_mess, self.xls_erreur)
             link = 'HYPERLINK("{0}"; "{1}")'.format(layer_infos.get(u'folder'),
                                                     self.blabla.get('browse'))
             sheet.write(line, 1, Formula(link), self.url)
-            sheet.write(line, 2, self.blabla.get((layer_infos.get('error')), self.erreur))
+            
+
             # Interruption of function
             return self.book, self.feuy1
         else:
@@ -1224,7 +1226,7 @@ class DicoGIS(Tk):
             link = 'HYPERLINK("' + layer_infos.get(u'folder') \
                              + '"; "' + self.blabla.get('browse') + '")'
             sheet.write(line, 1, Formula(link), self.url)
-            sheet.write(line, 2, self.blabla.get((layer_infos.get('error')), self.erreur))
+            sheet.write(line, 2, self.blabla.get((layer_infos.get('error')), self.xls_erreur))
             # Interruption of function
             return self.book, self.feuy2
         else:
@@ -1306,7 +1308,7 @@ class DicoGIS(Tk):
             link = 'HYPERLINK("' + layer_infos.get(u'folder') \
                              + '"; "' + self.blabla.get('browse') + '")'
             sheet.write(line, 1, Formula(link), self.url)
-            sheet.write(line, 2, self.blabla.get((layer_infos.get('error')), self.erreur))
+            sheet.write(line, 2, self.blabla.get((layer_infos.get('error')), self.xls_erreur))
             # Interruption of function
             return self.book, self.feuy1
 
@@ -1341,10 +1343,10 @@ class DicoGIS(Tk):
         sheet.write(line, 3, layer_infos.get(u'num_fields'))
         # Name of objects
         sheet.write(line, 4, layer_infos.get(u'num_obj'))
-        # Creation date
-        sheet.write(line, 10, layer_infos.get(u'date_crea'))
-        # Last update date
-        sheet.write(line, 11, layer_infos.get(u'date_actu'))
+        # # Creation date
+        # sheet.write(line, 10, layer_infos.get(u'date_crea'))
+        # # Last update date
+        # sheet.write(line, 11, layer_infos.get(u'date_actu'))
         # Format of data
         sheet.write(line, 12, layer_infos.get(u'type'))
         # Field informations
