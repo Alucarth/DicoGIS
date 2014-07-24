@@ -37,3 +37,4 @@ pip-log.txt
 \test\datatestGDB*
 *.xls
 options.ini
+*.xls
