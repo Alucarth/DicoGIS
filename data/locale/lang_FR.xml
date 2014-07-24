@@ -94,6 +94,7 @@
 	<noformat>Aucun format sélectionné</noformat>
 	<err_encod>Le nom du champ n'est pas bien formaté (caractères spéciaux) : </err_encod>
 	<err_corrupt> Fichier corrompu </err_corrupt>
+	<err_noprj> Aucun référentiel de coordonnées trouvé (ex: .prj) </err_noprj>
 	<err_pg_empty_field>Champ requis</err_pg_empty_field>
 	<err_pg_conn_fail>La connexion a échoué</err_pg_conn_fail>
 	<err_nobjet> Cette donnée n'a aucun objet. Traitement impossible !</err_nobjet>
