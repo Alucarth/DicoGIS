@@ -26,8 +26,16 @@ from time import localtime, strptime, strftime
 from collections import OrderedDict as OD
 
 # 3rd party libraries
-from osgeo import ogr    # handler for vector spatial files
+from osgeo import ogr    
 from osgeo import osr
+
+try:
+    from osgeo import gdal
+    from osgeo import ogr  # handler for vector spatial files
+    from osgeo import osr
+except ImportError:
+    import ogr # handler for vector spatial files
+    import osr
 
 
 
