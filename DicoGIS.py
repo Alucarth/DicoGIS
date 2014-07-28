@@ -551,7 +551,6 @@ class DicoGIS(Tk):
                     full_path = path.join(root, d)
                 except UnicodeDecodeError, e:
                     full_path = path.join(root, d.decode('latin1'))
-                    print unicode(full_path), e
                 if full_path[-4:].lower() == '.gdb':
                     # add complete path of shapefile
                     self.li_gdb.append(path.abspath(full_path))
@@ -669,8 +668,34 @@ class DicoGIS(Tk):
         # creating the Excel workbook
         self.configexcel()
         self.logger.info('Excel file created')
-        # configuring the progression bar
-        self.prog_layers["maximum"] = len(self.li_shp) + len(self.li_tab)
+        # configuring the progress bar
+        total_files = 0
+        if self.opt_shp.get():
+            total_files += len(self.li_shp)
+        else:
+            pass
+        if self.opt_tab.get():
+            total_files += len(self.li_tab)
+        else:
+            pass
+        if self.opt_kml.get():
+            total_files += len(self.li_kml)
+        else:
+            pass
+        if self.opt_gml.get():
+            total_files += len(self.li_gml)
+        else:
+            pass
+        if self.opt_geoj.get():
+            total_files += len(self.li_geoj)
+        else:
+            pass
+        if self.opt_rast.get():
+            total_files += len(self.li_raster)
+        else:
+            pass
+        print total_files
+        self.prog_layers["maximum"] = total_files
         self.prog_layers["value"]
         # getting the info from shapefiles and compile it in the excel
         line_folders = 1    # line rank of directories dictionary
@@ -1038,7 +1063,6 @@ class DicoGIS(Tk):
         # columns headers
         if self.typo.get() == 1 and (len(self.li_tab) + len(self.li_shp) + len(self.li_gml) + len(self.li_geoj) + len(self.li_kml)) >0:
             """ adding a new sheet for vectors informations """
-            print self.typo.get()
             self.feuy1 = self.book.add_sheet(u'Vectors', cell_overwrite_ok=True)
             self.feuy1.write(0, 0, self.blabla.get('nomfic'), self.entete)
             self.feuy1.write(0, 1, self.blabla.get('path'), self.entete)
