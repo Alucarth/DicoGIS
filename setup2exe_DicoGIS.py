@@ -19,12 +19,14 @@
 ###################################
 # Standard library
 from distutils.core import setup
-import py2exe
-import os, sys
 import ConfigParser
 import numpy
+import os
+import py2exe
+import sys
 
 # custom modules
+from DicoGIS import DGversion
 from modules import *
 
 ################################################################################
@@ -34,8 +36,6 @@ from modules import *
 # adding py2exe to the env path
 sys.argv.append('py2exe')
 
-# version
-num_version = "v2.0-beta.2"
 
 # Specific data for gdal
 gdal_dir = r'data/gdal'
@@ -71,12 +71,12 @@ py2exe_options = dict(
                         compressed=1,  # Compress library.zip
                         optimize = 2,
                         # bundle_files = 1,
-                        dist_dir = 'setup/DicoGIS_{}'.format(num_version)
+                        dist_dir = 'setup/DicoGIS_{}'.format(DGversion)
                       )
 
 
 setup(name="DicoGIS",
-      version=num_version,
+      version=DGversion,
       description="Dictionary of geographic datas",
       author="Julien Moura",
       url = "https://github.com/Guts/DicoGIS",
