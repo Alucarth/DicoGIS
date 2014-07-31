@@ -2,7 +2,7 @@
 #!/usr/bin/env python
 # from __future__ import unicode_literals
 
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Name:         InfosGDAL
 # Purpose:      Use GDAL/OGR library to extract informations about
 #                   geographic data. It permits a more friendly use as
@@ -12,29 +12,36 @@
 #
 # Python:       2.7.x
 # Created:      18/02/2014
-# Updated:      28/06/2014
+# Updated:      31/07/2014
 # Licence:      GPL 3
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
-################################################################################
+###############################################################################
 ########### Libraries #############
 ###################################
 # Standard library
-from os import walk, path       # files and folder managing
-from time import localtime, strptime, strftime
+from os import path       # files and folder managing
+from time import localtime, strftime
 
 # Python 3 backported
 from collections import OrderedDict as OD
 
 # 3rd party libraries
-from osgeo import gdal   # handler for raster spatial files
-from osgeo import osr
+try:
+    from osgeo import gdal
+    from osgeo import osr
+except ImportError:
+    import gdal
+    import osr
+
 from gdalconst import *
 gdal.AllRegister()
+gdal.UseExceptions()
 
-################################################################################
+###############################################################################
 ########### Classes #############
 ###################################
+
 
 class Read_Rasters():
     def __init__(self, rasterpath, dico_raster, dico_bands, tipo, text=''):
@@ -179,18 +186,17 @@ class Read_Rasters():
         return dicolayer
 
 
-################################################################################
+###############################################################################
 ###### Stand alone program ########
 ###################################
 
 if __name__ == '__main__':
     u""" standalone execution for tests. Paths are relative considering a test
     within the official repository (https://github.com/Guts/DicoShapes/)"""
-    # libraries import
-    from os import getcwd, chdir, path
-    # test files
-    li_ecw = [r'C:\\Users\julien.moura\Documents\GIS Database\ECW\0468_6740.ecw']    # ECW
-    li_gtif = [r'..\test\datatest\rasters\GeoTiff\BDP_07_0621_0049_020_LZ1.tif', r'..\test\datatest\rasters\GeoTiff\TrueMarble_16km_2700x1350.tif']    # GeoTIFF
+    # listing test files by formats
+    li_ecw = [r'C:\\Users\julien.moura\Documents\GIS Database\ECW\0468_6740.ecw']  # ECW
+    li_gtif = [r'..\test\datatest\rasters\GeoTiff\BDP_07_0621_0049_020_LZ1.tif',
+               r'..\test\datatest\rasters\GeoTiff\TrueMarble_16km_2700x1350.tif']  # GeoTIFF
     li_jpg2 = [r'..\test\datatest\rasters\JPEG2000\image_jpg2000.jp2']  # JPEG2000
 
     li_rasters = (li_ecw[0], li_gtif[0], li_gtif[1], li_jpg2[0])
@@ -220,5 +226,9 @@ if __name__ == '__main__':
             print("\n\t==> File doesn't exist: " + raster)
             continue
         print "\n======================\n\t", path.basename(raster)
-        info_raster = Read_Rasters(raster, dico_raster, dico_bands, path.splitext(raster)[1], textos)
+        info_raster = Read_Rasters(raster,
+                                   dico_raster,
+                                   dico_bands,
+                                   path.splitext(raster)[1],
+                                   textos)
         print '\n', dico_raster, dico_bands
