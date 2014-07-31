@@ -151,7 +151,7 @@ class DicoGIS(Tk):
         self.li_gml = []    # list for GML tables path
         self.li_geoj = []   # list for GeoJSON tables path
         self.li_raster_formats = (".ecw", ".tif", ".jp2")   # raster handled
-        self.li_vectors_formats = (".shp", ".tab", ".kml", ".gml", ".geojson")          # vectors handled
+        self.li_vectors_formats = (".shp", ".tab")          # vectors handled
         self.today = strftime("%Y-%m-%d")   # date of the day
         self.dico_layer = OD()      # dict for vectors informations
         self.dico_fields = OD()     # dict for fields informations
@@ -1163,8 +1163,6 @@ class DicoGIS(Tk):
 
     def dictionarize_vectors(self, layer_infos, fields_info, sheet, line):
         u""" write the infos of the layer into the Excel workbook """
-        # local variables
-        champs = ""
         # in case of a source error
         if layer_infos.get('error'):
             sheet.row(line).set_style(self.xls_erreur)
@@ -1188,8 +1186,8 @@ class DicoGIS(Tk):
                                                 self.blabla.get('browse'))
         sheet.write(line, 1, Formula(link), self.url)
         # Name of containing folder
-        # with an exception if this is the format name
-        if path.basename(layer_infos.get(u'folder')).lower() in self.li_vectors_formats:
+        # with an exceptin if this is the format name
+        if path.basename(layer_infos.get(u'folder')) in self.li_vectors_formats:
             sheet.write(line, 2, path.basename(layer_infos.get(u'folder')))
         else:
             sheet.write(line, 2, path.basename(path.dirname(layer_infos.get(u'folder'))))
@@ -1334,8 +1332,6 @@ class DicoGIS(Tk):
 
     def dictionarize_pg(self, layer_infos, fields_info, sheet, line):
         u""" write the infos of the layer into the Excel workbook """
-        # local variables
-        champs = ""
         # in case of a source error
         if layer_infos.get('error'):
             self.logger.warning('\tproblem detected')

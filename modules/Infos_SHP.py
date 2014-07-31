@@ -1,8 +1,8 @@
 ﻿# -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 ##from __future__ import unicode_literals
-#------------------------------------------------------------------------------
-# Name:         InfosSHP
+#-------------------------------------------------------------------------------
+# Name:         InfosOGR
 # Purpose:      Use GDAL/OGR library to extract informations about
 #                   geographic data. It permits a more friendly use as
 #                   submodule.
@@ -11,32 +11,37 @@
 #
 # Python:       2.7.x
 # Created:      18/02/2013
-# Updated:      31/07/2014
+# Updated:      21/07/2014
 # Licence:      GPL 3
-#------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
-###############################################################################
+################################################################################
 ########### Libraries #############
 ###################################
 # Standard library
-from os import path, listdir, chdir       # files and folder managing
-from time import localtime, strftime
+from os import walk, path       # files and folder managing
+from time import localtime, strptime, strftime
 
 # Python 3 backported
 from collections import OrderedDict as OD
 
 # 3rd party libraries
+from osgeo import ogr    
+from osgeo import osr
+
 try:
+    from osgeo import gdal
     from osgeo import ogr  # handler for vector spatial files
     from osgeo import osr
 except ImportError:
-    import ogr  # handler for vector spatial files
+    import ogr # handler for vector spatial files
     import osr
 
-###############################################################################
+
+
+################################################################################
 ########### Classes #############
 #################################
-
 
 class Read_SHP():
     def __init__(self, layerpath, dico_layer, dico_fields, tipo, text=''):
@@ -54,59 +59,48 @@ class Read_SHP():
         """
         # handling ogr specific exceptions
         ogr.UseExceptions()
-        # changing working directory to layer folder
-        chdir(path.dirname(layerpath))
         # Creating variables
         self.alert = 0
-        # raising corrupt files
         try:
-            source = ogr.Open(layerpath, 0)  # OGR driver
+            source = ogr.Open(layerpath, 0)     # OGR driver
         except RuntimeError:
             self.erratum(dico_layer, layerpath, u'err_corrupt')
-            self.alert = self.alert + 1
+            self.alert = self.alert +1
             return None
         except Exception, e:
             print e
             return None
-        # raising incompatible files
+
         if not source:
-            u""" if file is not compatible """
+            u""" if layer doesn't have any object, return an error """
             print 'no compatible source'
             self.erratum(dico_layer, layerpath, u'err_nobjet')
-            self.alert = self.alert + 1
-        else:
-            pass
+            self.alert = self.alert +1
         self.layer = source.GetLayer()          # get the layer
-        # raising empty files (without any data)
         if self.layer.GetFeatureCount() == 0:
             u""" if layer doesn't have any object, return an error """
             self.erratum(dico_layer, layerpath, u'err_nobjet')
-            self.alert = self.alert + 1
+            self.alert = self.alert +1
             return None
-        else:
-            pass
 
-        # get first feature
-        obj = self.layer.GetFeature(0)
-        # get the geometry from the first feature
-        self.geom = obj.GetGeometryRef()
-        # get layer definitions
-        self.def_couche = self.layer.GetLayerDefn()
 
-        # raising data without correct spatial reference
+        obj = self.layer.GetFeature(0)        # get the first object (shp)
+        self.geom = obj.GetGeometryRef()       # get the geometry
+
+        self.def_couche = self.layer.GetLayerDefn()  # get layer definitions
+        
         try:
-            self.srs = self.layer.GetSpatialRef()   # spatial system reference
+            self.srs = self.layer.GetSpatialRef()   # get spatial system reference
             self.srs.AutoIdentifyEPSG()     # try to determine the EPSG code
         except AttributeError, e:
-            if not (path.isfile('%s.prj' % layerpath[:-4])
-               or path.isfile('%s.PRJ' % layerpath[:-4])
-               or path.isfile('%s.qpj' % layerpath[:-4])
-               or path.isfile('%s.QRJ' % layerpath[:-4])):
+            if not path.isfile('%s.prj' % layerpath[:-4])\
+                or path.isfile('%s.PRJ' % layerpath[:-4]):
                 self.erratum(dico_layer, layerpath, u'err_noprj')
-                self.alert = self.alert + 1
+                self.alert = self.alert +1
                 return
             else:
                 pass
+
 
         # basic information
         dico_layer[u'type'] = tipo
@@ -126,7 +120,7 @@ class Read_SHP():
                     (self.srs.IsLocal(), txt.get('srs_loca')),
                     (self.srs.IsProjected(), txt.get('srs_proj')),
                     (self.srs.IsVertical(), txt.get('srs_vert'))
-                   ]
+                    ]
         # searching for a match with one of srs types
         for srsmet in srsmetod:
             if srsmet[0] == 1:
@@ -145,11 +139,6 @@ class Read_SHP():
         dico_layer[u'title'] = dico_layer[u'name'][:-4].replace('_', ' ').capitalize()
         dico_layer[u'num_obj'] = self.layer.GetFeatureCount()
         dico_layer[u'num_fields'] = self.def_couche.GetFieldCount()
-        # dependencies
-        dependencies = [f for f in listdir(path.dirname(layerpath))
-                        if path.splitext(path.abspath(f))[0] == path.splitext(layerpath)[0]
-                        and not path.splitext(path.abspath(f))[1] == path.splitext(layerpath)[1]]
-        dico_layer[u'dependencies'] = dependencies
         # Handling exception in srs names'encoding
         try:
             if self.srs.GetAttrValue('PROJCS') != 'unnamed':
@@ -157,7 +146,6 @@ class Read_SHP():
             else:
                 dico_layer[u'srs'] = unicode(self.srs.GetAttrValue('PROJECTION')).replace('_', ' ')
         except UnicodeDecodeError, e:
-            print e
             if self.srs.GetAttrValue('PROJCS') != 'unnamed':
                 dico_layer[u'srs'] = self.srs.GetAttrValue('PROJCS').decode('latin1').replace('_', ' ')
             else:
@@ -189,20 +177,21 @@ class Read_SHP():
         else:
             dico_layer[u'type_geom'] = self.geom.GetGeometryName()
         # Spatial extent (bounding box)
-        dico_layer[u'Xmin'] = round(self.layer.GetExtent()[0], 2)
-        dico_layer[u'Xmax'] = round(self.layer.GetExtent()[1], 2)
-        dico_layer[u'Ymin'] = round(self.layer.GetExtent()[2], 2)
-        dico_layer[u'Ymax'] = round(self.layer.GetExtent()[3], 2)
+        dico_layer[u'Xmin'] = round(self.layer.GetExtent()[0],2)
+        dico_layer[u'Xmax'] = round(self.layer.GetExtent()[1],2)
+        dico_layer[u'Ymin'] = round(self.layer.GetExtent()[2],2)
+        dico_layer[u'Ymax'] = round(self.layer.GetExtent()[3],2)
         # end of function
         return dico_layer
 
     def infos_fields(self, dico_fields):
         u""" get the informations about fields definitions """
         for i in range(self.def_couche.GetFieldCount()):
-            champomy = self.def_couche.GetFieldDefn(i) # fields ordered
+            champomy = self.def_couche.GetFieldDefn(i) # liste ordonnée des champs
             dico_fields[champomy.GetName()] = champomy.GetTypeName(),\
                                            champomy.GetWidth(),\
                                            champomy.GetPrecision()
+
 
         # end of function
         return dico_fields
@@ -222,7 +211,7 @@ class Read_SHP():
         # End of function
         return dicolayer
 
-###############################################################################
+################################################################################
 ###### Stand alone program ########
 ###################################
 
@@ -230,12 +219,9 @@ if __name__ == '__main__':
     u""" standalone execution for tests. Paths are relative considering a test
     within the official repository (https://github.com/Guts/DicoGIS)"""
     # libraries import
-    from os import getcwd
+    from os import getcwd, chdir, path
     # test files
-    li_shp = [path.join(getcwd(),
-                        r'..\test\datatest\vectors\shp\airports.shp'),
-              path.join(getcwd(),
-                        r'..\test\datatest\vectors\shp\itineraires_rando.shp')]
+    li_shp = [path.join(getcwd(), r'..\test\datatest\vectors\shp\airports.shp'), path.join(getcwd(), r'..\test\datatest\vectors\shp\itineraires_rando.shp')]         # shapefile
     # test text dictionary
     textos = OD()
     textos['srs_comp'] = u'Compound'
@@ -249,7 +235,7 @@ if __name__ == '__main__':
     textos['geom_polyg'] = u'Polygon'
     # recipient datas
     dico_layer = OD()     # dictionary where will be stored informations
-    dico_fields = OD()    # dictionary for fields information
+    dico_fields = OD()     # dictionary for fields information
     # execution
     for shp in li_shp:
         """ looping on shapefiles list """
@@ -258,9 +244,5 @@ if __name__ == '__main__':
         dico_fields.clear()
         # getting the informations
         print('\n{0}'.format(shp))
-        info_shp = Read_SHP(path.abspath(shp),
-                            dico_layer,
-                            dico_fields,
-                            'shape',
-                            textos)
+        info_shp = Read_SHP(shp, dico_layer, dico_fields, 'shape', textos)
         print '\n', dico_layer, dico_fields
