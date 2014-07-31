@@ -19,7 +19,7 @@
 ########### Libraries #############
 ###################################
 # Standard library
-from os import path, listdir, chdir       # files and folder managing
+from os import chdir, listdir, path       # files and folder managing
 from time import localtime, strftime
 
 # Python 3 backported
@@ -148,8 +148,16 @@ class Read_SHP():
         # dependencies
         dependencies = [f for f in listdir(path.dirname(layerpath))
                         if path.splitext(path.abspath(f))[0] == path.splitext(layerpath)[0]
-                        and not path.splitext(path.abspath(f))[1] == path.splitext(layerpath)[1]]
+                        and not path.splitext(path.abspath(f).lower())[1] == ".shp"
+                        or path.isfile('%s.xml' % f[:-4])]
         dico_layer[u'dependencies'] = dependencies
+
+        # total file and dependencies size
+        dependencies.append(layerpath)
+        total_size = sum([path.getsize(f) for f in dependencies])
+        dico_layer[u"total_size"] = self.sizeof(total_size)
+        dependencies.pop(-1)
+
         # Handling exception in srs names'encoding
         try:
             if self.srs.GetAttrValue('PROJCS') != 'unnamed':
@@ -206,6 +214,15 @@ class Read_SHP():
 
         # end of function
         return dico_fields
+
+    def sizeof(self, os_size):
+        u""" return size in different units depending on size
+        see http://stackoverflow.com/a/1094933 """
+        for size_cat in ['octets', 'Ko', 'Mo', 'Go']:
+            if os_size < 1024.0:
+                return "%3.1f %s" % (os_size, size_cat)
+            os_size /= 1024.0
+        return "%3.1f %s" % (os_size, " To")
 
     def erratum(self, dicolayer, layerpath, mess):
         u""" errors handling """

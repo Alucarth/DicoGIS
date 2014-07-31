@@ -1,7 +1,7 @@
 ﻿# -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 ##from __future__ import unicode_literals
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Name:         InfosOGR
 # Purpose:      Use GDAL/OGR library to extract informations about
 #                   geographic data. It permits a more friendly use as
@@ -11,16 +11,16 @@
 #
 # Python:       2.7.x
 # Created:      18/02/2013
-# Updated:      21/06/2014
+# Updated:      31/07/2014
 # Licence:      GPL 3
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
-################################################################################
+###############################################################################
 ########### Libraries #############
 ###################################
 # Standard library
-from os import walk, path       # files and folder managing
-from time import localtime, strptime, strftime
+from os import path, chdir, listdir  # files and folder managing
+from time import localtime, strftime
 
 # Python 3 backported
 from collections import OrderedDict as OD
@@ -29,9 +29,10 @@ from collections import OrderedDict as OD
 from osgeo import ogr    # handler for vector spatial files
 from osgeo import osr
 
-################################################################################
+###############################################################################
 ########### Classes #############
 #################################
+
 
 class Read_TAB():
     def __init__(self, layerpath, dico_layer, dico_fields, tipo, text=''):
@@ -49,6 +50,8 @@ class Read_TAB():
         """
         # handling ogr specific exceptions
         ogr.UseExceptions()
+        # changing working directory to layer folder
+        chdir(path.dirname(layerpath))
         # Creating variables
         self.alert = 0
         source = ogr.Open(layerpath, 0)     # OGR driver
@@ -56,17 +59,21 @@ class Read_TAB():
             u""" if layer doesn't have any object, return an error """
             print 'no compatible source'
             self.erratum(dico_layer, layerpath, u'err_nobjet')
-            self.alert = self.alert +1
+            self.alert = self.alert + 1
+        else:
+            pass
         self.layer = source.GetLayer()          # get the layer
         if self.layer.GetFeatureCount() == 0:
             u""" if layer doesn't have any object, return an error """
             self.erratum(dico_layer, layerpath, u'err_nobjet')
-            self.alert = self.alert +1
+            self.alert = self.alert + 1
             return None
+        else:
+            pass
 
         obj = self.layer.GetFeature(1)        # get the first object (tab)
         self.geom = obj.GetGeometryRef()      # get the geometry
-        
+
         self.def_couche = self.layer.GetLayerDefn()  # get layer definitions
         self.srs = self.layer.GetSpatialRef()   # get spatial system reference
         self.srs.AutoIdentifyEPSG()     # try to determine the EPSG code
@@ -83,16 +90,18 @@ class Read_TAB():
         u""" get the global informations about the layer """
         # srs type
         srsmetod = [
-                    (self.srs.IsCompound(), txt.get('srs_comp')),
-                    (self.srs.IsGeocentric(), txt.get('srs_geoc')),
-                    (self.srs.IsGeographic(), txt.get('srs_geog')),
-                    (self.srs.IsLocal(), txt.get('srs_loca')),
-                    (self.srs.IsProjected(), txt.get('srs_proj')),
-                    (self.srs.IsVertical(), txt.get('srs_vert'))
-                    ]
+                   (self.srs.IsCompound(), txt.get('srs_comp')),
+                   (self.srs.IsGeocentric(), txt.get('srs_geoc')),
+                   (self.srs.IsGeographic(), txt.get('srs_geog')),
+                   (self.srs.IsLocal(), txt.get('srs_loca')),
+                   (self.srs.IsProjected(), txt.get('srs_proj')),
+                   (self.srs.IsVertical(), txt.get('srs_vert'))
+                   ]
         for srsmet in srsmetod:
             if srsmet[0] == 1:
                 typsrs = srsmet[1]
+            else:
+                continue
         dico_layer[u'srs_type'] = unicode(typsrs)
         # Storing into the dictionary
         dico_layer[u'name'] = path.basename(layerpath)
@@ -100,6 +109,19 @@ class Read_TAB():
         dico_layer[u'title'] = dico_layer[u'name'][:-4].replace('_', ' ').capitalize()
         dico_layer[u'num_obj'] = self.layer.GetFeatureCount()
         dico_layer[u'num_fields'] = self.def_couche.GetFieldCount()
+        
+        # dependencies
+        dependencies = [f for f in listdir(path.dirname(layerpath))
+                        if path.splitext(path.abspath(f))[0] == path.splitext(layerpath)[0]
+                        and not path.splitext(path.abspath(f).lower())[1] == ".tab"]
+        dico_layer[u'dependencies'] = dependencies
+
+        # total file and dependencies size
+        dependencies.append(layerpath)
+        total_size = sum([path.getsize(f) for f in dependencies])
+        dico_layer[u"total_size"] = self.sizeof(total_size)
+        dependencies.pop(-1)
+
         # Handling exception in srs names'encoding
         try:
             if self.srs.GetAttrValue('PROJCS') != 'unnamed':
@@ -107,6 +129,7 @@ class Read_TAB():
             else:
                 dico_layer[u'srs'] = unicode(self.srs.GetAttrValue('PROJECTION')).replace('_', ' ')
         except UnicodeDecodeError, e:
+            print e
             if self.srs.GetAttrValue('PROJCS') != 'unnamed':
                 dico_layer[u'srs'] = self.srs.GetAttrValue('PROJCS').decode('latin1').replace('_', ' ')
             else:
@@ -138,24 +161,31 @@ class Read_TAB():
         else:
             dico_layer[u'type_geom'] = self.geom.GetGeometryName()
         # Spatial extent (bounding box)
-        dico_layer[u'Xmin'] = round(self.layer.GetExtent()[0],2)
-        dico_layer[u'Xmax'] = round(self.layer.GetExtent()[1],2)
-        dico_layer[u'Ymin'] = round(self.layer.GetExtent()[2],2)
-        dico_layer[u'Ymax'] = round(self.layer.GetExtent()[3],2)
+        dico_layer[u'Xmin'] = round(self.layer.GetExtent()[0], 2)
+        dico_layer[u'Xmax'] = round(self.layer.GetExtent()[1], 2)
+        dico_layer[u'Ymin'] = round(self.layer.GetExtent()[2], 2)
+        dico_layer[u'Ymax'] = round(self.layer.GetExtent()[3], 2)
         # end of function
         return dico_layer
 
     def infos_fields(self, dico_fields):
         u""" get the informations about fields definitions """
         for i in range(self.def_couche.GetFieldCount()):
-            champomy = self.def_couche.GetFieldDefn(i) # liste ordonnée des champs
+            champomy = self.def_couche.GetFieldDefn(i)  # ordered fields
             dico_fields[champomy.GetName()] = champomy.GetTypeName(),\
-                                           champomy.GetWidth(),\
-                                           champomy.GetPrecision()
-
-
+                                              champomy.GetWidth(),\
+                                              champomy.GetPrecision()
         # end of function
         return dico_fields
+
+    def sizeof(self, os_size):
+        u""" return size in different units depending on size
+        see http://stackoverflow.com/a/1094933 """
+        for size_cat in ['octets', 'Ko', 'Mo', 'Go']:
+            if os_size < 1024.0:
+                return "%3.1f %s" % (os_size, size_cat)
+            os_size /= 1024.0
+        return "%3.1f %s" % (os_size, " To")
 
     def erratum(self, dicolayer, layerpath, mess):
         u""" errors handling """
@@ -172,7 +202,7 @@ class Read_TAB():
         # End of function
         return dicolayer
 
-################################################################################
+###############################################################################
 ###### Stand alone program ########
 ###################################
 
@@ -180,10 +210,12 @@ if __name__ == '__main__':
     u""" standalone execution for tests. Paths are relative considering a test
     within the official repository (https://github.com/Guts/DicoGIS)"""
     # libraries import
-    from os import getcwd, chdir, path
+    from os import getcwd
     # test files
-    li_tab = [path.join(getcwd(), r'..\test\datatest\vectors\tab\tab\airports_MI.tab'), \
-              path.join(getcwd(), r'..\test\datatest\vectors\tab\tab\Hydrobiologie.TAB')] # MapInfo table
+    li_tab = [path.join(getcwd(),
+                        r'..\test\datatest\vectors\tab\tab\airports_MI.tab'),
+              path.join(getcwd(),
+                        r'..\test\datatest\vectors\tab\tab\Hydrobiologie.TAB')] # MapInfo table
     # test text dictionary
     textos = OD()
     textos['srs_comp'] = u'Compound'
@@ -205,5 +237,10 @@ if __name__ == '__main__':
         dico_layer.clear()
         dico_fields.clear()
         # getting the informations
-        info_tab = Read_TAB(tab, dico_layer, dico_fields, 'table', textos)
+        info_tab = Read_TAB(path.abspath(tab),
+                            dico_layer,
+                            dico_fields,
+                            'MI table',
+                            textos)
         print '\n', dico_layer, dico_fields
+

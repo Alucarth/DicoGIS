@@ -11,7 +11,7 @@ from __future__ import unicode_literals
 #
 # Python:       2.7.x
 # Created:      14/02/2013
-# Updated:      30/07/2014
+# Updated:      31/07/2014
 #
 # Licence:      GPL 3
 #------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ DGversion = "2.0-beta.3"
 ###################################
 # Standard library
 from Tkinter import Tk, StringVar, IntVar, Image    # GUI
-from Tkinter import N, S, E, W, PhotoImage, ACTIVE, DISABLED, END
+from Tkinter import W, PhotoImage, ACTIVE, DISABLED, END
 from tkFileDialog import askdirectory, asksaveasfilename    # dialogs
 from tkMessageBox import showinfo as info, showerror as avert
 from ttk import Combobox, Progressbar, Style, Labelframe
@@ -44,7 +44,6 @@ import platform
 import logging      # log files
 from logging.handlers import RotatingFileHandler
 
-import sys
 import subprocess
 
 from xml.etree import ElementTree as ET     # XML parsing and writer
@@ -68,7 +67,7 @@ gdal.UseExceptions()
 from xlwt import Workbook, easyxf, Formula  # excel writer
 
 # Custom modules
-from modules import Read_Rasters    # custom extractor for geographic data in PostGIS databases
+from modules import Read_Rasters    # custom extractor for rasters files
 from modules import Read_SHP        # custom extractor for shapefiles
 from modules import Read_TAB        # custom extractor for MapInfo Tables
 from modules import Read_KML        # custom extractor for KML
@@ -151,7 +150,7 @@ class DicoGIS(Tk):
         self.li_gml = []    # list for GML tables path
         self.li_geoj = []   # list for GeoJSON tables path
         self.li_raster_formats = (".ecw", ".tif", ".jp2")   # raster handled
-        self.li_vectors_formats = (".shp", ".tab", ".kml", ".gml", ".geojson")          # vectors handled
+        self.li_vectors_formats = (".shp", ".tab", ".kml", ".gml", ".geojson")  # vectors handled
         self.today = strftime("%Y-%m-%d")   # date of the day
         self.dico_layer = OD()      # dict for vectors informations
         self.dico_fields = OD()     # dict for fields informations
@@ -241,7 +240,7 @@ class DicoGIS(Tk):
         self.target = Entry(master=self.FrPath, width=35)
         self.browsetarg = Button(self.FrPath,       # browse button
                                  text=self.blabla.get('gui_choix'),
-                                 command=lambda:  self.setpathtarg(),
+                                 command=lambda: self.setpathtarg(),
                                  takefocus=True)
         self.browsetarg.focus_force()               # force the focus on
         # widgets placement
@@ -327,47 +326,54 @@ class DicoGIS(Tk):
         # Hola
         self.welcome = Label(self,
                              text=self.blabla.get('hi') + self.uzer,
-                             font = ft_tit,
-                             foreground = "red2")
+                             font=ft_tit,
+                             foreground="red2")
         # Imagen
-        self.icone = PhotoImage(file = r'data/img/DicoGIS_logo.gif')
-        Label(self, borderwidth=2,
-                    image = self.icone).grid(row=1,
-                                             rowspan = 5,
-                                             column=0,
-                                             padx=2,
-                                             pady=2,
-                                             sticky = W)
+        self.icone = PhotoImage(file=r'data/img/DicoGIS_logo.gif')
+        Label(self,
+              borderwidth=2,
+              image=self.icone).grid(row=1,
+                                     rowspan=5,
+                                     column=0,
+                                     padx=2,
+                                     pady=2,
+                                     sticky=W)
         # credits
         s = Style(self)
         s.configure('Kim.TButton', foreground='DodgerBlue', borderwidth=0)
-        Button(self, text='by Julien M.\n      2014',
-                     style = 'Kim.TButton',
-                     command=lambda:  open_new('https://github.com/Guts')).grid(row=6,
-                                                                                 padx=2,
-                                                                                 pady=2,
-                                                                                 sticky = W+E)
+        Button(self,
+               text='by Julien M.\n      2014',
+               style='Kim.TButton',
+               command=lambda: open_new('https://github.com/Guts')).grid(row=6,
+                                                                         padx=2,
+                                                                         pady=2,
+                                                                         sticky="WE")
         # language switcher
-        self.ddl_lang = Combobox(self, values = li_lang, width=5)
+        self.ddl_lang = Combobox(self,
+                                 values=li_lang,
+                                 width=5)
         self.ddl_lang.current(li_lang.index(self.def_lang))
         self.ddl_lang.bind("<<ComboboxSelected>>", self.change_lang)
         # type switcher
-        rd_file = Radiobutton(self, text='Fichiers',
-                                           variable=self.typo,
-                                           value = 1,
-                                           command=lambda: self.change_type())
-        rd_pg = Radiobutton(self, text='PostGIS',
-                                  variable=self.typo,
-                                  value = 2,
-                                  command=lambda: self.change_type())
+        rd_file = Radiobutton(self,
+                              text='Fichiers',
+                              variable=self.typo,
+                              value=1,
+                              command=lambda: self.change_type())
+        rd_pg = Radiobutton(self,
+                            text='PostGIS',
+                            variable=self.typo,
+                            value=2,
+                            command=lambda: self.change_type())
         # Basic buttons
         #img_proc = PhotoImage(master = self, file = 'img/Processing_TNP_10789.gif')
-        self.val = Button(self, text=self.blabla.get('gui_go'),
-                                state = ACTIVE,
-                                command=lambda: self.process())
+        self.val = Button(self,
+                          text=self.blabla.get('gui_go'),
+                          state=ACTIVE,
+                          command=lambda: self.process())
         #self.val.config(image = img_proc)
         self.can = Button(self, text=self.blabla.get('gui_quit'),
-                           command=lambda: self.destroy())
+                          command=lambda: self.destroy())
 
         # widgets placement
         self.welcome.grid(row=1, column=1, columnspan=1, sticky="NS",
@@ -376,7 +382,7 @@ class DicoGIS(Tk):
         rd_file.grid(row=2, column=1, sticky="NSW", padx=2, pady=2)
         rd_pg.grid(row=2, column=1, sticky="NSE", padx=2, pady=2)
         self.val.grid(row=7, column=1, columnspan=2,
-                            sticky="NSWE", padx=2, pady=2)
+                      sticky="NSWE", padx=2, pady=2)
         self.can.grid(row=7, column=0, sticky="NSWE", padx=2, pady=2)
         # Frames placement
         rd_file.invoke()    # to provoc the type (frame 2) placement
@@ -458,7 +464,7 @@ class DicoGIS(Tk):
     def change_lang(self, event):
         u""" update the texts dictionary with the language selected """
         new_lang = event.widget.get()
-        self.logger.info('\tLanguage switched to: %s' %event.widget.get())
+        self.logger.info('\tLanguage switched to: {0}'.format(event.widget.get()))
         # change to the new language selected
         self.load_texts(new_lang)
         # update widgets text
@@ -485,7 +491,7 @@ class DicoGIS(Tk):
         # clearing the text dictionary
         self.blabla.clear()
         # open xml cursor
-        xml = ET.parse('data/locale/lang_' + lang + '.xml')
+        xml = ET.parse('data/locale/lang_{0}.xml'.format(lang))
         # Looping and gathering texts from the xml file
         for elem in xml.getroot().getiterator():
             self.blabla[elem.tag] = elem.text
@@ -501,9 +507,9 @@ class DicoGIS(Tk):
             self.FrDb.grid_forget()
             self.status.set('')
             self.FrPath.grid(row=3, column=1, padx=2, pady=2,
-                                sticky="NSWE")
-            self.FrFilters.grid(row=4, column=1, padx=2, pady=2,
                              sticky="NSWE")
+            self.FrFilters.grid(row=4, column=1, padx=2, pady=2,
+                                sticky="NSWE")
         elif self.typo.get() == 2:
             self.logger.info('Type switched to: database')
             self.FrPath.grid_forget()
@@ -513,12 +519,11 @@ class DicoGIS(Tk):
         # End of function
         return self.typo
 
-
     def setpathtarg(self):
         """ ...browse and insert the path of target folder """
-        foldername = askdirectory(parent = self,
-                                  initialdir = self.def_rep,
-                                  mustexist = True,
+        foldername = askdirectory(parent=self,
+                                  initialdir=self.def_rep,
+                                  mustexist=True,
                                   title=self.blabla.get('gui_cible'))
         # check if a folder has been choosen
         if foldername:
@@ -529,14 +534,16 @@ class DicoGIS(Tk):
                 info(title=self.blabla.get('nofolder'),
                      message=self.blabla.get('nofolder'))
                 return
+        else:
+            pass
         # set the default output file
         self.output.delete(0, END)
         self.output.insert(0, "DicoGIS_{0}_{1}.xls".format(
                                             path.split(self.target.get())[1],
                                             self.today ))
-        # calculate number of shapefiles and MapInfo files in a separated thread
-
-        proc = threading.Thread(target = self.ligeofiles, args = (foldername, ))
+        # count geofiles in a separated thread
+        proc = threading.Thread(target=self.ligeofiles,
+                                args=(foldername, ))
         proc.daemon = True
         proc.start()
         # end of function
@@ -552,7 +559,7 @@ class DicoGIS(Tk):
         self.li_gml = []
         self.li_geoj = []
         self.li_raster = []
-        self.browsetarg.config(state = DISABLED)
+        self.browsetarg.config(state=DISABLED)
         # Looping in folders structure
         self.status.set(self.blabla.get('gui_prog1'))
         self.prog_layers.start()
@@ -614,7 +621,8 @@ class DicoGIS(Tk):
 
         # end of listing
         self.prog_layers.stop()
-        self.logger.info('End of folders parsing: {0} shapefiles - {1} tables (MapInfo) - {2} KML - {3} GML - {4} GeoJSON\n{5} rasters - in {6}{7}'.format(len(self.li_shp),                                                                                                                                   len(self.li_tab), 
+        self.logger.info('End of folders parsing: {0} shapefiles - {1} tables (MapInfo) - {2} KML - {3} GML - {4} GeoJSON\n{5} rasters - in {6}{7}'.format(len(self.li_shp),
+                                                                                                                                                          len(self.li_tab),
                                                                                                                                                           len(self.li_kml),
                                                                                                                                                           len(self.li_gml),
                                                                                                                                                           len(self.li_geoj),
@@ -644,14 +652,16 @@ class DicoGIS(Tk):
                                                                                                                                   self.num_folders,
                                                                                                                                   self.blabla.get('log_numfold')))
 
-        self.browsetarg.config(state = ACTIVE)
-        self.val.config(state = ACTIVE)
+        self.browsetarg.config(state=ACTIVE)
+        self.val.config(state=ACTIVE)
         # End of function
         return foldertarget, self.li_shp, self.li_tab, self.li_kml, self.li_raster
 
-
     def process(self):
         """ check needed info and launch different processes """
+        # saving settings
+        self.save_settings()
+        # process files or PostGIS database
         if self.typo.get() == 1:
             self.logger.info('=> files process started')
             self.process_files()
@@ -662,7 +672,6 @@ class DicoGIS(Tk):
             pass
         # end of function
         return self.typo.get()
-
 
     def process_files(self):
         u""" launch the different processes """
@@ -728,13 +737,17 @@ class DicoGIS(Tk):
                 self.dico_fields.clear()
                 # getting the informations
                 try:
-                    Read_SHP(shp, self.dico_layer, self.dico_fields, 'shape', self.blabla)
+                    Read_SHP(path.abspath(shp),
+                             self.dico_layer,
+                             self.dico_fields,
+                             'Esri shapefiles',
+                             self.blabla)
                     self.logger.info('\t Infos OK')
                 except AttributeError, e:
                     """ empty files """
                     self.logger.error(e)
                     continue
-                except RuntimeError,e:
+                except RuntimeError, e:
                     """ corrupt files """
                     self.logger.error(e)
                     continue
@@ -742,12 +755,15 @@ class DicoGIS(Tk):
                     self.logger.error(e)
                     continue
                 # writing to the Excel dictionary
-                self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
+                self.dictionarize_vectors(self.dico_layer,
+                                          self.dico_fields,
+                                          self.feuy1,
+                                          line_vectors)
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
-                line_vectors = line_vectors +1
+                line_vectors = line_vectors + 1
                 # increment the progress bar
-                self.prog_layers["value"] = self.prog_layers["value"] +1
+                self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
         else:
             self.logger.info('\tIgnoring {0} shapefiles'.format(len(self.li_shp)))
@@ -764,24 +780,30 @@ class DicoGIS(Tk):
                 self.dico_fields.clear()
                 # getting the informations
                 try:
-                    Read_TAB(tab, self.dico_layer, self.dico_fields, 'table', self.blabla)
+                    Read_TAB(path.abspath(tab),
+                             self.dico_layer,
+                             self.dico_fields,
+                             'MapInfo tab',
+                             self.blabla)
                     self.logger.info('\t Infos OK')
                 except AttributeError, e:
                     self.logger.error(e)
                     continue
-                except RuntimeError,e:
+                except RuntimeError, e:
                     self.logger.error(e)
                     continue
                 except Exception, e:
                     self.logger.error(e)
                     continue
                 # writing to the Excel dictionary
-                self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
+                self.dictionarize_vectors(self.dico_layer,
+                                          self.dico_fields,
+                                          self.feuy1, line_vectors)
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
-                line_vectors = line_vectors +1
+                line_vectors = line_vectors + 1
                 # increment the progress bar
-                self.prog_layers["value"] = self.prog_layers["value"] +1
+                self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
         else:
             self.logger.info('\tIgnoring {0} MapInfo tables'.format(len(self.li_tab)))
@@ -798,24 +820,31 @@ class DicoGIS(Tk):
                 self.dico_fields.clear()
                 # getting the informations
                 try:
-                    Read_KML(kml, self.dico_layer, self.dico_fields, 'kml', self.blabla)
+                    Read_KML(path.abspath(kml),
+                             self.dico_layer,
+                             self.dico_fields,
+                             'KML',
+                             self.blabla)
                     self.logger.info('\t Infos OK')
                 except AttributeError, e:
                     self.logger.error(e)
                     continue
-                except RuntimeError,e:
+                except RuntimeError, e:
                     self.logger.error(e)
                     continue
                 except Exception, e:
                     self.logger.error(e)
                     continue
                 # writing to the Excel dictionary
-                self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
+                self.dictionarize_vectors(self.dico_layer,
+                                          self.dico_fields,
+                                          self.feuy1,
+                                          line_vectors)
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
-                line_vectors = line_vectors +1
+                line_vectors = line_vectors + 1
                 # increment the progress bar
-                self.prog_layers["value"] = self.prog_layers["value"] +1
+                self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
         else:
             self.logger.info('\tIgnoring {0} KML'.format(len(self.li_kml)))
@@ -832,24 +861,30 @@ class DicoGIS(Tk):
                 self.dico_fields.clear()
                 # getting the informations
                 try:
-                    Read_GML(gml, self.dico_layer, self.dico_fields, 'gml', self.blabla)
+                    Read_GML(path.abspath(gml),
+                             self.dico_layer,
+                             self.dico_fields,
+                             'GML',
+                             self.blabla)
                     self.logger.info('\t Infos OK')
                 except AttributeError, e:
                     self.logger.error(e)
                     continue
-                except RuntimeError,e:
+                except RuntimeError, e:
                     self.logger.error(e)
                     continue
                 except Exception, e:
                     self.logger.error(e)
                     continue
                 # writing to the Excel dictionary
-                self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
+                self.dictionarize_vectors(self.dico_layer,
+                                          self.dico_fields,
+                                          self.feuy1, line_vectors)
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
-                line_vectors = line_vectors +1
+                line_vectors = line_vectors + 1
                 # increment the progress bar
-                self.prog_layers["value"] = self.prog_layers["value"] +1
+                self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
         else:
             self.logger.info('\tIgnoring {0} GML'.format(len(self.li_gml)))
@@ -866,24 +901,31 @@ class DicoGIS(Tk):
                 self.dico_fields.clear()
                 # getting the informations
                 try:
-                    Read_GeoJSON(geojson, self.dico_layer, self.dico_fields, 'geojson', self.blabla)
+                    Read_GeoJSON(path.abspath(geojson),
+                                 self.dico_layer,
+                                 self.dico_fields,
+                                 'GeoJSON',
+                                 self.blabla)
                     self.logger.info('\t Infos OK')
                 except AttributeError, e:
                     self.logger.error(e)
                     continue
-                except RuntimeError,e:
+                except RuntimeError, e:
                     self.logger.error(e)
                     continue
                 except Exception, e:
                     self.logger.error(e)
                     continue
                 # writing to the Excel dictionary
-                self.dictionarize_vectors(self.dico_layer, self.dico_fields, self.feuy1, line_vectors)
+                self.dictionarize_vectors(self.dico_layer,
+                                          self.dico_fields,
+                                          self.feuy1,
+                                          line_vectors)
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
-                line_vectors = line_vectors +1
+                line_vectors = line_vectors + 1
                 # increment the progress bar
-                self.prog_layers["value"] = self.prog_layers["value"] +1
+                self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
         else:
             self.logger.info('\tIgnoring {0} GeoJSON'.format(len(self.li_geoj)))
@@ -900,25 +942,32 @@ class DicoGIS(Tk):
                 self.dico_bands.clear()
                 # getting the informations
                 try:
-                    Read_Rasters(raster, self.dico_raster, self.dico_bands, path.splitext(raster)[1], self.blabla)
+                    Read_Rasters(path.abspath(raster),
+                                 self.dico_raster,
+                                 self.dico_bands,
+                                 path.splitext(raster)[1],
+                                 self.blabla)
                     self.logger.info('\t Infos OK')
-                #   print(self.dico_raster, self.dico_bands)
+                #   print(self.path.abspath(dico_raster), self.dico_bands)
                 except AttributeError, e:
                     self.logger.error(e)
                     continue
-                except RuntimeError,e:
+                except RuntimeError, e:
                     self.logger.error(e)
                     continue
                 except Exception, e:
                     self.logger.error(e)
                     continue
                 # writing to the Excel dictionary
-                self.dictionarize_rasters(self.dico_raster, self.dico_bands, self.feuy2, line_rasters)
+                self.dictionarize_rasters(self.dico_raster,
+                                          self.dico_bands,
+                                          self.feuy2,
+                                          line_rasters)
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
-                line_rasters = line_rasters +1
+                line_rasters = line_rasters + 1
                 # increment the progress bar
-                self.prog_layers["value"] = self.prog_layers["value"] +1
+                self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
         else:
             self.logger.info('\tIgnoring {0} rasters'.format(len(self.li_raster)))
@@ -927,8 +976,6 @@ class DicoGIS(Tk):
         # saving dictionary
         self.savedico()
         self.logger.info('\n\tWorkbook saved: %s', self.output.get())
-        # saving settings
-        self.save_settings()
         self.bell()
 
         # quit and exit
@@ -936,9 +983,8 @@ class DicoGIS(Tk):
         self.destroy()
         exit()
 
-        # End of function
+        # End path.abspath(of) function
         return
-
 
     def process_db(self, conn):
         u""" launch the different processes """
@@ -955,21 +1001,28 @@ class DicoGIS(Tk):
             # reset recipient data
             self.dico_layer.clear()
             self.dico_fields.clear()
-            Read_PostGIS(layer, self.dico_layer, self.dico_fields, 'pg', self.blabla)
+            Read_PostGIS(layer,
+                         self.dico_layer,
+                         self.dico_fields,
+                         'PostGIS table',
+                         self.blabla)
             self.logger.info('Table examined: %s' % layer.GetName())
             # writing to the Excel dictionary
-            self.dictionarize_pg(self.dico_layer, self.dico_fields, self.feuy3, line)
+            self.dictionarize_pg(self.dico_layer,
+                                 self.dico_fields,
+                                 self.feuy3,
+                                 line)
             self.logger.info('\t Wrote into the dictionary')
             # increment the line number
-            line = line +1
+            line = line + 1
             # increment the progress bar
-            self.prog_layers["value"] = self.prog_layers["value"] +1
+            self.prog_layers["value"] = self.prog_layers["value"] + 1
             self.update()
         # saving dictionary
         self.savedico()
         self.logger.info('\n\tWorkbook saved: %s', self.output.get())
         # saving settings
-        self.save_settings()
+        self.save_settingspath.abspath(())
 
         # quit and exit
         self.open_dir_file(self.output.get())
@@ -983,7 +1036,8 @@ class DicoGIS(Tk):
         u""" Check if required fields are not empty """
         # error counter
         # checking empty fields
-        if self.host.get() == u'' or self.host.get() == self.blabla.get("err_pg_empty_field"):
+        if self.host.get() == u''\
+        or self.host.get() == self.blabla.get("err_pg_empty_field"):
             self.ent_H.configure(foreground="red")
             self.ent_H.delete(0, END)
             self.ent_H.insert(0, self.blabla.get("err_pg_empty_field"))
@@ -991,27 +1045,30 @@ class DicoGIS(Tk):
         else:
             pass
         if not self.ent_P.get():
-            self.ent_P.configure(foreground = 'red')
+            self.ent_P.configure(foreground='red')
             self.ent_P.delete(0, END)
             self.ent_P.insert(0, 0000)
             return
         else:
             pass
-        if self.dbnb.get() == u'' or self.host.get() == self.blabla.get("err_pg_empty_field"):
-            self.ent_D.configure(foreground = 'red')
+        if self.dbnb.get() == u''\
+        or self.host.get() == self.blabla.get("err_pg_empty_field"):
+            self.ent_D.configure(foreground='red')
             self.ent_D.delete(0, END)
             self.ent_D.insert(0, self.blabla.get("err_pg_empty_field"))
             return
         else:
             pass
-        if self.user.get() == u'' or self.host.get() == self.blabla.get("err_pg_empty_field"):
-            self.ent_U.configure(foreground = 'red')
+        if self.user.get() == u''\
+        or self.host.get() == self.blabla.get("err_pg_empty_field"):
+            self.ent_U.configure(foreground='red')
             self.ent_U.delete(0, END)
             self.ent_U.insert(0, self.blabla.get("err_pg_empty_field"))
             return
         else:
             pass
-        if self.pswd.get() == u'' or self.pswd.get() == self.blabla.get("err_pg_empty_field"):
+        if self.pswd.get() == u''\
+        or self.pswd.get() == self.blabla.get("err_pg_empty_field"):
             self.ent_M.configure(foreground="red")
             self.ent_M.delete(0, END)
             self.ent_M.insert(0, self.blabla.get("err_pg_empty_field"))
@@ -1036,7 +1093,7 @@ class DicoGIS(Tk):
         # testing connection settings
         try:
             conn = ogr.Open("PG: host={0} port={1} dbname={2} user={3} password={4}".format(
-                            self.host.get(), self.port.get(), self.dbnb.get(), self.user.get(), 
+                            self.host.get(), self.port.get(), self.dbnb.get(), self.user.get(),
                             self.pswd.get()))
         except Exception, e:
             self.logger.warning("Connection failed: {0}.".format(e))
@@ -1076,8 +1133,8 @@ class DicoGIS(Tk):
 
         # columns headers
         if self.typo.get() == 1 \
-           and (len(self.li_tab) + len(self.li_shp) + len(self.li_gml)
-           + len(self.li_geoj) + len(self.li_kml)) > 0:
+            and (len(self.li_tab) + len(self.li_shp) + len(self.li_gml)
+            + len(self.li_geoj) + len(self.li_kml)) > 0:
             """ adding a new sheet for vectors informations """
             self.feuy1 = self.book.add_sheet(u'Vectors', cell_overwrite_ok=True)
             self.feuy1.write(0, 0, self.blabla.get('nomfic'), self.entete)
@@ -1093,7 +1150,9 @@ class DicoGIS(Tk):
             self.feuy1.write(0, 10, self.blabla.get('date_crea'), self.entete)
             self.feuy1.write(0, 11, self.blabla.get('date_actu'), self.entete)
             self.feuy1.write(0, 12, self.blabla.get('format'), self.entete)
-            self.feuy1.write(0, 13, self.blabla.get('li_chps'), self.entete)
+            self.feuy1.write(0, 13, self.blabla.get('li_depends'), self.entete)
+            self.feuy1.write(0, 14, self.blabla.get('tot_size'), self.entete)
+            self.feuy1.write(0, 15, self.blabla.get('li_chps'), self.entete)
             self.logger.info('Sheet vectors adedd')
             # tunning headers
             lg_shp_names = [len(lg) for lg in self.li_shp]
@@ -1125,6 +1184,7 @@ class DicoGIS(Tk):
             self.feuy2.write(0, 16, self.blabla.get('compression'), self.entete)
             self.feuy2.write(0, 17, self.blabla.get('coloref'), self.entete)
             self.feuy2.write(0, 18, self.blabla.get('li_depends'), self.entete)
+            self.feuy2.write(0, 19, self.blabla.get('total_size'), self.entete)
             self.logger.info('Sheet rasters created')
             # tunning headers
             lg_rast_names = [len(lg) for lg in self.li_raster]
@@ -1218,6 +1278,10 @@ class DicoGIS(Tk):
         sheet.write(line, 11, layer_infos.get(u'date_actu'))
         # Format of data
         sheet.write(line, 12, layer_infos.get(u'type'))
+        # dependencies
+        self.feuy1.write(line, 13, ' | '.join(layer_infos.get(u'dependencies')))
+        # total size
+        self.feuy1.write(line, 14, layer_infos.get(u'total_size'))
         # Field informations
         for chp in fields_info.keys():
             # field type
@@ -1244,12 +1308,14 @@ class DicoGIS(Tk):
                 self.logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
                 # decode the fucking field name
                 champs = champs + chp.decode('latin1') \
-                + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo, fields_info[chp][1], fields_info[chp][2])
+                + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
+                                                        fields_info[chp][1],
+                                                        fields_info[chp][2])
                 # then continue
                 continue
 
         # Once all fieds explored, write them
-        sheet.write(line, 13, champs)
+        sheet.write(line, 15, champs)
 
         # End of function
         return self.book, self.feuy1
@@ -1319,7 +1385,8 @@ class DicoGIS(Tk):
         # Last update date
         sheet.write(line, 12, dico_raster.get(u'date_actu'))
         # Format of data
-        sheet.write(line, 15, "{} {}".format(dico_raster.get(u'format'), dico_raster.get('format_version')))
+        sheet.write(line, 15, "{0} {1}".format(dico_raster.get(u'format'),
+                                               dico_raster.get('format_version')))
         # Compression rate
         sheet.write(line, 16, dico_raster.get(u'compr_rate'))
 
@@ -1328,6 +1395,9 @@ class DicoGIS(Tk):
 
         # Dependencies
         sheet.write(line, 18, ' | '.join(dico_raster.get(u'dependencies')))
+
+        # total size of file and its dependencies
+        sheet.write(line, 18, dico_raster.get(u'total_size'))
 
         # End of function
         return line, sheet
@@ -1448,14 +1518,14 @@ class DicoGIS(Tk):
 
     def open_dir_file(self, target):
         """ open a file or a directory in the explorer of the operating system
-        see: http://sametmax.com/ouvrir-un-fichier-avec-le-bon-programme-en-python"""
+        see: http://sametmax.com/ouvrir-un-fichier-avec-le-bon-programme-en-python """
         # check if the file or the directory exists
         if not path.exists(target):
-            raise IOError('No such file: %s' % target)
+            raise IOError('No such file: {0}'.format(target))
 
         # check the read permission
         if not access(target, R_OK):
-            raise IOError('Cannot access file: %s' % target)
+            raise IOError('Cannot access file: {0}'.format(target))
 
         # open the directory or the file according to the os
         if opersys == 'win32':  # Windows
@@ -1463,11 +1533,13 @@ class DicoGIS(Tk):
 
         elif opersys.startswith('linux'):  # Linux:
             proc = subprocess.Popen(['xdg-open', target],
-                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE)
 
         elif opersys == 'darwin':  # Mac:
             proc = subprocess.Popen(['open', '--', target],
-                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE)
 
         else:
             raise NotImplementedError(
@@ -1483,7 +1555,7 @@ class DicoGIS(Tk):
         self.root.destroy()
         exit()
 
-################################################################################
+###############################################################################
 ###### Stand alone program ########
 ###################################
 

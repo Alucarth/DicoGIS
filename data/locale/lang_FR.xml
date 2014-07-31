@@ -55,6 +55,7 @@
 	<emprise>Emprise spatiale</emprise>
 	<format>Format</format>
 	<li_depends>Dépendances</li_depends>
+	<tot_size>Taille totale</tot_size>
 <!-- Output file: vectors -->
 	<num_objets># objets</num_objets>
 	<num_attrib># attributs</num_attrib>

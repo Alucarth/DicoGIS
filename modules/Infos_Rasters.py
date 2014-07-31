@@ -3,9 +3,9 @@
 # from __future__ import unicode_literals
 
 #------------------------------------------------------------------------------
-# Name:         InfosGDAL
-# Purpose:      Use GDAL/OGR library to extract informations about
-#                   geographic data. It permits a more friendly use as
+# Name:         Infos Rasters
+# Purpose:      Use GDAL library to extract informations about
+#                   geographic rasters data. It permits a more friendly use as
 #                   submodule.
 #
 # Author:       Julien Moura (https://github.com/Guts/)
@@ -20,7 +20,7 @@
 ########### Libraries #############
 ###################################
 # Standard library
-from os import path       # files and folder managing
+from os import chdir, path       # files and folder managing
 from time import localtime, strftime
 
 # Python 3 backported
@@ -35,8 +35,6 @@ except ImportError:
     import osr
 
 from gdalconst import *
-gdal.AllRegister()
-gdal.UseExceptions()
 
 ###############################################################################
 ########### Classes #############
@@ -56,10 +54,13 @@ class Read_Rasters():
         tipo = format
         text = dictionary of text in the selected language
         """
+        # gdal specific
+        gdal.AllRegister()
+        gdal.UseExceptions()
+        # changing working directory to layer folder
+        chdir(path.dirname(rasterpath))
         # variables
         self.alert = 0
-
-        print rasterpath
         # opening file
         self.rast = gdal.Open(rasterpath, GA_ReadOnly)
         
@@ -68,7 +69,8 @@ class Read_Rasters():
             print("\n\tUnable to open " + rasterpath)
             print("Please check compatibility.")
             self.alert += 1
-
+        else:
+            pass
         # basic informations
         dico_raster[u'format'] = tipo
         self.infos_basics(rasterpath, dico_raster, text)
@@ -84,7 +86,17 @@ class Read_Rasters():
         dico_raster[u'name'] = path.basename(rasterpath)
         dico_raster[u'folder'] = path.dirname(rasterpath)
         dico_raster[u'title'] = dico_raster[u'name'][:-4].replace('_', ' ').capitalize()
-        dico_raster[u'dependencies'] = [path.basename(filedepend) for filedepend in self.rast.GetFileList() if filedepend != rasterpath]
+
+        # dependencies
+        dependencies = [path.basename(filedepend) for filedepend in self.rast.GetFileList() if filedepend != rasterpath]
+        dico_raster[u'dependencies'] = dependencies
+
+        # total size
+        dependencies.append(rasterpath)
+        total_size = sum([path.getsize(f) for f in dependencies])
+        dico_raster[u"total_size"] = self.sizeof(total_size)
+        dependencies.pop(-1)
+
         # format
         dico_raster[u'compr_rate'] = self.rast.GetMetadata().get('COMPRESSION_RATE_TARGET')
         dico_raster[u'color_ref'] = self.rast.GetMetadata().get('COLORSPACE')
@@ -96,18 +108,18 @@ class Read_Rasters():
         dico_raster[u'num_cols'] = self.rast.RasterXSize
         dico_raster[u'num_rows'] = self.rast.RasterYSize
         dico_raster[u'num_bands'] = self.rast.RasterCount
-        # data type 
+
+        # data type
         dico_raster[u'data_type'] = gdal.GetDataTypeName(self.rast.GetRasterBand(1).DataType)
 
         # basic dates
         dico_raster[u'date_actu'] = strftime('%Y-%m-%d',
-                                            localtime(path.getmtime(rasterpath)))
+                                             localtime(path.getmtime(rasterpath)))
         dico_raster[u'date_crea'] = strftime('%Y-%m-%d',
-                                            localtime(path.getctime(rasterpath)))
+                                             localtime(path.getctime(rasterpath)))
 
         # end of function
         return dico_raster
-
 
     def infos_geom(self, dico_raster, txt):
         u""" get the informations about geometry """
@@ -116,7 +128,7 @@ class Read_Rasters():
         dico_raster[u'xOrigin'] = geotransform[0]
         dico_raster[u'yOrigin'] = geotransform[3]
         dico_raster[u'pixelWidth'] = round(geotransform[1], 3)
-        dico_raster[u'pixelHeight'] = round(geotransform[5],3)
+        dico_raster[u'pixelHeight'] = round(geotransform[5], 3)
         dico_raster[u'orientation'] = geotransform[2]
 
             ## SRS
@@ -148,7 +160,7 @@ class Read_Rasters():
 
         # Handling exception in srs names'encoding
         try:
-            if srs.GetAttrValue('PROJCS') != None:
+            if srs.GetAttrValue('PROJCS') is not None:
                 dico_raster[u'srs'] = unicode(srs.GetAttrValue('PROJCS')).replace('_', ' ')
             else:
                 dico_raster[u'srs'] = unicode(srs.GetAttrValue('PROJECTION')).replace('_', ' ')
@@ -162,7 +174,6 @@ class Read_Rasters():
         # end of function
         return dico_raster
 
-
     def infos_bands(self, band, dico_bands):
         u""" get the informations about fields definitions """
         band_info = self.rast.GetRasterBand(band)
@@ -173,6 +184,14 @@ class Read_Rasters():
         # end of function
         return dico_bands
 
+    def sizeof(self, os_size):
+        u""" return size in different units depending on size
+        see http://stackoverflow.com/a/1094933 """
+        for size_cat in ['octets', 'Ko', 'Mo', 'Go']:
+            if os_size < 1024.0:
+                return "%3.1f %s" % (os_size, size_cat)
+            os_size /= 1024.0
+        return "%3.1f %s" % (os_size, " To")
 
     def erratum(self, dicolayer, layerpath, mess):
         u""" errors handling """
@@ -199,7 +218,10 @@ if __name__ == '__main__':
                r'..\test\datatest\rasters\GeoTiff\TrueMarble_16km_2700x1350.tif']  # GeoTIFF
     li_jpg2 = [r'..\test\datatest\rasters\JPEG2000\image_jpg2000.jp2']  # JPEG2000
 
-    li_rasters = (li_ecw[0], li_gtif[0], li_gtif[1], li_jpg2[0])
+    li_rasters = (path.abspath(li_ecw[0]),
+                  path.abspath(li_gtif[0]),
+                  path.abspath(li_gtif[1]),
+                  path.abspath(li_jpg2[0]))
 
     # test text dictionary
     textos = OD()
@@ -225,8 +247,10 @@ if __name__ == '__main__':
         if not path.isfile(raster):
             print("\n\t==> File doesn't exist: " + raster)
             continue
+        else:
+            pass
         print "\n======================\n\t", path.basename(raster)
-        info_raster = Read_Rasters(raster,
+        info_raster = Read_Rasters(path.abspath(raster),
                                    dico_raster,
                                    dico_bands,
                                    path.splitext(raster)[1],
