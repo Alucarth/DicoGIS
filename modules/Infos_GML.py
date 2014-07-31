@@ -12,16 +12,16 @@
 #
 # Python:       2.7.x
 # Created:      18/06/2013
-# Updated:      21/07/2014
+# Updated:      31/07/2014
 # Licence:      GPL 3
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
-################################################################################
+###############################################################################
 ########### Libraries #############
 ###################################
 # Standard library
-from os import walk, path       # files and folder managing
-from time import localtime, strptime, strftime
+from os import chdir, listdir, path  # files and folder managing
+from time import localtime, strftime
 
 # Python 3 backported
 from collections import OrderedDict as OD
@@ -30,9 +30,10 @@ from collections import OrderedDict as OD
 from osgeo import ogr    # handling vector spatial files
 from osgeo import osr
 
-################################################################################
+###############################################################################
 ########### Classes #############
 #################################
+
 
 class Read_GML():
     def __init__(self, layerpath, dico_layer, dico_fields, tipo, text=''):
@@ -50,6 +51,8 @@ class Read_GML():
         """
         # handling ogr specific exceptions
         ogr.UseExceptions()
+        # changing working directory to layer folder
+        chdir(path.dirname(layerpath))
         # Creating variables
         self.alert = 0
         source = ogr.Open(layerpath, 0)     # OGR driver
@@ -57,12 +60,12 @@ class Read_GML():
             u""" if layer doesn't have any object, return an error """
             print 'no compatible source'
             self.erratum(dico_layer, layerpath, u'err_nobjet')
-            self.alert = self.alert +1
+            self.alert = self.alert + 1
         self.layer = source.GetLayer()          # get the layer
         if self.layer.GetFeatureCount() == 0:
             u""" if layer doesn't have any object, return an error """
             self.erratum(dico_layer, layerpath, u'err_nobjet')
-            self.alert = self.alert +1
+            self.alert = self.alert + 1
             return None
         
         obj = self.layer.GetFeature(1)        # get the first object (shp)
@@ -101,6 +104,19 @@ class Read_GML():
         dico_layer[u'title'] = dico_layer[u'name'][:-4].replace('_', ' ').capitalize()
         dico_layer[u'num_obj'] = self.layer.GetFeatureCount()
         dico_layer[u'num_fields'] = self.def_couche.GetFieldCount()
+
+        # dependencies
+        dependencies = [f for f in listdir(path.dirname(layerpath))
+                        if path.splitext(path.abspath(f))[0] == path.splitext(layerpath)[0]
+                        and not path.splitext(path.abspath(f).lower())[1] == ".gml"]
+        dico_layer[u'dependencies'] = dependencies
+
+        # total file and dependencies size
+        dependencies.append(layerpath)
+        total_size = sum([path.getsize(f) for f in dependencies])
+        dico_layer[u"total_size"] = self.sizeof(total_size)
+        dependencies.pop(-1)
+
         # Handling exception in srs names'encoding
         try:
             if self.srs.GetAttrValue('PROJCS') != 'unnamed':
@@ -139,24 +155,32 @@ class Read_GML():
         else:
             dico_layer[u'type_geom'] = self.geom.GetGeometryName()
         # Spatial extent (bounding box)
-        dico_layer[u'Xmin'] = round(self.layer.GetExtent()[0],2)
-        dico_layer[u'Xmax'] = round(self.layer.GetExtent()[1],2)
-        dico_layer[u'Ymin'] = round(self.layer.GetExtent()[2],2)
-        dico_layer[u'Ymax'] = round(self.layer.GetExtent()[3],2)
+        dico_layer[u'Xmin'] = round(self.layer.GetExtent()[0], 2)
+        dico_layer[u'Xmax'] = round(self.layer.GetExtent()[1], 2)
+        dico_layer[u'Ymin'] = round(self.layer.GetExtent()[2], 2)
+        dico_layer[u'Ymax'] = round(self.layer.GetExtent()[3], 2)
         # end of function
         return dico_layer
 
     def infos_fields(self, dico_fields):
         u""" get the informations about fields definitions """
         for i in range(self.def_couche.GetFieldCount()):
-            champomy = self.def_couche.GetFieldDefn(i) # liste ordonnée des champs
+            champomy = self.def_couche.GetFieldDefn(i)  # ordered fields
             dico_fields[champomy.GetName()] = champomy.GetTypeName(),\
-                                           champomy.GetWidth(),\
-                                           champomy.GetPrecision()
-
+                                              champomy.GetWidth(),\
+                                              champomy.GetPrecision()
 
         # end of function
         return dico_fields
+
+    def sizeof(self, os_size):
+        u""" return size in different units depending on size
+        see http://stackoverflow.com/a/1094933 """
+        for size_cat in ['octets', 'Ko', 'Mo', 'Go']:
+            if os_size < 1024.0:
+                return "%3.1f %s" % (os_size, size_cat)
+            os_size /= 1024.0
+        return "%3.1f %s" % (os_size, " To")
 
     def erratum(self, dicolayer, layerpath, mess):
         u""" errors handling """
@@ -167,13 +191,13 @@ class Read_GML():
             def_couche = self.layer.GetLayerDefn()
             dicolayer[u'num_fields'] = def_couche.GetFieldCount()
         except AttributeError:
-            mess = mess    
+            mess = mess
         finally:
             dicolayer[u'error'] = mess
         # End of function
         return dicolayer
 
-################################################################################
+###############################################################################
 ###### Stand alone program ########
 ###################################
 
@@ -181,9 +205,10 @@ if __name__ == '__main__':
     u""" standalone execution for tests. Paths are relative considering a test
     within the official repository (https://github.com/Guts/DicoGIS)"""
     # libraries import
-    from os import getcwd, chdir, path
+    from os import getcwd
     # test files
-    li_gml = [path.join(getcwd(), r'..\test\datatest\vectors\gml\airports.gml')]  # kml
+    li_gml = [path.join(getcwd(),
+                        r'..\test\datatest\vectors\gml\airports.gml')]  # gml
     # test text dictionary
     textos = OD()
     textos['srs_comp'] = u'Compound'
@@ -206,5 +231,10 @@ if __name__ == '__main__':
         dico_fields.clear()
         # getting the informations
         print gml
-        info_gml = Read_GML(gml, dico_layer, dico_fields, 'gml', textos)
+        info_gml = Read_GML(path.abspath(gml),
+                            dico_layer,
+                            dico_fields,
+                            'GML',
+                            textos)
         print '\n', dico_layer, dico_fields
+

@@ -55,6 +55,7 @@
 	<emprise>Spatial extent</emprise>
 	<format>Format</format>
 	<li_depends>Dependencies</li_depends>
+	<tot_size>Total size</tot_size>
 <!-- Output file: vectors -->
 	<num_objets># objects</num_objets>
 	<num_attrib># fields</num_attrib>

@@ -55,6 +55,7 @@
 	<emprise>Extensión espacial</emprise>
 	<format>Formato</format>
 	<li_depends>Relacionados</li_depends>
+	<tot_size>Tamaño total</tot_size>
 <!-- Output file: vectors -->
 	<num_objets># objetos</num_objets>
 	<num_attrib># atributos</num_attrib>
