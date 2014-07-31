@@ -28,6 +28,11 @@ from collections import OrderedDict as OD
 from osgeo import ogr    # spatial files
 from osgeo import gdal
 
+from gdalconst import *
+gdal.AllRegister()
+ogr.UseExceptions()
+gdal.UseExceptions()
+
 # gdal.SetConfigOption("PG_LIST_ALL_TABLES", "YES")
 
 ################################################################################
