@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 from __future__ import unicode_literals
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Name:         DicoGIS
 # Purpose:      Automatize the creation of a dictionnary of geographic data
 #                   contained in a folders structures.
@@ -11,27 +11,27 @@ from __future__ import unicode_literals
 #
 # Python:       2.7.x
 # Created:      14/02/2013
-# Updated:      24/07/2014
+# Updated:      30/07/2014
 #
 # Licence:      GPL 3
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
-DGversion = "2.0-beta.2"
+DGversion = "2.0-beta.3"
 
-################################################################################
+###############################################################################
 ########### Libraries #############
 ###################################
 # Standard library
 from Tkinter import Tk, StringVar, IntVar, Image    # GUI
-from Tkinter import N, S, E, W, PhotoImage, ACTIVE, DISABLED, END, LEFT, RIGHT
+from Tkinter import N, S, E, W, PhotoImage, ACTIVE, DISABLED, END
 from tkFileDialog import askdirectory, asksaveasfilename    # dialogs
 from tkMessageBox import showinfo as info, showerror as avert
-from ttk import Combobox, Progressbar, Style, Labelframe, Frame
-from ttk import Label, Button, Entry, Radiobutton, Checkbutton       # advanced graphic widgets
+from ttk import Combobox, Progressbar, Style, Labelframe
+from ttk import Label, Button, Entry, Radiobutton, Checkbutton  # advanced widgets
 import tkFont   # font library
 
 from sys import exit, platform as opersys
-from os import  listdir, walk, path         # files and folder managing
+from os import listdir, walk, path         # files and folder managing
 from os import environ as env, access, R_OK
 from time import strftime
 from webbrowser import open_new
@@ -49,8 +49,6 @@ import subprocess
 
 from xml.etree import ElementTree as ET     # XML parsing and writer
 
-
-
 # Python 3 backported
 from collections import OrderedDict as OD   # ordered dictionary
 
@@ -58,11 +56,9 @@ from collections import OrderedDict as OD   # ordered dictionary
 try:
     from osgeo import gdal
     from osgeo import ogr
-    from osgeo import osr
 except ImportError:
     import gdal
     import ogr
-    import osr
 
 from gdalconst import *
 gdal.AllRegister()
@@ -79,31 +75,32 @@ from modules import Read_KML        # custom extractor for KML
 from modules import Read_GML        # custom extractor for GML
 from modules import Read_GeoJSON        # custom extractor for GeoJSON
 from modules import Read_PostGIS     # custom extractor for geographic data in PostGIS databases
-
+from modules import Read_GDB        # custom extractor for Esri FileGeoDataBase
 
 # Imports depending on operating system
 if opersys == 'win32':
     u""" windows """
     from os import startfile                            # to open a folder/file
-    try:
-        import arcpy
-        print("Great! ArcGIS is well installed.")
-    except ImportError:
-        print("ArcGIS isn't registered in the sys.path")
-        sys.path.append(r'C:\Program Files (x86)\ArcGIS\Desktop10.2\arcpy')
-        sys.path.append(r'C:\Program Files (x86)\ArcGIS\Desktop10.2\bin')
-        sys.path.append(r'C:\Program Files (x86)\ArcGIS\Desktop10.2\ArcToolbox\Scripts')
-        try:
-            import arcpy
-            print("ArcGIS has been added to Python path and then imported.")
-        except:
-            print("ArcGIS isn't installed on this computer")
+    # try:
+    #     import arcpy
+    #     print("Great! ArcGIS is well installed.")
+    # except ImportError:
+    #     print("ArcGIS isn't registered in the sys.path")
+    #     sys.path.append(r'C:\Program Files (x86)\ArcGIS\Desktop10.2\arcpy')
+    #     sys.path.append(r'C:\Program Files (x86)\ArcGIS\Desktop10.2\bin')
+    #     sys.path.append(r'C:\Program Files (x86)\ArcGIS\Desktop10.2\ArcToolbox\Scripts')
+    #     try:
+    #         import arcpy
+    #         print("ArcGIS has been added to Python path and then imported.")
+    #     except:
+    #         print("ArcGIS isn't installed on this computer")
 else:
     pass
 
-################################################################################
+###############################################################################
 ########### Variables #############
 ###################################
+
 
 class DicoGIS(Tk):
     def __init__(self):
@@ -122,7 +119,7 @@ class DicoGIS(Tk):
 
         # basics settings
         Tk.__init__(self)               # constructor of parent graphic class
-        self.title(u'DicoGIS')
+        self.title(u'DicoGIS {0}'.format(DGversion))
         if opersys == 'win32':
             self.logger.info('Operating system: {0}'.format(platform.platform()))
             self.iconbitmap('DicoGIS.ico')    # windows icon
@@ -130,8 +127,8 @@ class DicoGIS(Tk):
         elif opersys == 'linux2':
             self.logger.info('Operating system: {0}'.format(platform.platform()))
             self.uzer = env.get(u'USER')
-            icon = Image("photo", file = r'data/img/DicoGIS_logo.gif')
-            self.call('wm','iconphoto', self._w, icon)
+            icon = Image("photo", file=r'data/img/DicoGIS_logo.gif')
+            self.call('wm', 'iconphoto', self._w, icon)
             self.style = Style().theme_use('clam')
         elif opersys == 'darwin':
             self.logger.info('Operating system: {0}'.format(platform.platform()))
@@ -139,7 +136,7 @@ class DicoGIS(Tk):
         else:
             self.logger.warning('Operating system unknown')
             self.logger.info('Operating system: {0}'.format(platform.platform()))
-        self.resizable(width = False, height = False)
+        self.resizable(width=False, height=False)
         self.focus_force()
 
         # variables
@@ -153,15 +150,15 @@ class DicoGIS(Tk):
         self.li_kml = []    # list for KML path
         self.li_gml = []    # list for GML tables path
         self.li_geoj = []   # list for GeoJSON tables path
-        self.li_raster_formats = (".ecw", ".tif", ".jp2")   # raster formats handled
-        self.li_vectors_formats = (".shp", ".tab")          # vectors formats handled
+        self.li_raster_formats = (".ecw", ".tif", ".jp2")   # raster handled
+        self.li_vectors_formats = (".shp", ".tab")          # vectors handled
         self.today = strftime("%Y-%m-%d")   # date of the day
         self.dico_layer = OD()      # dict for vectors informations
         self.dico_fields = OD()     # dict for fields informations
         self.dico_raster = OD()     # dict for rasters global informations
         self.dico_bands = OD()      # dict for bands informations
         self.dico_err = OD()     # errors list
-        li_lang = [lg[5:-4] for lg in listdir(r'data/locale')] # available languages
+        li_lang = [lg[5:-4] for lg in listdir(r'data/locale')]  # languages
         self.blabla = OD()      # texts dictionary
 
         # GUI fonts
@@ -171,86 +168,93 @@ class DicoGIS(Tk):
         self.load_texts(self.def_lang)
 
         # Frames
-        self.FrPath = Labelframe(self, name ='files',
-                                       text = self.blabla.get('gui_fr1'))
-        self.FrFilters = Labelframe(self, name ='filters',
-                                          text = self.blabla.get('gui_fr3'))
-        self.FrDb = Labelframe(self, name ='database',
-                                       text = self.blabla.get('gui_fr2'))
-        self.FrProg = Labelframe(self, name ='progression',
-                                       text = self.blabla.get('gui_prog'))
-        self.FrOutp = Labelframe(self, name ='output',
-                                       text = self.blabla.get('gui_fr4'))
+        self.FrPath = Labelframe(self,
+                                 name='files',
+                                 text=self.blabla.get('gui_fr1'))
+        self.FrFilters = Labelframe(self,
+                                    name='filters',
+                                    text=self.blabla.get('gui_fr3'))
+        self.FrDb = Labelframe(self,
+                               name='database',
+                               text=self.blabla.get('gui_fr2'))
+        self.FrProg = Labelframe(self,
+                                 name='progression',
+                                 text=self.blabla.get('gui_prog'))
+        self.FrOutp = Labelframe(self,
+                                 name='output',
+                                 text=self.blabla.get('gui_fr4'))
             ## Frame 1: path of geofiles
         # formats options
-        self.opt_shp = IntVar(self.FrFilters) # able/disable handling shapefiles
-        self.opt_tab = IntVar(self.FrFilters) # able/disable handling MapInfo tables
-        self.opt_kml = IntVar(self.FrFilters) # able/disable handling KML
-        self.opt_gml = IntVar(self.FrFilters) # able/disable handling GML
-        self.opt_geoj = IntVar(self.FrFilters) # able/disable handling GeoJSON
-        self.opt_rast = IntVar(self.FrFilters) # able/disable handling rasters
+        self.opt_shp = IntVar(self.FrFilters)   # able/disable shapefiles
+        self.opt_tab = IntVar(self.FrFilters)   # able/disable MapInfo tables
+        self.opt_kml = IntVar(self.FrFilters)   # able/disable KML
+        self.opt_gml = IntVar(self.FrFilters)   # able/disable GML
+        self.opt_geoj = IntVar(self.FrFilters)  # able/disable GeoJSON
+        self.opt_rast = IntVar(self.FrFilters)  # able/disable rasters
 
         # format choosen: check buttons
         caz_shp = Checkbutton(self.FrFilters,
-                              text = u'.shp',
-                              variable = self.opt_shp)
+                              text=u'.shp',
+                              variable=self.opt_shp)
         caz_tab = Checkbutton(self.FrFilters,
-                              text = u'.tab',
-                              variable = self.opt_tab)
+                              text=u'.tab',
+                              variable=self.opt_tab)
         caz_kml = Checkbutton(self.FrFilters,
-                              text = u'.kml',
-                              variable = self.opt_kml)
+                              text=u'.kml',
+                              variable=self.opt_kml)
         caz_gml = Checkbutton(self.FrFilters,
-                              text = u'.gml',
-                              variable = self.opt_gml)
+                              text=u'.gml',
+                              variable=self.opt_gml)
         caz_geoj = Checkbutton(self.FrFilters,
-                              text = u'.geojson',
-                              variable = self.opt_geoj)
+                               text=u'.geojson',
+                               variable=self.opt_geoj)
         caz_rast = Checkbutton(self.FrFilters,
-                              text = u'rasters ({0})'.format(', '.join(self.li_raster_formats)),
-                              variable = self.opt_rast)
+                               text=u'rasters ({0})'.format(', '.join(self.li_raster_formats)),
+                               variable=self.opt_rast)
         # widgets placement
-        caz_shp.grid(row = 1,
-                     column = 0,
-                     sticky = N+S+W+E,
-                     padx = 2, pady = 2)
-        caz_tab.grid(row = 1,
-                     column = 1,
-                     sticky = N+S+W+E,
-                     padx = 2, pady = 2)
-        caz_kml.grid(row = 1,
-                     column = 2,
-                     sticky = N+S+W+E,
-                     padx = 2, pady = 2)
-        caz_gml.grid(row = 1,
-                     column = 3,
-                     sticky = N+S+W+E,
-                     padx = 2, pady = 2)
-        caz_geoj.grid(row = 1,
-                     column = 4,
-                     sticky = N+S+W+E,
-                     padx = 2, pady = 2)
-        caz_rast.grid(row = 1,
-                     column = 5,
-                     sticky = N+S+W+E,
-                     padx = 2, pady = 2)
+        caz_shp.grid(row=1,
+                     column=0,
+                     sticky="NSWE",
+                     padx=2, pady=2)
+        caz_tab.grid(row=1,
+                     column=1,
+                     sticky="NSWE",
+                     padx=2, pady=2)
+        caz_kml.grid(row=1,
+                     column=2,
+                     sticky="NSWE",
+                     padx=2, pady=2)
+        caz_gml.grid(row=1,
+                     column=3,
+                     sticky="NSWE",
+                     padx=2, pady=2)
+        caz_geoj.grid(row=1,
+                      column=4,
+                      sticky="NSWE",
+                      padx=2, pady=2)
+        caz_rast.grid(row=1,
+                      column=5,
+                      sticky="NSWE",
+                      padx=2, pady=2)
         # target folder
-        self.labtarg = Label(self.FrPath, text = self.blabla.get('gui_path'))
-        self.target = Entry(master=self.FrPath, width = 35)
+        self.labtarg = Label(self.FrPath, text=self.blabla.get('gui_path'))
+        self.target = Entry(master=self.FrPath, width=35)
         self.browsetarg = Button(self.FrPath,       # browse button
-                                 text = self.blabla.get('gui_choix'),
-                                 command = lambda:self.setpathtarg(),
-                                 takefocus = True)
+                                 text=self.blabla.get('gui_choix'),
+                                 command=lambda:  self.setpathtarg(),
+                                 takefocus=True)
         self.browsetarg.focus_force()               # force the focus on
         # widgets placement
-        self.labtarg.grid(row = 1, column = 1, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
-        self.target.grid(row = 1, column = 2, columnspan = 1, sticky = N+S+W+E, padx = 2, pady = 2)
-        self.browsetarg.grid(row = 1, column = 3, sticky = N+S+W+E, padx = 2, pady = 2)
-
+        self.labtarg.grid(row=1, column=1, columnspan=1,
+                          sticky="NSWE", padx=2, pady=2)
+        self.target.grid(row=1, column=2, columnspan=1,
+                         sticky="NSWE", padx=2, pady=2)
+        self.browsetarg.grid(row=1, column=3,
+                             sticky="NSWE", padx=2, pady=2)
 
             ## Frame 2: Database
         # variables
-        self.opt_pgvw = IntVar(self.FrDb) # able/disable handling PostGIS views
+        self.opt_pgvw = IntVar(self.FrDb)  # able/disable PostGIS views
         self.host = StringVar(self.FrDb, 'localhost')
         self.port = IntVar(self.FrDb, 5432)
         self.dbnb = StringVar(self.FrDb)
@@ -258,31 +262,42 @@ class DicoGIS(Tk):
         self.pswd = StringVar(self.FrDb)
         # Form widgets
         caz_pgvw = Checkbutton(self.FrDb,
-                              text = u'See views?',
-                              variable = self.opt_pgvw)
-        self.ent_H = Entry(self.FrDb, textvariable = self.host)
-        self.ent_P = Entry(self.FrDb, textvariable = self.port, width = 5)
-        self.ent_D = Entry(self.FrDb, textvariable = self.dbnb)
-        self.ent_U = Entry(self.FrDb, textvariable = self.user)
-        self.ent_M = Entry(self.FrDb, textvariable = self.pswd, show='*')
+                               text=u'See views?',
+                               variable=self.opt_pgvw)
+        self.ent_H = Entry(self.FrDb, textvariable=self.host)
+        self.ent_P = Entry(self.FrDb, textvariable=self.port, width=5)
+        self.ent_D = Entry(self.FrDb, textvariable=self.dbnb)
+        self.ent_U = Entry(self.FrDb, textvariable=self.user)
+        self.ent_M = Entry(self.FrDb, textvariable=self.pswd, show='*')
         # Label widgets
-        self.lb_H = Label(self.FrDb, text = self.blabla.get('gui_host'))
-        self.lb_P = Label(self.FrDb, text = self.blabla.get('gui_port'))
-        self.lb_D = Label(self.FrDb, text = self.blabla.get('gui_db'))
-        self.lb_U = Label(self.FrDb, text = self.blabla.get('gui_user'))
-        self.lb_M = Label(self.FrDb, text = self.blabla.get('gui_mdp'))
+        self.lb_H = Label(self.FrDb, text=self.blabla.get('gui_host'))
+        self.lb_P = Label(self.FrDb, text=self.blabla.get('gui_port'))
+        self.lb_D = Label(self.FrDb, text=self.blabla.get('gui_db'))
+        self.lb_U = Label(self.FrDb, text=self.blabla.get('gui_user'))
+        self.lb_M = Label(self.FrDb, text=self.blabla.get('gui_mdp'))
         # widgets placement
-        self.ent_H.grid(row = 1, column = 1, columnspan = 2, sticky = N+S+E+W, padx = 2, pady = 2)
-        self.ent_P.grid(row = 1, column = 3, columnspan = 1, sticky = N+S+E, padx = 2, pady = 2)
-        self.ent_D.grid(row = 2, column = 1, columnspan = 1, sticky = N+S+E+W, padx = 2, pady = 2)
-        self.ent_U.grid(row = 2, column = 3, columnspan = 1, sticky = N+S+E+W, padx = 2, pady = 2)
-        self.ent_M.grid(row = 3, column = 1, columnspan = 3, sticky = N+S+E+W, padx = 2, pady = 2)
-        self.lb_H.grid(row = 1, column = 0, sticky = N+S+E+W, padx = 2, pady = 2)
-        self.lb_P.grid(row = 1, column = 3, sticky = N+S+W, padx = 2, pady = 2)
-        self.lb_D.grid(row = 2, column = 0, sticky = N+S+W, padx = 2, pady = 2)
-        self.lb_U.grid(row = 2, column = 2, sticky = N+S+W, padx = 2, pady = 2)
-        self.lb_M.grid(row = 3, column = 0, sticky = N+S+W+E, padx = 2, pady = 2)
-        caz_pgvw.grid(row = 4, column = 0, sticky = N+S+W+E, padx = 2, pady = 2)
+        self.ent_H.grid(row=1, column=1, columnspan=2,
+                        sticky="NSEW", padx=2, pady=2)
+        self.ent_P.grid(row=1, column=3, columnspan=1,
+                        sticky="NSE", padx=2, pady=2)
+        self.ent_D.grid(row=2, column=1, columnspan=1,
+                        sticky="NSEW", padx=2, pady=2)
+        self.ent_U.grid(row=2, column=3, columnspan=1,
+                        sticky="NSEW", padx=2, pady=2)
+        self.ent_M.grid(row=3, column=1, columnspan=3,
+                        sticky="NSEW", padx=2, pady=2)
+        self.lb_H.grid(row=1, column=0,
+                       sticky="NSEW", padx=2, pady=2)
+        self.lb_P.grid(row=1, column=3,
+                       sticky="NSW", padx=2, pady=2)
+        self.lb_D.grid(row=2, column=0,
+                       sticky="NSW", padx=2, pady=2)
+        self.lb_U.grid(row=2, column=2,
+                       sticky="NSW", padx=2, pady=2)
+        self.lb_M.grid(row=3, column=0,
+                       sticky="NSWE", padx=2, pady=2)
+        caz_pgvw.grid(row=4, column=0,
+                      sticky="NSWE", padx=2, pady=2)
 
             ## Frame 3: Progression bar
         # variables
@@ -290,86 +305,86 @@ class DicoGIS(Tk):
         # widgets
         self.prog_layers = Progressbar(self.FrProg,
                                        orient="horizontal")
-        Label(self.FrProg, textvariable = self.status,
-                           foreground = 'DodgerBlue').pack()
+        Label(master=self.FrProg,
+              textvariable=self.status,
+              foreground='DodgerBlue').pack()
         # widgets placement
         self.prog_layers.pack(expand=1, fill='both')
 
             ## Frame 4: Output configuration
         # widgets
         self.nameoutput = Label(self.FrOutp,
-                                text = self.blabla.get('gui_fic'))
-        self.output = Entry(self.FrOutp, width = 35)
+                                text=self.blabla.get('gui_fic'))
+        self.output = Entry(self.FrOutp, width=35)
         # widgets placement
-        self.nameoutput.grid(row = 0, column= 1, 
-                             sticky = N+S+W+E, padx = 2, pady = 2)
-        self.output.grid(row = 0, column= 2, columnspan = 2, 
-                         sticky = N+S+W+E, padx = 2, pady = 2)
+        self.nameoutput.grid(row=0, column=1,
+                             sticky="NSWE", padx=2, pady=2)
+        self.output.grid(row=0, column=2, columnspan=2,
+                         sticky="NSWE", padx=2, pady=2)
 
             ## Main frame
         self.typo = IntVar(self, 1)    # type value (files or database)
         # Hola
         self.welcome = Label(self,
-                             text = self.blabla.get('hi') + self.uzer,
+                             text=self.blabla.get('hi') + self.uzer,
                              font = ft_tit,
                              foreground = "red2")
         # Imagen
         self.icone = PhotoImage(file = r'data/img/DicoGIS_logo.gif')
-        Label(self, borderwidth = 2,
-                    image = self.icone).grid(row = 1,
+        Label(self, borderwidth=2,
+                    image = self.icone).grid(row=1,
                                              rowspan = 5,
-                                             column = 0,
-                                             padx = 2,
-                                             pady = 2,
+                                             column=0,
+                                             padx=2,
+                                             pady=2,
                                              sticky = W)
         # credits
         s = Style(self)
-        s.configure('Kim.TButton', foreground='DodgerBlue', borderwidth = 0)
-        Button(self, text = 'by Julien M.\n      2014',
+        s.configure('Kim.TButton', foreground='DodgerBlue', borderwidth=0)
+        Button(self, text='by Julien M.\n      2014',
                      style = 'Kim.TButton',
-                     command = lambda: open_new('https://github.com/Guts')).grid(row = 6,
-                                                                                 padx = 2,
-                                                                                 pady = 2,
+                     command=lambda:  open_new('https://github.com/Guts')).grid(row=6,
+                                                                                 padx=2,
+                                                                                 pady=2,
                                                                                  sticky = W+E)
         # language switcher
-        self.ddl_lang = Combobox(self, values = li_lang, width = 5)
+        self.ddl_lang = Combobox(self, values = li_lang, width=5)
         self.ddl_lang.current(li_lang.index(self.def_lang))
         self.ddl_lang.bind("<<ComboboxSelected>>", self.change_lang)
         # type switcher
-        rd_file = Radiobutton(self, text = 'Fichiers', 
-                                           variable = self.typo, 
+        rd_file = Radiobutton(self, text='Fichiers',
+                                           variable=self.typo,
                                            value = 1,
-                                           command = lambda:self.change_type())
-        rd_pg = Radiobutton(self, text = 'PostGIS', 
-                                         variable = self.typo, 
-                                         value = 2,
-                                         command = lambda:self.change_type())
+                                           command=lambda: self.change_type())
+        rd_pg = Radiobutton(self, text='PostGIS',
+                                  variable=self.typo,
+                                  value = 2,
+                                  command=lambda: self.change_type())
         # Basic buttons
         #img_proc = PhotoImage(master = self, file = 'img/Processing_TNP_10789.gif')
-        self.val = Button(self, text = self.blabla.get('gui_go'),
+        self.val = Button(self, text=self.blabla.get('gui_go'),
                                 state = ACTIVE,
-                                command = lambda:self.process())
+                                command=lambda: self.process())
         #self.val.config(image = img_proc)
-        self.can = Button(self, text = self.blabla.get('gui_quit'),
-                           command = lambda:self.destroy())
+        self.can = Button(self, text=self.blabla.get('gui_quit'),
+                           command=lambda: self.destroy())
 
         # widgets placement
-        self.welcome.grid(row = 1, column = 1, columnspan = 1, sticky = N+S,
-                          padx = 2, pady = 2)
-        self.ddl_lang.grid(row=1, column = 1, sticky = N+S+E, padx = 2, pady = 2)
-        rd_file.grid(row=2, column = 1, sticky = N+S+W, padx = 2, pady = 2)
-        rd_pg.grid(row=2, column = 1, sticky = N+S+E, padx = 2, pady = 2)
-        self.val.grid(row = 7, column = 1, columnspan = 2,
-                            sticky = N+S+W+E, padx = 2, pady = 2)
-        self.can.grid(row = 7, column = 0, sticky = N+S+W+E, padx = 2, pady = 2)
+        self.welcome.grid(row=1, column=1, columnspan=1, sticky="NS",
+                          padx=2, pady=2)
+        self.ddl_lang.grid(row=1, column=1, sticky="NSE", padx=2, pady=2)
+        rd_file.grid(row=2, column=1, sticky="NSW", padx=2, pady=2)
+        rd_pg.grid(row=2, column=1, sticky="NSE", padx=2, pady=2)
+        self.val.grid(row=7, column=1, columnspan=2,
+                            sticky="NSWE", padx=2, pady=2)
+        self.can.grid(row=7, column=0, sticky="NSWE", padx=2, pady=2)
         # Frames placement
         rd_file.invoke()    # to provoc the type (frame 2) placement
-        self.FrProg.grid(row = 5, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
-        self.FrOutp.grid(row = 6, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
+        self.FrProg.grid(row=5, column=1, sticky="NSWE", padx=2, pady=2)
+        self.FrOutp.grid(row=6, column=1, sticky="NSWE", padx=2, pady=2)
 
         # loading previous options
         self.load_settings()
-
 
     def load_settings(self):
         u""" load settings from last execution """
@@ -447,20 +462,20 @@ class DicoGIS(Tk):
         # change to the new language selected
         self.load_texts(new_lang)
         # update widgets text
-        self.welcome.config(text = self.blabla.get('hi') + self.uzer)
-        self.can.config(text = self.blabla.get('gui_quit'))
-        self.FrPath.config(text = self.blabla.get('gui_fr1'))
-        self.FrDb.config(text = self.blabla.get('gui_fr2'))
-        self.FrProg.config(text = self.blabla.get('gui_prog'))
-        self.labtarg.config(text = self.blabla.get('gui_path'))
-        self.browsetarg.config(text = self.blabla.get('gui_choix'))
-        self.val.config(text = self.blabla.get('gui_go'))
-        self.nameoutput.config(text = self.blabla.get('gui_fic'))
-        self.lb_H.config(text = self.blabla.get('gui_host'))
-        self.lb_P.config(text = self.blabla.get('gui_port'))
-        self.lb_D.config(text = self.blabla.get('gui_db'))
-        self.lb_U.config(text = self.blabla.get('gui_user'))
-        self.lb_M.config(text = self.blabla.get('gui_mdp'))
+        self.welcome.config(text=self.blabla.get('hi') + self.uzer)
+        self.can.config(text=self.blabla.get('gui_quit'))
+        self.FrPath.config(text=self.blabla.get('gui_fr1'))
+        self.FrDb.config(text=self.blabla.get('gui_fr2'))
+        self.FrProg.config(text=self.blabla.get('gui_prog'))
+        self.labtarg.config(text=self.blabla.get('gui_path'))
+        self.browsetarg.config(text=self.blabla.get('gui_choix'))
+        self.val.config(text=self.blabla.get('gui_go'))
+        self.nameoutput.config(text=self.blabla.get('gui_fic'))
+        self.lb_H.config(text=self.blabla.get('gui_host'))
+        self.lb_P.config(text=self.blabla.get('gui_port'))
+        self.lb_D.config(text=self.blabla.get('gui_db'))
+        self.lb_U.config(text=self.blabla.get('gui_user'))
+        self.lb_M.config(text=self.blabla.get('gui_mdp'))
 
         # End of function
         return self.blabla
@@ -485,16 +500,16 @@ class DicoGIS(Tk):
             self.logger.info('Type switched to: files structure')
             self.FrDb.grid_forget()
             self.status.set('')
-            self.FrPath.grid(row = 3, column = 1, padx = 2, pady = 2,
-                                sticky = N+S+W+E)
-            self.FrFilters.grid(row = 4, column = 1, padx = 2, pady = 2,
-                             sticky = N+S+W+E)
+            self.FrPath.grid(row=3, column=1, padx=2, pady=2,
+                                sticky="NSWE")
+            self.FrFilters.grid(row=4, column=1, padx=2, pady=2,
+                             sticky="NSWE")
         elif self.typo.get() == 2:
             self.logger.info('Type switched to: database')
             self.FrPath.grid_forget()
             self.FrFilters.grid_forget()
             self.status.set('')
-            self.FrDb.grid(row = 3, column = 1, sticky = N+S+W+E, padx = 2, pady = 2)
+            self.FrDb.grid(row=3, column=1, sticky="NSWE", padx=2, pady=2)
         # End of function
         return self.typo
 
@@ -504,15 +519,15 @@ class DicoGIS(Tk):
         foldername = askdirectory(parent = self,
                                   initialdir = self.def_rep,
                                   mustexist = True,
-                                  title = self.blabla.get('gui_cible'))
+                                  title=self.blabla.get('gui_cible'))
         # check if a folder has been choosen
         if foldername:
             try:
                 self.target.delete(0, END)
                 self.target.insert(0, foldername)
             except:
-                info(title = self.blabla.get('nofolder'),
-                     message = self.blabla.get('nofolder'))
+                info(title=self.blabla.get('nofolder'),
+                     message=self.blabla.get('nofolder'))
                 return
         # set the default output file
         self.output.delete(0, END)
@@ -698,7 +713,7 @@ class DicoGIS(Tk):
         self.prog_layers["maximum"] = total_files
         self.prog_layers["value"]
         # getting the info from shapefiles and compile it in the excel
-        line_folders = 1    # line rank of directories dictionary
+        # line_folders = 1    # line rank of directories dictionary
         line_vectors = 1    # line rank of vectors dictionary
         line_rasters = 1    # line rank of rasters dictionary
 
@@ -1025,7 +1040,7 @@ class DicoGIS(Tk):
                             self.pswd.get()))
         except Exception, e:
             self.logger.warning("Connection failed: {0}.".format(e))
-            avert(title = self.blabla.get("err_pg_conn_fail"), message = unicode(e))
+            avert(title=self.blabla.get("err_pg_conn_fail"), message=unicode(e))
             return
 
         # if connection successed
@@ -1035,25 +1050,24 @@ class DicoGIS(Tk):
                                                     conn.GetLayerCount()))
         # set the default output file
         self.output.delete(0, END)
-        self.output.insert(0, "DicoGIS_{0}-{1}_{2}.xls".format(self.dbnb.get(), 
-                                                               self.host.get(), 
+        self.output.insert(0, "DicoGIS_{0}-{1}_{2}.xls".format(self.dbnb.get(),
+                                                               self.host.get(),
                                                                self.today))
         # launching the process
         self.process_db(conn)
         # end of function
         return conn
 
-
     def configexcel(self):
         u""" create and configure the Excel workbook """
         # Basic configuration
-        self.book = Workbook(encoding = 'utf8')
+        self.book = Workbook(encoding='utf8')
         self.logger.info('Workbook created')
         # Some customization: fonts and styles
         # headers style
         self.entete = easyxf('pattern: pattern solid, fore_colour black;'
-                            'font: colour white, bold True, height 220;'
-                            'align: horiz center')
+                             'font: colour white, bold True, height 220;'
+                             'align: horiz center')
         # hyperlinks style
         self.url = easyxf(u'font: underline single')
         # errors style
@@ -1061,7 +1075,9 @@ class DicoGIS(Tk):
                                  'font: colour white, bold True;')
 
         # columns headers
-        if self.typo.get() == 1 and (len(self.li_tab) + len(self.li_shp) + len(self.li_gml) + len(self.li_geoj) + len(self.li_kml)) >0:
+        if self.typo.get() == 1 \
+           and (len(self.li_tab) + len(self.li_shp) + len(self.li_gml)
+           + len(self.li_geoj) + len(self.li_kml)) > 0:
             """ adding a new sheet for vectors informations """
             self.feuy1 = self.book.add_sheet(u'Vectors', cell_overwrite_ok=True)
             self.feuy1.write(0, 0, self.blabla.get('nomfic'), self.entete)
@@ -1082,8 +1098,8 @@ class DicoGIS(Tk):
             # tunning headers
             lg_shp_names = [len(lg) for lg in self.li_shp]
             lg_tab_names = [len(lg) for lg in self.li_tab]
-            self.feuy1.col(0).width = max(lg_shp_names + lg_tab_names)*100
-            self.feuy1.col(1).width = len(self.blabla.get('browse'))*256
+            self.feuy1.col(0).width = max(lg_shp_names + lg_tab_names) * 100
+            self.feuy1.col(1).width = len(self.blabla.get('browse')) * 256
         else:
             pass
 
@@ -1112,10 +1128,10 @@ class DicoGIS(Tk):
             self.logger.info('Sheet rasters created')
             # tunning headers
             lg_rast_names = [len(lg) for lg in self.li_raster]
-            self.feuy2.col(0).width = max(lg_rast_names)*100
-            self.feuy2.col(1).width = len(self.blabla.get('browse'))*256
+            self.feuy2.col(0).width = max(lg_rast_names) * 100
+            self.feuy2.col(1).width = len(self.blabla.get('browse')) * 256
         else:
-            pass    
+            pass
 
         if self.typo.get() == 2:
             """ adding a new sheet for rasters informations """
@@ -1137,24 +1153,16 @@ class DicoGIS(Tk):
             self.logger.info('Sheet PostGIS created')
             # tunning headers
             # lg_rast_names = [len(lg) for lg in self.li_raster]
-            # self.feuy3.col(0).width = max(lg_rast_names)*100
-            # self.feuy3.col(1).width = len(self.blabla.get('browse'))*256
+            # self.feuy3.col(0).width=max(lg_rast_names)*100
+            # self.feuy3.col(1).width=len(self.blabla.get('browse'))*256
         else:
-            pass  
+            pass
 
         # end of function
         return self.book, self.entete, self.url, self.xls_erreur
 
     def dictionarize_vectors(self, layer_infos, fields_info, sheet, line):
         u""" write the infos of the layer into the Excel workbook """
-        # local variables
-        champs = ""
-        theme = ""
-
-                # errors style
-        xls_erreur = easyxf('pattern: pattern solid, fore_colour black;'
-                            'font: colour white, bold True;')
-
         # in case of a source error
         if layer_infos.get('error'):
             sheet.row(line).set_style(self.xls_erreur)
@@ -1166,7 +1174,6 @@ class DicoGIS(Tk):
                                                     self.blabla.get('browse'))
             sheet.write(line, 1, Formula(link), self.url)
             
-
             # Interruption of function
             return self.book, self.feuy1
         else:
@@ -1223,15 +1230,15 @@ class DicoGIS(Tk):
             # concatenation of field informations
             try:
                 champs = champs + chp +\
-                         u" (" + tipo + self.blabla.get(u'longueur') +\
-                         unicode(fields_info[chp][1]) +\
-                         self.blabla.get(u'precision') +\
-                         unicode(fields_info[chp][2]) + u") ; "
+                          u" (" + tipo + self.blabla.get(u'longueur') +\
+                          unicode(fields_info[chp][1]) +\
+                          self.blabla.get(u'precision') +\
+                          unicode(fields_info[chp][2]) + u") ; "
             except UnicodeDecodeError:
                 # write a notification into the log file
-                self.dico_err[layer_infos.get('name')] = self.blabla.get(u'err_encod') + \
-                                                         chp.decode('latin1') + \
-                                                         u"\n\n"
+                self.dico_err[layer_infos.get('name')] = self.blabla.get(u'err_encod')\
+                                                    + chp.decode('latin1') \
+                                                    + u"\n\n"
                 self.logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
                 # decode the fucking field name
                 champs = champs + chp.decode('latin1') \
@@ -1247,10 +1254,6 @@ class DicoGIS(Tk):
 
     def dictionarize_rasters(self, dico_raster, dico_bands, sheet, line):
         u""" write the infos of the layer into the Excel workbook """
-        # local variables
-        champs = ""
-        theme = ""
-
         # in case of a source error
         if dico_raster.get('error'):
             self.logger.warning('\tproblem detected')
@@ -1329,17 +1332,14 @@ class DicoGIS(Tk):
 
     def dictionarize_pg(self, layer_infos, fields_info, sheet, line):
         u""" write the infos of the layer into the Excel workbook """
-        # local variables
-        champs = ""
-        theme = ""
         # in case of a source error
         if layer_infos.get('error'):
             self.logger.warning('\tproblem detected')
             sheet.write(line, 0, layer_infos.get('name'))
             sheet.write(line, 1, "{0}:{1}-{2}".format(self.host.get(),
                                                       self.port.get(),
-                                                      self.dbnb.get()), 
-                                 self.xls_erreur)
+                                                      self.dbnb.get()),
+                                                      self.xls_erreur)
             sheet.write(line, 2, layer_infos.get('error'), self.xls_erreur)
             # Interruption of function
             return sheet
@@ -1405,7 +1405,9 @@ class DicoGIS(Tk):
                 self.logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
                 # decode the fucking field name
                 champs = champs + chp.decode('latin1') \
-                + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo, fields_info[chp][1], fields_info[chp][2])
+                        + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
+                                                                fields_info[chp][1],
+                                                                fields_info[chp][2])
                 # then continue
                 continue
 
@@ -1415,14 +1417,14 @@ class DicoGIS(Tk):
         # End of function
         return self.book, self.feuy3
 
-
     def savedico(self):
         u""" Save the Excel file """
         # Prompt of folder where save the file
-        saved = asksaveasfilename(initialdir= self.target.get(),
-                            defaultextension = '.xls',
-                            initialfile = self.output.get(),
-                            filetypes = [(self.blabla.get('gui_excel'),"*.xls")])
+        saved = asksaveasfilename(initialdir=self.target.get(),
+                                  defaultextension='.xls',
+                                  initialfile=self.output.get(),
+                                  filetypes=[(self.blabla.get('gui_excel'),
+                                              "*.xls")])
 
         # check if the extension is correctly indicated
         if path.splitext(saved)[1] != ".xls":
@@ -1435,7 +1437,7 @@ class DicoGIS(Tk):
         # # notification
         # total_files = unicode(len(self.li_shp) + len(self.li_tab))
         # info(title=self.blabla.get('info_end'),
-        #      message = self.blabla.get('info_end2'))
+        #      message=self.blabla.get('info_end2'))
 
         # End of function
         return self.book, saved
@@ -1452,14 +1454,14 @@ class DicoGIS(Tk):
             raise IOError('Cannot access file: %s' % target)
 
         # open the directory or the file according to the os
-        if opersys == 'win32': # Windows
+        if opersys == 'win32':  # Windows
             proc = startfile(target)
 
-        elif opersys.startswith('linux'): # Linux:
+        elif opersys.startswith('linux'):  # Linux:
             proc = subprocess.Popen(['xdg-open', target],
                                      stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        elif opersys == 'darwin': # Mac:
+        elif opersys == 'darwin':  # Mac:
             proc = subprocess.Popen(['open', '--', target],
                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -1472,7 +1474,7 @@ class DicoGIS(Tk):
 
     def erreurStop(self, mess):
         u""" In case of error, close the GUI and stop the program """
-        avert(title = u'Erreur', message = mess)
+        avert(title=u'Erreur', message=mess)
         self.logger.error(mess)
         self.root.destroy()
         exit()
