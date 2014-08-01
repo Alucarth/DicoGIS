@@ -51,13 +51,52 @@ class Read_GDB_f():
 class Read_GDB_o():
     def __init__(self, gdb):
         """ """
+        # test text dictionary
+        textos = OD()
+        textos['srs_comp'] = u'Compound'
+        textos['srs_geoc'] = u'Geocentric'
+        textos['srs_geog'] = u'Geographic'
+        textos['srs_loca'] = u'Local'
+        textos['srs_proj'] = u'Projected'
+        textos['srs_vert'] = u'Vertical'
+        textos['geom_point'] = u'Point'
+        textos['geom_ligne'] = u'Line'
+        textos['geom_polyg'] = u'Polygon'
+        # playing with driver
         print "\nLet's play with OGR OpenGDB driver".upper()
-        print(dir(gdb))
+        print("GDB available methods: {0}".format(dir(gdb)))
+        print gdb.__sizeof__()
         # print(gdb.GetStyleTable())
         print("{0} layers found into.".format(gdb.GetLayerCount()))
         for index in range(gdb.GetLayerCount()):
             # global information about each layer
             layer = gdb.GetLayerByIndex(index)
+            # first feature and geometry type
+            obj = layer.GetFeature(1)
+            geom = obj.GetGeometryRef()
+            print geom.GetGeometryName()
+            # SRS
+            srs = layer.GetSpatialRef()
+            srs.AutoIdentifyEPSG()
+            # srs type
+            srsmetod = [
+                        (srs.IsCompound(), textos.get('srs_comp')),
+                        (srs.IsGeocentric(), textos.get('srs_geoc')),
+                        (srs.IsGeographic(), textos.get('srs_geog')),
+                        (srs.IsLocal(), textos.get('srs_loca')),
+                        (srs.IsProjected(), textos.get('srs_proj')),
+                        (srs.IsVertical(), textos.get('srs_vert'))
+                       ]
+            # searching for a match with one of srs types
+            for srsmet in srsmetod:
+                if srsmet[0] == 1:
+                    typsrs = srsmet[1]
+                else:
+                    continue
+
+            print typsrs
+
+            print("\n\n\t\tLayer available methods: {0}\n".format(dir(layer)))
             print("\nLayer: {0}".format(layer.GetName()))
             print("Xmin = {0} - Xmax = {1} \n\
 Ymin = {2} - Ymax = {3}".format(layer.GetExtent()[0],
@@ -67,17 +106,19 @@ Ymin = {2} - Ymax = {3}".format(layer.GetExtent()[0],
             print("Geometry column name: {0}".format(layer.GetFIDColumn()))
             print("# features: {0}".format(layer.GetFeatureCount()))
             print("Geometry type: {0}".format(layer.GetGeomType()))
-            # print("{0}".format(layer.GetGeometryColumn()))
+            # print("Geometry name: {0}".format(layer.GetGeomName()))  # doesn't work
+            print("Geometry column: {0}".format(layer.GetGeometryColumn()))
+            print dir(layer.GetGeomType())
             
             # fields information about each layer
             layer_def = layer.GetLayerDefn()
+            print("\n\n\t\tLayer DEFINITION available methods: {0}\n".format(dir(layer_def)))
             print("# fields: {0}".format(layer_def.GetFieldCount()))
-            print(dir(layer_def))
             print("# geometry fields: {0}".format(layer_def.GetGeomFieldCount()))
             # print(layer_def.GetGeomFieldDefn())
             print(layer_def.GetGeomType())
+            print(dir(layer_def.GetGeomType()))
             # print(layer.GetName())
-            print(help(layer_def.GetFieldDefn))
             style_table = layer.GetStyleTable()
             print(style_table)
 
@@ -92,11 +133,10 @@ Ymin = {2} - Ymax = {3}".format(layer.GetExtent()[0],
                 print("== Length: {0}".format(field.width))
             
             # end of fields loop
-            print(dir(field))
+            print("\nFields, available methods: {0}".format(dir(field)))
 
         # end of function
-        print("\n")
-        print(dir(layer_def))
+        print("\nLayer definition, available methods: {0}".format(dir(layer_def)))
 
 
 ################################################################################
