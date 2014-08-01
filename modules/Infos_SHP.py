@@ -164,23 +164,23 @@ class Read_SHP():
                 dico_layer[u'srs'] = unicode(self.srs.GetAttrValue('PROJCS')).replace('_', ' ')
             else:
                 dico_layer[u'srs'] = unicode(self.srs.GetAttrValue('PROJECTION')).replace('_', ' ')
-        except UnicodeDecodeError, e:
-            print e
+        except UnicodeDecodeError:
             if self.srs.GetAttrValue('PROJCS') != 'unnamed':
                 dico_layer[u'srs'] = self.srs.GetAttrValue('PROJCS').decode('latin1').replace('_', ' ')
             else:
                 dico_layer[u'srs'] = self.srs.GetAttrValue('PROJECTION').decode('latin1').replace('_', ' ')
-        dico_layer[u'EPSG'] = unicode(self.srs.GetAttrValue("AUTHORITY", 1))
+        finally:
+            dico_layer[u'EPSG'] = unicode(self.srs.GetAttrValue("AUTHORITY", 1))
         # Getting basic dates
         dico_layer[u'date_actu'] = strftime('%Y-%m-%d',
                                             localtime(path.getmtime(layerpath)))
         dico_layer[u'date_crea'] = strftime('%Y-%m-%d',
                                             localtime(path.getctime(layerpath)))
-        # SRS exception handling
+        # World SRS default
         if dico_layer[u'EPSG'] == u'4326' and dico_layer[u'srs'] == u'None':
-            print dico_layer[u'srs']
             dico_layer[u'srs'] = u'WGS 84'
-            print dico_layer[u'srs']
+        else:
+            pass
 
         # end of function
         return dico_layer
