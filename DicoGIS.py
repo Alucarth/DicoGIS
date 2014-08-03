@@ -238,12 +238,14 @@ class DicoGIS(Tk):
                       column=4,
                       sticky="NSWE",
                       padx=2, pady=2)
-        caz_rast.grid(row=1,
-                      column=5,
+        caz_rast.grid(row=2,
+                      column=0,
+                      columnspan=2,
                       sticky="NSWE",
                       padx=2, pady=2)
-        caz_gdb.grid(row=1,
-                     column=6,
+        caz_gdb.grid(row=2,
+                     column=2,
+                     columnspan=2,
                      sticky="NSWE",
                      padx=2, pady=2)
         # target folder
@@ -367,7 +369,7 @@ class DicoGIS(Tk):
         self.ddl_lang.bind("<<ComboboxSelected>>", self.change_lang)
         # type switcher
         rd_file = Radiobutton(self,
-                              text='Fichiers',
+                              text=self.blabla.get('gui_tab1'),
                               variable=self.typo,
                               value=1,
                               command=lambda: self.change_type())
@@ -483,6 +485,8 @@ class DicoGIS(Tk):
         self.can.config(text=self.blabla.get('gui_quit'))
         self.FrPath.config(text=self.blabla.get('gui_fr1'))
         self.FrDb.config(text=self.blabla.get('gui_fr2'))
+        self.FrFilters.config(text=self.blabla.get('gui_fr3'))
+        self.FrOutp.config(text=self.blabla.get('gui_fr4'))
         self.FrProg.config(text=self.blabla.get('gui_prog'))
         self.labtarg.config(text=self.blabla.get('gui_path'))
         self.browsetarg.config(text=self.blabla.get('gui_choix'))

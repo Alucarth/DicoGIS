@@ -12,6 +12,7 @@
 	<gui_cholang>Idioma:</gui_cholang>
 	<gui_go>Iniciar</gui_go>
 	<gui_quit>Salir</gui_quit>
+	<gui_tab1> Archivos </gui_tab1>
 	<gui_fr1> Carpeta </gui_fr1>
 	<gui_fr2> Base de datos </gui_fr2>
 	<gui_fr3> Formatos </gui_fr3>
