@@ -27,7 +27,7 @@ from Tkinter import W, PhotoImage, ACTIVE, DISABLED, END
 from tkFileDialog import askdirectory, asksaveasfilename    # dialogs
 from tkMessageBox import showinfo as info, showerror as avert
 from ttk import Combobox, Progressbar, Style, Labelframe
-from ttk import Label, Button, Entry, Radiobutton, Checkbutton  # advanced widgets
+from ttk import Label, Button, Entry, Radiobutton, Checkbutton  # widgets
 import tkFont   # font library
 
 from sys import exit, platform as opersys
@@ -67,14 +67,14 @@ gdal.UseExceptions()
 from xlwt import Workbook, easyxf, Formula  # excel writer
 
 # Custom modules
-from modules import Read_Rasters    # custom extractor for rasters files
-from modules import Read_SHP        # custom extractor for shapefiles
-from modules import Read_TAB        # custom extractor for MapInfo Tables
-from modules import Read_KML        # custom extractor for KML
-from modules import Read_GML        # custom extractor for GML
-from modules import Read_GeoJSON        # custom extractor for GeoJSON
-from modules import Read_PostGIS     # custom extractor for geographic data in PostGIS databases
-from modules import Read_GDB        # custom extractor for Esri FileGeoDataBase
+from modules import Read_Rasters    # extractor for rasters files
+from modules import Read_SHP        # extractor for shapefiles
+from modules import Read_TAB        # extractor for MapInfo Tables
+from modules import Read_KML        # extractor for KML
+from modules import Read_GML        # extractor for GML
+from modules import Read_GeoJSON    # extractor for GeoJSON
+from modules import Read_PostGIS    # extractor for PostGIS databases
+from modules import Read_GDB        # extractor for Esri FileGeoDataBase
 
 # Imports depending on operating system
 if opersys == 'win32':
@@ -110,7 +110,7 @@ class DicoGIS(Tk):
         self.logger = logging.getLogger()
         self.logger.setLevel(logging.DEBUG)  # all errors will be get
         log_form = logging.Formatter('%(asctime)s || %(levelname)s || %(message)s')
-        logfile = RotatingFileHandler('DicoGIS.log', 'a', 5000000, 1)
+        logfile = RotatingFileHandler('DicoGIS.log', 'a', 1000000, 1)
         logfile.setLevel(logging.DEBUG)
         logfile.setFormatter(log_form)
         self.logger.addHandler(logfile)
@@ -147,8 +147,10 @@ class DicoGIS(Tk):
         self.li_raster = []     # list for rasters paths
         self.li_gdb = []     # list for Esri File Geodatabases
         self.li_kml = []    # list for KML path
-        self.li_gml = []    # list for GML tables path
-        self.li_geoj = []   # list for GeoJSON tables path
+        self.li_gml = []    # list for GML path
+        self.li_geoj = []   # list for GeoJSON path
+        self.li_dxf = []    # list for AutoCAD DXF path
+        self.li_pdf = []    # list for GeoPDF path
         self.li_raster_formats = (".ecw", ".tif", ".jp2")   # raster handled
         self.li_vectors_formats = (".shp", ".tab", ".kml", ".gml", ".geojson")  # vectors handled
         self.today = strftime("%Y-%m-%d")   # date of the day
@@ -156,6 +158,7 @@ class DicoGIS(Tk):
         self.dico_fields = OD()     # dict for fields informations
         self.dico_raster = OD()     # dict for rasters global informations
         self.dico_bands = OD()      # dict for bands informations
+        self.dico_gdb = OD()     # dict for Esri FileGDB
         self.dico_err = OD()     # errors list
         li_lang = [lg[5:-4] for lg in listdir(r'data/locale')]  # languages
         self.blabla = OD()      # texts dictionary
@@ -189,6 +192,7 @@ class DicoGIS(Tk):
         self.opt_kml = IntVar(self.FrFilters)   # able/disable KML
         self.opt_gml = IntVar(self.FrFilters)   # able/disable GML
         self.opt_geoj = IntVar(self.FrFilters)  # able/disable GeoJSON
+        self.opt_gdb = IntVar(self.FrFilters)   # able/disable Esri FileGDB
         self.opt_rast = IntVar(self.FrFilters)  # able/disable rasters
 
         # format choosen: check buttons
@@ -207,6 +211,9 @@ class DicoGIS(Tk):
         caz_geoj = Checkbutton(self.FrFilters,
                                text=u'.geojson',
                                variable=self.opt_geoj)
+        caz_gdb = Checkbutton(self.FrFilters,
+                              text=u'Esri FileGDB',
+                              variable=self.opt_gdb)
         caz_rast = Checkbutton(self.FrFilters,
                                text=u'rasters ({0})'.format(', '.join(self.li_raster_formats)),
                                variable=self.opt_rast)
@@ -235,6 +242,10 @@ class DicoGIS(Tk):
                       column=5,
                       sticky="NSWE",
                       padx=2, pady=2)
+        caz_gdb.grid(row=1,
+                     column=6,
+                     sticky="NSWE",
+                     padx=2, pady=2)
         # target folder
         self.labtarg = Label(self.FrPath, text=self.blabla.get('gui_path'))
         self.target = Entry(master=self.FrPath, width=35)
@@ -366,12 +377,10 @@ class DicoGIS(Tk):
                             value=2,
                             command=lambda: self.change_type())
         # Basic buttons
-        #img_proc = PhotoImage(master = self, file = 'img/Processing_TNP_10789.gif')
         self.val = Button(self,
                           text=self.blabla.get('gui_go'),
                           state=ACTIVE,
                           command=lambda: self.process())
-        #self.val.config(image = img_proc)
         self.can = Button(self, text=self.blabla.get('gui_quit'),
                           command=lambda: self.destroy())
 
@@ -408,6 +417,7 @@ class DicoGIS(Tk):
             self.opt_gml.set(config.get('filters', 'opt_gml'))
             self.opt_geoj.set(config.get('filters', 'opt_geoj'))
             self.opt_rast.set(config.get('filters', 'opt_rast'))
+            self.opt_gdb.set(config.get('filters', 'opt_gdb'))
             # database settings
             self.host.set(config.get('database', 'host'))
             self.port.set(config.get('database', 'port'))
@@ -447,6 +457,7 @@ class DicoGIS(Tk):
         config.set('filters', 'opt_gml', self.opt_gml.get())
         config.set('filters', 'opt_geoj', self.opt_geoj.get())
         config.set('filters', 'opt_rast', self.opt_rast.get())
+        config.set('filters', 'opt_gdb', self.opt_gdb.get())
         # databse settings
         config.set('database', 'host', self.host.get())
         config.set('database', 'port', self.port.get())
@@ -558,7 +569,10 @@ class DicoGIS(Tk):
         self.li_kml = []
         self.li_gml = []
         self.li_geoj = []
+        self.li_dxf = []
+        self.li_pdf = []
         self.li_raster = []
+        self.li_gdb = []
         self.browsetarg.config(state=DISABLED)
         # Looping in folders structure
         self.status.set(self.blabla.get('gui_prog1'))
@@ -574,7 +588,7 @@ class DicoGIS(Tk):
                 except UnicodeDecodeError, e:
                     full_path = path.join(root, d.decode('latin1'))
                 if full_path[-4:].lower() == '.gdb':
-                    # add complete path of shapefile
+                    # add complete path of Esri FileGeoDatabase
                     self.li_gdb.append(path.abspath(full_path))
                 else:
                     pass
@@ -587,16 +601,21 @@ class DicoGIS(Tk):
                     full_path = path.join(root, f.decode('latin1'))
                     print unicode(full_path), e
                 # Looping on files contained
-                if path.splitext(full_path.lower())[1].lower() == '.shp' and \
-        (path.isfile('%s.dbf' % full_path[:-4]) or path.isfile('%s.DBF' % full_path[:-4])) and \
-        (path.isfile('%s.shx' % full_path[:-4]) or path.isfile('%s.SHX' % full_path[:-4])):
+                if path.splitext(full_path.lower())[1].lower() == '.shp'\
+                   and (path.isfile('{0}.dbf'.format(full_path[:-4]))
+                        or path.isfile('{0}.DBF'.format(full_path[:-4])))\
+                   and (path.isfile('{0}.shx'.format(full_path[:-4]))
+                        or path.isfile('{0}.SHX'.format(full_path[:-4]))):
                     """ listing compatible shapefiles """
                     # add complete path of shapefile
                     self.li_shp.append(full_path)
-                elif path.splitext(full_path.lower())[1] == '.tab' and \
-        (path.isfile(full_path[:-4] + '.dat') or path.isfile(full_path[:-4] + '.DAT')) and \
-        (path.isfile(full_path[:-4] + '.map') or path.isfile(full_path[:-4] + '.MAP')) and \
-        (path.isfile(full_path[:-4] + '.id') or path.isfile(full_path[:-4] + '.ID')):
+                elif path.splitext(full_path.lower())[1] == '.tab'\
+                    and (path.isfile(full_path[:-4] + '.dat')
+                         or path.isfile(full_path[:-4] + '.DAT'))\
+                    and (path.isfile(full_path[:-4] + '.map')
+                         or path.isfile(full_path[:-4] + '.MAP'))\
+                    and (path.isfile(full_path[:-4] + '.id')
+                         or path.isfile(full_path[:-4] + '.ID')):
                     """ listing MapInfo tables """
                     # add complete path of MapInfo file
                     self.li_tab.append(full_path)
@@ -606,29 +625,45 @@ class DicoGIS(Tk):
                     self.li_kml.append(full_path)
                 elif path.splitext(full_path.lower())[1] == '.gml':
                     """ listing GML """
-                    # add complete path of KML file
+                    # add complete path of GML file
                     self.li_gml.append(full_path)
                 elif path.splitext(full_path.lower())[1] == '.geojson':
                     """ listing GeoJSON """
-                    # add complete path of KML file
+                    # add complete path of GeoJSON file
                     self.li_geoj.append(full_path)
+                elif path.splitext(full_path.lower())[1] == '.pdf':
+                    """ listing GeoPDF """
+                    # add complete path of PDF file
+                    self.li_pdf.append(full_path)
+                elif path.splitext(full_path.lower())[1] == '.dxf':
+                    """ listing DXF """
+                    # add complete path of DXF file
+                    self.li_dxf.append(full_path)
                 elif path.splitext(full_path.lower())[1] in self.li_raster_formats:
                     """ listing compatible rasters """
-                    # add complete path of MapInfo file
+                    # add complete path of raster file
                     self.li_raster.append(full_path)
                 else:
                     continue
 
         # end of listing
         self.prog_layers.stop()
-        self.logger.info('End of folders parsing: {0} shapefiles - {1} tables (MapInfo) - {2} KML - {3} GML - {4} GeoJSON\n{5} rasters - in {6}{7}'.format(len(self.li_shp),
-                                                                                                                                                          len(self.li_tab),
-                                                                                                                                                          len(self.li_kml),
-                                                                                                                                                          len(self.li_gml),
-                                                                                                                                                          len(self.li_geoj),
-                                                                                                                                                          len(self.li_raster),
-                                                                                                                                                          self.num_folders,
-                                                                                                                                                          self.blabla.get('log_numfold')))
+        self.logger.info('End of folders parsing: {0} shapefiles - \
+          {1} tables (MapInfo) - \
+          {2} KML - \
+          {3} GML - \
+          {4} GeoJSON\
+          {5} rasters - \
+          {6} rasters - \
+          in {7}{8}'.format(len(self.li_shp),
+                            len(self.li_tab),
+                            len(self.li_kml),
+                            len(self.li_gml),
+                            len(self.li_geoj),
+                            len(self.li_raster),
+                            len(self.li_gdb),
+                            self.num_folders,
+                            self.blabla.get('log_numfold')))
         # Lists ordering and tupling
         self.li_shp.sort()
         self.li_shp = tuple(self.li_shp)
@@ -643,19 +678,21 @@ class DicoGIS(Tk):
         self.li_geoj.sort()
         self.li_geoj = tuple(self.li_geoj)
         # setting the label text and activing the buttons
-        self.status.set('{0} shapefiles - {1} tables (MapInfo) - {2} KML - {3} GML - {4} GeoJSON\n{5} rasters - in {6}{7}'.format(len(self.li_shp), 
-                                                                                                                                  len(self.li_tab), 
-                                                                                                                                  len(self.li_kml),
-                                                                                                                                  len(self.li_gml),
-                                                                                                                                  len(self.li_geoj),
-                                                                                                                                  len(self.li_raster),
-                                                                                                                                  self.num_folders,
-                                                                                                                                  self.blabla.get('log_numfold')))
+        self.status.set('{0} shapefiles - {1} tables (MapInfo) - {2} KML - {3} GML - {4} GeoJSON\n{5} rasters - {6} Esri FileGDB in {7}{8}'.format(len(self.li_shp),
+                            len(self.li_tab),
+                            len(self.li_kml),
+                            len(self.li_gml),
+                            len(self.li_geoj),
+                            len(self.li_raster),
+                            len(self.li_gdb),
+                            self.num_folders,
+                            self.blabla.get('log_numfold')))
 
         self.browsetarg.config(state=ACTIVE)
         self.val.config(state=ACTIVE)
         # End of function
-        return foldertarget, self.li_shp, self.li_tab, self.li_kml, self.li_raster
+        return foldertarget, self.li_shp, self.li_tab, self.li_kml,\
+               self.li_gml, self.li_geoj, self.li_raster, self.li_gdb
 
     def process(self):
         """ check needed info and launch different processes """
@@ -676,15 +713,15 @@ class DicoGIS(Tk):
     def process_files(self):
         u""" launch the different processes """
         # check if at least a format has been choosen
-        if (self.opt_shp.get() + self.opt_tab.get() + self.opt_kml.get() + 
-            self.opt_gml.get() + self.opt_geoj.get() + self.opt_rast.get()):
+        if (self.opt_shp.get() + self.opt_tab.get() + self.opt_kml.get() +
+           self.opt_gml.get() + self.opt_geoj.get() + self.opt_rast.get()):
             pass
         else:
             avert('DicoGIS - User error', self.blabla.get('noformat'))
             return
         # check if there are some layers into the folder structure
-        if (len(self.li_shp) + len(self.li_tab) + len(self.li_kml) + 
-            len(self.li_gml) + len(self.li_geoj) + len(self.li_raster)):
+        if (len(self.li_shp) + len(self.li_tab) + len(self.li_kml) +
+           len(self.li_gml) + len(self.li_geoj) + len(self.li_raster)):
             pass
         else:
             avert('DicoGIS - User error', self.blabla.get('nodata'))
@@ -973,6 +1010,48 @@ class DicoGIS(Tk):
             self.logger.info('\tIgnoring {0} rasters'.format(len(self.li_raster)))
             pass
 
+        if self.opt_gdb.get():
+            self.logger.info('\n\tProcessing Esri FileGDB: start')
+            for gdb in self.li_gdb:
+                """ looping on FileGDB list """
+                self.status.set(path.basename(gdb))
+                self.logger.info('\n' + gdb)
+                # reset recipient data
+                self.dico_layer.clear()
+                self.dico_fields.clear()
+                # getting the informations
+                try:
+                    Read_GDB(path.abspath(gdb),
+                             self.dico_gdb,
+                             'Esri FileGeoDataBase',
+                             self.blabla)
+                    self.logger.info('\t Infos OK')
+                except AttributeError, e:
+                    """ empty files """
+                    self.logger.error(e)
+                    continue
+                except RuntimeError, e:
+                    """ corrupt files """
+                    self.logger.error(e)
+                    continue
+                except Exception, e:
+                    self.logger.error(e)
+                    continue
+                # writing to the Excel dictionary
+                # self.dictionarize_vectors(self.dico_layer,
+                #                           self.dico_fields,
+                #                           self.feuy1,
+                #                           line_vectors)
+                self.logger.info('\t Wrote into the dictionary')
+                # increment the line number
+                line_vectors = line_vectors + 1
+                # increment the progress bar
+                self.prog_layers["value"] = self.prog_layers["value"] + 1
+                self.update()
+        else:
+            self.logger.info('\tIgnoring {0} FileGDB'.format(len(self.li_gdb)))
+            pass
+
         # saving dictionary
         self.savedico()
         self.logger.info('\n\tWorkbook saved: %s', self.output.get())
@@ -1037,7 +1116,7 @@ class DicoGIS(Tk):
         # error counter
         # checking empty fields
         if self.host.get() == u''\
-        or self.host.get() == self.blabla.get("err_pg_empty_field"):
+           or self.host.get() == self.blabla.get("err_pg_empty_field"):
             self.ent_H.configure(foreground="red")
             self.ent_H.delete(0, END)
             self.ent_H.insert(0, self.blabla.get("err_pg_empty_field"))
@@ -1052,7 +1131,7 @@ class DicoGIS(Tk):
         else:
             pass
         if self.dbnb.get() == u''\
-        or self.host.get() == self.blabla.get("err_pg_empty_field"):
+           or self.host.get() == self.blabla.get("err_pg_empty_field"):
             self.ent_D.configure(foreground='red')
             self.ent_D.delete(0, END)
             self.ent_D.insert(0, self.blabla.get("err_pg_empty_field"))
@@ -1060,7 +1139,7 @@ class DicoGIS(Tk):
         else:
             pass
         if self.user.get() == u''\
-        or self.host.get() == self.blabla.get("err_pg_empty_field"):
+           or self.host.get() == self.blabla.get("err_pg_empty_field"):
             self.ent_U.configure(foreground='red')
             self.ent_U.delete(0, END)
             self.ent_U.insert(0, self.blabla.get("err_pg_empty_field"))
@@ -1068,7 +1147,7 @@ class DicoGIS(Tk):
         else:
             pass
         if self.pswd.get() == u''\
-        or self.pswd.get() == self.blabla.get("err_pg_empty_field"):
+           or self.pswd.get() == self.blabla.get("err_pg_empty_field"):
             self.ent_M.configure(foreground="red")
             self.ent_M.delete(0, END)
             self.ent_M.insert(0, self.blabla.get("err_pg_empty_field"))
@@ -1082,7 +1161,7 @@ class DicoGIS(Tk):
         return
 
     def test_connection(self):
-        u""" testing database connection settings using OGR specific exceptions """
+        u""" testing database connection settings """
         # checking if user chose to list PostGIS views
         if self.opt_pgvw.get():
             gdal.SetConfigOption(str("PG_LIST_ALL_TABLES"), str("YES"))
