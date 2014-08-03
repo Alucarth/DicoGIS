@@ -19,7 +19,7 @@
 ########### Libraries #############
 ###################################
 # Standard library
-from os import path       # files and folder managing
+from os import path, walk   # files and folder managing
 from time import localtime, strftime
 import sys
 
@@ -37,7 +37,7 @@ from gdalconst import *
 #################################
 
 class Read_GDB():
-    def __init__(self, gdbpath, dico_gdb, tipo, text=''):
+    def __init__(self, gdbpath, dico_gdb, tipo, txt=''):
         u""" Uses OGR functions to extract basic informations about
         geographic vector file (handles shapefile or MapInfo tables)
         and store into dictionaries.
@@ -93,7 +93,7 @@ class Read_GDB():
             # dictionary where will be stored informations
             dico_layer = OD()
             # parent GDB
-            dico_layer['name'] = path.basename(gdb.GetName())
+            dico_layer['gdb_name'] = path.basename(gdb.GetName())
             # getting layer object
             layer = gdb.GetLayerByIndex(layer_idx)
             # layer name
@@ -101,10 +101,12 @@ class Read_GDB():
             # layer index
             li_layers_idx.append(layer_idx)
             # getting layer globlal informations
-            self.infos_basics(layer, dico_layer, textos)
+            self.infos_basics(layer, dico_layer, txt)
             # storing layer into the GDB dictionary
             dico_gdb['{0}_{1}'.format(layer_idx,
                                       layer.GetName())] = dico_layer
+            #
+            del dico_layer
 
     def infos_basics(self, layer_obj, dico_layer, txt):
         u""" get the global informations about the layer """
@@ -114,7 +116,7 @@ class Read_GDB():
 
         # getting geography and geometry informations
         srs = layer_obj.GetSpatialRef()
-        self.infos_geos(layer_obj, srs, dico_layer, textos)
+        self.infos_geos(layer_obj, srs, dico_layer, txt)
 
         # getting fields informations
         dico_fields = OD()
@@ -170,9 +172,16 @@ class Read_GDB():
             pass
 
         # first feature and geometry type
-        first_obj = layer_obj.GetFeature(1)
-        geom = first_obj.GetGeometryRef()
 
+        try:
+            first_obj = layer_obj.GetFeature(1)
+            geom = first_obj.GetGeometryRef()
+        except AttributeError, e:
+            print e, layer_obj.GetName()
+            first_obj = layer_obj.GetNextFeature()
+            geom = first_obj.GetGeometryRef()
+
+            
         # geometry type human readable
         if geom.GetGeometryName() == u'POINT':
             dico_layer[u'type_geom'] = txt.get('geom_point')
@@ -219,9 +228,6 @@ class Read_GDB():
 if __name__ == '__main__':
     u""" standalone execution for tests. Paths are relative considering a test
     within the official repository (https://github.com/Guts/DicoGIS/)"""
-    # libraries import
-    from os import walk
-
     # test text dictionary
     textos = OD()
     textos['srs_comp'] = u'Compound'
@@ -236,7 +242,8 @@ if __name__ == '__main__':
 
     # searching for File GeoDataBase
     num_folders = 0
-    li_gdb = []
+    li_gdb = [r'C:\Users\julien.moura\Documents\GIS Database\FileGDB\Points.gdb',
+              r'C:\Users\julien.moura\Documents\GIS Database\FileGDB\Polygons.gdb']
     for root, dirs, files in walk(r'..\test\datatest'):
             num_folders = num_folders + len(dirs)
             for d in dirs:
@@ -257,10 +264,14 @@ if __name__ == '__main__':
     
     # read GDB
     for gdbpath in li_gdb:
-        print gdbpath
-        Read_GDB(gdbpath,
-                 dico_gdb,
-                 'Esri FileGDB',
-                 textos)
-    # print results
-    print(dico_gdb)
+        dico_gdb.clear()
+        if path.isdir(gdbpath):
+            print("\n{0}: ".format(gdbpath))
+            Read_GDB(gdbpath,
+                     dico_gdb,
+                     'Esri FileGDB',
+                     textos)
+            # print results
+            print(dico_gdb)
+        else:
+            pass
