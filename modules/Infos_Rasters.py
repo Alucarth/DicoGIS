@@ -61,14 +61,20 @@ class Read_Rasters():
         chdir(path.dirname(rasterpath))
         # variables
         self.alert = 0
+        # gdal.SetConfigOption(str("GTIFF_IGNORE_READ_ERRORS"), str("True"))
+
         # opening file
-        self.rast = gdal.Open(rasterpath, GA_ReadOnly)
+        try:
+            self.rast = gdal.Open(rasterpath, GA_ReadOnly)
+        except Exception, e:
+            print("oups", e)
         
         # check if raster is GDAL friendly
         if self.rast is None:
             print("\n\tUnable to open " + rasterpath)
             print("Please check compatibility.")
             self.alert += 1
+            return
         else:
             pass
         # basic informations
@@ -215,11 +221,12 @@ if __name__ == '__main__':
     # listing test files by formats
     li_ecw = [r'C:\\Users\julien.moura\Documents\GIS Database\ECW\0468_6740.ecw']  # ECW
     li_gtif = [r'..\test\datatest\rasters\GeoTiff\BDP_07_0621_0049_020_LZ1.tif',
-               r'..\test\datatest\rasters\GeoTiff\TrueMarble_16km_2700x1350.tif']  # GeoTIFF
+               r'..\test\datatest\rasters\GeoTiff\TrueMarble_16km_2700x1350.tif',
+               r'C:\Users\julien.moura\Documents\GIS Database\GeoTiff\BDP_07_0621_0049_020_LZ1.tif']  # GeoTIFF
     li_jpg2 = [r'..\test\datatest\rasters\JPEG2000\image_jpg2000.jp2']  # JPEG2000
 
     li_rasters = (path.abspath(li_ecw[0]),
-                  path.abspath(li_gtif[0]),
+                  path.abspath(li_gtif[2]),
                   path.abspath(li_gtif[1]),
                   path.abspath(li_jpg2[0]))
 
