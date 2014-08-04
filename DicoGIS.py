@@ -114,7 +114,7 @@ class DicoGIS(Tk):
         logfile.setLevel(logging.DEBUG)
         logfile.setFormatter(log_form)
         self.logger.addHandler(logfile)
-        self.logger.info('\t\t ============== DicoGIS =============')  # first write
+        self.logger.info('\t\t ============== DicoGIS =============')  # start
 
         # basics settings
         Tk.__init__(self)               # constructor of parent graphic class
@@ -152,7 +152,8 @@ class DicoGIS(Tk):
         self.li_dxf = []    # list for AutoCAD DXF path
         self.li_pdf = []    # list for GeoPDF path
         self.li_raster_formats = (".ecw", ".tif", ".jp2")   # raster handled
-        self.li_vectors_formats = (".shp", ".tab", ".kml", ".gml", ".geojson")  # vectors handled
+        self.li_vectors_formats = (".shp", ".tab", ".kml",
+                                   ".gml", ".geojson")  # vector formats handled
         self.today = strftime("%Y-%m-%d")   # date of the day
         self.dico_layer = OD()      # dict for vectors informations
         self.dico_fields = OD()     # dict for fields informations
@@ -696,7 +697,7 @@ class DicoGIS(Tk):
         self.val.config(state=ACTIVE)
         # End of function
         return foldertarget, self.li_shp, self.li_tab, self.li_kml,\
-               self.li_gml, self.li_geoj, self.li_raster, self.li_gdb
+            self.li_gml, self.li_geoj, self.li_raster, self.li_gdb
 
     def process(self):
         """ check needed info and launch different processes """
@@ -718,14 +719,16 @@ class DicoGIS(Tk):
         u""" launch the different processes """
         # check if at least a format has been choosen
         if (self.opt_shp.get() + self.opt_tab.get() + self.opt_kml.get() +
-           self.opt_gml.get() + self.opt_geoj.get() + self.opt_rast.get()):
+           self.opt_gml.get() + self.opt_geoj.get() + self.opt_rast.get() +
+           self.opt_gdb.get()):
             pass
         else:
             avert('DicoGIS - User error', self.blabla.get('noformat'))
             return
         # check if there are some layers into the folder structure
         if (len(self.li_shp) + len(self.li_tab) + len(self.li_kml) +
-           len(self.li_gml) + len(self.li_geoj) + len(self.li_raster)):
+           len(self.li_gml) + len(self.li_geoj) + len(self.li_raster) +
+           len(self.li_gdb)):
             pass
         else:
             avert('DicoGIS - User error', self.blabla.get('nodata'))
@@ -759,13 +762,17 @@ class DicoGIS(Tk):
             total_files += len(self.li_raster)
         else:
             pass
-        print total_files
+        if self.opt_gdb.get():
+            total_files += len(self.li_gdb)
+        else:
+            pass
         self.prog_layers["maximum"] = total_files
         self.prog_layers["value"]
         # getting the info from shapefiles and compile it in the excel
         # line_folders = 1    # line rank of directories dictionary
         line_vectors = 1    # line rank of vectors dictionary
         line_rasters = 1    # line rank of rasters dictionary
+        line_gdb = 1    # line rank of GDB dictionary
 
         if self.opt_shp.get():
             self.logger.info('\n\tProcessing shapefiles: start')
@@ -1042,13 +1049,12 @@ class DicoGIS(Tk):
                     self.logger.error(e)
                     continue
                 # writing to the Excel dictionary
-                # self.dictionarize_vectors(self.dico_layer,
-                #                           self.dico_fields,
-                #                           self.feuy1,
-                #                           line_vectors)
+                self.dictionarize_gdb(self.dico_gdb,
+                                      self.feuy3,
+                                      line_gdb)
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
-                line_vectors = line_vectors + 1
+                line_gdb += self.dico_gdb.get('layers_count') + 1
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1093,7 +1099,7 @@ class DicoGIS(Tk):
             # writing to the Excel dictionary
             self.dictionarize_pg(self.dico_layer,
                                  self.dico_fields,
-                                 self.feuy3,
+                                 self.feuy4,
                                  line)
             self.logger.info('\t Wrote into the dictionary')
             # increment the line number
@@ -1213,13 +1219,20 @@ class DicoGIS(Tk):
         # errors style
         self.xls_erreur = easyxf('pattern: pattern solid, fore_colour red;'
                                  'font: colour white, bold True;')
+        # cell style handling return in-cell
+        self.xls_wrap = easyxf('align: wrap True')
+        # date cell style
+        self.xls_date = easyxf(num_format_str='DD/MM/YYYY')
 
         # columns headers
         if self.typo.get() == 1 \
-            and (len(self.li_tab) + len(self.li_shp) + len(self.li_gml)
-            + len(self.li_geoj) + len(self.li_kml)) > 0:
+            and (self.opt_shp.get() + self.opt_tab.get() + self.opt_kml.get()
+                 + self.opt_gml.get() + self.opt_geoj.get() > 0):
             """ adding a new sheet for vectors informations """
-            self.feuy1 = self.book.add_sheet(u'Vectors', cell_overwrite_ok=True)
+            # sheet
+            self.feuy1 = self.book.add_sheet(u'Vectors',
+                                             cell_overwrite_ok=True)
+            # headers
             self.feuy1.write(0, 0, self.blabla.get('nomfic'), self.entete)
             self.feuy1.write(0, 1, self.blabla.get('path'), self.entete)
             self.feuy1.write(0, 2, self.blabla.get('theme'), self.entete)
@@ -1242,12 +1255,20 @@ class DicoGIS(Tk):
             lg_tab_names = [len(lg) for lg in self.li_tab]
             self.feuy1.col(0).width = max(lg_shp_names + lg_tab_names) * 100
             self.feuy1.col(1).width = len(self.blabla.get('browse')) * 256
+            self.feuy1.col(9).width = 35 * 256
+            # freezing headers line and first column
+            self.feuy1.set_panes_frozen(True)
+            self.feuy1.set_horz_split_pos(1)
+            self.feuy1.set_vert_split_pos(1)
         else:
             pass
 
-        if self.typo.get() == 1 and len(self.li_raster) > 0:
+        if self.typo.get() == 1 and self.opt_rast.get() == 1:
             """ adding a new sheet for rasters informations """
-            self.feuy2 = self.book.add_sheet(u'Rasters', cell_overwrite_ok=True)
+            # sheet
+            self.feuy2 = self.book.add_sheet(u'Rasters',
+                                             cell_overwrite_ok=True)
+            # headers
             self.feuy2.write(0, 0, self.blabla.get('nomfic'), self.entete)
             self.feuy2.write(0, 1, self.blabla.get('path'), self.entete)
             self.feuy2.write(0, 2, self.blabla.get('theme'), self.entete)
@@ -1267,37 +1288,83 @@ class DicoGIS(Tk):
             self.feuy2.write(0, 16, self.blabla.get('compression'), self.entete)
             self.feuy2.write(0, 17, self.blabla.get('coloref'), self.entete)
             self.feuy2.write(0, 18, self.blabla.get('li_depends'), self.entete)
-            self.feuy2.write(0, 19, self.blabla.get('total_size'), self.entete)
+            self.feuy2.write(0, 19, self.blabla.get('tot_size'), self.entete)
             self.logger.info('Sheet rasters created')
             # tunning headers
             lg_rast_names = [len(lg) for lg in self.li_raster]
             self.feuy2.col(0).width = max(lg_rast_names) * 100
             self.feuy2.col(1).width = len(self.blabla.get('browse')) * 256
+            # freezing headers line and first column
+            self.feuy2.set_panes_frozen(True)
+            self.feuy2.set_horz_split_pos(1)
+            self.feuy2.set_vert_split_pos(1)
+        else:
+            pass
+
+        if self.opt_gdb.get() == 1:
+            """ adding a new sheet for Esri FileGeoDatabase informations """
+            # sheet
+            self.feuy3 = self.book.add_sheet(u'Esri FileGDB',
+                                             cell_overwrite_ok=True)
+            # headers
+            self.feuy3.write(0, 0, self.blabla.get('nomfic'), self.entete)
+            self.feuy3.write(0, 1, self.blabla.get('path'), self.entete)
+            self.feuy3.write(0, 2, self.blabla.get('theme'), self.entete)
+            self.feuy3.write(0, 3, self.blabla.get('tot_size'), self.entete)
+            self.feuy3.write(0, 4, self.blabla.get('date_crea'), self.entete)
+            self.feuy3.write(0, 5, self.blabla.get('date_actu'), self.entete)
+            self.feuy3.write(0, 6, self.blabla.get('feats_class'), self.entete)
+            self.feuy3.write(0, 7, self.blabla.get('num_attrib'), self.entete)
+            self.feuy3.write(0, 8, self.blabla.get('num_objets'), self.entete)
+            self.feuy3.write(0, 9, self.blabla.get('geometrie'), self.entete)
+            self.feuy3.write(0, 10, self.blabla.get('srs'), self.entete)
+            self.feuy3.write(0, 11, self.blabla.get('srs_type'), self.entete)
+            self.feuy3.write(0, 12, self.blabla.get('codepsg'), self.entete)
+            self.feuy3.write(0, 13, self.blabla.get('emprise'), self.entete)
+            self.feuy3.write(0, 14, self.blabla.get('li_chps'), self.entete)
+            self.logger.info('Sheet Esri FileGDB created')
+            # tunning headers
+            lg_gdb_names = [len(lg) for lg in self.li_gdb]
+            self.feuy3.col(0).width = max(lg_gdb_names) * 100
+            self.feuy3.col(1).width = len(self.blabla.get('browse')) * 256
+            self.feuy3.col(4).width = len(self.blabla.get('date_crea')) * 256
+            self.feuy3.col(5).width = len(self.blabla.get('date_actu')) * 256
+            self.feuy3.col(6).width = len(self.blabla.get('feats_class')) * 256
+            self.feuy3.col(13).width = 35 * 256
+            # freezing headers line and first column
+            self.feuy3.set_panes_frozen(True)
+            self.feuy3.set_horz_split_pos(1)
+            self.feuy3.set_vert_split_pos(1)
         else:
             pass
 
         if self.typo.get() == 2:
-            """ adding a new sheet for rasters informations """
-            self.feuy3 = self.book.add_sheet(u'PostGIS', cell_overwrite_ok=True)
-            self.feuy3.write(0, 0, self.blabla.get('nomfic'), self.entete)
-            self.feuy3.write(0, 1, self.blabla.get('conn_chain'), self.entete)
-            self.feuy3.write(0, 2, self.blabla.get('schema'), self.entete)
-            self.feuy3.write(0, 3, self.blabla.get('num_attrib'), self.entete)
-            self.feuy3.write(0, 4, self.blabla.get('num_objets'), self.entete)
-            self.feuy3.write(0, 5, self.blabla.get('geometrie'), self.entete)
-            self.feuy3.write(0, 6, self.blabla.get('srs'), self.entete)
-            self.feuy3.write(0, 7, self.blabla.get('srs_type'), self.entete)
-            self.feuy3.write(0, 8, self.blabla.get('codepsg'), self.entete)
-            self.feuy3.write(0, 9, self.blabla.get('emprise'), self.entete)
-            self.feuy3.write(0, 10, self.blabla.get('date_crea'), self.entete)
-            self.feuy3.write(0, 11, self.blabla.get('date_actu'), self.entete)
-            self.feuy3.write(0, 12, self.blabla.get('format'), self.entete)
-            self.feuy3.write(0, 13, self.blabla.get('li_chps'), self.entete)
+            """ adding a new sheet for PostGIS informations """
+            # sheet
+            self.feuy4 = self.book.add_sheet(u'PostGIS',
+                                             cell_overwrite_ok=True)
+            # headers
+            self.feuy4.write(0, 0, self.blabla.get('nomfic'), self.entete)
+            self.feuy4.write(0, 1, self.blabla.get('conn_chain'), self.entete)
+            self.feuy4.write(0, 2, self.blabla.get('schema'), self.entete)
+            self.feuy4.write(0, 3, self.blabla.get('num_attrib'), self.entete)
+            self.feuy4.write(0, 4, self.blabla.get('num_objets'), self.entete)
+            self.feuy4.write(0, 5, self.blabla.get('geometrie'), self.entete)
+            self.feuy4.write(0, 6, self.blabla.get('srs'), self.entete)
+            self.feuy4.write(0, 7, self.blabla.get('srs_type'), self.entete)
+            self.feuy4.write(0, 8, self.blabla.get('codepsg'), self.entete)
+            self.feuy4.write(0, 9, self.blabla.get('emprise'), self.entete)
+            self.feuy4.write(0, 10, self.blabla.get('date_crea'), self.entete)
+            self.feuy4.write(0, 11, self.blabla.get('date_actu'), self.entete)
+            self.feuy4.write(0, 12, self.blabla.get('format'), self.entete)
+            self.feuy4.write(0, 13, self.blabla.get('li_chps'), self.entete)
             self.logger.info('Sheet PostGIS created')
             # tunning headers
-            # lg_rast_names = [len(lg) for lg in self.li_raster]
-            # self.feuy3.col(0).width=max(lg_rast_names)*100
-            # self.feuy3.col(1).width=len(self.blabla.get('browse'))*256
+            self.feuy3.col(1).width = len(self.blabla.get('browse')) * 256
+            # freezing headers line and first column
+            self.feuy4.set_panes_frozen(True)
+            self.feuy4.set_horz_split_pos(1)
+            self.feuy4.set_vert_split_pos(1)
         else:
             pass
 
@@ -1326,6 +1393,7 @@ class DicoGIS(Tk):
 
         # Name
         sheet.write(line, 0, layer_infos.get('name'))
+
         # Path of containing folder formatted to be a hyperlink
         link = 'HYPERLINK("{0}"; "{1}")'.format(layer_infos.get(u'folder'),
                                                 self.blabla.get('browse'))
@@ -1340,11 +1408,13 @@ class DicoGIS(Tk):
         # Geometry type
         sheet.write(line, 5, layer_infos.get(u'type_geom'))
         # Spatial extent
-        emprise = u"Xmin : " + unicode(layer_infos.get(u'Xmin')) +\
-                  u", Xmax : " + unicode(layer_infos.get(u'Xmax')) +\
-                  u", Ymin : " + unicode(layer_infos.get(u'Ymin')) +\
-                  u", Ymax : " + unicode(layer_infos.get(u'Ymax'))
-        sheet.write(line, 9, emprise)
+        emprise = u"Xmin : {0} - Xmax : {1} \
+                   \nYmin : {2} - Ymax : {3}".format(unicode(layer_infos.get(u'Xmin')),
+                                                     unicode(layer_infos.get(u'Xmax')),
+                                                     unicode(layer_infos.get(u'Ymin')),
+                                                     unicode(layer_infos.get(u'Ymax'))
+                                                     )
+        sheet.write(line, 9, emprise, self.xls_wrap)
         # Name of srs
         sheet.write(line, 6, layer_infos.get(u'srs'))
         # Type of SRS
@@ -1420,6 +1490,7 @@ class DicoGIS(Tk):
 
         # Name
         sheet.write(line, 0, dico_raster.get('name'))
+
         # Path of containing folder formatted to be a hyperlink
         link = 'HYPERLINK("' + dico_raster.get(u'folder') \
                              + '"; "' + self.blabla.get('browse') + '")'
@@ -1485,6 +1556,114 @@ class DicoGIS(Tk):
         # End of function
         return line, sheet
 
+    def dictionarize_gdb(self, gdb_infos, sheet, line):
+        u""" write the infos of the layer into the Excel workbook """
+        # local variables
+        champs = ""
+
+        # GDB name
+        sheet.write(line, 0, gdb_infos.get('name'))
+
+        # Path of containing folder formatted to be a hyperlink
+        link = 'HYPERLINK("{0}"; "{1}")'.format(gdb_infos.get(u'folder'),
+                                                self.blabla.get('browse'))
+        sheet.write(line, 1, Formula(link), self.url)
+
+        # Name of containing folder
+        sheet.write(line, 2, path.basename(gdb_infos.get(u'folder')))
+
+        # total size
+        sheet.write(line, 3, gdb_infos.get(u'total_size'))
+
+        # Creation date
+        sheet.write(line, 4, gdb_infos.get(u'date_crea'), self.xls_date)
+        # Last update date
+        sheet.write(line, 5, gdb_infos.get(u'date_actu'), self.xls_date)
+
+        # Layers count
+        sheet.write(line, 6, gdb_infos.get(u'layers_count'))
+
+        # total number of fields
+        sheet.write(line, 7, gdb_infos.get(u'total_fields'))
+
+        # total number of objects
+        sheet.write(line, 8, gdb_infos.get(u'total_objs'))
+
+        # parsing layers
+        for (layer_idx, layer_name) in zip(gdb_infos.get(u'layers_idx'),
+                                           gdb_infos.get(u'layers_names')):
+            # increment line
+            line += 1
+            # get the layer informations
+            gdb_layer = gdb_infos.get('{0}_{1}'.format(layer_idx, layer_name))
+
+            # layer's name
+            sheet.write(line, 6, gdb_layer.get(u'title'))
+
+            # number of fields
+            sheet.write(line, 7, gdb_layer.get(u'num_fields'))
+
+            # number of objects
+            sheet.write(line, 8, gdb_layer.get(u'num_obj'))
+
+            # Geometry type
+            sheet.write(line, 9, gdb_layer.get(u'type_geom'))
+
+            # SRS label
+            sheet.write(line, 10, gdb_layer.get(u'srs'))
+            # SRS type
+            sheet.write(line, 11, gdb_layer.get(u'srs_type'))
+            # SRS reference EPSG code
+            sheet.write(line, 12, gdb_layer.get(u'EPSG'))
+
+            # Spatial extent
+            emprise = u"Xmin : {0} - Xmax : {1} \
+                       \nYmin : {2} - Ymax : {3}".format(unicode(gdb_layer.get(u'Xmin')),
+                                                         unicode(gdb_layer.get(u'Xmax')),
+                                                         unicode(gdb_layer.get(u'Ymin')),
+                                                         unicode(gdb_layer.get(u'Ymax'))
+                                                         )
+            sheet.write(line, 13, emprise, self.xls_wrap)
+
+            # Field informations
+            fields_info = gdb_layer.get(u'fields')
+            for chp in fields_info.keys():
+                # field type
+                if fields_info[chp][0] == 'Integer':
+                    tipo = self.blabla.get(u'entier')
+                elif fields_info[chp][0] == 'Real':
+                    tipo = self.blabla.get(u'reel')
+                elif fields_info[chp][0] == 'String':
+                    tipo = self.blabla.get(u'string')
+                elif fields_info[chp][0] == 'Date':
+                    tipo = self.blabla.get(u'date')
+                # concatenation of field informations
+                try:
+                    champs = champs + chp +\
+                             u" (" + tipo + self.blabla.get(u'longueur') +\
+                             unicode(fields_info[chp][1]) +\
+                             self.blabla.get(u'precision') +\
+                             unicode(fields_info[chp][2]) + u") \n; "
+                except UnicodeDecodeError:
+                    # write a notification into the log file
+                    self.dico_err[gdb_infos.get('name')] = self.blabla.get(u'err_encod') + \
+                                                             chp.decode('latin1') + \
+                                                             u"\n\n"
+                    self.logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
+                    # decode the fucking field name
+                    champs = champs + chp.decode('latin1') \
+                            + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
+                                                                    fields_info[chp][1],
+                                                                    fields_info[chp][2])
+                    # then continue
+                    continue
+
+            # Once all fieds explored, write them
+            sheet.write(line, 14, champs)
+
+        # End of function
+        return self.book, self.feuy3, line
+
     def dictionarize_pg(self, layer_infos, fields_info, sheet, line):
         u""" write the infos of the layer into the Excel workbook """
         # local variables
@@ -1505,6 +1684,7 @@ class DicoGIS(Tk):
 
         # Name
         sheet.write(line, 0, layer_infos.get('name'))
+        
         # Connection chain to reach database
         sheet.write(line, 1, "{0}:{1}-{2}".format(self.host.get(),
                                                   self.port.get(),
