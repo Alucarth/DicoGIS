@@ -84,6 +84,8 @@
 <!-- Output file: PostGIS -->
 	<schema>Esquema</schema>
 	<conn_chain>Cadena de conexión</conn_chain>
+<!-- Output file: FileGDB -->
+	<feats_class>Clases de objetos</feats_class>
 <!-- SRS -->
 	<srs_comp>Compuesta (2D +)</srs_comp>
 	<srs_geoc>Geocéntrica</srs_geoc>
