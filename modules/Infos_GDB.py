@@ -11,7 +11,7 @@
 #
 # Python:       2.7.x
 # Created:      24/05/2014
-# Updated:      01/08/2014
+# Updated:      04/08/2014
 # Licence:      GPL 3
 #------------------------------------------------------------------------------
 
@@ -70,7 +70,9 @@ class Read_GDB():
         dico_gdb['layers_count'] = gdb.GetLayerCount()
         li_layers_names = []
         li_layers_idx = []
-
+        dico_gdb['layers_names'] = li_layers_names
+        dico_gdb['layers_idx'] = li_layers_idx
+        
         # cumulated size
         total_size = 0
         for chemins in walk(gdbpath):
@@ -83,11 +85,16 @@ class Read_GDB():
         dico_gdb[u"total_size"] = self.sizeof(total_size)
 
         # global dates
-        dico_gdb[u'date_actu'] = strftime('%Y-%m-%d',
+        dico_gdb[u'date_actu'] = strftime('%d/%m/%Y',
                                           localtime(path.getmtime(gdbpath)))
-        dico_gdb[u'date_crea'] = strftime('%Y-%m-%d',
+        dico_gdb[u'date_crea'] = strftime('%d/%m/%Y',
                                           localtime(path.getctime(gdbpath)))
-
+        # total fields count
+        total_fields = 0
+        dico_gdb['total_fields'] = total_fields
+        # total objects count
+        total_objs = 0
+        dico_gdb['total_objs'] = total_objs
         # parsing layers
         for layer_idx in range(gdb.GetLayerCount()):
             # dictionary where will be stored informations
@@ -105,8 +112,15 @@ class Read_GDB():
             # storing layer into the GDB dictionary
             dico_gdb['{0}_{1}'.format(layer_idx,
                                       layer.GetName())] = dico_layer
-            #
+            # summing fields number
+            total_fields += dico_layer.get(u'num_fields')
+            # summing objects number
+            total_objs += dico_layer.get(u'num_obj')
+            # deleting dictionary to ensure having cleared space
             del dico_layer
+        # storing fileds and objects sum
+        dico_gdb['total_fields'] = total_fields
+        dico_gdb['total_objs'] = total_objs
 
     def infos_basics(self, layer_obj, dico_layer, txt):
         u""" get the global informations about the layer """
@@ -121,6 +135,7 @@ class Read_GDB():
         # getting fields informations
         dico_fields = OD()
         layer_def = layer_obj.GetLayerDefn()
+        dico_layer['num_fields'] = layer_def.GetFieldCount()
         self.infos_fields(layer_def, dico_fields)
         dico_layer['fields'] = dico_fields
 
@@ -208,7 +223,6 @@ class Read_GDB():
             dico_fields[champomy.GetName()] = champomy.GetTypeName(),\
                                               champomy.GetWidth(),\
                                               champomy.GetPrecision()
-
         # end of function
         return dico_fields
 
