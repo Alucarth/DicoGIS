@@ -84,6 +84,8 @@
 <!-- Output file: PostGIS -->
 	<schema>Schema</schema>
 	<conn_chain>DB connection</conn_chain>
+<!-- Output file: FileGDB -->
+	<feats_class>Features classes</feats_class>
 <!-- SRS -->
 	<srs_comp>Compound</srs_comp>
 	<srs_geoc>Geocentric</srs_geoc>
