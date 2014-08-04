@@ -11,12 +11,12 @@ from __future__ import unicode_literals
 #
 # Python:       2.7.x
 # Created:      14/02/2013
-# Updated:      31/07/2014
+# Updated:      04/08/2014
 #
 # Licence:      GPL 3
 #------------------------------------------------------------------------------
 
-DGversion = "2.0-beta.3"
+DGversion = "2.0-beta.4"
 
 ###############################################################################
 ########### Libraries #############
@@ -554,9 +554,9 @@ class DicoGIS(Tk):
             pass
         # set the default output file
         self.output.delete(0, END)
-        self.output.insert(0, "DicoGIS_{0}_{1}.xls".format(
-                                            path.split(self.target.get())[1],
-                                            self.today ))
+        self.output.insert(0,
+                           "DicoGIS_{0}_{1}.xls".format(path.split(self.target.get())[1],
+                                                        self.today))
         # count geofiles in a separated thread
         proc = threading.Thread(target=self.ligeofiles,
                                 args=(foldername, ))
