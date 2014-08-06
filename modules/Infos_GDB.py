@@ -55,13 +55,17 @@ class Read_GDB():
         ogr.UseExceptions()
         gdal.UseExceptions()
 
+        # counting alerts
+        self.alert = 0
+
         # opening GDB
         dr_gdb_o = ogr.GetDriverByName("OpenFileGDB")
         try:
             gdb = dr_gdb_o.Open(gdbpath, 0)
-        except Exception, e:
-            print e
-            sys.exit()
+        except Exception:
+            self.erratum(dico_gdb, gdbpath, u'err_corrupt')
+            self.alert = self.alert + 1
+            return None
 
         # GDB name and parent folder
         dico_gdb['name'] = path.basename(gdb.GetName())
@@ -235,6 +239,22 @@ class Read_GDB():
             os_size /= 1024.0
         return "%3.1f %s" % (os_size, " To")
 
+    def erratum(self, dico_gdb, gdbpath, mess):
+        u""" errors handling """
+        # local variables
+        dico_gdb[u'name'] = path.basename(gdbpath)
+        dico_gdb[u'folder'] = path.dirname(gdbpath)
+        try:
+            def_couche = self.layer.GetLayerDefn()
+            dico_gdb[u'num_fields'] = def_couche.GetFieldCount()
+        except AttributeError:
+            mess = mess
+        finally:
+            dico_gdb[u'error'] = mess
+            dico_gdb[u'layers_count'] = 0
+        # End of function
+        return dico_gdb
+
 ###############################################################################
 ###### Stand alone program ########
 ###################################
@@ -257,7 +277,8 @@ if __name__ == '__main__':
     # searching for File GeoDataBase
     num_folders = 0
     li_gdb = [r'C:\Users\julien.moura\Documents\GIS Database\FileGDB\Points.gdb',
-              r'C:\Users\julien.moura\Documents\GIS Database\FileGDB\Polygons.gdb']
+              r'C:\Users\julien.moura\Documents\GIS Database\FileGDB\Polygons.gdb',
+              r'C:\Users\julien.moura\Documents\GIS Database\FileGDB\AAHH.gdb']
     for root, dirs, files in walk(r'..\test\datatest'):
             num_folders = num_folders + len(dirs)
             for d in dirs:
