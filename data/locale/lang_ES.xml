@@ -81,6 +81,7 @@
 	<origin_y>Y origin</origin_y>
 	<compression>Rato de compresión</compression>
 	<coloref>Sistema de colores</coloref>
+	<gdal_warn>Advertencias GDAL</gdal_warn>
 <!-- Output file: PostGIS -->
 	<schema>Esquema</schema>
 	<conn_chain>Cadena de conexión</conn_chain>
@@ -89,7 +90,7 @@
 <!-- SRS -->
 	<srs_comp>Compuesta (2D +)</srs_comp>
 	<srs_geoc>Geocéntrica</srs_geoc>
-	<srs_geog>Geográphica</srs_geog>
+	<srs_geog>Geográfica</srs_geog>
 	<srs_loca>Local</srs_loca>
 	<srs_proj>Projectada</srs_proj>
 	<srs_vert>Vertical</srs_vert>
@@ -98,6 +99,7 @@
 	<nofolder>Ninguna carpeta seleccionada</nofolder>
 	<nodata>Ningún dato compatible encontrado.</nodata>
 	<noformat>Ningún formato seleccionado</noformat>
+	<err_incomp>Tipo de archivo no compatible: algo de geográfico adentro? </err_incomp>
 	<err_encod>El nombre del atributo esta mal formateado. (caracteres especiales) : </err_encod>
 	<err_nobjet> Este dato no tiene ningún objeto. Nopuede ser procesado!</err_nobjet>
 	<err_corrupt> Archivo corupto </err_corrupt>

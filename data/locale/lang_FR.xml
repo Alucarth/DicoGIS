@@ -81,6 +81,7 @@
 	<origin_y>Origine Y</origin_y>
 	<compression>Taux de compression</compression>
 	<coloref>Référentiel couleur</coloref>
+	<gdal_warn>Avertissements GDAL</gdal_warn>
 <!-- Output file: PostGIS -->
 	<schema>Schéma</schema>
 	<conn_chain>Chaîne de connexion</conn_chain>
@@ -98,6 +99,7 @@
 	<nofolder>Aucun dossier sélectionné</nofolder>
 	<nodata>Aucune donnée géographique compatible trouvée.</nodata>
 	<noformat>Aucun format sélectionné</noformat>
+	<err_incomp>Fichier non pris en compte : est-il bien géographique ? </err_incomp>
 	<err_encod>Le nom du champ n'est pas bien formaté (caractères spéciaux) : </err_encod>
 	<err_corrupt> Fichier corrompu </err_corrupt>
 	<err_noprj> Aucun référentiel de coordonnées trouvé (ex: .prj) </err_noprj>

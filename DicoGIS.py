@@ -35,11 +35,11 @@ from os import listdir, walk, path         # files and folder managing
 from os import environ as env, access, R_OK
 from time import strftime
 from webbrowser import open_new
-import threading    # handling various subprocess
+import threading    # handling various subprocesses
 
-import ConfigParser         # to manipulate the options.ini file
+import ConfigParser  # to manipulate the options.ini file
 
-import platform
+import platform  # about operating systems
 
 import logging      # log files
 from logging.handlers import RotatingFileHandler
@@ -108,7 +108,7 @@ class DicoGIS(Tk):
         logging.captureWarnings(True)
         self.logger.setLevel(logging.DEBUG)  # all errors will be get
         log_form = logging.Formatter('%(asctime)s || %(levelname)s || %(message)s')
-        logfile = RotatingFileHandler('DicoGIS.log', 'a', 1000000, 1)
+        logfile = RotatingFileHandler('DicoGIS.log', 'a', 5000000, 1)
         logfile.setLevel(logging.DEBUG)
         logfile.setFormatter(log_form)
         self.logger.addHandler(logfile)
@@ -539,6 +539,8 @@ class DicoGIS(Tk):
                                   initialdir=self.def_rep,
                                   mustexist=True,
                                   title=self.blabla.get('gui_cible'))
+        # deactivate Go button
+        self.val.config(state=DISABLED)
         # check if a folder has been choosen
         if foldername:
             try:
@@ -657,7 +659,7 @@ class DicoGIS(Tk):
           {3} GML - \
           {4} GeoJSON\
           {5} rasters - \
-          {6} rasters - \
+          {6} FileGDB - \
           in {7}{8}'.format(len(self.li_shp),
                             len(self.li_tab),
                             len(self.li_kml),
@@ -701,6 +703,7 @@ class DicoGIS(Tk):
         """ check needed info and launch different processes """
         # saving settings
         self.save_settings()
+        self.val.config(state=DISABLED)
         # process files or PostGIS database
         if self.typo.get() == 1:
             self.logger.info('=> files process started')
@@ -710,6 +713,7 @@ class DicoGIS(Tk):
             self.check_fields()
         else:
             pass
+        self.val.config(state=ACTIVE)
         # end of function
         return self.typo.get()
 
@@ -1027,8 +1031,7 @@ class DicoGIS(Tk):
                 self.status.set(path.basename(gdb))
                 self.logger.info('\n' + gdb)
                 # reset recipient data
-                self.dico_layer.clear()
-                self.dico_fields.clear()
+                self.dico_gdb.clear()
                 # getting the informations
                 try:
                     Read_GDB(path.abspath(gdb),
@@ -1062,6 +1065,7 @@ class DicoGIS(Tk):
             pass
 
         # saving dictionary
+        self.val.config(state=ACTIVE)
         self.savedico()
         self.logger.info('\n\tWorkbook saved: %s', self.output.get())
         self.bell()
@@ -1288,6 +1292,7 @@ class DicoGIS(Tk):
             self.feuy2.write(0, 17, self.blabla.get('coloref'), self.entete)
             self.feuy2.write(0, 18, self.blabla.get('li_depends'), self.entete)
             self.feuy2.write(0, 19, self.blabla.get('tot_size'), self.entete)
+            self.feuy2.write(0, 20, self.blabla.get('gdal_warn'), self.entete)
             self.logger.info('Sheet rasters created')
             # tunning headers
             lg_rast_names = [len(lg) for lg in self.li_raster]
@@ -1477,11 +1482,12 @@ class DicoGIS(Tk):
         # in case of a source error
         if dico_raster.get('error'):
             self.logger.warning('\tproblem detected')
-            sheet.write(line, 0, layer_infos.get('name'))
-            link = 'HYPERLINK("' + layer_infos.get(u'folder') \
-                             + '"; "' + self.blabla.get('browse') + '")'
+            sheet.write(line, 0, dico_raster.get('name'))
+            link = 'HYPERLINK("{0}"; "{1}")'.format(dico_raster.get(u'folder'),
+                                                    self.blabla.get('browse'))
             sheet.write(line, 1, Formula(link), self.url)
-            sheet.write(line, 2, self.blabla.get((layer_infos.get('error')), self.xls_erreur))
+            sheet.write(line, 2, self.blabla.get(dico_raster.get('error')),
+                                 self.xls_erreur)
             # Interruption of function
             return self.book, self.feuy2
         else:
@@ -1491,8 +1497,8 @@ class DicoGIS(Tk):
         sheet.write(line, 0, dico_raster.get('name'))
 
         # Path of containing folder formatted to be a hyperlink
-        link = 'HYPERLINK("' + dico_raster.get(u'folder') \
-                             + '"; "' + self.blabla.get('browse') + '")'
+        link = 'HYPERLINK("{0}"; "{1}")'.format(dico_raster.get(u'folder'),
+                                                self.blabla.get('browse'))
         sheet.write(line, 1, Formula(link), self.url)
         # Name of containing folder
         sheet.write(line, 2, path.basename(dico_raster.get(u'folder')))
@@ -1534,9 +1540,9 @@ class DicoGIS(Tk):
         # # Name of objects
         # sheet.write(line, 4, layer_infos.get(u'num_obj'))
         # Creation date
-        sheet.write(line, 12, dico_raster.get(u'date_crea'))
+        sheet.write(line, 12, dico_raster.get(u'date_crea'), self.xls_date)
         # Last update date
-        sheet.write(line, 12, dico_raster.get(u'date_actu'))
+        sheet.write(line, 13, dico_raster.get(u'date_actu'), self.xls_date)
         # Format of data
         sheet.write(line, 15, "{0} {1}".format(dico_raster.get(u'format'),
                                                dico_raster.get('format_version')))
@@ -1550,15 +1556,39 @@ class DicoGIS(Tk):
         sheet.write(line, 18, ' | '.join(dico_raster.get(u'dependencies')))
 
         # total size of file and its dependencies
-        sheet.write(line, 18, dico_raster.get(u'total_size'))
+        sheet.write(line, 19, dico_raster.get(u'total_size'))
+
+        # in case of a source error
+        if dico_raster.get('err_gdal')[0] != 0:
+            self.logger.warning('\tproblem detected')
+            sheet.write(line, 20, "{0} : {1}".format(dico_raster.get('err_gdal')[0],
+                                                     dico_raster.get('err_gdal')[1]), self.xls_erreur)
+        else:
+            pass
 
         # End of function
         return line, sheet
 
     def dictionarize_gdb(self, gdb_infos, sheet, line):
-        u""" write the infos of the layer into the Excel workbook """
+        u""" write the infos of the FileGDB into the Excel workbook """
         # local variables
         champs = ""
+
+        # in case of a source error
+        if gdb_infos.get('error'):
+            self.logger.warning('\tproblem detected')
+            sheet.write(line, 0, gdb_infos.get('name'))
+            link = 'HYPERLINK("{0}"; "{1}")'.format(gdb_infos.get(u'folder'),
+                                                    self.blabla.get('browse'))
+            sheet.write(line, 1, Formula(link), self.url)
+            sheet.write(line, 2, self.blabla.get(gdb_infos.get('error')),
+                                 self.xls_erreur)
+            # incrementing line
+            # gdb_infos['layers_count'] = 0
+            # Interruption of function
+            return self.feuy3, line
+        else:
+            pass
 
         # GDB name
         sheet.write(line, 0, gdb_infos.get('name'))
@@ -1661,7 +1691,7 @@ class DicoGIS(Tk):
             sheet.write(line, 14, champs)
 
         # End of function
-        return self.book, self.feuy3, line
+        return self.feuy3, line
 
     def dictionarize_pg(self, layer_infos, fields_info, sheet, line):
         u""" write the infos of the layer into the Excel workbook """
