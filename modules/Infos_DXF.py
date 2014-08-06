@@ -1,190 +1,248 @@
-﻿# -*- coding: UTF-8 -*-
+# -*- coding: UTF-8 -*-
 #!/usr/bin/env python
-##from __future__ import unicode_literals
-#-------------------------------------------------------------------------------
-# Name:         InfosDXF
-# Purpose:      Use GDAL/OGR library to extract informations about
-#                   geographic data. It permits a more friendly use as
-#                   submodule.
+# from __future__ import unicode_literals
+
+#------------------------------------------------------------------------------
+# Name:         Infos DXF
+# Purpose:      Use GDAL/OGR to read into AutocAD exchanges file format.
 #
 # Author:       Julien Moura (https://github.com/Guts/)
 #
 # Python:       2.7.x
-# Created:      18/06/2014
-# Updated:      14/07/2014
+# Created:      24/07/2014
+# Updated:      04/08/2014
 # Licence:      GPL 3
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
-################################################################################
+###############################################################################
 ########### Libraries #############
 ###################################
 # Standard library
-from os import walk, path       # files and folder managing
-from time import localtime, strptime, strftime
+from os import path, walk   # files and folder managing
+from time import localtime, strftime
+import sys
 
 # Python 3 backported
 from collections import OrderedDict as OD
 
 # 3rd party libraries
-from osgeo import ogr    # handler for vector spatial files
-from osgeo import osr
-from osgeo import gdal
-from gdalconst import *
-gdal.AllRegister()
+try:
+    from osgeo import gdal
+    from osgeo import osr
+    from osgeo.gdalconst import *
+except ImportError:
+    import gdal
+    import osr
+    from gdalconst import *
 
-################################################################################
+###############################################################################
 ########### Classes #############
 #################################
 
 class Read_DXF():
-    def __init__(self, layerpath, dico_layer, dico_fields, tipo, text=''):
+    def __init__(self, dxfpath, dico_dxf, tipo, txt=''):
         u""" Uses OGR functions to extract basic informations about
         geographic vector file (handles shapefile or MapInfo tables)
         and store into dictionaries.
 
-        layerpath = path to the geographic file
-        dico_layer = dictionary for global informations
+        dxfpath = path to the File Geodatabase Esri
+        dico_dxf = dictionary for global informations
         dico_fields = dictionary for the fields' informations
         li_fieds = ordered list of fields
-        tipo = shp or tab
+        tipo = format
         text = dictionary of text in the selected language
 
         """
-        # Creating variables
-        self.alert = 0
-        source = ogr.Open(layerpath, 0)     # OGR driver
-        if not source:
-            u""" if layer doesn't have any object, return an error """
-            print 'no compatible source'
-            self.erratum(dico_layer, layerpath, u'err_nobjet')
-            self.alert = self.alert +1
-        self.layer = source.GetLayer()          # get the layer
-        if self.layer.GetFeatureCount() == 0:
-            u""" if layer doesn't have any object, return an error """
-            self.erratum(dico_layer, layerpath, u'err_nobjet')
-            self.alert = self.alert +1
-            return None
+        # raising GDAL/OGR specific exceptions
+        gdal.AllRegister()
+        ogr.UseExceptions()
+        gdal.UseExceptions()
 
+        # opening DXF
+        dr_dxf = ogr.GetDriverByName("DXF")
+        try:
+            dxf = dr_dxf.Open(dxfpath, 0)
+        except Exception, e:
+            print e
+            sys.exit()
 
-        obj = self.layer.GetFeature(0)        # get the first object (shp)
-        self.geom = obj.GetGeometryRef()       # get the geometry
+        # DXF name and parent folder
+        dico_dxf['name'] = path.basename(dxf.GetName())
+        dico_dxf['folder'] = path.dirname(dxf.GetName())
+        # layers count and names
+        dico_dxf['layers_count'] = dxf.GetLayerCount()
+        li_layers_names = []
+        li_layers_idx = []
+        dico_dxf['layers_names'] = li_layers_names
+        dico_dxf['layers_idx'] = li_layers_idx
+        
+        # cumulated size
+        total_size = 0
+        for chemins in walk(dxfpath):
+            for file in chemins[2]:
+                chem_complete = path.join(chemins[0], file)
+                if path.isfile(chem_complete):
+                    total_size = total_size + path.getsize(chem_complete)
+                else:
+                    pass
+        dico_dxf[u"total_size"] = self.sizeof(total_size)
 
-        self.def_couche = self.layer.GetLayerDefn()  # get layer definitions
-        self.srs = self.layer.GetSpatialRef()   # get spatial system reference
-        self.srs.AutoIdentifyEPSG()     # try to determine the EPSG code
+        # global dates
+        dico_dxf[u'date_actu'] = strftime('%d/%m/%Y',
+                                          localtime(path.getmtime(dxfpath)))
+        dico_dxf[u'date_crea'] = strftime('%d/%m/%Y',
+                                          localtime(path.getctime(dxfpath)))
+        # total fields count
+        total_fields = 0
+        dico_dxf['total_fields'] = total_fields
+        # total objects count
+        total_objs = 0
+        dico_dxf['total_objs'] = total_objs
+        # parsing layers
+        for layer_idx in range(dxf.GetLayerCount()):
+            # dictionary where will be stored informations
+            dico_layer = OD()
+            # parent DXF
+            dico_layer['dxf_name'] = path.basename(dxf.GetName())
+            # getting layer object
+            layer = dxf.GetLayerByIndex(layer_idx)
+            # layer name
+            li_layers_names.append(layer.GetName())
+            # layer index
+            li_layers_idx.append(layer_idx)
+            # getting layer globlal informations
+            self.infos_basics(layer, dico_layer, txt)
+            # storing layer into the DXF dictionary
+            dico_dxf['{0}_{1}'.format(layer_idx,
+                                      layer.GetName())] = dico_layer
+            # summing fields number
+            total_fields += dico_layer.get(u'num_fields')
+            # summing objects number
+            total_objs += dico_layer.get(u'num_obj')
+            # deleting dictionary to ensure having cleared space
+            del dico_layer
+        # storing fileds and objects sum
+        dico_dxf['total_fields'] = total_fields
+        dico_dxf['total_objs'] = total_objs
 
-        # basic information
-        dico_layer[u'type'] = tipo
-        self.infos_basics(layerpath, dico_layer, text)
-        # geometry information
-        self.infos_geom(dico_layer, text)
-        # fields information
-        self.infos_fields(dico_fields)
-
-    def infos_basics(self, layerpath, dico_layer, txt):
+    def infos_basics(self, layer_obj, dico_layer, txt):
         u""" get the global informations about the layer """
+        # title and features count
+        dico_layer[u'title'] = layer_obj.GetName()
+        dico_layer[u'num_obj'] = layer_obj.GetFeatureCount()
+
+        # getting geography and geometry informations
+        srs = layer_obj.GetSpatialRef()
+        # self.infos_geos(layer_obj, srs, dico_layer, txt)
+
+        # getting fields informations
+        dico_fields = OD()
+        layer_def = layer_obj.GetLayerDefn()
+        dico_layer['num_fields'] = layer_def.GetFieldCount()
+        self.infos_fields(layer_def, dico_fields)
+        dico_layer['fields'] = dico_fields
+
+        # end of function
+        return dico_layer
+
+    def infos_geos(self, layer_obj, srs, dico_layer, txt):
+        u""" get the informations about geography and geometry """
+        # SRS
+        srs.AutoIdentifyEPSG()
         # srs type
-        srsmetod = [
-                    (self.srs.IsCompound(), txt.get('srs_comp')),
-                    (self.srs.IsGeocentric(), txt.get('srs_geoc')),
-                    (self.srs.IsGeographic(), txt.get('srs_geog')),
-                    (self.srs.IsLocal(), txt.get('srs_loca')),
-                    (self.srs.IsProjected(), txt.get('srs_proj')),
-                    (self.srs.IsVertical(), txt.get('srs_vert'))
-                    ]
+        srsmetod = [(srs.IsCompound(), txt.get('srs_comp')),
+                    (srs.IsGeocentric(), txt.get('srs_geoc')),
+                    (srs.IsGeographic(), txt.get('srs_geog')),
+                    (srs.IsLocal(), txt.get('srs_loca')),
+                    (srs.IsProjected(), txt.get('srs_proj')),
+                    (srs.IsVertical(), txt.get('srs_vert'))]
+        # searching for a match with one of srs types
         for srsmet in srsmetod:
             if srsmet[0] == 1:
                 typsrs = srsmet[1]
-        dico_layer[u'srs_type'] = unicode(typsrs)
-        # Storing into the dictionary
-        dico_layer[u'name'] = path.basename(layerpath)
-        dico_layer[u'folder'] = path.dirname(layerpath)
-        dico_layer[u'title'] = dico_layer[u'name'][:-4].replace('_', ' ').capitalize()
-        dico_layer[u'num_obj'] = self.layer.GetFeatureCount()
-        dico_layer[u'num_fields'] = self.def_couche.GetFieldCount()
-        # Handling exception in srs names'encoding
+            else:
+                continue
+        # in case of not match
         try:
-            if self.srs.GetAttrValue('PROJCS') != 'unnamed':
-                dico_layer[u'srs'] = unicode(self.srs.GetAttrValue('PROJCS')).replace('_', ' ')
+            dico_layer[u'srs_type'] = unicode(typsrs)
+        except UnboundLocalError:
+            typsrs = txt.get('srs_nr')
+            dico_layer[u'srs_type'] = unicode(typsrs)
+
+        # handling exceptions in srs names'encoding
+        try:
+            if srs.GetAttrValue('PROJCS') != 'unnamed':
+                dico_layer[u'srs'] = unicode(srs.GetAttrValue('PROJCS')).replace('_', ' ')
             else:
-                dico_layer[u'srs'] = unicode(self.srs.GetAttrValue('PROJECTION')).replace('_', ' ')
-        except UnicodeDecodeError, e:
-            if self.srs.GetAttrValue('PROJCS') != 'unnamed':
-                dico_layer[u'srs'] = self.srs.GetAttrValue('PROJCS').decode('latin1').replace('_', ' ')
+                dico_layer[u'srs'] = unicode(srs.GetAttrValue('PROJECTION')).replace('_', ' ')
+        except UnicodeDecodeError:
+            if srs.GetAttrValue('PROJCS') != 'unnamed':
+                dico_layer[u'srs'] = srs.GetAttrValue('PROJCS').decode('latin1').replace('_', ' ')
             else:
-                dico_layer[u'srs'] = self.srs.GetAttrValue('PROJECTION').decode('latin1').replace('_', ' ')
-        dico_layer[u'EPSG'] = unicode(self.srs.GetAttrValue("AUTHORITY", 1))
-        # Getting basic dates
-        dico_layer[u'date_actu'] = strftime('%Y-%m-%d',
-                                            localtime(path.getmtime(layerpath)))
-        dico_layer[u'date_crea'] = strftime('%Y-%m-%d',
-                                            localtime(path.getctime(layerpath)))
-        # SRS exception handling
+                dico_layer[u'srs'] = srs.GetAttrValue('PROJECTION').decode('latin1').replace('_', ' ')
+        finally:
+            dico_layer[u'EPSG'] = unicode(srs.GetAttrValue("AUTHORITY", 1))
+
+        # World SRS default
         if dico_layer[u'EPSG'] == u'4326' and dico_layer[u'srs'] == u'None':
-            print dico_layer[u'srs']
             dico_layer[u'srs'] = u'WGS 84'
-            print dico_layer[u'srs']
+        else:
+            pass
 
-        # end of function
-        return dico_layer
+        # first feature and geometry type
 
-    def infos_geom(self, dico_layer, txt):
-        u""" get the informations about geometry """
-        # type géométrie
-        if self.geom.GetGeometryName() == u'POINT':
+        try:
+            first_obj = layer_obj.GetFeature(1)
+            geom = first_obj.GetGeometryRef()
+        except AttributeError, e:
+            print e, layer_obj.GetName()
+            first_obj = layer_obj.GetNextFeature()
+            geom = first_obj.GetGeometryRef()
+
+            
+        # geometry type human readable
+        if geom.GetGeometryName() == u'POINT':
             dico_layer[u'type_geom'] = txt.get('geom_point')
-        elif u'LINESTRING' in self.geom.GetGeometryName():
+        elif u'LINESTRING' in geom.GetGeometryName():
             dico_layer[u'type_geom'] = txt.get('geom_ligne')
-        elif u'POLYGON' in self.geom.GetGeometryName():
+        elif u'POLYGON' in geom.GetGeometryName():
             dico_layer[u'type_geom'] = txt.get('geom_polyg')
         else:
-            dico_layer[u'type_geom'] = self.geom.GetGeometryName()
-        # Spatial extent (bounding box)
-        dico_layer[u'Xmin'] = round(self.layer.GetExtent()[0],2)
-        dico_layer[u'Xmax'] = round(self.layer.GetExtent()[1],2)
-        dico_layer[u'Ymin'] = round(self.layer.GetExtent()[2],2)
-        dico_layer[u'Ymax'] = round(self.layer.GetExtent()[3],2)
+            dico_layer[u'type_geom'] = geom.GetGeometryName()
+
+        # spatial extent (bounding box)
+        dico_layer[u'Xmin'] = round(layer_obj.GetExtent()[0], 2)
+        dico_layer[u'Xmax'] = round(layer_obj.GetExtent()[1], 2)
+        dico_layer[u'Ymin'] = round(layer_obj.GetExtent()[2], 2)
+        dico_layer[u'Ymax'] = round(layer_obj.GetExtent()[3], 2)
+
         # end of function
         return dico_layer
 
-    def infos_fields(self, dico_fields):
+    def infos_fields(self, layer_def, dico_fields):
         u""" get the informations about fields definitions """
-        for i in range(self.def_couche.GetFieldCount()):
-            champomy = self.def_couche.GetFieldDefn(i) # liste ordonnée des champs
-            dico_fields[champomy.GetName()] = champomy.GetTypeName(),\
-                                           champomy.GetWidth(),\
-                                           champomy.GetPrecision()
-
-
+        for i in range(layer_def.GetFieldCount()):
+            champomy = layer_def.GetFieldDefn(i)  # fields ordered
+            dico_fields[champomy.GetName()] = champomy.GetTypeName()
         # end of function
         return dico_fields
 
-    def erratum(self, dicolayer, layerpath, mess):
-        u""" errors handling """
-        # local variables
-        dicolayer[u'name'] = path.basename(layerpath)
-        dicolayer[u'folder'] = path.dirname(layerpath)
-        try:
-            def_couche = self.layer.GetLayerDefn()
-            dicolayer[u'num_fields'] = def_couche.GetFieldCount()
-        except AttributeError:
-            mess = mess    
-        finally:
-            dicolayer[u'error'] = mess
-        # End of function
-        return dicolayer
+    def sizeof(self, os_size):
+        u""" return size in different units depending on size
+        see http://stackoverflow.com/a/1094933 """
+        for size_cat in ['octets', 'Ko', 'Mo', 'Go']:
+            if os_size < 1024.0:
+                return "%3.1f %s" % (os_size, size_cat)
+            os_size /= 1024.0
+        return "%3.1f %s" % (os_size, " To")
 
-################################################################################
+###############################################################################
 ###### Stand alone program ########
 ###################################
 
 if __name__ == '__main__':
     u""" standalone execution for tests. Paths are relative considering a test
-    within the official repository (https://github.com/Guts/DicoGIS)"""
-    # libraries import
-    from os import getcwd, chdir, path
-    # test files
-    li_dxf = [path.join(getcwd(), r'..\test\datatest\cao\dxf\paris_transports.dxf')] # dwg
+    within the official repository (https://github.com/Guts/DicoGIS/)"""
     # test text dictionary
     textos = OD()
     textos['srs_comp'] = u'Compound'
@@ -196,23 +254,24 @@ if __name__ == '__main__':
     textos['geom_point'] = u'Point'
     textos['geom_ligne'] = u'Line'
     textos['geom_polyg'] = u'Polygon'
+
+    # searching for DX Files
+    num_folders = 0
+    li_dxf = [r'..\test\datatest\cao\dxf\paris_transports.dxf']
+    
     # recipient datas
-    dico_layer = OD()     # dictionary where will be stored informations
-    dico_fields = OD()     # dictionary for fields information
-    # execution
-    for dxf in li_dxf:
-        """ looping on DXF list """
-        # reset recipient data
-        dico_layer.clear()
-        dico_fields.clear()
-        # getting the informations
-        print dxf
-        source_ogr = ogr.Open(dxf)
-        print(dir(source_ogr))
-        print(source_ogr.GetLayerCount())
-        print(source_ogr.GetRefCount())
-        print(source_ogr.GetSummaryRefCount())
-        layer1 = source_ogr.GetLayerByIndex(0)
-        print(dir(layer1))
-        # info_dxf = Read_DXF(dxf, dico_layer, dico_fields, 'dxf', textos)
-        # print '\n', dico_layer, dico_fields
+    dico_dxf = OD()
+    
+    # read DXF
+    for dxfpath in li_dxf:
+        dico_dxf.clear()
+        if path.isfile(dxfpath):
+            print("\n{0}: ".format(dxfpath))
+            Read_DXF(dxfpath,
+                     dico_dxf,
+                     'AutoCAD DXF',
+                     textos)
+            # print results
+            print(dico_dxf)
+        else:
+            pass
