@@ -1,4 +1,45 @@
 <PAMDataset>
+  <Metadata domain="xml:gml.root-instance">
+    <MDI key="&lt;gml">FeatureCollection xmlns:gml="http://www.opengis.net/gml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/gml http://schemas.opengis.net/gml/3.1.1/profiles/gmlJP2Profile/1.0.0/gmlJP2Profile.xsd"&gt;
+  &lt;gml:boundedBy&gt;
+    &lt;gml:Null&gt;withheld&lt;/gml:Null&gt;
+  &lt;/gml:boundedBy&gt;
+  &lt;gml:featureMember&gt;
+    &lt;gml:FeatureCollection&gt;
+      &lt;gml:featureMember&gt;
+        &lt;gml:RectifiedGridCoverage dimension="2" gml:id="RGC0001"&gt;
+          &lt;gml:rectifiedGridDomain&gt;
+            &lt;gml:RectifiedGrid dimension="2"&gt;
+              &lt;gml:limits&gt;
+                &lt;gml:GridEnvelope&gt;
+                  &lt;gml:low&gt;0 0&lt;/gml:low&gt;
+                  &lt;gml:high&gt;1349 674&lt;/gml:high&gt;
+                &lt;/gml:GridEnvelope&gt;
+              &lt;/gml:limits&gt;
+              &lt;gml:axisName&gt;x&lt;/gml:axisName&gt;
+              &lt;gml:axisName&gt;y&lt;/gml:axisName&gt;
+              &lt;gml:origin&gt;
+                &lt;gml:Point gml:id="P0001" srsName="urn:ogc:def:crs:EPSG::4326"&gt;
+                  &lt;gml:pos&gt;89.8666666666667 -179.866666666667&lt;/gml:pos&gt;
+                &lt;/gml:Point&gt;
+              &lt;/gml:origin&gt;
+              &lt;gml:offsetVector srsName="urn:ogc:def:crs:EPSG::4326"&gt;0 0.266666666666667&lt;/gml:offsetVector&gt;
+              &lt;gml:offsetVector srsName="urn:ogc:def:crs:EPSG::4326"&gt;-0.266666666666667 0&lt;/gml:offsetVector&gt;
+            &lt;/gml:RectifiedGrid&gt;
+          &lt;/gml:rectifiedGridDomain&gt;
+          &lt;gml:rangeSet&gt;
+            &lt;gml:File&gt;
+              &lt;gml:fileName&gt;gmljp2://codestream/0&lt;/gml:fileName&gt;
+              &lt;gml:fileStructure&gt;Record Interleaved&lt;/gml:fileStructure&gt;
+            &lt;/gml:File&gt;
+          &lt;/gml:rangeSet&gt;
+        &lt;/gml:RectifiedGridCoverage&gt;
+      &lt;/gml:featureMember&gt;
+    &lt;/gml:FeatureCollection&gt;
+  &lt;/gml:featureMember&gt;
+&lt;/gml:FeatureCollection&gt;
+</MDI>
+  </Metadata>
   <Metadata>
     <MDI key="COLORSPACE">RGB</MDI>
     <MDI key="COMPRESSION_RATE_TARGET">12</MDI>
