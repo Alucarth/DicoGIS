@@ -30,18 +30,56 @@ from collections import OrderedDict as OD
 try:
     from osgeo import gdal
     from osgeo import osr
+    from osgeo.gdalconst import *
 except ImportError:
     import gdal
     import osr
-
-from gdalconst import *
+    from gdalconst import *
 
 ###############################################################################
 ########### Classes #############
 ###################################
 
 
-class Read_Rasters():
+class GdalErrorHandler(object):
+    def __init__(self):
+        """ Callable error handler
+        see: http://trac.osgeo.org/gdal/wiki/PythonGotchas#Exceptionsraisedincustomerrorhandlersdonotgetcaught
+        and http://pcjericks.github.io/py-gdalogr-cookbook/gdal_general.html#install-gdal-ogr-error-handler
+        """
+        self.err_level = gdal.CE_None
+        self.err_type = 0
+        self.err_msg = ''
+
+    def handler(self, err_level, err_type, err_msg):
+        """ Making errors messages more readable """
+        # available types
+        err_class = {
+                    gdal.CE_None: 'None',
+                    gdal.CE_Debug: 'Debug',
+                    gdal.CE_Warning: 'Warning',
+                    gdal.CE_Failure: 'Failure',
+                    gdal.CE_Fatal: 'Fatal'
+                    }
+        # getting type
+        err_type = err_class.get(err_type, 'None')
+        
+        # cleaning message
+        err_msg = err_msg.replace('\n', ' ')
+
+        # disabling GDAL exceptions raising to avoid future troubles
+        gdal.DontUseExceptions()
+
+        # propagating
+        self.err_level = err_level
+        self.err_type = err_type
+        self.err_msg = err_msg
+
+        # end of function
+        return self.err_level, self.err_type, self.err_msg
+
+
+class Read_Rasters(object):
     def __init__(self, rasterpath, dico_raster, dico_bands, tipo, text=''):
         u""" Uses GDAL functions to extract basic informations about
         geographic raster file (handles ECW, GeoTIFF, JPEG2000)
@@ -50,25 +88,31 @@ class Read_Rasters():
         layerpath = path to the geographic file
         dico_raster = dictionary for global informations
         dico_bands = dictionary for the bands informations
-        li_fieds = ordered list of fields
         tipo = format
         text = dictionary of text in the selected language
         """
         # gdal specific
         gdal.AllRegister()
-        gdal.UseExceptions()
         # changing working directory to layer folder
         chdir(path.dirname(rasterpath))
-        # variables
+
+        path.basename(rasterpath)
+        
+        # handling specific exceptions
+        gdalerr = GdalErrorHandler()
+        errhandler = gdalerr.handler
+        gdal.PushErrorHandler(errhandler)
         self.alert = 0
-        # gdal.SetConfigOption(str("GTIFF_IGNORE_READ_ERRORS"), str("True"))
+        # gdal.SetConfigOption(str("GTIFF_IGNORE_READ_ERRORS"), str("TRUE"))
+        gdal.UseExceptions()
 
         # opening file
         try:
-            self.rast = gdal.Open(rasterpath, GA_ReadOnly)
+            self.rast = gdal.Open(rasterpath)
         except Exception, e:
-            print("oups", e)
-        
+            print e
+            return
+
         # check if raster is GDAL friendly
         if self.rast is None:
             print("\n\tUnable to open " + rasterpath)
@@ -83,18 +127,27 @@ class Read_Rasters():
         # geometry information
         self.infos_geom(dico_raster, text)
         # bands information
-        for band in range(1, dico_raster.get('num_bands')):
+        for band in range(self.rast.RasterCount):
+            band += 1
             self.infos_bands(band, dico_bands)
+            band = None
+        # safe close (see: http://pcjericks.github.io/py-gdalogr-cookbook/)
+        self.rast = None
+
+        # warnings messages
+        dico_raster['err_gdal'] = gdalerr.err_type, gdalerr.err_msg
 
     def infos_basics(self, rasterpath, dico_raster, txt):
         u""" get the global informations about the raster """
         # files and folder
         dico_raster[u'name'] = path.basename(rasterpath)
         dico_raster[u'folder'] = path.dirname(rasterpath)
-        dico_raster[u'title'] = dico_raster[u'name'][:-4].replace('_', ' ').capitalize()
+        dico_raster[u'title'] = dico_raster[u'name'][:-4].replace('_', ' ')\
+                                                         .capitalize()
 
         # dependencies
-        dependencies = [path.basename(filedepend) for filedepend in self.rast.GetFileList() if filedepend != rasterpath]
+        dependencies = [path.basename(filedepend) for filedepend in
+                        self.rast.GetFileList() if filedepend != rasterpath]
         dico_raster[u'dependencies'] = dependencies
 
         # total size
@@ -104,10 +157,11 @@ class Read_Rasters():
         dependencies.pop(-1)
 
         # format
-        dico_raster[u'compr_rate'] = self.rast.GetMetadata().get('COMPRESSION_RATE_TARGET')
-        dico_raster[u'color_ref'] = self.rast.GetMetadata().get('COLORSPACE')
-        if self.rast.GetMetadata().get('VERSION'):
-            dico_raster[u'format_version'] = "(v{})".format(self.rast.GetMetadata().get('VERSION'))
+        rastMD = self.rast.GetMetadata()
+        dico_raster[u'compr_rate'] = rastMD.get('COMPRESSION_RATE_TARGET')
+        dico_raster[u'color_ref'] = rastMD.get('COLORSPACE')
+        if rastMD.get('VERSION'):
+            dico_raster[u'format_version'] = "(v{})".format(rastMD.get('VERSION'))
         else:
             dico_raster[u'format_version'] = ""
         # image specifications
@@ -170,7 +224,7 @@ class Read_Rasters():
                 dico_raster[u'srs'] = unicode(srs.GetAttrValue('PROJCS')).replace('_', ' ')
             else:
                 dico_raster[u'srs'] = unicode(srs.GetAttrValue('PROJECTION')).replace('_', ' ')
-        except UnicodeDecodeError, e:
+        except UnicodeDecodeError:
             if srs.GetAttrValue('PROJCS') != 'unnamed':
                 dico_raster[u'srs'] = srs.GetAttrValue('PROJCS').decode('latin1').replace('_', ' ')
             else:
@@ -182,10 +236,59 @@ class Read_Rasters():
 
     def infos_bands(self, band, dico_bands):
         u""" get the informations about fields definitions """
+        # getting band object
         band_info = self.rast.GetRasterBand(band)
-        dico_bands["band{}_Min".format(band)] = band_info.GetMinimum()
-        dico_bands["band{}_Max".format(band)] = band_info.GetMaximum()
+
+        # band statistics
+        stats = band_info.GetStatistics(True, True)
+        if stats is None:
+            print "no stats available"
+        else:
+            # band minimum value
+            if band_info.GetMinimum() is None:
+                dico_bands["band{}_Min".format(band)] = stats[0]
+            else:
+                dico_bands["band{}_Min".format(band)] = band_info.GetMinimum()
+            
+            # band maximum value
+            if band_info.GetMinimum() is None:
+                dico_bands["band{}_Max".format(band)] = stats[1]
+            else:
+                dico_bands["band{}_Max".format(band)] = band_info.GetMaximum()
+
+            # band mean value
+            dico_bands["band{}_Mean".format(band)] = stats[2]
+
+            # band standard deviation value
+            dico_bands["band{}_Sdev".format(band)] = stats[3]
+
+        # band no data value
         dico_bands["band{}_NoData".format(band)] = band_info.GetNoDataValue()
+
+        # band scale value
+        dico_bands["band{}_Scale".format(band)] = band_info.GetScale()
+
+        # band unit type value
+        dico_bands["band{}_UnitType".format(band)] = band_info.GetUnitType()
+
+        # color table
+        coul_table = band_info.GetColorTable()
+        if coul_table is None:
+            dico_bands["band{}_CTabCount".format(band)] = 0
+        else:
+            dico_bands["band{}_CTabCount".format(band)] = coul_table.GetCount()
+            #### COMENTED BECAUSE IT'S TOO MUCH INFORMATIONS
+            # for ctab_idx in range(0, coul_table.GetCount()):
+            #     entry = coul_table.GetColorEntry(ctab_idx)
+            #     if not entry:
+            #         continue
+            #     else:
+            #         pass
+            #     dico_bands["band{0}_CTab{1}_RGB".format(band, ctab_idx)] = \
+            #                   coul_table.GetColorEntryAsRGB(ctab_idx, entry)
+
+        # safe close (quite uselsss but good practice to have)
+        band_info = None
 
         # end of function
         return dico_bands
@@ -199,16 +302,14 @@ class Read_Rasters():
             os_size /= 1024.0
         return "%3.1f %s" % (os_size, " To")
 
-    def erratum(self, dicolayer, layerpath, mess):
+    def erratum(self, dico_raster, rasterpath, mess):
         u""" errors handling """
-        # local variables
-        dicolayer[u'name'] = path.basename(layerpath)
-        dicolayer[u'folder'] = path.dirname(layerpath)
-        def_couche = self.layer.GetLayerDefn()
-        dicolayer[u'num_fields'] = def_couche.GetFieldCount()
-        dicolayer[u'error'] = mess
+        # storing minimal informations to give clues to solve later
+        dico_raster[u'name'] = path.basename(rasterpath)
+        dico_raster[u'folder'] = path.dirname(rasterpath)
+        dico_raster[u'error'] = mess
         # End of function
-        return dicolayer
+        return dico_raster
 
 
 ###############################################################################
@@ -222,13 +323,14 @@ if __name__ == '__main__':
     li_ecw = [r'C:\\Users\julien.moura\Documents\GIS Database\ECW\0468_6740.ecw']  # ECW
     li_gtif = [r'..\test\datatest\rasters\GeoTiff\BDP_07_0621_0049_020_LZ1.tif',
                r'..\test\datatest\rasters\GeoTiff\TrueMarble_16km_2700x1350.tif',
-               r'C:\Users\julien.moura\Documents\GIS Database\GeoTiff\BDP_07_0621_0049_020_LZ1.tif']  # GeoTIFF
+               r'C:\Users\julien.moura\Documents\GIS Database\GeoTiff\ASTGTM_S17W069_dem.tif']  # GeoTIFF
     li_jpg2 = [r'..\test\datatest\rasters\JPEG2000\image_jpg2000.jp2']  # JPEG2000
-
     li_rasters = (path.abspath(li_ecw[0]),
-                  path.abspath(li_gtif[2]),
+                  path.abspath(li_gtif[0]),
                   path.abspath(li_gtif[1]),
-                  path.abspath(li_jpg2[0]))
+                  path.abspath(li_gtif[2]),
+                  path.abspath(li_jpg2[0])
+                  )
 
     # test text dictionary
     textos = OD()
@@ -241,15 +343,13 @@ if __name__ == '__main__':
     textos['geom_point'] = u'Point'
     textos['geom_ligne'] = u'Line'
     textos['geom_polyg'] = u'Polygon'
-    # recipient datas
-    dico_raster = OD()     # dictionary where will be stored informations
-    dico_bands = OD()     # dictionary for fields information
+
     # execution
     for raster in li_rasters:
         """ looping on raster files """
-        # reset recipient data
-        dico_raster.clear()
-        dico_bands.clear()
+        # recipient datas
+        dico_raster = OD()     # dictionary where will be stored informations
+        dico_bands = OD()     # dictionary for fields information
         # getting the informations
         if not path.isfile(raster):
             print("\n\t==> File doesn't exist: " + raster)
@@ -257,9 +357,13 @@ if __name__ == '__main__':
         else:
             pass
         print "\n======================\n\t", path.basename(raster)
+        # handling odd warnings
         info_raster = Read_Rasters(path.abspath(raster),
                                    dico_raster,
                                    dico_bands,
                                    path.splitext(raster)[1],
                                    textos)
-        print '\n', dico_raster, dico_bands
+        print(u'\n\n{0}\n{1}'.format(dico_raster, dico_bands))
+        
+        # deleting dictionaries
+        del dico_raster, dico_bands, info_raster, raster
