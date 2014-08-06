@@ -95,8 +95,6 @@ class Read_Rasters(object):
         gdal.AllRegister()
         # changing working directory to layer folder
         chdir(path.dirname(rasterpath))
-
-        path.basename(rasterpath)
         
         # handling specific exceptions
         gdalerr = GdalErrorHandler()
@@ -108,16 +106,15 @@ class Read_Rasters(object):
 
         # opening file
         try:
-            self.rast = gdal.Open(rasterpath)
+            self.rast = gdal.Open(rasterpath, GA_ReadOnly)
         except Exception, e:
             print e
             return
 
         # check if raster is GDAL friendly
         if self.rast is None:
-            print("\n\tUnable to open " + rasterpath)
-            print("Please check compatibility.")
             self.alert += 1
+            self.erratum(dico_raster, rasterpath, u'err_incomp')
             return
         else:
             pass
@@ -131,9 +128,9 @@ class Read_Rasters(object):
             band += 1
             self.infos_bands(band, dico_bands)
             band = None
-        # safe close (see: http://pcjericks.github.io/py-gdalogr-cookbook/)
-        self.rast = None
 
+        # safe close (see: http://pcjericks.github.io/py-gdalogr-cookbook/)
+        del self.rast
         # warnings messages
         dico_raster['err_gdal'] = gdalerr.err_type, gdalerr.err_msg
 
@@ -173,9 +170,9 @@ class Read_Rasters(object):
         dico_raster[u'data_type'] = gdal.GetDataTypeName(self.rast.GetRasterBand(1).DataType)
 
         # basic dates
-        dico_raster[u'date_actu'] = strftime('%Y-%m-%d',
+        dico_raster[u'date_actu'] = strftime('%d/%m/%Y',
                                              localtime(path.getmtime(rasterpath)))
-        dico_raster[u'date_crea'] = strftime('%Y-%m-%d',
+        dico_raster[u'date_crea'] = strftime('%d/%m/%Y',
                                              localtime(path.getctime(rasterpath)))
 
         # end of function
@@ -193,9 +190,10 @@ class Read_Rasters(object):
 
             ## SRS
         # using osr to get the srs
-        srs = osr.SpatialReference()
-        srs.ImportFromWkt(self.rast.GetProjectionRef())
+        srs = osr.SpatialReference(self.rast.GetProjection())
+        # srs.ImportFromWkt(self.rast.GetProjection())
         srs.AutoIdentifyEPSG()
+
         # srs types
         srsmetod = [
                     (srs.IsCompound(), txt.get('srs_comp')),
@@ -219,16 +217,29 @@ class Read_Rasters(object):
             dico_raster[u'srs_type'] = unicode(typsrs)
 
         # Handling exception in srs names'encoding
-        try:
-            if srs.GetAttrValue('PROJCS') is not None:
-                dico_raster[u'srs'] = unicode(srs.GetAttrValue('PROJCS')).replace('_', ' ')
-            else:
-                dico_raster[u'srs'] = unicode(srs.GetAttrValue('PROJECTION')).replace('_', ' ')
-        except UnicodeDecodeError:
-            if srs.GetAttrValue('PROJCS') != 'unnamed':
-                dico_raster[u'srs'] = srs.GetAttrValue('PROJCS').decode('latin1').replace('_', ' ')
-            else:
-                dico_raster[u'srs'] = srs.GetAttrValue('PROJECTION').decode('latin1').replace('_', ' ')
+        if srs.IsProjected():
+            try:
+                if srs.GetAttrValue('PROJCS') is not None:
+                    dico_raster[u'srs'] = unicode(srs.GetAttrValue('PROJCS')).replace('_', ' ')
+                else:
+                    dico_raster[u'srs'] = unicode(srs.GetAttrValue('PROJECTION')).replace('_', ' ')
+            except UnicodeDecodeError:
+                if srs.GetAttrValue('PROJCS') != 'unnamed':
+                    dico_raster[u'srs'] = srs.GetAttrValue('PROJCS').decode('latin1').replace('_', ' ')
+                else:
+                    dico_raster[u'srs'] = srs.GetAttrValue('PROJECTION').decode('latin1').replace('_', ' ')
+        else:
+            try:
+                if srs.GetAttrValue('GEOGCS') is not None:
+                    dico_raster[u'srs'] = unicode(srs.GetAttrValue('GEOGCS')).replace('_', ' ')
+                else:
+                    dico_raster[u'srs'] = unicode(srs.GetAttrValue('PROJECTION')).replace('_', ' ')
+            except UnicodeDecodeError:
+                if srs.GetAttrValue('GEOGCS') != 'unnamed':
+                    dico_raster[u'srs'] = srs.GetAttrValue('GEOGCS').decode('latin1').replace('_', ' ')
+                else:
+                    dico_raster[u'srs'] = srs.GetAttrValue('PROJECTION').decode('latin1').replace('_', ' ')
+        
         dico_raster[u'EPSG'] = unicode(srs.GetAttrValue("AUTHORITY", 1))
 
         # end of function
@@ -239,8 +250,12 @@ class Read_Rasters(object):
         # getting band object
         band_info = self.rast.GetRasterBand(band)
 
+        stats = None
         # band statistics
-        stats = band_info.GetStatistics(True, True)
+        try:
+            stats = band_info.GetStatistics(True, True)
+        except:
+            return
         if stats is None:
             print "no stats available"
         else:
@@ -257,10 +272,10 @@ class Read_Rasters(object):
                 dico_bands["band{}_Max".format(band)] = band_info.GetMaximum()
 
             # band mean value
-            dico_bands["band{}_Mean".format(band)] = stats[2]
+            dico_bands["band{}_Mean".format(band)] = round(stats[2], 2)
 
             # band standard deviation value
-            dico_bands["band{}_Sdev".format(band)] = stats[3]
+            dico_bands["band{}_Sdev".format(band)] = round(stats[3], 2)
 
         # band no data value
         dico_bands["band{}_NoData".format(band)] = band_info.GetNoDataValue()
@@ -287,8 +302,9 @@ class Read_Rasters(object):
             #     dico_bands["band{0}_CTab{1}_RGB".format(band, ctab_idx)] = \
             #                   coul_table.GetColorEntryAsRGB(ctab_idx, entry)
 
-        # safe close (quite uselsss but good practice to have)
-        band_info = None
+        # safe close (quite useless but good practice to have)
+        del stats
+        del band_info
 
         # end of function
         return dico_bands
@@ -323,12 +339,14 @@ if __name__ == '__main__':
     li_ecw = [r'C:\\Users\julien.moura\Documents\GIS Database\ECW\0468_6740.ecw']  # ECW
     li_gtif = [r'..\test\datatest\rasters\GeoTiff\BDP_07_0621_0049_020_LZ1.tif',
                r'..\test\datatest\rasters\GeoTiff\TrueMarble_16km_2700x1350.tif',
-               r'C:\Users\julien.moura\Documents\GIS Database\GeoTiff\ASTGTM_S17W069_dem.tif']  # GeoTIFF
+               r'C:\Users\julien.moura\Documents\GIS Database\GeoTiff\ASTGTM_S17W069_dem.tif',
+               r'C:\Users\julien.moura\Documents\GIS Database\GeoTiff\completo1-2.tif']  # GeoTIFF
     li_jpg2 = [r'..\test\datatest\rasters\JPEG2000\image_jpg2000.jp2']  # JPEG2000
     li_rasters = (path.abspath(li_ecw[0]),
                   path.abspath(li_gtif[0]),
                   path.abspath(li_gtif[1]),
                   path.abspath(li_gtif[2]),
+                  path.abspath(li_gtif[3]),
                   path.abspath(li_jpg2[0])
                   )
 
@@ -366,4 +384,4 @@ if __name__ == '__main__':
         print(u'\n\n{0}\n{1}'.format(dico_raster, dico_bands))
         
         # deleting dictionaries
-        del dico_raster, dico_bands, info_raster, raster
+        del dico_raster, dico_bands, raster

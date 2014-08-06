@@ -81,6 +81,7 @@
 	<origin_y>Y origin</origin_y>
 	<compression>Compression rate</compression>
 	<coloref>Color system</coloref>
+	<gdal_warn>GDAL warnings</gdal_warn>
 <!-- Output file: PostGIS -->
 	<schema>Schema</schema>
 	<conn_chain>DB connection</conn_chain>
@@ -98,6 +99,7 @@
 	<nofolder>Any folder selected</nofolder>
 	<nodata>Any compatible geographic data (.shp / .tab) has been found.</nodata>
 	<noformat>Any format selected</noformat>
+	<err_incomp>Not compatible file: is there something geographic there?</err_incomp>
 	<err_encod>Field name is not correctly formatted (encoding issue): </err_encod>
 	<err_nobjet> This data doesn't have any object, so can't be processed!</err_nobjet>
 	<err_corrupt> Corrupt file</err_corrupt>
