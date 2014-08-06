@@ -16,7 +16,7 @@ from __future__ import unicode_literals
 # Licence:      GPL 3
 #------------------------------------------------------------------------------
 
-DGversion = "2.0-beta.4"
+DGversion = "2.0-beta.5"
 
 ###############################################################################
 ########### Libraries #############
@@ -54,15 +54,12 @@ from collections import OrderedDict as OD   # ordered dictionary
 # 3rd party libraries
 try:
     from osgeo import gdal
-    from osgeo import ogr
+    from osgeo import osr
+    from osgeo.gdalconst import *
 except ImportError:
     import gdal
-    import ogr
-
-from gdalconst import *
-gdal.AllRegister()
-ogr.UseExceptions()
-gdal.UseExceptions()
+    import osr
+    from gdalconst import *
 
 from xlwt import Workbook, easyxf, Formula  # excel writer
 
@@ -108,6 +105,7 @@ class DicoGIS(Tk):
         # creation and configuration of log file
         # see: http://sametmax.com/ecrire-des-logs-en-python/
         self.logger = logging.getLogger()
+        logging.captureWarnings(True)
         self.logger.setLevel(logging.DEBUG)  # all errors will be get
         log_form = logging.Formatter('%(asctime)s || %(levelname)s || %(message)s')
         logfile = RotatingFileHandler('DicoGIS.log', 'a', 1000000, 1)
@@ -984,6 +982,7 @@ class DicoGIS(Tk):
             for raster in self.li_raster:
                 """ looping on rasters list """
                 self.status.set(path.basename(raster))
+                self.update()
                 self.logger.info('\n' + raster)
                 # reset recipient data
                 self.dico_raster.clear()
@@ -1301,7 +1300,7 @@ class DicoGIS(Tk):
         else:
             pass
 
-        if self.opt_gdb.get() == 1:
+        if self.opt_gdb.get() == 1 and len(self.li_gdb) > 0:
             """ adding a new sheet for Esri FileGeoDatabase informations """
             # sheet
             self.feuy3 = self.book.add_sheet(u'Esri FileGDB',
