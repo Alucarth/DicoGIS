@@ -3,8 +3,8 @@
 # from __future__ import unicode_literals
 
 #------------------------------------------------------------------------------
-# Name:         Infos DXF
-# Purpose:      Use GDAL/OGR and dxfgrabber to read AutoCAD exchanges file format.
+# Name:         Infos DWG
+# Purpose:      Use GDAL/OGR to read into AutoCAD exchanges file format.
 #
 # Author:       Julien Moura (https://github.com/Guts/)
 #
@@ -39,7 +39,7 @@ import dxfgrabber   # module dedicated to DXF
 #################################
 
 
-class Read_DXF():
+class Read_DWG():
     def __init__(self, dxfpath, dico_dxf, tipo, txt=''):
         u""" Uses OGR functions to extract basic informations about
         geographic vector file (handles shapefile or MapInfo tables)
