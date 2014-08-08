@@ -27,7 +27,7 @@ from collections import OrderedDict as OD
 
 # 3rd party libraries
 import dxfgrabber
-
+import ogr
 
 ###############################################################################
 ########### Classes #############
@@ -76,6 +76,16 @@ class Read_DXF():
 
         # entities count
         dico_dxf['entities_count'] = len(dxf.entities)
+
+        # blocs count
+        dico_dxf['blocks_count'] = len(dxf.blocks)
+
+        # encoding
+        dico_dxf['encoding'] = dxf.encoding
+
+        # entities
+        dico_dxf['entities'] = [entity for entity in dxf.entities if entity.layer == '1']
+
 
     def sizeof(self, os_size):
         u""" return size in different units depending on size
