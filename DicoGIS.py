@@ -254,11 +254,11 @@ class DicoGIS(Tk):
                      columnspan=2,
                      sticky="NSWE",
                      padx=2, pady=2)
-        caz_cdao.grid(row=2,
-                      column=4,
-                      columnspan=2,
-                      sticky="NSWE",
-                      padx=2, pady=2)
+        # caz_cdao.grid(row=2,
+        #               column=4,
+        #               columnspan=2,
+        #               sticky="NSWE",
+        #               padx=2, pady=2)
         # target folder
         self.labtarg = Label(self.FrPath, text=self.blabla.get('gui_path'))
         self.target = Entry(master=self.FrPath, width=35)
@@ -593,6 +593,7 @@ class DicoGIS(Tk):
         self.li_pdf = []
         self.li_raster = []
         self.li_gdb = []
+        self.li_cdao = []
         self.browsetarg.config(state=DISABLED)
         # Looping in folders structure
         self.status.set(self.blabla.get('gui_prog1'))
