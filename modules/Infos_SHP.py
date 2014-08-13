@@ -11,7 +11,7 @@
 #
 # Python:       2.7.x
 # Created:      18/02/2013
-# Updated:      31/07/2014
+# Updated:      13/08/2014
 # Licence:      GPL 3
 #------------------------------------------------------------------------------
 
@@ -66,14 +66,16 @@ class Read_SHP():
             self.alert = self.alert + 1
             return None
         except Exception, e:
-            print e
+            self.erratum(dico_layer, layerpath, u'err_corrupt')
+            self.alert = self.alert + 1
             return None
         # raising incompatible files
         if not source:
             u""" if file is not compatible """
             print 'no compatible source'
-            self.erratum(dico_layer, layerpath, u'err_nobjet')
             self.alert = self.alert + 1
+            self.erratum(dico_layer, layerpath, u'err_nobjet')
+            return None
         else:
             pass
         self.layer = source.GetLayer()          # get the layer
@@ -118,6 +120,26 @@ class Read_SHP():
 
     def infos_basics(self, layerpath, dico_layer, txt):
         u""" get the global informations about the layer """
+        # Storing into the dictionary
+        dico_layer[u'name'] = path.basename(layerpath)
+        dico_layer[u'folder'] = path.dirname(layerpath)
+        dico_layer[u'title'] = dico_layer[u'name'][:-4].replace('_', ' ').capitalize()
+        dico_layer[u'num_obj'] = self.layer.GetFeatureCount()
+        dico_layer[u'num_fields'] = self.def_couche.GetFieldCount()
+        # dependencies
+        dependencies = [f for f in listdir(path.dirname(layerpath))
+                        if path.splitext(path.abspath(f))[0] == path.splitext(layerpath)[0]
+                        and not path.splitext(path.abspath(f).lower())[1] == ".shp"
+                        or path.isfile('%s.xml' % f[:-4])]
+        dico_layer[u'dependencies'] = dependencies
+
+        # total file and dependencies size
+        dependencies.append(layerpath)
+        total_size = sum([path.getsize(f) for f in dependencies])
+        dico_layer[u"total_size"] = self.sizeof(total_size)
+        dependencies.pop(-1)
+
+        ## SRS
         # srs type
         srsmetod = [
                     (self.srs.IsCompound(), txt.get('srs_comp')),
@@ -139,24 +161,6 @@ class Read_SHP():
         except UnboundLocalError:
             typsrs = txt.get('srs_nr')
             dico_layer[u'srs_type'] = unicode(typsrs)
-        # Storing into the dictionary
-        dico_layer[u'name'] = path.basename(layerpath)
-        dico_layer[u'folder'] = path.dirname(layerpath)
-        dico_layer[u'title'] = dico_layer[u'name'][:-4].replace('_', ' ').capitalize()
-        dico_layer[u'num_obj'] = self.layer.GetFeatureCount()
-        dico_layer[u'num_fields'] = self.def_couche.GetFieldCount()
-        # dependencies
-        dependencies = [f for f in listdir(path.dirname(layerpath))
-                        if path.splitext(path.abspath(f))[0] == path.splitext(layerpath)[0]
-                        and not path.splitext(path.abspath(f).lower())[1] == ".shp"
-                        or path.isfile('%s.xml' % f[:-4])]
-        dico_layer[u'dependencies'] = dependencies
-
-        # total file and dependencies size
-        dependencies.append(layerpath)
-        total_size = sum([path.getsize(f) for f in dependencies])
-        dico_layer[u"total_size"] = self.sizeof(total_size)
-        dependencies.pop(-1)
 
         # Handling exception in srs names'encoding
         try:
