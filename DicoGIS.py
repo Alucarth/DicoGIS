@@ -16,7 +16,7 @@ from __future__ import unicode_literals
 # Licence:      GPL 3
 #------------------------------------------------------------------------------
 
-DGversion = "2.0-beta.5"
+DGversion = "2.0-beta.6"
 
 ###############################################################################
 ########### Libraries #############
@@ -1526,12 +1526,22 @@ class DicoGIS(Tk):
         sheet.write(line, 0, layer_infos.get('name'))
 
         # Path of containing folder formatted to be a hyperlink
-        link = 'HYPERLINK("{0}"; "{1}")'.format(layer_infos.get(u'folder'),
-                                                self.blabla.get('browse'))
+        try:
+            link = 'HYPERLINK("{0}"; "{1}")'.format(layer_infos.get(u'folder'),
+                                                    self.blabla.get('browse'))
+        except UnicodeDecodeError:
+            # write a notification into the log file
+            self.logger.warning('Path name with special letters: {}'.format(layer_infos.get(u'folder').decode('utf8')))
+            # decode the fucking path name
+            link = 'HYPERLINK("{0}"; "{1}")'.format(layer_infos.get(u'folder').decode('utf8'),
+                                                    self.blabla.get('browse'))
+            
         sheet.write(line, 1, Formula(link), self.url)
+
         # Name of containing folder
         # with an exception if this is the format name
-        if path.basename(layer_infos.get(u'folder')).lower() in self.li_vectors_formats:
+        if not path.basename(layer_infos.get(u'folder')).lower() in self.li_vectors_formats:
+            print "youhou"
             sheet.write(line, 2, path.basename(layer_infos.get(u'folder')))
         else:
             sheet.write(line, 2, path.basename(path.dirname(layer_infos.get(u'folder'))))
@@ -1624,9 +1634,18 @@ class DicoGIS(Tk):
         sheet.write(line, 0, dico_raster.get('name'))
 
         # Path of containing folder formatted to be a hyperlink
-        link = 'HYPERLINK("{0}"; "{1}")'.format(dico_raster.get(u'folder'),
-                                                self.blabla.get('browse'))
+        try:
+            link = 'HYPERLINK("{0}"; "{1}")'.format(dico_raster.get(u'folder'),
+                                                    self.blabla.get('browse'))
+        except UnicodeDecodeError:
+            # write a notification into the log file
+            self.logger.warning('Path name with special letters: {}'.format(dico_raster.get(u'folder').decode('utf8')))
+            # decode the fucking path name
+            link = 'HYPERLINK("{0}"; "{1}")'.format(dico_raster.get(u'folder').decode('utf8'),
+                                                    self.blabla.get('browse'))
+            
         sheet.write(line, 1, Formula(link), self.url)
+
         # Name of containing folder
         sheet.write(line, 2, path.basename(dico_raster.get(u'folder')))
         # Name of containing folder
@@ -1721,8 +1740,16 @@ class DicoGIS(Tk):
         sheet.write(line, 0, gdb_infos.get('name'))
 
         # Path of containing folder formatted to be a hyperlink
-        link = 'HYPERLINK("{0}"; "{1}")'.format(gdb_infos.get(u'folder'),
-                                                self.blabla.get('browse'))
+        try:
+            link = 'HYPERLINK("{0}"; "{1}")'.format(gdb_infos.get(u'folder'),
+                                                    self.blabla.get('browse'))
+        except UnicodeDecodeError:
+            # write a notification into the log file
+            self.logger.warning('Path name with special letters: {}'.format(gdb_infos.get(u'folder').decode('utf8')))
+            # decode the fucking path name
+            link = 'HYPERLINK("{0}"; "{1}")'.format(gdb_infos.get(u'folder').decode('utf8'),
+                                                    self.blabla.get('browse'))
+            
         sheet.write(line, 1, Formula(link), self.url)
 
         # Name of containing folder
