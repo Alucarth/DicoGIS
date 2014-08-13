@@ -11,7 +11,7 @@
 #
 # Python:       2.7.x
 # Created:      18/02/2013
-# Updated:      31/07/2014
+# Updated:      13/08/2014
 # Licence:      GPL 3
 #------------------------------------------------------------------------------
 
@@ -26,8 +26,12 @@ from time import localtime, strftime
 from collections import OrderedDict as OD
 
 # 3rd party libraries
-from osgeo import ogr    # handler for vector spatial files
-from osgeo import osr
+try:
+    from osgeo import ogr  # handler for vector spatial files
+    from osgeo import osr
+except ImportError:
+    import ogr  # handler for vector spatial files
+    import osr
 
 ###############################################################################
 ########### Classes #############
@@ -90,19 +94,25 @@ class Read_TAB():
         u""" get the global informations about the layer """
         # srs type
         srsmetod = [
-                   (self.srs.IsCompound(), txt.get('srs_comp')),
-                   (self.srs.IsGeocentric(), txt.get('srs_geoc')),
-                   (self.srs.IsGeographic(), txt.get('srs_geog')),
-                   (self.srs.IsLocal(), txt.get('srs_loca')),
-                   (self.srs.IsProjected(), txt.get('srs_proj')),
-                   (self.srs.IsVertical(), txt.get('srs_vert'))
+                    (self.srs.IsCompound(), txt.get('srs_comp')),
+                    (self.srs.IsGeocentric(), txt.get('srs_geoc')),
+                    (self.srs.IsGeographic(), txt.get('srs_geog')),
+                    (self.srs.IsLocal(), txt.get('srs_loca')),
+                    (self.srs.IsProjected(), txt.get('srs_proj')),
+                    (self.srs.IsVertical(), txt.get('srs_vert'))
                    ]
+        # searching for a match with one of srs types
         for srsmet in srsmetod:
             if srsmet[0] == 1:
                 typsrs = srsmet[1]
             else:
                 continue
-        dico_layer[u'srs_type'] = unicode(typsrs)
+        # in case of not match
+        try:
+            dico_layer[u'srs_type'] = unicode(typsrs)
+        except UnboundLocalError:
+            typsrs = txt.get('srs_nr')
+            dico_layer[u'srs_type'] = unicode(typsrs)
         # Storing into the dictionary
         dico_layer[u'name'] = path.basename(layerpath)
         dico_layer[u'folder'] = path.dirname(layerpath)
@@ -128,23 +138,23 @@ class Read_TAB():
                 dico_layer[u'srs'] = unicode(self.srs.GetAttrValue('PROJCS')).replace('_', ' ')
             else:
                 dico_layer[u'srs'] = unicode(self.srs.GetAttrValue('PROJECTION')).replace('_', ' ')
-        except UnicodeDecodeError, e:
-            print e
+        except UnicodeDecodeError:
             if self.srs.GetAttrValue('PROJCS') != 'unnamed':
                 dico_layer[u'srs'] = self.srs.GetAttrValue('PROJCS').decode('latin1').replace('_', ' ')
             else:
                 dico_layer[u'srs'] = self.srs.GetAttrValue('PROJECTION').decode('latin1').replace('_', ' ')
-        dico_layer[u'EPSG'] = unicode(self.srs.GetAttrValue("AUTHORITY", 1))
+        finally:
+            dico_layer[u'EPSG'] = unicode(self.srs.GetAttrValue("AUTHORITY", 1))
         # Getting basic dates
         dico_layer[u'date_actu'] = strftime('%Y-%m-%d',
                                             localtime(path.getmtime(layerpath)))
         dico_layer[u'date_crea'] = strftime('%Y-%m-%d',
                                             localtime(path.getctime(layerpath)))
-        # SRS exception handling
+        # World SRS default
         if dico_layer[u'EPSG'] == u'4326' and dico_layer[u'srs'] == u'None':
-            print dico_layer[u'srs']
             dico_layer[u'srs'] = u'WGS 84'
-            print dico_layer[u'srs']
+        else:
+            pass
 
         # end of function
         return dico_layer

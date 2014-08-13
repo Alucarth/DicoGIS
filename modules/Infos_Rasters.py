@@ -12,7 +12,7 @@
 #
 # Python:       2.7.x
 # Created:      18/02/2014
-# Updated:      31/07/2014
+# Updated:      13/08/2014
 # Licence:      GPL 3
 #------------------------------------------------------------------------------
 
@@ -109,6 +109,8 @@ class Read_Rasters(object):
             self.rast = gdal.Open(rasterpath, GA_ReadOnly)
         except Exception, e:
             print e
+            self.alert += 1
+            self.erratum(dico_raster, rasterpath, u'err_incomp')
             return
 
         # check if raster is GDAL friendly
@@ -250,15 +252,12 @@ class Read_Rasters(object):
         # getting band object
         band_info = self.rast.GetRasterBand(band)
 
-        stats = None
         # band statistics
         try:
             stats = band_info.GetStatistics(True, True)
         except:
             return
-        if stats is None:
-            print "no stats available"
-        else:
+        if stats:
             # band minimum value
             if band_info.GetMinimum() is None:
                 dico_bands["band{}_Min".format(band)] = stats[0]
@@ -276,6 +275,8 @@ class Read_Rasters(object):
 
             # band standard deviation value
             dico_bands["band{}_Sdev".format(band)] = round(stats[3], 2)
+        else:
+            pass
 
         # band no data value
         dico_bands["band{}_NoData".format(band)] = band_info.GetNoDataValue()

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #from __future__ import unicode_literals
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Name:         InfosOGR_PG
 # Purpose:      Use GDAL/OGR library to extract informations about
 #                   geographic data contained in a PostGIS database.
@@ -11,31 +11,34 @@
 #
 # Python:       2.7.x
 # Created:      18/06/2013
-# Updated:      13/07/2014
+# Updated:      13/08/2014
 # Licence:      GPL 3
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
-################################################################################
+###############################################################################
 ########### Libraries #############
 ###################################
 # Standard library
-
 
 # Python 3 backported
 from collections import OrderedDict as OD
 
 # 3rd party libraries
-from osgeo import ogr    # spatial files
-from osgeo import gdal
+# 3rd party libraries
+try:
+    from osgeo import gdal
+    from osgeo import ogr  # handler for vector spatial files
+    from osgeo import osr
+except ImportError:
+    import gdal
+    import ogr  # handler for vector spatial files
+    import osr
 
 from gdalconst import *
-gdal.AllRegister()
-ogr.UseExceptions()
-gdal.UseExceptions()
 
 # gdal.SetConfigOption("PG_LIST_ALL_TABLES", "YES")
 
-################################################################################
+###############################################################################
 ########### Classes #############
 ###################################
 
@@ -51,23 +54,31 @@ class Read_PostGIS():
         tipo = feature type to read
         text = dictionary of texts to display
         """
-        # handling ogr specific exceptions
+        # handling GDAL/OGR specific exceptions
+        gdal.AllRegister()
         ogr.UseExceptions()
+        gdal.UseExceptions()
+
         # Creating variables
         self.alert = 0
 
-        if layer == None:
-            print "Houston, we've a problem with the source"
-            self.alert = self.alert +1
+        # raising incompatible files
+        if not source:
+            u""" if file is not compatible """
+            self.erratum(dico_layer, layerpath, u'err_nobjet')
+            self.alert = self.alert + 1
             return None
+        else:
+            pass
+
+        # raising forbidden access
         try:
             obj = layer.GetFeature(1)          # get the first object (shp)
         except RuntimeError, e:
             if u'permission denied' in str(e):
-                print 'yop'
                 mess = str(e).split('\n')[0]
+                self.alert = self.alert + 1
                 self.erratum(dico_layer, layer, mess)
-                self.alert = self.alert +1
                 return None
             else:
                 pass
@@ -87,6 +98,20 @@ class Read_PostGIS():
 
     def infos_basics(self, layer, dico_layer, txt):
         u""" get the global informations about the layer """
+        # Storing into the dictionary
+        dico_layer[u'name'] = layer.GetName()
+        dico_layer[u'title'] = layer.GetName().capitalize()
+        dico_layer[u'num_obj'] = layer.GetFeatureCount()
+        dico_layer[u'num_fields'] = self.def_couche.GetFieldCount()
+
+        # schema name
+        try:
+            layer.GetName().split('.')[1]
+            dico_layer[u'folder'] = layer.GetName().split('.')[0]
+        except IndexError:
+            dico_layer[u'folder'] = 'public'
+
+        ## SRS
         # srs type
         srsmetod = [
                     (self.srs.IsCompound(), txt.get('srs_comp')),
@@ -95,30 +120,28 @@ class Read_PostGIS():
                     (self.srs.IsLocal(), txt.get('srs_loca')),
                     (self.srs.IsProjected(), txt.get('srs_proj')),
                     (self.srs.IsVertical(), txt.get('srs_vert'))
-                    ]
+                   ]
+        # searching for a match with one of srs types
         for srsmet in srsmetod:
             if srsmet[0] == 1:
                 typsrs = srsmet[1]
-        dico_layer[u'srs_type'] = unicode(typsrs)
-        # Storing into the dictionary
-        dico_layer[u'name'] = layer.GetName()
-        dico_layer[u'title'] = layer.GetName().capitalize()
-        dico_layer[u'num_obj'] = layer.GetFeatureCount()
-        dico_layer[u'num_fields'] = self.def_couche.GetFieldCount()
-        # schema name
+            else:
+                continue
+        # in case of not match
         try:
-            layer.GetName().split('.')[1]
-            dico_layer[u'folder'] = layer.GetName().split('.')[0]
-        except IndexError:
-            dico_layer[u'folder'] = 'public'
+            dico_layer[u'srs_type'] = unicode(typsrs)
+        except UnboundLocalError:
+            typsrs = txt.get('srs_nr')
+            dico_layer[u'srs_type'] = unicode(typsrs)
+
+
         # Handling exception in srs names'encoding
         try:
             if self.srs.GetAttrValue('PROJCS') != 'unnamed':
                 dico_layer[u'srs'] = unicode(self.srs.GetAttrValue('PROJCS')).replace('_', ' ')
             else:
                 dico_layer[u'srs'] = unicode(self.srs.GetAttrValue('PROJECTION')).replace('_', ' ')
-        except UnicodeDecodeError, e:
-            print 'youpiyo', e
+        except UnicodeDecodeError:
             if self.srs.GetAttrValue('PROJCS') != 'unnamed':
                 dico_layer[u'srs'] = self.srs.GetAttrValue('PROJCS').decode('latin1').replace('_', ' ')
             else:
