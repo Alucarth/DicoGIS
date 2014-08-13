@@ -11,7 +11,7 @@ from __future__ import unicode_literals
 #
 # Python:       2.7.x
 # Created:      14/02/2013
-# Updated:      04/08/2014
+# Updated:      13/08/2014
 #
 # Licence:      GPL 3
 #------------------------------------------------------------------------------
@@ -149,7 +149,10 @@ class DicoGIS(Tk):
         self.li_gml = []    # list for GML path
         self.li_geoj = []   # list for GeoJSON path
         self.li_vectors = []  # list for all vectors
-        self.li_cdao = []    # list for AutoCAD DXF path
+        self.li_cdao = []     # list for all CAO/DAO files
+        self.li_dxf = []      # list for AutoCAD DXF paths
+        self.li_dwg = []      # list for AutoCAD DWG paths
+        self.li_dgn = []      # list for MicroStation DGN paths
         self.li_pdf = []    # list for GeoPDF path
         self.li_raster_formats = (".ecw", ".tif", ".jp2")   # raster handled
         self.li_vectors_formats = (".shp", ".tab", ".kml",
@@ -254,11 +257,11 @@ class DicoGIS(Tk):
                      columnspan=2,
                      sticky="NSWE",
                      padx=2, pady=2)
-        # caz_cdao.grid(row=2,
-        #               column=4,
-        #               columnspan=2,
-        #               sticky="NSWE",
-        #               padx=2, pady=2)
+        caz_cdao.grid(row=2,
+                      column=4,
+                      columnspan=2,
+                      sticky="NSWE",
+                      padx=2, pady=2)
         # target folder
         self.labtarg = Label(self.FrPath, text=self.blabla.get('gui_path'))
         self.target = Entry(master=self.FrPath, width=35)
@@ -580,8 +583,8 @@ class DicoGIS(Tk):
         return foldername
 
     def ligeofiles(self, foldertarget):
-        u""" List shapefiles and MapInfo files (.tab, not .mid/mif) contained
-        in the folders structure """
+        u""" List compatible geo-files stored into
+        the folders structure """
         # reseting global variables
         self.li_shp = []
         self.li_tab = []
@@ -590,11 +593,14 @@ class DicoGIS(Tk):
         self.li_geoj = []
         self.li_vectors = []
         self.li_dxf = []
+        self.li_dwg = []
+        self.li_dgn = []
         self.li_pdf = []
         self.li_raster = []
         self.li_gdb = []
         self.li_cdao = []
         self.browsetarg.config(state=DISABLED)
+
         # Looping in folders structure
         self.status.set(self.blabla.get('gui_prog1'))
         self.prog_layers.start()
@@ -663,14 +669,22 @@ class DicoGIS(Tk):
                 elif path.splitext(full_path.lower())[1] == '.dxf':
                     """ listing DXF """
                     # add complete path of DXF file
-                    self.li_cdao.append(full_path)
+                    self.li_dxf.append(full_path)
                 elif path.splitext(full_path.lower())[1] == '.dwg':
                     """ listing DWG """
                     # add complete path of DWG file
-                    self.li_cdao.append(full_path)
+                    self.li_dwg.append(full_path)
+                elif path.splitext(full_path.lower())[1] == '.dgn':
+                    """ listing MicroStation DGN """
+                    # add complete path of DGN file
+                    self.li_dgn.append(full_path)
                 else:
                     continue
 
+        # grouping CAO/DAO files
+        self.li_cdao.extend(self.li_dxf)
+        self.li_cdao.extend(self.li_dwg)
+        self.li_cdao.extend(self.li_dgn)
         # end of listing
         self.prog_layers.stop()
         self.logger.info('End of folders parsing: {0} shapefiles - \
@@ -713,24 +727,41 @@ class DicoGIS(Tk):
         self.li_geoj = tuple(self.li_geoj)
         self.li_gdb.sort()
         self.li_gdb = tuple(self.li_gdb)
+        self.li_dxf.sort()
+        self.li_dxf = tuple(self.li_dxf)
+        self.li_dwg.sort()
+        self.li_dwg = tuple(self.li_dwg)
+        self.li_dgn.sort()
+        self.li_dgn = tuple(self.li_dgn)
         self.li_cdao.sort()
         self.li_cdao = tuple(self.li_cdao)
-        # setting the label text and activing the buttons
-        self.status.set('{0} shapefiles - {1} tables (MapInfo) - {2} KML - {3} GML - {4} GeoJSON\n{5} rasters - {6} Esri FileGDB in {7}{8}'.format(len(self.li_shp),
-                            len(self.li_tab),
-                            len(self.li_kml),
-                            len(self.li_gml),
-                            len(self.li_geoj),
-                            len(self.li_raster),
-                            len(self.li_gdb),
-                            self.num_folders,
-                            self.blabla.get('log_numfold')))
+        # status message
+        self.status.set(u'{0} shapefiles - \
+{1} tables (MapInfo) - \
+{2} KML - \
+{3} GML - \
+{4} GeoJSON\
+\n{5} rasters - \
+{6} Esri FileGDB - \
+{7} CAO/DAO - \
+in {8}{9}'.format(len(self.li_shp),
+                  len(self.li_tab),
+                  len(self.li_kml),
+                  len(self.li_gml),
+                  len(self.li_geoj),
+                  len(self.li_raster),
+                  len(self.li_gdb),
+                  len(self.li_cdao),
+                  self.num_folders,
+                  self.blabla.get('log_numfold')))
 
+        # reactivating the buttons
         self.browsetarg.config(state=ACTIVE)
         self.val.config(state=ACTIVE)
         # End of function
         return foldertarget, self.li_shp, self.li_tab, self.li_kml,\
-            self.li_gml, self.li_geoj, self.li_raster, self.li_gdb
+            self.li_gml, self.li_geoj, self.li_raster, self.li_gdb,\
+            self.li_dxf, self.li_dwg, self.li_dgn, self.li_cdao
 
     def process(self):
         """ check needed info and launch different processes """
@@ -755,15 +786,16 @@ class DicoGIS(Tk):
         # check if at least a format has been choosen
         if (self.opt_shp.get() + self.opt_tab.get() + self.opt_kml.get() +
            self.opt_gml.get() + self.opt_geoj.get() + self.opt_rast.get() +
-           self.opt_gdb.get()):
+           self.opt_gdb.get() + self.opt_cdao.get()):
             pass
         else:
             avert('DicoGIS - User error', self.blabla.get('noformat'))
             return
         # check if there are some layers into the folder structure
         if (len(self.li_vectors)
-          + len(self.li_raster)
-          + len(self.li_gdb)):
+            + len(self.li_raster)
+            + len(self.li_gdb)
+            + len(self.li_cdao)):
             pass
         else:
             avert('DicoGIS - User error', self.blabla.get('nodata'))
@@ -1104,47 +1136,44 @@ class DicoGIS(Tk):
             pass
 
         if self.opt_cdao.get() and len(self.li_cdao) > 0:
-            self.logger.info('\n\tProcessing DXF: start')
-            for cdao in self.li_cdao:
-                """ looping on CAO/DAO list """
-                self.status.set(path.basename(cdao))
-                self.logger.info('\n' + cdao)
+            self.logger.info('\n\tProcessing CAO/DAO: start')
+            for dxf in self.li_dxf:
+                """ looping on DXF list """
+                self.status.set(path.basename(dxf))
+                self.logger.info('\n' + dxf)
                 # reset recipient data
                 self.dico_cdao.clear()
                 # getting the informations
-                if cdao[:-3].lower() == 'dxf':
-                    try:
-                        Read_DXF(path.abspath(cdao),
-                                 self.dico_cdao,
-                                 'AutoCAD DXF',
-                                 self.blabla)
-                        self.logger.info('\t Infos OK')
-                    except AttributeError, e:
-                        """ empty files """
-                        self.logger.error(e)
-                        continue
-                    except RuntimeError, e:
-                        """ corrupt files """
-                        self.logger.error(e)
-                        continue
-                    except Exception, e:
-                        self.logger.error(e)
-                        continue
-                    print dico_cdao
-                else:
+                try:
+                    Read_DXF(path.abspath(dxf),
+                             self.dico_cdao,
+                             'AutoCAD DXF',
+                             self.blabla)
+                    self.logger.info('\t Infos OK')
+                except AttributeError, e:
+                    """ empty files """
+                    self.logger.error(e)
                     continue
+                except RuntimeError, e:
+                    """ corrupt files """
+                    self.logger.error(e)
+                    continue
+                except Exception, e:
+                    self.logger.error(e)
+                    continue
+                print self.dico_cdao
                 # writing to the Excel dictionary
-                self.dictionarize_gdb(self.dico_gdb,
-                                      self.feuy3,
-                                      line_gdb)
+                self.dictionarize_cdao(self.dico_cdao,
+                                       self.feuy5,
+                                       line_gdb)
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
-                line_gdb += self.dico_gdb.get('layers_count') + 1
+                line_cdao += self.dico_cdao.get('layers_count') + 1
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
         else:
-            self.logger.info('\tIgnoring {0} FileGDB'.format(len(self.li_gdb)))
+            self.logger.info('\tIgnoring {0} CAO/DAO files'.format(len(self.li_cdao)))
             pass
 
         # saving dictionary
@@ -1847,6 +1876,131 @@ class DicoGIS(Tk):
         # End of function
         return self.feuy3, line
 
+    def dictionarize_cdao(self, dico_cdao, sheet, line):
+        u""" write the infos of the CAO/DAO files into the Excel workbook """
+        # local variables
+        champs = ""
+
+        # in case of a source error
+        if dico_cdao.get('error'):
+            self.logger.warning('\tproblem detected')
+            sheet.write(line, 0, dico_cdao.get('name'))
+            link = 'HYPERLINK("{0}"; "{1}")'.format(dico_cdao.get(u'folder'),
+                                                    self.blabla.get('browse'))
+            sheet.write(line, 1, Formula(link), self.url)
+            sheet.write(line, 2, self.blabla.get(dico_cdao.get('error')),
+                                 self.xls_erreur)
+            # incrementing line
+            dico_cdao['layers_count'] = 0
+            # Interruption of function
+            return self.feuy5, line
+        else:
+            pass
+
+        # GDB name
+        sheet.write(line, 0, dico_cdao.get('name'))
+
+        # Path of containing folder formatted to be a hyperlink
+        try:
+            link = 'HYPERLINK("{0}"; "{1}")'.format(dico_cdao.get(u'folder'),
+                                                    self.blabla.get('browse'))
+        except UnicodeDecodeError:
+            # write a notification into the log file
+            self.logger.warning('Path name with special letters: {}'.format(dico_cdao.get(u'folder').decode('utf8')))
+            # decode the fucking path name
+            link = 'HYPERLINK("{0}"; "{1}")'.format(dico_cdao.get(u'folder').decode('utf8'),
+                                                    self.blabla.get('browse'))
+            
+        sheet.write(line, 1, Formula(link), self.url)
+
+        # Name of containing folder
+        sheet.write(line, 2, path.basename(dico_cdao.get(u'folder')))
+
+        # total size
+        sheet.write(line, 3, dico_cdao.get(u'total_size'))
+
+        # Creation date
+        sheet.write(line, 4, dico_cdao.get(u'date_crea'), self.xls_date)
+        # Last update date
+        sheet.write(line, 5, dico_cdao.get(u'date_actu'), self.xls_date)
+
+        # Layers count
+        sheet.write(line, 6, dico_cdao.get(u'layers_count'))
+
+        # total number of fields
+        sheet.write(line, 7, dico_cdao.get(u'total_fields'))
+
+        # total number of objects
+        sheet.write(line, 8, dico_cdao.get(u'total_objs'))
+
+        # parsing layers
+        for (layer_idx, layer_name) in zip(dico_cdao.get(u'layers_idx'),
+                                           dico_cdao.get(u'layers_names')):
+            # increment line
+            line += 1
+            # get the layer informations
+            cdao_layer = dico_cdao.get('{0}_{1}'.format(layer_idx, layer_name))
+
+            # layer's name
+            sheet.write(line, 6, cdao_layer.get(u'title'))
+
+            # number of fields
+            sheet.write(line, 7, cdao_layer.get(u'num_fields'))
+
+            # number of objects
+            sheet.write(line, 8, cdao_layer.get(u'num_obj'))
+
+            # Geometry type
+            sheet.write(line, 9, cdao_layer.get(u'type_geom'))
+
+            # SRS label
+            sheet.write(line, 10, cdao_layer.get(u'srs'))
+            # SRS type
+            sheet.write(line, 11, cdao_layer.get(u'srs_type'))
+            # SRS reference EPSG code
+            sheet.write(line, 12, cdao_layer.get(u'EPSG'))
+
+            # Spatial extent
+            emprise = u"Xmin : {0} - Xmax : {1} \
+                       \nYmin : {2} - Ymax : {3}".format(unicode(cdao_layer.get(u'Xmin')),
+                                                         unicode(cdao_layer.get(u'Xmax')),
+                                                         unicode(cdao_layer.get(u'Ymin')),
+                                                         unicode(cdao_layer.get(u'Ymax'))
+                                                         )
+            sheet.write(line, 13, emprise, self.xls_wrap)
+
+            # Field informations
+            fields_info = cdao_layer.get(u'fields')
+            for chp in fields_info.keys():
+                # field type
+                if fields_info[chp] == 'Integer':
+                    tipo = self.blabla.get(u'entier')
+                elif fields_info[chp] == 'Real':
+                    tipo = self.blabla.get(u'reel')
+                elif fields_info[chp] == 'String':
+                    tipo = self.blabla.get(u'string')
+                elif fields_info[chp] == 'Date':
+                    tipo = self.blabla.get(u'date')
+                # concatenation of field informations
+                try:
+                    champs = champs + chp + u" (" + tipo + u") \n; "
+                except UnicodeDecodeError:
+                    # write a notification into the log file
+                    self.dico_err[dico_cdao.get('name')] = self.blabla.get(u'err_encod') + \
+                                                             chp.decode('latin1') + \
+                                                             u"\n\n"
+                    self.logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
+                    # decode the fucking field name
+                    champs = champs + chp.decode('latin1') + u" ({}) ;".format(tipo)
+                    # then continue
+                    continue
+
+            # Once all fieds explored, write them
+            sheet.write(line, 14, champs)
+
+        # End of function
+        return self.feuy5, line
+
     def dictionarize_pg(self, layer_infos, fields_info, sheet, line):
         u""" write the infos of the layer into the Excel workbook """
         # local variables
@@ -1935,7 +2089,7 @@ class DicoGIS(Tk):
         sheet.write(line, 13, champs)
 
         # End of function
-        return self.book, self.feuy3
+        return self.book, self.feuy4
 
     def savedico(self):
         u""" Save the Excel file """
