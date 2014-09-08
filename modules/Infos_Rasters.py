@@ -126,8 +126,7 @@ class Read_Rasters(object):
         # geometry information
         self.infos_geom(dico_raster, text)
         # bands information
-        for band in range(self.rast.RasterCount):
-            band += 1
+        for band in range(1, self.rast.RasterCount):
             self.infos_bands(band, dico_bands)
             band = None
 
