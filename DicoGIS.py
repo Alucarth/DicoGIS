@@ -54,10 +54,12 @@ from collections import OrderedDict as OD   # ordered dictionary
 # 3rd party libraries
 try:
     from osgeo import gdal
+    from osgeo import ogr
     from osgeo import osr
     from osgeo.gdalconst import *
 except ImportError:
     import gdal
+    import ogr
     import osr
     from gdalconst import *
 
@@ -95,7 +97,7 @@ else:
     pass
 
 ###############################################################################
-########### Variables #############
+############# Classes #############
 ###################################
 
 
@@ -1225,8 +1227,6 @@ in {8}{9}'.format(len(self.li_shp),
         # saving dictionary
         self.savedico()
         self.logger.info('\n\tWorkbook saved: %s', self.output.get())
-        # saving settings
-        self.save_settingspath.abspath(())
 
         # quit and exit
         self.open_dir_file(self.output.get())
@@ -1481,7 +1481,7 @@ in {8}{9}'.format(len(self.li_shp),
             self.feuy4.write(0, 13, self.blabla.get('li_chps'), self.entete)
             self.logger.info('Sheet PostGIS created')
             # tunning headers
-            self.feuy3.col(1).width = len(self.blabla.get('browse')) * 256
+            self.feuy4.col(1).width = len(self.blabla.get('browse')) * 256
             # freezing headers line and first column
             self.feuy4.set_panes_frozen(True)
             self.feuy4.set_horz_split_pos(1)
