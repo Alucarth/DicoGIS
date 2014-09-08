@@ -63,13 +63,13 @@ class Read_PostGIS():
         self.alert = 0
 
         # raising incompatible files
-        if not source:
-            u""" if file is not compatible """
-            self.erratum(dico_layer, layerpath, u'err_nobjet')
-            self.alert = self.alert + 1
-            return None
-        else:
-            pass
+        # if not source:
+        #     u""" if file is not compatible """
+        #     self.erratum(dico_layer, layerpath, u'err_nobjet')
+        #     self.alert = self.alert + 1
+        #     return None
+        # else:
+        #     pass
 
         # raising forbidden access
         try:
