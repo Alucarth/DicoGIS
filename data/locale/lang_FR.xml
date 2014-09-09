@@ -44,6 +44,11 @@
 	<log_start>Début du traitement : </log_start>
 	<log_tps>Temps écoulé : </log_tps>
 <!-- Output file: commons -->
+	<sheet_vectors>Vecteurs</sheet_vectors>
+	<sheet_rasters>Rasters</sheet_rasters>
+	<sheet_filedb>Base de données fichiers</sheet_filedb>
+	<sheet_cdao>CAO / DAO</sheet_cdao>
+	<sheet_maplans>Documents cartographiques</sheet_maplans>
 	<nomfic>Nom du fichier</nomfic>
 	<path>Chemin</path>
 	<browse>Atteindre le dossier</browse>
