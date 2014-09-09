@@ -1,8 +1,8 @@
 Informations gathered depending on format
 ====
 
-| Format  | Sheet name | Filename | Clikable path | Parent folder | Fields count | Features count | Geometry type | Spatial Reference System (SRS) | SRS type | EPSG code | 
-| ------------- | ------------- | ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |
+| Format  | Sheet name | Filename |
+| ------------- | ------------- | ------------- |
 | Shapefile  | Vectors  | [x] |
 | MapInfo tables  | Vectors  | [x] |
 | GeoJSON  | Vectors  | [x] |
