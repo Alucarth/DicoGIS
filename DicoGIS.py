@@ -1345,7 +1345,7 @@ in {8}{9}'.format(len(self.li_shp),
             and len(self.li_vectors) >0:
             """ adding a new sheet for vectors informations """
             # sheet
-            self.feuy1 = self.book.add_sheet(u'Vectors',
+            self.feuy1 = self.book.add_sheet(self.blabla.get('sheet_vectors'),
                                              cell_overwrite_ok=True)
             # headers
             self.feuy1.write(0, 0, self.blabla.get('nomfic'), self.entete)
@@ -1383,7 +1383,7 @@ in {8}{9}'.format(len(self.li_shp),
            and len(self.li_raster) > 0:
             """ adding a new sheet for rasters informations """
             # sheet
-            self.feuy2 = self.book.add_sheet(u'Rasters',
+            self.feuy2 = self.book.add_sheet(self.blabla.get('sheet_rasters'),
                                              cell_overwrite_ok=True)
             # headers
             self.feuy2.write(0, 0, self.blabla.get('nomfic'), self.entete)
@@ -1424,7 +1424,7 @@ in {8}{9}'.format(len(self.li_shp),
            and len(self.li_gdb) > 0:
             """ adding a new sheet for Esri FileGeoDatabase informations """
             # sheet
-            self.feuy3 = self.book.add_sheet(u'Esri FileGDB',
+            self.feuy3 = self.book.add_sheet(self.blabla.get('sheet_filedb'),
                                              cell_overwrite_ok=True)
             # headers
             self.feuy3.write(0, 0, self.blabla.get('nomfic'), self.entete)
@@ -1493,7 +1493,7 @@ in {8}{9}'.format(len(self.li_shp),
            and len(self.li_cdao) > 0:
             """ adding a new sheet for CAO informations """
             # sheet
-            self.feuy5 = self.book.add_sheet(u'CAO - DAO',
+            self.feuy5 = self.book.add_sheet(self.blabla.get('sheet_cdao'),
                                              cell_overwrite_ok=True)
             # headers
             self.feuy5.write(0, 0, self.blabla.get('nomfic'), self.entete)

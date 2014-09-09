@@ -44,6 +44,11 @@
 	<log_start>Start: </log_start>
 	<log_tps>Time elapsed: </log_tps>
 <!-- Output file: commons -->
+	<sheet_vectors>Vectors</sheet_vectors>
+	<sheet_rasters>Rasters</sheet_rasters>
+	<sheet_filedb>File databases</sheet_filedb>
+	<sheet_cdao>CAD</sheet_cdao>
+	<sheet_maplans>Maps documents</sheet_maplans>
 	<nomfic>Filename</nomfic>
 	<path>Path</path>
 	<browse>Reach the folder</browse>
