@@ -1163,11 +1163,10 @@ in {8}{9}'.format(len(self.li_shp),
                 except Exception, e:
                     self.logger.error(e)
                     continue
-                print self.dico_cdao
                 # writing to the Excel dictionary
                 self.dictionarize_cdao(self.dico_cdao,
                                        self.feuy5,
-                                       line_gdb)
+                                       line_cdao)
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_cdao += self.dico_cdao.get('layers_count') + 1
@@ -1570,7 +1569,6 @@ in {8}{9}'.format(len(self.li_shp),
         # Name of containing folder
         # with an exception if this is the format name
         if not path.basename(layer_infos.get(u'folder')).lower() in self.li_vectors_formats:
-            print "youhou"
             sheet.write(line, 2, path.basename(layer_infos.get(u'folder')))
         else:
             sheet.write(line, 2, path.basename(path.dirname(layer_infos.get(u'folder'))))
