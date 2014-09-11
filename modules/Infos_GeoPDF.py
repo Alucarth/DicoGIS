@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
-# from __future__ import unicode_literals
+from __future__ import unicode_literals
 
 #------------------------------------------------------------------------------
 # Name:         Infos Geospatial PDF
@@ -180,8 +180,12 @@ class Read_GeoPDF(object):
             # getting layer globlal informations
             self.vector_basics(layer, dico_layer, txt)
             # storing layer into the GDB dictionary
-            dico_geopdf['{0}_{1}'.format(layer_idx,
-                                         layer.GetName())] = dico_layer
+            try:
+                dico_geopdf['{0}_{1}'.format(layer_idx, unicode(layer.GetName()))] = dico_layer
+            except UnicodeDecodeError:
+                print layer.GetName()
+                layerName = layer.GetName().decode('latin1')
+                dico_geopdf['{0}_{1}'.format(layer_idx, layerName)] = dico_layer
             # summing fields number
             total_fields += dico_layer.get(u'num_fields')
             # summing objects number
@@ -306,28 +310,28 @@ class Read_GeoPDF(object):
         # Handling exception in srs names'encoding
         if srs.IsProjected():
             try:
-                if srs.GetAttrValue('PROJCS') is not None:
-                    dico_geopdf[u'srs'] = unicode(srs.GetAttrValue('PROJCS')).replace('_', ' ')
+                if srs.GetAttrValue(str('PROJCS')) is not None:
+                    dico_geopdf[u'srs'] = unicode(srs.GetAttrValue(str('PROJCS'))).replace('_', ' ')
                 else:
-                    dico_geopdf[u'srs'] = unicode(srs.GetAttrValue('PROJECTION')).replace('_', ' ')
+                    dico_geopdf[u'srs'] = unicode(srs.GetAttrValue(str('PROJECTION'))).replace('_', ' ')
             except UnicodeDecodeError:
-                if srs.GetAttrValue('PROJCS') != 'unnamed':
-                    dico_geopdf[u'srs'] = srs.GetAttrValue('PROJCS').decode('latin1').replace('_', ' ')
+                if srs.GetAttrValue(str('PROJCS')) != str('unnamed'):
+                    dico_geopdf[u'srs'] = srs.GetAttrValue(str('PROJCS')).decode('latin1').replace('_', ' ')
                 else:
-                    dico_geopdf[u'srs'] = srs.GetAttrValue('PROJECTION').decode('latin1').replace('_', ' ')
+                    dico_geopdf[u'srs'] = srs.GetAttrValue(str('PROJECTION')).decode('latin1').replace('_', ' ')
         else:
             try:
-                if srs.GetAttrValue('GEOGCS') is not None:
-                    dico_geopdf[u'srs'] = unicode(srs.GetAttrValue('GEOGCS')).replace('_', ' ')
+                if srs.GetAttrValue(str('GEOGCS')) is not None:
+                    dico_geopdf[u'srs'] = unicode(srs.GetAttrValue(str('GEOGCS'))).replace('_', ' ')
                 else:
-                    dico_geopdf[u'srs'] = unicode(srs.GetAttrValue('PROJECTION')).replace('_', ' ')
+                    dico_geopdf[u'srs'] = unicode(srs.GetAttrValue(str('PROJECTION'))).replace('_', ' ')
             except UnicodeDecodeError:
-                if srs.GetAttrValue('GEOGCS') != 'unnamed':
-                    dico_geopdf[u'srs'] = srs.GetAttrValue('GEOGCS').decode('latin1').replace('_', ' ')
+                if srs.GetAttrValue(str('GEOGCS')) != str('unnamed'):
+                    dico_geopdf[u'srs'] = srs.GetAttrValue(str('GEOGCS')).decode('latin1').replace('_', ' ')
                 else:
-                    dico_geopdf[u'srs'] = srs.GetAttrValue('PROJECTION').decode('latin1').replace('_', ' ')
+                    dico_geopdf[u'srs'] = srs.GetAttrValue(str('PROJECTION')).decode('latin1').replace('_', ' ')
         
-        dico_geopdf[u'EPSG'] = unicode(srs.GetAttrValue("AUTHORITY", 1))
+        dico_geopdf[u'EPSG'] = unicode(srs.GetAttrValue(str("AUTHORITY"), 1))
 
         # end of function
         return dico_geopdf
@@ -431,10 +435,12 @@ if __name__ == '__main__':
     within the official repository (https://github.com/Guts/GIS)"""
     # test files
     chdir(r'..\test\datatest\pdf')
-    li_pdf = [r'US_Country_Populations.pdf',
+    li_pdf = [
+              # r'US_Country_Populations.pdf',
               r'Advanced_geospatial_PDF_made_with_GDAL.pdf',
-              r'Geospatial_OpenStreetMap_vector_and_raster_map.pdf',
-              r'NC_Windsor_North_20110909_TM_geo.pdf']
+              # r'Geospatial_OpenStreetMap_vector_and_raster_map.pdf',
+              # r'NC_Windsor_North_20110909_TM_geo.pdf'
+              ]
     
     # test txt dictionary
     textos = OD()
