@@ -11,7 +11,7 @@ from __future__ import unicode_literals
 #
 # Python:       2.7.x
 # Created:      14/02/2013
-# Updated:      13/08/2014
+# Updated:      10/09/2014
 #
 # Licence:      GPL 3
 #------------------------------------------------------------------------------
@@ -21,6 +21,7 @@ DGversion = "2.0-beta.6"
 ###############################################################################
 ########### Libraries #############
 ###################################
+
 # Standard library
 from Tkinter import Tk, StringVar, IntVar, Image    # GUI
 from Tkinter import W, PhotoImage, ACTIVE, DISABLED, END
@@ -75,6 +76,7 @@ from modules import Read_GeoJSON    # extractor for GeoJSON
 from modules import Read_PostGIS    # extractor for PostGIS databases
 from modules import Read_GDB        # extractor for Esri FileGeoDataBase
 from modules import Read_DXF        # extractor for AutoCAD DXF
+from modules import Read_GeoPDF     # extractor for Geospatial PDF
 
 # Imports depending on operating system
 if opersys == 'win32':
@@ -164,8 +166,9 @@ class DicoGIS(Tk):
         self.dico_fields = OD()     # dict for fields informations
         self.dico_raster = OD()     # dict for rasters global informations
         self.dico_bands = OD()      # dict for bands informations
-        self.dico_gdb = OD()     # dict for Esri FileGDB
-        self.dico_cdao = OD()     # dict for CAO/DAO
+        self.dico_gdb = OD()        # dict for Esri FileGDB
+        self.dico_cdao = OD()       # dict for CAO/DAO
+        self.dico_pdf = OD()       # dict for Geospatial PDF
         self.dico_err = OD()     # errors list
         li_lang = [lg[5:-4] for lg in listdir(r'data/locale')]  # languages
         self.blabla = OD()      # texts dictionary
@@ -202,6 +205,7 @@ class DicoGIS(Tk):
         self.opt_gdb = IntVar(self.FrFilters)   # able/disable Esri FileGDB
         self.opt_rast = IntVar(self.FrFilters)  # able/disable rasters
         self.opt_cdao = IntVar(self.FrFilters)  # able/disable CAO/DAO files
+        self.opt_pdf = IntVar(self.FrFilters)   # able/disable Geospatial PDF
 
         # format choosen: check buttons
         caz_shp = Checkbutton(self.FrFilters,
@@ -228,6 +232,9 @@ class DicoGIS(Tk):
         caz_cdao = Checkbutton(self.FrFilters,
                                text=u'CAO/DAO',
                                variable=self.opt_cdao)
+        caz_pdf = Checkbutton(self.FrFilters,
+                              text=u'Geospatial PDF',
+                              variable=self.opt_pdf)
         # widgets placement
         caz_shp.grid(row=1,
                      column=0,
@@ -261,9 +268,14 @@ class DicoGIS(Tk):
                      padx=2, pady=2)
         caz_cdao.grid(row=2,
                       column=4,
-                      columnspan=2,
+                      columnspan=1,
                       sticky="NSWE",
                       padx=2, pady=2)
+        caz_pdf.grid(row=2,
+                     column=5,
+                     columnspan=2,
+                     sticky="NSWE",
+                     padx=2, pady=2)
         # target folder
         self.labtarg = Label(self.FrPath, text=self.blabla.get('gui_path'))
         self.target = Entry(master=self.FrPath, width=35)
@@ -437,6 +449,7 @@ class DicoGIS(Tk):
             self.opt_rast.set(config.get('filters', 'opt_rast'))
             self.opt_gdb.set(config.get('filters', 'opt_gdb'))
             self.opt_cdao.set(config.get('filters', 'opt_cdao'))
+            self.opt_pdf.set(config.get('filters', 'opt_pdf'))
             # database settings
             self.host.set(config.get('database', 'host'))
             self.port.set(config.get('database', 'port'))
@@ -478,6 +491,7 @@ class DicoGIS(Tk):
         config.set('filters', 'opt_rast', self.opt_rast.get())
         config.set('filters', 'opt_gdb', self.opt_gdb.get())
         config.set('filters', 'opt_cdao', self.opt_cdao.get())
+        config.set('filters', 'opt_pdf', self.opt_pdf.get())
         # databse settings
         config.set('database', 'host', self.host.get())
         config.set('database', 'port', self.port.get())
@@ -597,10 +611,10 @@ class DicoGIS(Tk):
         self.li_dxf = []
         self.li_dwg = []
         self.li_dgn = []
-        self.li_pdf = []
+        self.li_cdao = []
         self.li_raster = []
         self.li_gdb = []
-        self.li_cdao = []
+        self.li_pdf = []
         self.browsetarg.config(state=DISABLED)
 
         # Looping in folders structure
@@ -697,7 +711,8 @@ class DicoGIS(Tk):
           {5} rasters - \
           {6} FileGDB - \
           {7} CAO/DAO - \
-          in {8}{9}'.format(len(self.li_shp),
+          {8} PDF - \
+          in {9}{10}'.format(len(self.li_shp),
                             len(self.li_tab),
                             len(self.li_kml),
                             len(self.li_gml),
@@ -705,6 +720,7 @@ class DicoGIS(Tk):
                             len(self.li_raster),
                             len(self.li_gdb),
                             len(self.li_cdao),
+                            len(self.li_pdf),
                             self.num_folders,
                             self.blabla.get('log_numfold')))
         # grouping vectors lists
@@ -737,6 +753,8 @@ class DicoGIS(Tk):
         self.li_dgn = tuple(self.li_dgn)
         self.li_cdao.sort()
         self.li_cdao = tuple(self.li_cdao)
+        self.li_pdf.sort()
+        self.li_pdf = tuple(self.li_pdf)
         # status message
         self.status.set(u'{0} shapefiles - \
 {1} tables (MapInfo) - \
@@ -746,7 +764,8 @@ class DicoGIS(Tk):
 \n{5} rasters - \
 {6} Esri FileGDB - \
 {7} CAO/DAO - \
-in {8}{9}'.format(len(self.li_shp),
+{8} PDF - \
+in {9}{10}'.format(len(self.li_shp),
                   len(self.li_tab),
                   len(self.li_kml),
                   len(self.li_gml),
@@ -754,6 +773,7 @@ in {8}{9}'.format(len(self.li_shp),
                   len(self.li_raster),
                   len(self.li_gdb),
                   len(self.li_cdao),
+                  len(self.li_pdf),
                   self.num_folders,
                   self.blabla.get('log_numfold')))
 
@@ -788,7 +808,7 @@ in {8}{9}'.format(len(self.li_shp),
         # check if at least a format has been choosen
         if (self.opt_shp.get() + self.opt_tab.get() + self.opt_kml.get() +
            self.opt_gml.get() + self.opt_geoj.get() + self.opt_rast.get() +
-           self.opt_gdb.get() + self.opt_cdao.get()):
+           self.opt_gdb.get() + self.opt_cdao.get() + self.opt_pdf.get()):
             pass
         else:
             avert('DicoGIS - User error', self.blabla.get('noformat'))
@@ -797,7 +817,8 @@ in {8}{9}'.format(len(self.li_shp),
         if (len(self.li_vectors)
             + len(self.li_raster)
             + len(self.li_gdb)
-            + len(self.li_cdao)):
+            + len(self.li_cdao)
+            + len(self.li_pdf)):
             pass
         else:
             avert('DicoGIS - User error', self.blabla.get('nodata'))
@@ -839,6 +860,10 @@ in {8}{9}'.format(len(self.li_shp),
             total_files += len(self.li_cdao)
         else:
             pass
+        if self.opt_pdf.get() and len(self.li_pdf) > 0:
+            total_files += len(self.li_pdf)
+        else:
+            pass
         self.prog_layers["maximum"] = total_files
         self.prog_layers["value"]
 
@@ -848,6 +873,7 @@ in {8}{9}'.format(len(self.li_shp),
         line_rasters = 1    # line rank of rasters dictionary
         line_gdb = 1        # line rank of GDB dictionary
         line_cdao = 1       # line rank of CAO/DAO dictionary
+        line_maps = 1       # line rank of maps & plans dictionary
 
         if self.opt_shp.get() and len(self.li_shp) > 0:
             self.logger.info('\n\tProcessing shapefiles: start')
@@ -1177,6 +1203,46 @@ in {8}{9}'.format(len(self.li_shp),
             self.logger.info('\tIgnoring {0} CAO/DAO files'.format(len(self.li_cdao)))
             pass
 
+        if self.opt_pdf.get() and len(self.li_pdf) > 0:
+            self.logger.info('\n\tProcessing Geospatial PDF: start')
+            for pdf in self.li_pdf:
+                """ looping on PDF list """
+                self.status.set(path.basename(pdf))
+                self.logger.info('\n' + pdf)
+                # reset recipient data
+                self.dico_pdf.clear()
+                # getting the informations
+                try:
+                    Read_GeoPDF(path.abspath(pdf),
+                                self.dico_pdf,
+                                'Geospatial PDF',
+                                self.blabla)
+                    self.logger.info('\t Infos OK')
+                except AttributeError, e:
+                    """ empty files """
+                    self.logger.error(e)
+                    continue
+                except RuntimeError, e:
+                    """ corrupt files """
+                    self.logger.error(e)
+                    continue
+                except Exception, e:
+                    self.logger.error(e)
+                    continue
+                # writing to the Excel dictionary
+                self.dictionarize_mapdocs(self.dico_pdf,
+                                          self.feuy3,
+                                          line_gdb)
+                self.logger.info('\t Wrote into the dictionary')
+                # increment the line number
+                line_gdb += self.dico_pdf.get('layers_count') + 1
+                # increment the progress bar
+                self.prog_layers["value"] = self.prog_layers["value"] + 1
+                self.update()
+        else:
+            self.logger.info('\tIgnoring {0} Geospatial PDF'.format(len(self.li_pdf)))
+            pass
+
         # saving dictionary
         self.val.config(state=ACTIVE)
         self.savedico()
@@ -1493,8 +1559,7 @@ in {8}{9}'.format(len(self.li_shp),
            and len(self.li_cdao) > 0:
             """ adding a new sheet for CAO informations """
             # sheet
-            self.feuy5 = self.book.add_sheet(self.blabla.get('sheet_cdao'),
-                                             cell_overwrite_ok=True)
+            self.feuy5 = self.book.add_sheet(self.blabla.get('sheet_cdao'), cell_overwrite_ok=True)
             # headers
             self.feuy5.write(0, 0, self.blabla.get('nomfic'), self.entete)
             self.feuy5.write(0, 1, self.blabla.get('path'), self.entete)
@@ -1999,6 +2064,142 @@ in {8}{9}'.format(len(self.li_shp),
         # End of function
         return self.feuy5, line
 
+    def dictionarize_mapdocs(self, mapdoc_infos, sheet, line):
+        u""" write the infos of the map document into the Excel workbook """
+        # local variables
+        champs = ""
+
+        # in case of a source error
+        if mapdoc_infos.get('error'):
+            self.logger.warning('\tproblem detected')
+            sheet.write(line, 0, mapdoc_infos.get('name'))
+            link = 'HYPERLINK("{0}"; "{1}")'.format(mapdoc_infos.get(u'folder'),
+                                                    self.blabla.get('browse'))
+            sheet.write(line, 1, Formula(link), self.url)
+            sheet.write(line, 2, self.blabla.get(mapdoc_infos.get('error')),
+                                 self.xls_erreur)
+            # incrementing line
+            # mapdoc_infos['layers_count'] = 0
+            # Interruption of function
+            return self.feuy3, line
+        else:
+            pass
+
+        # GDB name
+        sheet.write(line, 0, mapdoc_infos.get('name'))
+
+        # Path of containing folder formatted to be a hyperlink
+        try:
+            link = 'HYPERLINK("{0}"; "{1}")'.format(mapdoc_infos.get(u'folder'),
+                                                    self.blabla.get('browse'))
+        except UnicodeDecodeError:
+            # write a notification into the log file
+            self.logger.warning('Path name with special letters: {}'.format(mapdoc_infos.get(u'folder').decode('utf8')))
+            # decode the fucking path name
+            link = 'HYPERLINK("{0}"; "{1}")'.format(mapdoc_infos.get(u'folder').decode('utf8'),
+                                                    self.blabla.get('browse'))
+            
+        sheet.write(line, 1, Formula(link), self.url)
+
+        # Name of containing folder
+        sheet.write(line, 2, path.basename(mapdoc_infos.get(u'folder')))
+
+        # total size
+        sheet.write(line, 3, mapdoc_infos.get(u'total_size'))
+
+        # Creation date
+        sheet.write(line, 4, mapdoc_infos.get(u'date_crea'), self.xls_date)
+        # Last update date
+        sheet.write(line, 5, mapdoc_infos.get(u'date_actu'), self.xls_date)
+
+        # Layers count
+        sheet.write(line, 6, mapdoc_infos.get(u'layers_count'))
+
+        # total number of fields
+        sheet.write(line, 7, mapdoc_infos.get(u'total_fields'))
+
+        # total number of objects
+        sheet.write(line, 8, mapdoc_infos.get(u'total_objs'))
+
+        # parsing layers
+        for (layer_idx, layer_name) in zip(mapdoc_infos.get(u'layers_idx'),
+                                           mapdoc_infos.get(u'layers_names')):
+            # increment line
+            line += 1
+            # get the layer informations
+            try:
+                mapdoc_layer = mapdoc_infos.get('{0}_{1}'.format(layer_idx, 
+                                                                 layer_name))
+            except UnicodeDecodeError, e:
+                print layer_name, type(layer_name)
+                mapdoc_layer = mapdoc_infos.get('{0}_{1}'.format(layer_idx, 
+                                                                 unicode(layer_name.decode('latin1'))))
+
+            # layer's name
+            print mapdoc_layer
+            sheet.write(line, 6, mapdoc_layer.get(u'title'))
+
+            # number of fields
+            sheet.write(line, 7, mapdoc_layer.get(u'num_fields'))
+
+            # number of objects
+            sheet.write(line, 8, mapdoc_layer.get(u'num_obj'))
+
+            # Geometry type
+            sheet.write(line, 9, mapdoc_layer.get(u'type_geom'))
+
+            # SRS label
+            sheet.write(line, 10, mapdoc_layer.get(u'srs'))
+            # SRS type
+            sheet.write(line, 11, mapdoc_layer.get(u'srs_type'))
+            # SRS reference EPSG code
+            sheet.write(line, 12, mapdoc_layer.get(u'EPSG'))
+
+            # Spatial extent
+            emprise = u"Xmin : {0} - Xmax : {1} \
+                       \nYmin : {2} - Ymax : {3}".format(unicode(mapdoc_layer.get(u'Xmin')),
+                                                         unicode(mapdoc_layer.get(u'Xmax')),
+                                                         unicode(mapdoc_layer.get(u'Ymin')),
+                                                         unicode(mapdoc_layer.get(u'Ymax'))
+                                                         )
+            sheet.write(line, 13, emprise, self.xls_wrap)
+
+            # Field informations
+            fields_info = mapdoc_layer.get(u'fields')
+            for chp in fields_info.keys():
+                # field type
+                if fields_info[chp][0] == 'Integer':
+                    tipo = self.blabla.get(u'entier')
+                elif fields_info[chp][0] == 'Real':
+                    tipo = self.blabla.get(u'reel')
+                elif fields_info[chp][0] == 'String':
+                    tipo = self.blabla.get(u'string')
+                elif fields_info[chp][0] == 'Date':
+                    tipo = self.blabla.get(u'date')
+                # concatenation of field informations
+                try:
+                    champs = champs + chp +\
+                             u" ({0}) ; ".format(tipo)
+                except UnicodeDecodeError:
+                    # write a notification into the log file
+                    self.dico_err[mapdoc_infos.get('name')] = self.blabla.get(u'err_encod') + \
+                                                             chp.decode('latin1') + \
+                                                             u"\n\n"
+                    self.logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
+                    # decode the fucking field name
+                    champs = champs + chp.decode('latin1') \
+                            + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
+                                                                    fields_info[chp][1],
+                                                                    fields_info[chp][2])
+                    # then continue
+                    continue
+
+            # Once all fieds explored, write them
+            sheet.write(line, 14, champs)
+
+        # End of function
+        return self.feuy3, line
+
     def dictionarize_pg(self, layer_infos, fields_info, sheet, line):
         u""" write the infos of the layer into the Excel workbook """
         # local variables
@@ -2045,10 +2246,6 @@ in {8}{9}'.format(len(self.li_shp),
         sheet.write(line, 3, layer_infos.get(u'num_fields'))
         # Name of objects
         sheet.write(line, 4, layer_infos.get(u'num_obj'))
-        # # Creation date
-        # sheet.write(line, 10, layer_infos.get(u'date_crea'))
-        # # Last update date
-        # sheet.write(line, 11, layer_infos.get(u'date_actu'))
         # Format of data
         sheet.write(line, 12, layer_infos.get(u'type'))
         # Field informations
@@ -2096,20 +2293,20 @@ in {8}{9}'.format(len(self.li_shp),
                                   defaultextension='.xls',
                                   initialfile=self.output.get(),
                                   filetypes=[(self.blabla.get('gui_excel'),
-                                              "*.xls")])
+                                              "*.xls")],
+                                  # message='Select where to save the output file',
+                                  title='Output location')
 
         # check if the extension is correctly indicated
         if path.splitext(saved)[1] != ".xls":
             saved = saved + ".xls"
         # save
-        self.book.save(saved)
-        self.output.delete(0, END)
-        self.output.insert(0, saved)
-
-        # # notification
-        # total_files = unicode(len(self.li_shp) + len(self.li_tab))
-        # info(title=self.blabla.get('info_end'),
-        #      message=self.blabla.get('info_end2'))
+        if saved != ".xls":
+            self.book.save(saved)
+            self.output.delete(0, END)
+            self.output.insert(0, saved)
+        else:
+            avert(title=u'Erreur', message=mess)
 
         # End of function
         return self.book, saved
