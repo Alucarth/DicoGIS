@@ -1,6 +1,6 @@
 ﻿#DicoGIS
 
-Including 3 languages ([English](#en), [French](#fr) and [Spanish](#es)) but you can add your own translations (in [locale folder](https://github.com/Guts/DicoGIS/tree/master/data/locale)).
+Available in 3 languages ([English](#en), [French](#fr) and [Spanish](#es)) but you can add your own translations (in [locale folder](https://github.com/Guts/DicoGIS/tree/master/data/locale)).
 
 ##EN
 Automatize the creation of a dictionnary of geographic data in a folders structure. The output dictionary is an Excel file (.xls).
