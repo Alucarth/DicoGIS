@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
-# from __future__ import unicode_literals
+from __future__ import unicode_literals
 
 #------------------------------------------------------------------------------
 # Name:         InfosGDB
@@ -59,7 +59,7 @@ class Read_GDB():
         self.alert = 0
 
         # opening GDB
-        dr_gdb_o = ogr.GetDriverByName("OpenFileGDB")
+        dr_gdb_o = ogr.GetDriverByName(str("OpenFileGDB"))
         try:
             gdb = dr_gdb_o.Open(gdbpath, 0)
         except Exception:
@@ -115,7 +115,7 @@ class Read_GDB():
             self.infos_basics(layer, dico_layer, txt)
             # storing layer into the GDB dictionary
             dico_gdb['{0}_{1}'.format(layer_idx,
-                                      layer.GetName())] = dico_layer
+                                      dico_layer.get('title'))] = dico_layer
             # summing fields number
             total_fields += dico_layer.get(u'num_fields')
             # summing objects number
@@ -128,8 +128,14 @@ class Read_GDB():
 
     def infos_basics(self, layer_obj, dico_layer, txt):
         u""" get the global informations about the layer """
-        # title and features count
-        dico_layer[u'title'] = layer_obj.GetName()
+        # title
+        try:
+            dico_layer[u'title'] = unicode(layer_obj.GetName())
+        except UnicodeDecodeError:
+            layerName = layer_obj.GetName().decode('latin1', errors='replace')
+            dico_layer[u'title'] = layerName
+
+        # features count
         dico_layer[u'num_obj'] = layer_obj.GetFeatureCount()
 
         # getting geography and geometry informations
@@ -172,17 +178,17 @@ class Read_GDB():
 
         # handling exceptions in srs names'encoding
         try:
-            if srs.GetAttrValue('PROJCS') != 'unnamed':
-                dico_layer[u'srs'] = unicode(srs.GetAttrValue('PROJCS')).replace('_', ' ')
+            if srs.GetAttrValue(str('PROJCS')) != 'unnamed':
+                dico_layer[u'srs'] = unicode(srs.GetAttrValue(str('PROJCS'))).replace('_', ' ')
             else:
-                dico_layer[u'srs'] = unicode(srs.GetAttrValue('PROJECTION')).replace('_', ' ')
+                dico_layer[u'srs'] = unicode(srs.GetAttrValue(str('PROJECTION'))).replace('_', ' ')
         except UnicodeDecodeError:
-            if srs.GetAttrValue('PROJCS') != 'unnamed':
-                dico_layer[u'srs'] = srs.GetAttrValue('PROJCS').decode('latin1').replace('_', ' ')
+            if srs.GetAttrValue(str('PROJCS')) != 'unnamed':
+                dico_layer[u'srs'] = srs.GetAttrValue(str('PROJCS')).decode('latin1').replace('_', ' ')
             else:
-                dico_layer[u'srs'] = srs.GetAttrValue('PROJECTION').decode('latin1').replace('_', ' ')
+                dico_layer[u'srs'] = srs.GetAttrValue(str('PROJECTION')).decode('latin1').replace('_', ' ')
         finally:
-            dico_layer[u'EPSG'] = unicode(srs.GetAttrValue("AUTHORITY", 1))
+            dico_layer[u'EPSG'] = unicode(srs.GetAttrValue(str("AUTHORITY"), 1))
 
         # World SRS default
         if dico_layer[u'EPSG'] == u'4326' and dico_layer[u'srs'] == u'None':
@@ -262,6 +268,9 @@ class Read_GDB():
 if __name__ == '__main__':
     u""" standalone execution for tests. Paths are relative considering a test
     within the official repository (https://github.com/Guts/DicoGIS/)"""
+    from os import chdir
+    # sample files
+    chdir(r'..\test\datatest\FileGDB\Esri_FileGDB')
     # test text dictionary
     textos = OD()
     textos['srs_comp'] = u'Compound'
@@ -276,9 +285,11 @@ if __name__ == '__main__':
 
     # searching for File GeoDataBase
     num_folders = 0
-    li_gdb = [r'C:\Users\julien.moura\Documents\GIS Database\FileGDB\Points.gdb',
-              r'C:\Users\julien.moura\Documents\GIS Database\FileGDB\Polygons.gdb',
-              r'C:\Users\julien.moura\Documents\GIS Database\FileGDB\AAHH.gdb']
+    li_gdb = [
+              r'Points.gdb',
+              r'Polygons.gdb',
+              r'AAHH.gdb'
+              ]
     for root, dirs, files in walk(r'..\test\datatest'):
             num_folders = num_folders + len(dirs)
             for d in dirs:

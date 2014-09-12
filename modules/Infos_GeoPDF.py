@@ -179,13 +179,8 @@ class Read_GeoPDF(object):
             li_layers_idx.append(layer_idx)
             # getting layer globlal informations
             self.vector_basics(layer, dico_layer, txt)
-            # storing layer into the GDB dictionary
-            try:
-                dico_geopdf['{0}_{1}'.format(layer_idx, unicode(layer.GetName()))] = dico_layer
-            except UnicodeDecodeError:
-                print layer.GetName()
-                layerName = layer.GetName().decode('latin1')
-                dico_geopdf['{0}_{1}'.format(layer_idx, layerName)] = dico_layer
+            # storing layer into the GeoPDF dictionary
+            dico_geopdf['{0}_{1}'.format(layer_idx, dico_layer.get('title'))] = dico_layer
             # summing fields number
             total_fields += dico_layer.get(u'num_fields')
             # summing objects number
@@ -251,8 +246,17 @@ class Read_GeoPDF(object):
 
     def vector_basics(self, layer_obj, dico_layer, txt):
         u""" get the global informations about the layer """
-        # title and features count
-        dico_layer[u'title'] = layer_obj.GetName()
+        # title 
+        try:
+            dico_layer[u'title'] = unicode(layer_obj.GetName()) 
+        except UnicodeDecodeError:
+            # just if you use chardet from Mozilla
+            # encDet = chardet.detect(layer_obj.GetName()).get('encoding')
+            # dico_layer[u'encoding_detected'] = encDet
+            layerName = layer_obj.GetName().decode('latin1', errors='ignore')
+            dico_layer[u'title'] = layerName
+
+        # features count
         dico_layer[u'num_obj'] = layer_obj.GetFeatureCount()
 
         # getting geography and geometry informations
@@ -433,13 +437,13 @@ class Read_GeoPDF(object):
 if __name__ == '__main__':
     u""" standalone execution for tests. Paths are relative considering a test
     within the official repository (https://github.com/Guts/GIS)"""
-    # test files
+    # sample files
     chdir(r'..\test\datatest\pdf')
     li_pdf = [
-              # r'US_Country_Populations.pdf',
+              r'US_Country_Populations.pdf',
               r'Advanced_geospatial_PDF_made_with_GDAL.pdf',
-              # r'Geospatial_OpenStreetMap_vector_and_raster_map.pdf',
-              # r'NC_Windsor_North_20110909_TM_geo.pdf'
+              r'Geospatial_OpenStreetMap_vector_and_raster_map.pdf',
+              r'NC_Windsor_North_20110909_TM_geo.pdf'
               ]
     
     # test txt dictionary

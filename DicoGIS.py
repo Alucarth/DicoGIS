@@ -1486,7 +1486,7 @@ in {9}{10}'.format(len(self.li_shp),
             pass
 
         if self.typo.get() == 1\
-           and self.opt_gdb.get() == 1\
+           and (self.opt_gdb.get() + self.opt_pdf.get() > 0)\
            and len(self.li_gdb) > 0:
             """ adding a new sheet for Esri FileGeoDatabase informations """
             # sheet
@@ -1870,7 +1870,12 @@ in {9}{10}'.format(len(self.li_shp),
             # increment line
             line += 1
             # get the layer informations
-            gdb_layer = gdb_infos.get('{0}_{1}'.format(layer_idx, layer_name))
+            try:
+                gdb_layer = gdb_infos.get('{0}_{1}'.format(layer_idx, 
+                                                           layer_name))
+            except UnicodeDecodeError, e:
+                gdb_layer = gdb_infos.get('{0}_{1}'.format(layer_idx, 
+                                                           unicode(layer_name.decode('latin1'))))
 
             # layer's name
             sheet.write(line, 6, gdb_layer.get(u'title'))
@@ -2131,12 +2136,10 @@ in {9}{10}'.format(len(self.li_shp),
                 mapdoc_layer = mapdoc_infos.get('{0}_{1}'.format(layer_idx, 
                                                                  layer_name))
             except UnicodeDecodeError, e:
-                print layer_name, type(layer_name)
                 mapdoc_layer = mapdoc_infos.get('{0}_{1}'.format(layer_idx, 
                                                                  unicode(layer_name.decode('latin1'))))
 
             # layer's name
-            print mapdoc_layer
             sheet.write(line, 6, mapdoc_layer.get(u'title'))
 
             # number of fields
@@ -2168,18 +2171,17 @@ in {9}{10}'.format(len(self.li_shp),
             fields_info = mapdoc_layer.get(u'fields')
             for chp in fields_info.keys():
                 # field type
-                if fields_info[chp][0] == 'Integer':
+                if fields_info[chp] == u'Integer':
                     tipo = self.blabla.get(u'entier')
-                elif fields_info[chp][0] == 'Real':
+                elif fields_info[chp] == u'Real':
                     tipo = self.blabla.get(u'reel')
-                elif fields_info[chp][0] == 'String':
+                elif fields_info[chp] == u'String':
                     tipo = self.blabla.get(u'string')
-                elif fields_info[chp][0] == 'Date':
+                elif fields_info[chp] == u'Date':
                     tipo = self.blabla.get(u'date')
                 # concatenation of field informations
                 try:
-                    champs = champs + chp +\
-                             u" ({0}) ; ".format(tipo)
+                    champs = champs + chp +  u" ({0}) ; ".format(tipo)
                 except UnicodeDecodeError:
                     # write a notification into the log file
                     self.dico_err[mapdoc_infos.get('name')] = self.blabla.get(u'err_encod') + \
