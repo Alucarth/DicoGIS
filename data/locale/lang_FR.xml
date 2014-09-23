@@ -92,6 +92,13 @@
 	<conn_chain>Chaîne de connexion</conn_chain>
 <!-- Output file: FileGDB -->
 	<feats_class>Classes d'entités</feats_class>
+<!-- Output file: Maps & Docs -->
+	<sub_layers>Couches - Calques</sub_layers>
+	<custom_title>Titre</custom_title>
+	<res_image>Résolution (DPI)</res_image>
+	<creator_prod>Créateur - Générateur</creator_prod>
+	<keywords>Mots-clés</keywords>
+	<subject>Sujet</subject>
 <!-- SRS -->
 	<srs_comp>Composée (2D +)</srs_comp>
 	<srs_geoc>Géocentrique</srs_geoc>
