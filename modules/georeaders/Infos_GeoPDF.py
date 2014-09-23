@@ -109,7 +109,6 @@ class Read_GeoPDF(object):
         try:
             self.geopdf = gdal.Open(pdfpath, GA_ReadOnly)
         except Exception, e:
-            print e
             self.alert += 1
             self.erratum(dico_geopdf, pdfpath, u'err_incomp')
             return
@@ -212,16 +211,20 @@ class Read_GeoPDF(object):
 
         # metadata
         geopdf_MD = self.geopdf.GetMetadata()
-        print(geopdf_MD.keys())
         dico_geopdf[u'title'] = geopdf_MD.get('TITLE')
-        dico_geopdf[u'creator'] = geopdf_MD.get('CREATOR')
-        dico_geopdf[u'producer'] = geopdf_MD.get('PRODUCER')
-        dico_geopdf[u'date_crea'] = geopdf_MD.get('CREATION_DATE')
+        dico_geopdf[u'creator_prod'] = u"{0} - {1}".format(geopdf_MD.get('CREATOR'),
+                                                           geopdf_MD.get('PRODUCER'))
         dico_geopdf[u'keywords'] = geopdf_MD.get('KEYWORDS')
         dico_geopdf[u'dpi'] = geopdf_MD.get('DPI')
         dico_geopdf[u'subject'] = geopdf_MD.get('SUBJECT')
         dico_geopdf[u'neatline'] = geopdf_MD.get('NEATLINE')
-        dico_geopdf['description'] = self.geopdf.GetDescription()
+        dico_geopdf[u'description'] = self.geopdf.GetDescription()
+
+        # creation date
+        creadate = geopdf_MD.get('CREATION_DATE')
+        dico_geopdf[u'date_crea'] = '{0}/{1}/{2}'.format(creadate[8:10],
+                                                         creadate[6:8],
+                                                         creadate[2:6])
 
         # image specifications
         dico_geopdf[u'num_cols'] = self.geopdf.RasterXSize
@@ -438,7 +441,7 @@ if __name__ == '__main__':
     u""" standalone execution for tests. Paths are relative considering a test
     within the official repository (https://github.com/Guts/GIS)"""
     # sample files
-    chdir(r'..\test\datatest\pdf')
+    chdir(r'../../test/datatest/pdf')
     li_pdf = [
               r'US_Country_Populations.pdf',
               r'Advanced_geospatial_PDF_made_with_GDAL.pdf',
