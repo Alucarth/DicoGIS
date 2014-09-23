@@ -7,7 +7,16 @@ col = easyxf('pattern: pattern solid, fore_colour green')
 cell = easyxf('pattern: pattern solid, fore_colour light_blue;'
                               'font: colour white, bold True;')
 
-book = Workbook()
+book = Workbook(encoding='UTF-8')
+help(book)
+print book.country_code
+print book.tab_width
+book.set_owner('DicoGIS')
+print book.owner
+
+# book.encoding = 'UTF-8'
+print book.encoding
+
 sheet = book.add_sheet('Precedence')
 
 
@@ -40,3 +49,5 @@ for i in range(10):
     sheet.col(i).width = 256*i
 
 book.save('format_rowscols.xls')
+
+
