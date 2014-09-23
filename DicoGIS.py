@@ -1189,36 +1189,33 @@ in {9}{10}'.format(len(self.li_shp),
                 """ looping on DWG list """
                 self.status.set(path.basename(dwg))
                 self.logger.info('\n' + dwg)
-                # # reset recipient data
-                # self.dico_cdao.clear()
-                # # getting the informations
-                # try:
-                #     Read_DXF(path.abspath(dwg),
-                #              self.dico_cdao,
-                #              'AutoCAD DXF',
-                #              self.blabla)
-                #     self.logger.info('\t Infos OK')
-                # except AttributeError, e:
-                #     """ empty files """
-                #     self.logger.error(e)
-                #     continue
-                # except RuntimeError, e:
-                #     """ corrupt files """
-                #     self.logger.error(e)
-                #     continue
-                # except Exception, e:
-                #     self.logger.error(e)
-                #     continue
-                # # writing to the Excel dictionary
-                # self.dictionarize_cdao(self.dico_cdao,
-                #                        self.feuyCDAO,
-                #                        line_cdao)
-                # self.logger.info('\t Wrote into the dictionary')
-                # # increment the line number
-                # line_cdao += self.dico_cdao.get('layers_count') + 1
+
+                # just writing filename and link to parent folder
+                self.feuyCDAO.write(line_cdao, 0, path.basename(dwg))
+
+                # Path of parent folder formatted to be a hyperlink
+                try:
+                    link = 'HYPERLINK("{0}"; "{1}")'.format(path.dirname(dwg),
+                                                            self.blabla.get('browse'))
+                except UnicodeDecodeError:
+                    # write a notification into the log file
+                    self.logger.warning('Path name with special letters: {}'.format(path.dirname(dwg).decode('utf8')))
+                    # decode the fucking path name
+                    link = 'HYPERLINK("{0}"; "{1}")'.format(path.dirname(dwg).decode('utf8'),
+                                                            self.blabla.get('browse'))
+                    
+                self.feuyCDAO.write(line_cdao, 1, Formula(link), self.url)
+
+                # Name of parent folder
+                self.feuyCDAO.write(line_cdao, 2, path.basename(path.dirname(dwg)))
+                
+                # logging
+                self.logger.info('\t Wrote into the dictionary')
+                # increment the line number
+                line_cdao += 1
                 # # increment the progress bar
-                # self.prog_layers["value"] = self.prog_layers["value"] + 1
-                # self.update()
+                self.prog_layers["value"] = self.prog_layers["value"] + 1
+                self.update()
         else:
             self.logger.info('\tIgnoring {0} CAO/DAO files'.format(len(self.li_cdao)))
             pass
@@ -1788,8 +1785,8 @@ in {9}{10}'.format(len(self.li_shp),
             pass
 
         # Name
-        sheet.write(line, 0, dico_raster.get('name')
-)
+        sheet.write(line, 0, dico_raster.get('name'))
+
         # Path of parent folder formatted to be a hyperlink
         try:
             link = 'HYPERLINK("{0}"; "{1}")'.format(dico_raster.get(u'folder'),
@@ -2030,7 +2027,7 @@ in {9}{10}'.format(len(self.li_shp),
         else:
             pass
 
-        # GDB name
+        # Filename
         sheet.write(line, 0, dico_cdao.get('name'))
 
         # Path of parent folder formatted to be a hyperlink
