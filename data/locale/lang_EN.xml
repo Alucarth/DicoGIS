@@ -39,7 +39,7 @@
 	<log_dossour>Input folder: </log_dossour>
 	<log_end>End: </log_end>
 	<log_entete>DicoGIS - automatized geographic database dictionary</log_entete>
-	<log_numshp>Number of layers: </log_numshp>
+	<log_numshp>Layers count: </log_numshp>
 	<log_numfold> folders.</log_numfold>
 	<log_start>Start: </log_start>
 	<log_tps>Time elapsed: </log_tps>
@@ -92,6 +92,13 @@
 	<conn_chain>DB connection</conn_chain>
 <!-- Output file: FileGDB -->
 	<feats_class>Features classes</feats_class>
+<!-- Output file: Maps & Docs -->
+	<sub_layers>Layers</sub_layers>
+	<custom_title>Title</custom_title>
+	<res_image>DPI</res_image>
+	<creator_prod>Creator - Producer</creator_prod>
+	<keywords>Keywords</keywords>
+	<subject>Subject</subject>
 <!-- SRS -->
 	<srs_comp>Compound</srs_comp>
 	<srs_geoc>Geocentric</srs_geoc>

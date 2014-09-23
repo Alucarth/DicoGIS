@@ -92,6 +92,13 @@
 	<conn_chain>Cadena de conexión</conn_chain>
 <!-- Output file: FileGDB -->
 	<feats_class>Clases de objetos</feats_class>
+<!-- Output file: Maps & Docs -->
+	<sub_layers>Capas de información</sub_layers>
+	<custom_title>Título</custom_title>
+	<res_image>Resolución (DPI)</res_image>
+	<creator_prod>Creador - Herramienta</creator_prod>
+	<keywords>Palabras claves</keywords>
+	<subject>Tema</subject>
 <!-- SRS -->
 	<srs_comp>Compuesta (2D +)</srs_comp>
 	<srs_geoc>Geocéntrica</srs_geoc>
