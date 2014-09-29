@@ -78,6 +78,8 @@ from modules import Read_GDB        # extractor for Esri FileGeoDataBase
 from modules import Read_DXF        # extractor for AutoCAD DXF
 from modules import Read_GeoPDF     # extractor for Geospatial PDF
 
+from modules import TextsManager
+
 # Imports depending on operating system
 if opersys == 'win32':
     u""" windows """
@@ -163,8 +165,10 @@ class DicoGIS(Tk):
         # GUI fonts
         ft_tit = tkFont.Font(family="Times", size=10, weight=tkFont.BOLD)
 
-        # fillfulling
-        self.load_texts(self.def_lang)
+        # fillfulling text
+        TextsManager().load_texts(dico_texts=self.blabla,
+                                  lang=self.def_lang,
+                                  locale_folder=r'data/locale')
 
         # Frames
         self.FrPath = Labelframe(self,
@@ -498,7 +502,9 @@ class DicoGIS(Tk):
         new_lang = event.widget.get()
         self.logger.info('\tLanguage switched to: {0}'.format(event.widget.get()))
         # change to the new language selected
-        self.load_texts(new_lang)
+        TextsManager().load_texts(dico_texts=self.blabla,
+                                  lang=new_lang,
+                                  locale_folder=r'data/locale')
         # update widgets text
         self.welcome.config(text=self.blabla.get('hi') + self.uzer)
         self.can.config(text=self.blabla.get('gui_quit'))
@@ -518,20 +524,6 @@ class DicoGIS(Tk):
         self.lb_M.config(text=self.blabla.get('gui_mdp'))
 
         # End of function
-        return self.blabla
-
-    def load_texts(self, lang='FR'):
-        u""" Load texts according to the selected language """
-        # clearing the text dictionary
-        self.blabla.clear()
-        # open xml cursor
-        xml = ET.parse('data/locale/lang_{0}.xml'.format(lang))
-        # Looping and gathering texts from the xml file
-        for elem in xml.getroot().getiterator():
-            self.blabla[elem.tag] = elem.text
-        # updating the GUI
-        self.update()
-        # Fin de fonction
         return self.blabla
 
     def change_type(self):
