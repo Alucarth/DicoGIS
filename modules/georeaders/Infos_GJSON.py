@@ -26,12 +26,56 @@ from time import localtime, strftime
 from collections import OrderedDict as OD
 
 # 3rd party libraries
-from osgeo import ogr    # handling vector spatial files
-from osgeo import osr
+try:
+    from osgeo import gdal
+    from osgeo import ogr  # handler for vector spatial files
+    from osgeo import osr
+except ImportError:
+    import gdal
+    import ogr  # handler for vector spatial files
+    import osr
 
 ###############################################################################
 ########### Classes #############
 #################################
+
+
+class OGRErrorHandler(object):
+    def __init__(self):
+        """ Callable error handler
+        see: http://trac.osgeo.org/gdal/wiki/PythonGotchas#Exceptionsraisedincustomerrorhandlersdonotgetcaught
+        and http://pcjericks.github.io/py-gdalogr-cookbook/gdal_general.html#install-gdal-ogr-error-handler
+        """
+        self.err_level = gdal.CE_None
+        self.err_type = 0
+        self.err_msg = ''
+
+    def handler(self, err_level, err_type, err_msg):
+        """ Making errors messages more readable """
+        # available types
+        err_class = {
+                    gdal.CE_None: 'None',
+                    gdal.CE_Debug: 'Debug',
+                    gdal.CE_Warning: 'Warning',
+                    gdal.CE_Failure: 'Failure',
+                    gdal.CE_Fatal: 'Fatal'
+                    }
+        # getting type
+        err_type = err_class.get(err_type, 'None')
+        
+        # cleaning message
+        err_msg = err_msg.replace('\n', ' ')
+
+        # disabling OGR exceptions raising to avoid future troubles
+        ogr.DontUseExceptions()
+
+        # propagating
+        self.err_level = err_level
+        self.err_type = err_type
+        self.err_msg = err_msg
+
+        # end of function
+        return self.err_level, self.err_type, self.err_msg
 
 
 class Read_GeoJSON():
@@ -49,11 +93,15 @@ class Read_GeoJSON():
 
         """
         # handling ogr specific exceptions
+        ogrerr = OGRErrorHandler()
+        errhandler = ogrerr.handler
+        gdal.PushErrorHandler(errhandler)
         ogr.UseExceptions()
+        self.alert = 0
+
         # changing working directory to layer folder
         chdir(path.dirname(layerpath))
-        # Creating variables
-        self.alert = 0
+        # raising source issues
         source = ogr.Open(layerpath, 0)     # OGR driver
         if not source:
             u""" if layer doesn't have any object, return an error """
@@ -81,6 +129,12 @@ class Read_GeoJSON():
         self.infos_geom(dico_layer, text)
         # fields information
         self.infos_fields(dico_fields)
+
+        # warnings messages
+        dico_layer['err_gdal'] = ogrerr.err_type, ogrerr.err_msg
+
+        # safe exit
+        del source
 
     def infos_basics(self, layerpath, dico_layer, txt):
         u""" get the global informations about the layer """
@@ -207,7 +261,7 @@ if __name__ == '__main__':
     from os import getcwd
     # test files
     li_geoj = [path.join(getcwd(),
-                         r'..\test\datatest\vectors\geojson\wc2014_MapTour.geojson')]
+                         r'..\..\test\datatest\vectors\geojson\wc2014_MapTour.geojson')]
     # test text dictionary
     textos = OD()
     textos['srs_comp'] = u'Compound'
