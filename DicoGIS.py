@@ -1564,8 +1564,8 @@ in {9}{10}'.format(len(self.li_shp),
             self.feuyMAPS.write(0, 19, self.blabla.get('li_chps'), self.entete)
             self.logger.info('Sheet Maps & Documents created')
             # tunning headers
-            lg_gdb_names = [len(lg) for lg in self.li_gdb]
-            self.feuyMAPS.col(0).width = max(lg_gdb_names) * 100
+            lg_maps_names = [len(lg) for lg in self.li_pdf]
+            self.feuyMAPS.col(0).width = max(lg_maps_names) * 100
             self.feuyMAPS.col(1).width = len(self.blabla.get('browse')) * 256
             self.feuyMAPS.col(4).width = len(self.blabla.get('date_crea')) * 256
             self.feuyMAPS.col(5).width = len(self.blabla.get('date_actu')) * 256
