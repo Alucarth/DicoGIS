@@ -60,36 +60,38 @@ En ce qui concerne les performances, cela dépend surtout de la machine sur laqu
 
 1. Télécharger la dernière version :
 
-- soit de l’exécutable Windows (link is external),
-- soit du code source (link is external).
+..- soit de [l’exécutable Windows](https://github.com/Guts/DicoGIS/releases),
+..- soit du [code source](https://github.com/Guts/DicoGIS/archive/master.zip).
 
 2. Dézipper et lancer DicoGIS.exe / le script DicoGIS.py
 
-![DicoGIS - Launch](https://raw.githubusercontent.com/Guts/DicoGIS/master/doc/00a_DicoGIS_Win32exe.PNG "DicoGIS - Launch")
+..![DicoGIS - Launch](https://raw.githubusercontent.com/Guts/DicoGIS/master/doc/00a_DicoGIS_Win32exe.PNG "DicoGIS - Launch")
 
 3. Changer la langue au besoin
 
-![DicoGIS - Switch language](https://github.com/Guts/DicoGIS/blob/master/doc/99_DicoGIS_SwitchLanguage.gif "DicoGIS - Switch language")
+..![DicoGIS - Switch language](https://github.com/Guts/DicoGIS/blob/master/doc/99_DicoGIS_SwitchLanguage.gif "DicoGIS - Switch language")
 
 4.a Pour des données organisées en fichiers :
 
-- Choisir le dossier parent : l’exploration commence et la barre de progression tourne jusqu’à la fin du listing
-- Choisir les formats désirés
+..- Choisir le dossier parent : l’exploration commence et la barre de progression tourne jusqu’à la fin du listing
+..- Choisir les formats désirés
 
-![DicoGIS - Listing](https://raw.githubusercontent.com/Guts/DicoGIS/master/doc/02_DicoGIS_Listing.gif "DicoGIS - Listing")
+..![DicoGIS - Listing](https://raw.githubusercontent.com/Guts/DicoGIS/master/doc/02_DicoGIS_Listing.gif "DicoGIS - Listing")
 
-4.b. Pour des données stockées dans une base PostgreSQL / PostGIS, c'est le même principe sauf qu'il faut entrer les paramètres de connexion :
+4.b Pour des données stockées dans une base PostgreSQL / PostGIS, c'est le même principe sauf qu'il faut entrer les paramètres de connexion :
 
-![DicoGIS - Processing PostGIS](https://raw.githubusercontent.com/Guts/DicoGIS/master/doc/06_DicoGIS_PostGIS.gif "DicoGIS - Processing PostGIS")
+..![DicoGIS - Processing PostGIS](https://raw.githubusercontent.com/Guts/DicoGIS/master/doc/06_DicoGIS_PostGIS.gif "DicoGIS - Processing PostGIS")
 
 5. Lancer et attendre la fin du traitement : sauvegarder le fichier Excel généré.
 
-![DicoGIS - Processing files](https://raw.githubusercontent.com/Guts/DicoGIS/master/doc/05_DicoGIS_Processing.gif "DicoGIS - Processing files")
+..![DicoGIS - Processing files](https://raw.githubusercontent.com/Guts/DicoGIS/master/doc/05_DicoGIS_Processing.gif "DicoGIS - Processing files")
 
 6. Consulter le fichier en sortie et le fichier DicoGIS.log (dans lequel il y a un paquet d'informations ^^).
-Et au final, quelles informations sur quels formats
 
-En sortie, vous obtenez un fichier Excel (2003 = .xls) dans lequel les métadonnées sont organisées en différents onglets correspondant au type de donnée. J'ai fait une matrice des informations disponibles selon le format (link is external).
+
+# Et au final, quelles informations sur quels formats ?
+
+En sortie, vous obtenez un fichier Excel (2003 = .xls) dans lequel les métadonnées sont organisées en différents onglets correspondant au type de donnée. J'ai fait une [matrice des informations disponibles selon le format](https://github.com/Guts/DicoGIS/blob/master/doc/InfosByFormats_matrix.md).
 
 # A venir (ou pas)
 
