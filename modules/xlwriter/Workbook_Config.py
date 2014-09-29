@@ -315,4 +315,5 @@ class ConfigExcel(Workbook):
 
 if __name__ == '__main__':
     """ standalone execution """
+    from .
     app = ConfigExcel()

@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 #
 # Python:       2.7.x
 # Created:      21/09/2014
-# Updated:      21/09/2014
+# Updated:      28/09/2014
 #
 # Licence:      GPL 3
 #------------------------------------------------------------------------------
@@ -25,41 +25,38 @@ from xml.etree import ElementTree as ET     # XML parsing and writer
 # Python 3 backported
 from collections import OrderedDict as OD   # ordered dictionary
 
-# 3rd party libraries
-
-# Custom modules
-
-# Imports depending on operating system
-
 ###############################################################################
 ############# Classes #############
 ###################################
 
 
 class TextsManager():
-    def __init__(self, dico_texts, lang='EN', locale_folder=r'../../data/locale'):
+    def __init__(self):
         u"""
-        Load texts from a file into a dictionary used to custom program display.
+        Manage texts from a file into a dictionary used to custom program display.
+        """
+
+    def load_texts(self, dico_texts, lang='EN', locale_folder=r'../../data/locale'):
+        u"""
+        Load texts according to the selected language.
 
         dico_texts = ordered dictonary filled by methods
         lang = 2 letters prefix to pick the correct language
         locale_folder = directory where languages files are located
         """
-        print path.isdir(locale_folder)
-
-    def load_texts(self, lang='FR'):
-        u""" Load texts according to the selected language """
         # clearing the text dictionary
-        self.blabla.clear()
+        dico_texts.clear()
+        
         # open xml cursor
-        xml = ET.parse('data/locale/lang_{0}.xml'.format(lang))
+        locale_folder = path.abspath(locale_folder)
+        xml = ET.parse('{0}/lang_{1}.xml'.format(locale_folder, lang))
+
         # Looping and gathering texts from the xml file
         for elem in xml.getroot().getiterator():
-            self.blabla[elem.tag] = elem.text
-        # updating the GUI
-        self.update()
-        # Fin de fonction
-        return self.blabla
+            dico_texts[elem.tag] = elem.text
+        
+        # end of fonction
+        return dico_texts
 
 ###############################################################################
 ###### Stand alone program ########
@@ -67,8 +64,16 @@ class TextsManager():
 
 if __name__ == '__main__':
     """ standalone execution """
+    # ordered dictionay to store texts
     blabla = OD()
-    app = TextsManager(dico_texts=blabla,
-                       lang='EN',
-                       locale_folder=r'../../data/locale')
 
+    # get the app aobject
+    app = TextsManager()
+
+    # get texts
+    app.load_texts(dico_texts=blabla,
+                   lang='EN',
+                   locale_folder=r'../../data/locale')
+
+    # return texts
+    print blabla

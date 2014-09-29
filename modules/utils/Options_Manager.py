@@ -32,7 +32,14 @@ class OptionsManager():
         Main window constructor
         Creates 1 frame and 2 labelled subframes
         """
+        print confile
         config = ConfigParser.RawConfigParser()
+
+        self.load_settings(confile)
+
+
+
+
 
     def load_settings(self, confile):
         u""" load settings from last execution """
@@ -58,10 +65,10 @@ class OptionsManager():
             self.user.set(config.get('database', 'user'))
             self.opt_pgvw.set(config.get('database', 'opt_views'))
             # log
-            self.logger.info('Last options loaded')
+            # self.logger.info('Last options loaded')
         except:
             # log
-            self.logger.info('1st use.')
+            # self.logger.info('1st use.')
         # End of function
         return self.def_rep, self.def_lang
 
@@ -111,5 +118,8 @@ class OptionsManager():
 
 if __name__ == '__main__':
     """ standalone execution """
-    confile = r'../../options.ini'
+    from os import path, chdir
+    confile = r'options.ini'
+
+    confile = path.abspath(confile)
     app = OptionsManager(confile)
