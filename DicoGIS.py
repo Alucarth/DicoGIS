@@ -1440,6 +1440,7 @@ in {9}{10}'.format(len(self.li_shp),
             self.feuyVC.write(0, 13, self.blabla.get('li_depends'), self.entete)
             self.feuyVC.write(0, 14, self.blabla.get('tot_size'), self.entete)
             self.feuyVC.write(0, 15, self.blabla.get('li_chps'), self.entete)
+            self.feuyVC.write(0, 16, self.blabla.get('gdal_warn'), self.entete)
             self.logger.info('Sheet vectors adedd')
             # tunning headers
             lg_shp_names = [len(lg) for lg in self.li_shp]
@@ -1756,6 +1757,14 @@ in {9}{10}'.format(len(self.li_shp),
 
         # Once all fieds explored, write them
         sheet.write(line, 15, champs)
+
+        # in case of a source error
+        if layer_infos.get('err_gdal')[0] != 0:
+            self.logger.warning('\tproblem detected')
+            sheet.write(line, 16, "{0} : {1}".format(layer_infos.get('err_gdal')[0],
+                                                     layer_infos.get('err_gdal')[1]), self.xls_erreur)
+        else:
+            pass
 
         # End of function
         return self.book, self.feuyVC
