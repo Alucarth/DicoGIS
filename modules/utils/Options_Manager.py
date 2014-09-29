@@ -35,7 +35,7 @@ class OptionsManager():
         print confile
         config = ConfigParser.RawConfigParser()
 
-        self.load_settings(confile)
+        # self.load_settings(confile)
 
 
 
@@ -46,31 +46,32 @@ class OptionsManager():
         try:
             config.read(confile)
             # basics
-            self.def_lang = config.get('basics', 'def_codelang')
-            self.def_rep = config.get('basics', 'def_rep')
+            def_lang = config.get('basics', 'def_codelang')
+            def_rep = config.get('basics', 'def_rep')
             # filters
-            self.opt_shp.set(config.get('filters', 'opt_shp'))
-            self.opt_tab.set(config.get('filters', 'opt_tab'))
-            self.opt_kml.set(config.get('filters', 'opt_kml'))
-            self.opt_gml.set(config.get('filters', 'opt_gml'))
-            self.opt_geoj.set(config.get('filters', 'opt_geoj'))
-            self.opt_rast.set(config.get('filters', 'opt_rast'))
-            self.opt_gdb.set(config.get('filters', 'opt_gdb'))
-            self.opt_cdao.set(config.get('filters', 'opt_cdao'))
-            self.opt_pdf.set(config.get('filters', 'opt_pdf'))
+            opt_shp.set(config.get('filters', 'opt_shp'))
+            opt_tab.set(config.get('filters', 'opt_tab'))
+            opt_kml.set(config.get('filters', 'opt_kml'))
+            opt_gml.set(config.get('filters', 'opt_gml'))
+            opt_geoj.set(config.get('filters', 'opt_geoj'))
+            opt_rast.set(config.get('filters', 'opt_rast'))
+            opt_gdb.set(config.get('filters', 'opt_gdb'))
+            opt_cdao.set(config.get('filters', 'opt_cdao'))
+            opt_pdf.set(config.get('filters', 'opt_pdf'))
             # database settings
-            self.host.set(config.get('database', 'host'))
-            self.port.set(config.get('database', 'port'))
-            self.dbnb.set(config.get('database', 'db_name'))
-            self.user.set(config.get('database', 'user'))
-            self.opt_pgvw.set(config.get('database', 'opt_views'))
+            host.set(config.get('database', 'host'))
+            port.set(config.get('database', 'port'))
+            dbnb.set(config.get('database', 'db_name'))
+            user.set(config.get('database', 'user'))
+            opt_pgvw.set(config.get('database', 'opt_views'))
             # log
             # self.logger.info('Last options loaded')
         except:
             # log
             # self.logger.info('1st use.')
+            print '1st use'
         # End of function
-        return self.def_rep, self.def_lang
+        return def_rep, def_lang
 
     def save_settings(self, confile):
         u""" save last options in order to make the next excution more easy """

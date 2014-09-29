@@ -97,7 +97,8 @@ setup(name="DicoGIS",
                     ("data/img", ["data/img/DicoGIS_logo.gif"]),
                     # documentation
                     ("doc",["README.md",
-                            "doc/DicoGIS_Manual_ES.pdf",
+                            "doc/DicoGIS_Presentacion_ES.html",
+                            "doc/DicoGIS_Presentation_FR.html",
                             "doc/DicoGIS_ReadMe.html",
                             "doc/DicoGIS_GitHub.url"])
                     ],
