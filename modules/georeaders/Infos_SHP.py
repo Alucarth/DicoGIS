@@ -1,6 +1,6 @@
 ﻿# -*- coding: UTF-8 -*-
 #!/usr/bin/env python
-##from __future__ import unicode_literals
+# from __future__ import unicode_literals
 #------------------------------------------------------------------------------
 # Name:         InfosSHP
 # Purpose:      Use GDAL/OGR library to extract informations about
@@ -11,7 +11,7 @@
 #
 # Python:       2.7.x
 # Created:      18/02/2013
-# Updated:      13/08/2014
+# Updated:      28/09/2014
 # Licence:      GPL 3
 #------------------------------------------------------------------------------
 
@@ -27,15 +27,55 @@ from collections import OrderedDict as OD
 
 # 3rd party libraries
 try:
+    from osgeo import gdal
     from osgeo import ogr  # handler for vector spatial files
     from osgeo import osr
 except ImportError:
+    import gdal
     import ogr  # handler for vector spatial files
     import osr
 
 ###############################################################################
 ########### Classes #############
 #################################
+
+
+class OGRErrorHandler(object):
+    def __init__(self):
+        """ Callable error handler
+        see: http://trac.osgeo.org/gdal/wiki/PythonGotchas#Exceptionsraisedincustomerrorhandlersdonotgetcaught
+        and http://pcjericks.github.io/py-gdalogr-cookbook/gdal_general.html#install-gdal-ogr-error-handler
+        """
+        self.err_level = gdal.CE_None
+        self.err_type = 0
+        self.err_msg = ''
+
+    def handler(self, err_level, err_type, err_msg):
+        """ Making errors messages more readable """
+        # available types
+        err_class = {
+                    gdal.CE_None: 'None',
+                    gdal.CE_Debug: 'Debug',
+                    gdal.CE_Warning: 'Warning',
+                    gdal.CE_Failure: 'Failure',
+                    gdal.CE_Fatal: 'Fatal'
+                    }
+        # getting type
+        err_type = err_class.get(err_type, 'None')
+        
+        # cleaning message
+        err_msg = err_msg.replace('\n', ' ')
+
+        # disabling OGR exceptions raising to avoid future troubles
+        ogr.DontUseExceptions()
+
+        # propagating
+        self.err_level = err_level
+        self.err_type = err_type
+        self.err_msg = err_msg
+
+        # end of function
+        return self.err_level, self.err_type, self.err_msg
 
 
 class Read_SHP():
@@ -53,11 +93,15 @@ class Read_SHP():
 
         """
         # handling ogr specific exceptions
+        ogrerr = OGRErrorHandler()
+        errhandler = ogrerr.handler
+        gdal.PushErrorHandler(errhandler)
         ogr.UseExceptions()
+        self.alert = 0
+        
         # changing working directory to layer folder
         chdir(path.dirname(layerpath))
-        # Creating variables
-        self.alert = 0
+        
         # raising corrupt files
         try:
             source = ogr.Open(layerpath, 0)  # OGR driver
@@ -72,7 +116,6 @@ class Read_SHP():
         # raising incompatible files
         if not source:
             u""" if file is not compatible """
-            print 'no compatible source'
             self.alert = self.alert + 1
             self.erratum(dico_layer, layerpath, u'err_nobjet')
             return None
@@ -117,6 +160,12 @@ class Read_SHP():
         self.infos_geom(dico_layer, text)
         # fields information
         self.infos_fields(dico_fields)
+
+        # warnings messages
+        dico_layer['err_gdal'] = ogrerr.err_type, ogrerr.err_msg
+
+        # safe exit
+        del source
 
     def infos_basics(self, layerpath, dico_layer, txt):
         u""" get the global informations about the layer """
@@ -253,10 +302,13 @@ if __name__ == '__main__':
     # libraries import
     from os import getcwd
     # test files
-    li_shp = [path.join(getcwd(),
-                        r'..\test\datatest\vectors\shp\airports.shp'),
+    li_shp = [
               path.join(getcwd(),
-                        r'..\test\datatest\vectors\shp\itineraires_rando.shp')]
+                        r'..\..\test\datatest\vectors\shp\airports.shp'),
+              path.join(getcwd(),
+                        r'..\..\test\datatest\vectors\shp\itineraires_rando.shp'),
+              r'C:\Users\julien.moura\Documents\GIS Database\Montserrado\Layers_County_Boundary.shp',
+              r'C:\Users\julien.moura\Documents\GIS Database\Montserrado\Layers_Ocean.shp']
     # test text dictionary
     textos = OD()
     textos['srs_comp'] = u'Compound'

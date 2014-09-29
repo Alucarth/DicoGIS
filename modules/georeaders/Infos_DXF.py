@@ -26,9 +26,11 @@ from collections import OrderedDict as OD
 
 # 3rd party libraries
 try:
+    from osgeo import gdal
     from osgeo import ogr
     from osgeo import osr
 except ImportError:
+    import gdal
     import ogr
     import osr
 
@@ -37,6 +39,45 @@ import dxfgrabber   # module dedicated to DXF
 ###############################################################################
 ########### Classes #############
 #################################
+
+class OGRErrorHandler(object):
+    def __init__(self):
+        """ Callable error handler
+        see: http://trac.osgeo.org/gdal/wiki/PythonGotchas#Exceptionsraisedincustomerrorhandlersdonotgetcaught
+        and http://pcjericks.github.io/py-gdalogr-cookbook/gdal_general.html#install-gdal-ogr-error-handler
+        """
+        self.err_level = gdal.CE_None
+        self.err_type = 0
+        self.err_msg = ''
+
+    def handler(self, err_level, err_type, err_msg):
+        """ Making errors messages more readable """
+        # available types
+        err_class = {
+                    gdal.CE_None: 'None',
+                    gdal.CE_Debug: 'Debug',
+                    gdal.CE_Warning: 'Warning',
+                    gdal.CE_Failure: 'Failure',
+                    gdal.CE_Fatal: 'Fatal'
+                    }
+        # getting type
+        err_type = err_class.get(err_type, 'None')
+        
+        # cleaning message
+        err_msg = err_msg.replace('\n', ' ')
+
+        # disabling OGR exceptions raising to avoid future troubles
+        ogr.DontUseExceptions()
+
+        # propagating
+        self.err_level = err_level
+        self.err_type = err_type
+        self.err_msg = err_msg
+
+        # end of function
+        return self.err_level, self.err_type, self.err_msg
+
+
 
 
 class Read_DXF():
@@ -50,12 +91,15 @@ class Read_DXF():
         tipo = format
         text = dictionary of text in the selected language
         """
-        # changing working directory to layer folder
-        chdir(path.dirname(dxfpath))
-
-        # raising GDAL/OGR specific exceptions
+        # handling ogr specific exceptions
+        ogrerr = OGRErrorHandler()
+        errhandler = ogrerr.handler
+        gdal.PushErrorHandler(errhandler)
         ogr.UseExceptions()
         self.alert = 0
+
+        # changing working directory to layer folder
+        chdir(path.dirname(dxfpath))        
 
         # opening DXF
         dr_dxf = ogr.GetDriverByName("DXF")
@@ -154,6 +198,12 @@ class Read_DXF():
         # storing fileds and objects sum
         dico_dxf['total_fields'] = total_fields
         dico_dxf['total_objs'] = total_objs
+
+        # warnings messages
+        dico_dxf['err_gdal'] = ogrerr.err_type, ogrerr.err_msg
+
+        # safe exit
+        del dxf
 
     def infos_basics(self, layer_obj, dico_layer, txt):
         u""" get the global informations about the layer """
@@ -299,7 +349,7 @@ if __name__ == '__main__':
 
     # searching for DX Files
     num_folders = 0
-    li_dxf = [r'..\test\datatest\cao\dxf\paris_transports_ed.dxf']
+    li_dxf = [r'..\..\test\datatest\cao\dxf\paris_transports_ed.dxf']
     
     # recipient datas
     dico_dxf = OD()
