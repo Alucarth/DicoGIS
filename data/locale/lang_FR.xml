@@ -24,6 +24,7 @@
 	<gui_db>Base de données : </gui_db>
 	<gui_user>Utilisateur : </gui_user>
 	<gui_mdp>Mot de passe : </gui_mdp>
+	<gui_prox_server>Serveur : </gui_prox_server>
 	<gui_prog>Progression</gui_prog>
 	<gui_prog1>Progression : recherche des fichiers compatibles</gui_prog1>
 	<gui_prog2>Progression : traitement des fichiers en cours</gui_prog2>
