@@ -11,7 +11,7 @@ from __future__ import unicode_literals
 #
 # Python:       2.7.x
 # Created:      24/05/2014
-# Updated:      04/08/2014
+# Updated:      11/11/2014
 # Licence:      GPL 3
 #------------------------------------------------------------------------------
 
@@ -36,6 +36,45 @@ from gdalconst import *
 ########### Classes #############
 #################################
 
+
+class OGRErrorHandler(object):
+    def __init__(self):
+        """ Callable error handler
+        see: http://trac.osgeo.org/gdal/wiki/PythonGotchas#Exceptionsraisedincustomerrorhandlersdonotgetcaught
+        and http://pcjericks.github.io/py-gdalogr-cookbook/gdal_general.html#install-gdal-ogr-error-handler
+        """
+        self.err_level = gdal.CE_None
+        self.err_type = 0
+        self.err_msg = ''
+
+    def handler(self, err_level, err_type, err_msg):
+        """ Making errors messages more readable """
+        # available types
+        err_class = {
+                    gdal.CE_None: 'None',
+                    gdal.CE_Debug: 'Debug',
+                    gdal.CE_Warning: 'Warning',
+                    gdal.CE_Failure: 'Failure',
+                    gdal.CE_Fatal: 'Fatal'
+                    }
+        # getting type
+        err_type = err_class.get(err_type, 'None')
+        
+        # cleaning message
+        err_msg = err_msg.replace('\n', ' ')
+
+        # disabling OGR exceptions raising to avoid future troubles
+        ogr.DontUseExceptions()
+
+        # propagating
+        self.err_level = err_level
+        self.err_type = err_type
+        self.err_msg = err_msg
+
+        # end of function
+        return self.err_level, self.err_type, self.err_msg
+
+
 class Read_GDB():
     def __init__(self, gdbpath, dico_gdb, tipo, txt=''):
         u""" Uses OGR functions to extract basic informations about
@@ -50,10 +89,12 @@ class Read_GDB():
         text = dictionary of text in the selected language
 
         """
-        # raising GDAL/OGR specific exceptions
-        gdal.AllRegister()
+        # handling ogr specific exceptions
+        ogrerr = OGRErrorHandler()
+        errhandler = ogrerr.handler
+        gdal.PushErrorHandler(errhandler)
         ogr.UseExceptions()
-        gdal.UseExceptions()
+        self.alert = 0
 
         # counting alerts
         self.alert = 0
@@ -126,6 +167,9 @@ class Read_GDB():
         dico_gdb['total_fields'] = total_fields
         dico_gdb['total_objs'] = total_objs
 
+        # warnings messages
+        dico_gdb['err_gdal'] = ogrerr.err_type, ogrerr.err_msg
+
     def infos_basics(self, layer_obj, dico_layer, txt):
         u""" get the global informations about the layer """
         # title
@@ -138,9 +182,14 @@ class Read_GDB():
         # features count
         dico_layer[u'num_obj'] = layer_obj.GetFeatureCount()
 
-        # getting geography and geometry informations
-        srs = layer_obj.GetSpatialRef()
-        self.infos_geos(layer_obj, srs, dico_layer, txt)
+        if layer_obj.GetFeatureCount() == 0:
+            u""" if layer doesn't have any object, return an error """
+            dico_layer[u'error'] = u'err_nobjet'
+            self.alert = self.alert + 1
+        else:
+            # getting geography and geometry informations
+            srs = layer_obj.GetSpatialRef()
+            self.infos_geos(layer_obj, srs, dico_layer, txt)
 
         # getting fields informations
         dico_fields = OD()
@@ -197,15 +246,13 @@ class Read_GDB():
             pass
 
         # first feature and geometry type
-
         try:
             first_obj = layer_obj.GetFeature(1)
             geom = first_obj.GetGeometryRef()
         except AttributeError, e:
-            print e, layer_obj.GetName()
+            print e, layer_obj.GetName(), layer_obj.GetFeatureCount()
             first_obj = layer_obj.GetNextFeature()
             geom = first_obj.GetGeometryRef()
-
             
         # geometry type human readable
         if geom.GetGeometryName() == u'POINT':
@@ -270,7 +317,7 @@ if __name__ == '__main__':
     within the official repository (https://github.com/Guts/DicoGIS/)"""
     from os import chdir
     # sample files
-    chdir(r'..\test\datatest\FileGDB\Esri_FileGDB')
+    chdir(r'..\..\test\datatest\FileGDB\Esri_FileGDB')
     # test text dictionary
     textos = OD()
     textos['srs_comp'] = u'Compound'
@@ -286,9 +333,10 @@ if __name__ == '__main__':
     # searching for File GeoDataBase
     num_folders = 0
     li_gdb = [
-              r'Points.gdb',
-              r'Polygons.gdb',
-              r'AAHH.gdb'
+              # r'Points.gdb',
+              # r'Polygons.gdb',
+              # r'AAHH.gdb',
+              r'LBR.gdb'
               ]
     for root, dirs, files in walk(r'..\test\datatest'):
             num_folders = num_folders + len(dirs)
