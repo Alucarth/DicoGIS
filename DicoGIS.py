@@ -11,12 +11,12 @@ from __future__ import unicode_literals
 #
 # Python:       2.7.x
 # Created:      14/02/2013
-# Updated:      10/09/2014
+# Updated:      11/11/2014
 #
 # Licence:      GPL 3
 #------------------------------------------------------------------------------
 
-DGversion = "2.0.1"
+DGversion = "2.1.0"
 
 ###############################################################################
 ########### Libraries #############
@@ -284,22 +284,42 @@ class DicoGIS(Tk):
                              sticky="NSWE", padx=2, pady=2)
 
             ## Frame 2: Database
-        # variables
-        self.opt_pgvw = IntVar(self.FrDb)  # able/disable PostGIS views
+        # subframe
+        self.FrProx = Labelframe(self.FrDb,
+                                 name='proxy',
+                                 text=self.blabla.get('gui_fr2'))
+
+        # DB variables
+        self.opt_pgvw = IntVar(self.FrDb)   # able/disable PostGIS views
+        self.opt_proxy = IntVar(self.FrDb)  # proxy option
+
         self.host = StringVar(self.FrDb, 'localhost')
         self.port = IntVar(self.FrDb, 5432)
         self.dbnb = StringVar(self.FrDb)
         self.user = StringVar(self.FrDb, 'postgres')
         self.pswd = StringVar(self.FrDb)
+
+        # proxy specific variables
+        self.opt_ntlm = IntVar(self.FrProx)  # proxy NTLM protocol option
+        self.prox_server = StringVar(self.FrProx, 'proxy.server.com')
+        self.prox_port = IntVar(self.FrProx, 80)
+        self.prox_user = StringVar(self.FrProx, 'postgres')
+        self.prox_pswd = StringVar(self.FrProx)
+
         # Form widgets
-        caz_pgvw = Checkbutton(self.FrDb,
-                               text=u'See views?',
-                               variable=self.opt_pgvw)
         self.ent_H = Entry(self.FrDb, textvariable=self.host)
         self.ent_P = Entry(self.FrDb, textvariable=self.port, width=5)
         self.ent_D = Entry(self.FrDb, textvariable=self.dbnb)
         self.ent_U = Entry(self.FrDb, textvariable=self.user)
         self.ent_M = Entry(self.FrDb, textvariable=self.pswd, show='*')
+
+        caz_pgvw = Checkbutton(self.FrDb,
+                               text=u'See views?',
+                               variable=self.opt_pgvw)
+        caz_prox = Checkbutton(self.FrDb,
+                               text=u'Proxy',
+                               variable=self.opt_proxy,
+                               command=lambda: self.proxy_form())
         # Label widgets
         self.lb_H = Label(self.FrDb, text=self.blabla.get('gui_host'))
         self.lb_P = Label(self.FrDb, text=self.blabla.get('gui_port'))
@@ -329,6 +349,36 @@ class DicoGIS(Tk):
                        sticky="NSWE", padx=2, pady=2)
         caz_pgvw.grid(row=4, column=0,
                       sticky="NSWE", padx=2, pady=2)
+        caz_prox.grid(row=4, column=2,
+                      sticky="NSWE", padx=2, pady=2)
+
+        # Proxy form widgets
+        self.prox_ent_H = Entry(self.FrProx, textvariable=self.prox_server)
+        self.prox_ent_P = Entry(self.FrProx, textvariable=self.prox_port)
+        self.prox_ent_M = Entry(self.FrProx, textvariable=self.prox_pswd, show='*')
+
+        self.prox_lb_H = Label(self.FrProx, text=self.blabla.get('gui_prox_server'))
+        self.prox_lb_P = Label(self.FrProx, text=self.blabla.get('gui_port'))
+        caz_ntlm = Checkbutton(self.FrProx,
+                               text=u'NTLM',
+                               variable=self.opt_ntlm)
+        self.prox_lb_M = Label(self.FrProx, text=self.blabla.get('gui_mdp'))
+
+        # proxy widgets placement
+        self.prox_lb_H.grid(row=1, column=0,
+                            sticky="NSEW", padx=2, pady=2)
+        self.prox_ent_H.grid(row=1, column=1, columnspan=2,
+                             sticky="NSEW", padx=2, pady=2)
+        self.prox_lb_P.grid(row=1, column=2,
+                            sticky="NSEW", padx=2, pady=2)
+        self.prox_ent_P.grid(row=1, column=3, columnspan=2,
+                             sticky="NSEW", padx=2, pady=2)
+        caz_ntlm.grid(row=2, column=0,
+                            sticky="NSEW", padx=2, pady=2)
+        self.prox_lb_M.grid(row=2, column=1,
+                            sticky="NSEW", padx=2, pady=2)
+        self.prox_ent_M.grid(row=2, column=2, columnspan=2,
+                             sticky="NSEW", padx=2, pady=2)
 
             ## Frame 3: Progression bar
         # variables
@@ -421,6 +471,18 @@ class DicoGIS(Tk):
 
         # loading previous options
         self.load_settings()
+
+    def proxy_form(self):
+        u"""
+        Activate or deactivate the proxy configuration form.
+        """
+        if self.opt_proxy.get():
+            self.FrProx.grid(row=5, column=0, columnspan=4,
+                      sticky="NSWE", padx=2, pady=2)
+        else:
+            self.FrProx.grid_forget()
+        # end of function
+        return
 
     def load_settings(self):
         u""" load settings from last execution """
@@ -1195,12 +1257,12 @@ in {9}{10}'.format(len(self.li_shp),
                     # decode the fucking path name
                     link = 'HYPERLINK("{0}"; "{1}")'.format(path.dirname(dwg).decode('utf8'),
                                                             self.blabla.get('browse'))
-                    
+
                 self.feuyCDAO.write(line_cdao, 1, Formula(link), self.url)
 
                 # Name of parent folder
                 self.feuyCDAO.write(line_cdao, 2, path.basename(path.dirname(dwg)))
-                
+
                 # logging
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
@@ -1360,7 +1422,26 @@ in {9}{10}'.format(len(self.li_shp),
         return
 
     def test_connection(self):
-        u""" testing database connection settings """
+        u"""
+        Testing database connection and handling specific
+        settings : proxy, DB views, etc.
+        """
+        # check if a proxy is needed
+        # more information about the GDAL HTTP proxy options here:
+        # http://trac.osgeo.org/gdal/wiki/ConfigOptions#GDALOGRHTTPoptions
+        if self.opt_proxy.get():
+            self.logger.info("Proxy configured.")
+            gdal.SetConfigOption('GDAL_HTTP_PROXY', '{0}:{1}'.format(self.prox_server.get(),
+                                                                     self.prox_port.get()))
+            if self.opt_ntlm.get():
+                # if authentication needs ...\
+                # username/password or not (NTLM)
+                gdal.SetConfigOption('GDAL_PROXY_AUTH', 'NTLM')
+                gdal.SetConfigOption('GDAL_HTTP_PROXYUSERPWD', ' : ')
+            else:
+                pass
+        else:
+            self.logger.info("No proxy configured.")
         # checking if user chose to list PostGIS views
         if self.opt_pgvw.get():
             gdal.SetConfigOption(str("PG_LIST_ALL_TABLES"), str("YES"))
@@ -1375,6 +1456,7 @@ in {9}{10}'.format(len(self.li_shp),
                             self.pswd.get()))
         except Exception, e:
             self.logger.warning("Connection failed: {0}.".format(e))
+            self.status.set("Connection failed: {0}.".format(e))
             avert(title=self.blabla.get("err_pg_conn_fail"), message=unicode(e))
             return
 
@@ -1927,6 +2009,14 @@ in {9}{10}'.format(len(self.li_shp),
         # total number of objects
         sheet.write(line, 8, gdb_infos.get(u'total_objs'))
 
+        # in case of a source error
+        if gdb_infos.get('err_gdal')[0] != 0:
+            self.logger.warning('\tproblem detected')
+            sheet.write(line, 15, "{0} : {1}".format(gdb_infos.get('err_gdal')[0],
+                                                     gdb_infos.get('err_gdal')[1]), self.xls_erreur)
+        else:
+            pass
+
         # parsing layers
         for (layer_idx, layer_name) in zip(gdb_infos.get(u'layers_idx'),
                                            gdb_infos.get(u'layers_names')):
@@ -1936,9 +2026,21 @@ in {9}{10}'.format(len(self.li_shp),
             try:
                 gdb_layer = gdb_infos.get('{0}_{1}'.format(layer_idx, 
                                                            layer_name))
-            except UnicodeDecodeError, e:
+            except UnicodeDecodeError:
                 gdb_layer = gdb_infos.get('{0}_{1}'.format(layer_idx, 
                                                            unicode(layer_name.decode('latin1'))))
+            # in case of a source error
+            if gdb_layer.get('error'):
+                err_mess = self.blabla.get(gdb_layer.get('error'))
+                self.logger.warning('\tproblem detected: \
+                                    {0} in {1}'.format(err_mess,
+                                                       gdb_layer.get(u'title')))
+                sheet.write(line, 6, gdb_layer.get(u'title'), self.xls_erreur)
+                sheet.write(line, 7, err_mess, self.xls_erreur)
+                # Interruption of function
+                continue
+            else:
+                pass
 
             # layer's name
             sheet.write(line, 6, gdb_layer.get(u'title'))
@@ -1982,22 +2084,16 @@ in {9}{10}'.format(len(self.li_shp),
                     tipo = self.blabla.get(u'date')
                 # concatenation of field informations
                 try:
-                    champs = champs + chp +\
-                             u" (" + tipo + self.blabla.get(u'longueur') +\
-                             unicode(fields_info[chp][1]) +\
-                             self.blabla.get(u'precision') +\
-                             unicode(fields_info[chp][2]) + u") \n; "
+                    champs = champs + chp + u" ({0}) ; ".format(tipo)
                 except UnicodeDecodeError:
                     # write a notification into the log file
-                    self.dico_err[gdb_infos.get('name')] = self.blabla.get(u'err_encod') + \
-                                                             chp.decode('latin1') + \
-                                                             u"\n\n"
+                    self.dico_err[mapdoc_infos.get('name')] = self.blabla.get(u'err_encod') + \
+                                                              chp.decode('latin1') + \
+                                                              u"\n\n"
                     self.logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
                     # decode the fucking field name
                     champs = champs + chp.decode('latin1') \
-                            + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
-                                                                    fields_info[chp][1],
-                                                                    fields_info[chp][2])
+                                    + u" ({0}) ;".format(tipo)
                     # then continue
                     continue
 
@@ -2118,8 +2214,8 @@ in {9}{10}'.format(len(self.li_shp),
                 except UnicodeDecodeError:
                     # write a notification into the log file
                     self.dico_err[dico_cdao.get('name')] = self.blabla.get(u'err_encod') + \
-                                                             chp.decode('latin1') + \
-                                                             u"\n\n"
+                                                           chp.decode('latin1') + \
+                                                           u"\n\n"
                     self.logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
                     # decode the fucking field name
                     champs = champs + chp.decode('latin1') + u" ({}) ;".format(tipo)
@@ -2224,10 +2320,10 @@ in {9}{10}'.format(len(self.li_shp),
             line += 1
             # get the layer informations
             try:
-                mapdoc_layer = mapdoc_infos.get('{0}_{1}'.format(layer_idx, 
+                mapdoc_layer = mapdoc_infos.get('{0}_{1}'.format(layer_idx,
                                                                  layer_name))
-            except UnicodeDecodeError, e:
-                mapdoc_layer = mapdoc_infos.get('{0}_{1}'.format(layer_idx, 
+            except UnicodeDecodeError:
+                mapdoc_layer = mapdoc_infos.get('{0}_{1}'.format(layer_idx,
                                                                  unicode(layer_name.decode('latin1'))))
 
             # layer's name
@@ -2253,18 +2349,16 @@ in {9}{10}'.format(len(self.li_shp),
                     tipo = self.blabla.get(u'date')
                 # concatenation of field informations
                 try:
-                    champs = champs + chp +  u" ({0}) ; ".format(tipo)
+                    champs = champs + chp + u" ({0}) ; ".format(tipo)
                 except UnicodeDecodeError:
                     # write a notification into the log file
                     self.dico_err[mapdoc_infos.get('name')] = self.blabla.get(u'err_encod') + \
-                                                             chp.decode('latin1') + \
-                                                             u"\n\n"
+                                                              chp.decode('latin1') + \
+                                                              u"\n\n"
                     self.logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
                     # decode the fucking field name
                     champs = champs + chp.decode('latin1') \
-                            + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
-                                                                    fields_info[chp][1],
-                                                                    fields_info[chp][2])
+                                    + u" ({0}) ;".format(tipo)
                     # then continue
                     continue
 
