@@ -47,8 +47,6 @@ from logging.handlers import RotatingFileHandler
 
 import subprocess
 
-from xml.etree import ElementTree as ET     # XML parsing and writer
-
 # Python 3 backported
 from collections import OrderedDict as OD   # ordered dictionary
 
@@ -75,6 +73,7 @@ from modules import Read_GML        # extractor for GML
 from modules import Read_GeoJSON    # extractor for GeoJSON
 from modules import Read_PostGIS    # extractor for PostGIS databases
 from modules import Read_GDB        # extractor for Esri FileGeoDataBase
+from modules import Read_SpaDB        # extractor for Spatialite DB
 from modules import Read_DXF        # extractor for AutoCAD DXF
 from modules import Read_GeoPDF     # extractor for Geospatial PDF
 
@@ -107,6 +106,7 @@ class DicoGIS(Tk):
         logfile.setFormatter(log_form)
         self.logger.addHandler(logfile)
         self.logger.info('\t\t ============== DicoGIS =============')  # start
+        self.logger.info('Version: {0}'.format(DGversion))
 
         # basics settings
         Tk.__init__(self)               # constructor of parent graphic class
@@ -130,38 +130,49 @@ class DicoGIS(Tk):
         self.resizable(width=False, height=False)
         self.focus_force()
 
-        # variables
+        ## Variables
+        # settings
         self.num_folders = 0
         self.def_rep = ""       # default folder to search for
         self.def_lang = 'EN'    # default language to start
-        self.li_shp = []         # list for shapefiles path
-        self.li_tab = []         # list for MapInfo tables path
+        self.today = strftime("%Y-%m-%d")   # date of the day
+        li_lang = [lg[5:-4] for lg in listdir(r'data/locale')]  # languages
+        self.blabla = OD()      # texts dictionary
+
+        # formats / type: vectors
+        self.li_vectors_formats = (".shp", ".tab", ".kml",
+                                   ".gml", ".geojson")  # vectors handled
+        self.li_shp = []        # list for shapefiles path
+        self.li_tab = []        # list for MapInfo tables path
+        self.li_kml = []        # list for KML path
+        self.li_gml = []        # list for GML path
+        self.li_geoj = []       # list for GeoJSON path
+        self.li_vectors = []    # list for all vectors
+        # formats / type: rasters
         self.li_raster = []     # list for rasters paths
-        self.li_gdb = []     # list for Esri File Geodatabases
-        self.li_kml = []    # list for KML path
-        self.li_gml = []    # list for GML path
-        self.li_geoj = []   # list for GeoJSON path
-        self.li_vectors = []  # list for all vectors
+        self.li_raster_formats = (".ecw", ".tif", ".jp2")   # raster handled
+        # formats / type: file databases
+        self.li_fdb = []        # list for all files databases
+        self.li_egdb = []       # list for Esri File Geodatabases
+        self.li_spadb = []      # list for Spatialite Geodatabases
+        # formats / type: CAO/DAO
         self.li_cdao = []     # list for all CAO/DAO files
         self.li_dxf = []      # list for AutoCAD DXF paths
         self.li_dwg = []      # list for AutoCAD DWG paths
         self.li_dgn = []      # list for MicroStation DGN paths
+        # formats / type: maps documents
         self.li_pdf = []    # list for GeoPDF path
-        self.li_raster_formats = (".ecw", ".tif", ".jp2")   # raster handled
-        self.li_vectors_formats = (".shp", ".tab", ".kml",
-                                   ".gml", ".geojson")  # vector formats handled
-        self.today = strftime("%Y-%m-%d")   # date of the day
+        
+        # dictionaries to store informations
         self.dico_layer = OD()      # dict for vectors informations
         self.dico_fields = OD()     # dict for fields informations
         self.dico_raster = OD()     # dict for rasters global informations
         self.dico_bands = OD()      # dict for bands informations
-        self.dico_gdb = OD()        # dict for Esri FileGDB
+        self.dico_fdb = OD()        # dict for Esri FileGDB
         self.dico_cdao = OD()       # dict for CAO/DAO
-        self.dico_pdf = OD()       # dict for Geospatial PDF
-        self.dico_err = OD()     # errors list
-        li_lang = [lg[5:-4] for lg in listdir(r'data/locale')]  # languages
-        self.blabla = OD()      # texts dictionary
-
+        self.dico_pdf = OD()        # dict for Geospatial PDF
+        self.dico_err = OD()        # errors list
+        
         # GUI fonts
         ft_tit = tkFont.Font(family="Times", size=10, weight=tkFont.BOLD)
 
@@ -193,7 +204,8 @@ class DicoGIS(Tk):
         self.opt_kml = IntVar(self.FrFilters)   # able/disable KML
         self.opt_gml = IntVar(self.FrFilters)   # able/disable GML
         self.opt_geoj = IntVar(self.FrFilters)  # able/disable GeoJSON
-        self.opt_gdb = IntVar(self.FrFilters)   # able/disable Esri FileGDB
+        self.opt_egdb = IntVar(self.FrFilters)   # able/disable Esri FileGDB
+        self.opt_spadb = IntVar(self.FrFilters)   # able/disable Spatalite DB
         self.opt_rast = IntVar(self.FrFilters)  # able/disable rasters
         self.opt_cdao = IntVar(self.FrFilters)  # able/disable CAO/DAO files
         self.opt_pdf = IntVar(self.FrFilters)   # able/disable Geospatial PDF
@@ -214,9 +226,12 @@ class DicoGIS(Tk):
         caz_geoj = Checkbutton(self.FrFilters,
                                text=u'.geojson',
                                variable=self.opt_geoj)
-        caz_gdb = Checkbutton(self.FrFilters,
-                              text=u'Esri FileGDB',
-                              variable=self.opt_gdb)
+        caz_egdb = Checkbutton(self.FrFilters,
+                               text=u'Esri FileGDB',
+                               variable=self.opt_egdb)
+        caz_spadb = Checkbutton(self.FrFilters,
+                                text=u'Spatialite',
+                                variable=self.opt_spadb)
         caz_rast = Checkbutton(self.FrFilters,
                                text=u'rasters ({0})'.format(', '.join(self.li_raster_formats)),
                                variable=self.opt_rast)
@@ -247,12 +262,17 @@ class DicoGIS(Tk):
                       column=4,
                       sticky="NSWE",
                       padx=2, pady=2)
+        caz_pdf.grid(row=1,
+                     column=5,
+                     columnspan=2,
+                     sticky="NSWE",
+                     padx=2, pady=2)
         caz_rast.grid(row=2,
                       column=0,
                       columnspan=2,
                       sticky="NSWE",
                       padx=2, pady=2)
-        caz_gdb.grid(row=2,
+        caz_egdb.grid(row=2,
                      column=2,
                      columnspan=2,
                      sticky="NSWE",
@@ -262,11 +282,11 @@ class DicoGIS(Tk):
                       columnspan=1,
                       sticky="NSWE",
                       padx=2, pady=2)
-        caz_pdf.grid(row=2,
-                     column=5,
-                     columnspan=2,
-                     sticky="NSWE",
-                     padx=2, pady=2)
+        caz_spadb.grid(row=2,
+                       column=5,
+                       columnspan=2,
+                       sticky="NSWE",
+                       padx=2, pady=2)
         # target folder
         self.labtarg = Label(self.FrPath, text=self.blabla.get('gui_path'))
         self.target = Entry(master=self.FrPath, width=35)
@@ -500,7 +520,8 @@ class DicoGIS(Tk):
             self.opt_gml.set(config.get('filters', 'opt_gml'))
             self.opt_geoj.set(config.get('filters', 'opt_geoj'))
             self.opt_rast.set(config.get('filters', 'opt_rast'))
-            self.opt_gdb.set(config.get('filters', 'opt_gdb'))
+            self.opt_egdb.set(config.get('filters', 'opt_egdb'))
+            self.opt_spadb.set(config.get('filters', 'opt_spadb'))
             self.opt_cdao.set(config.get('filters', 'opt_cdao'))
             self.opt_pdf.set(config.get('filters', 'opt_pdf'))
             # database settings
@@ -542,7 +563,8 @@ class DicoGIS(Tk):
         config.set('filters', 'opt_gml', self.opt_gml.get())
         config.set('filters', 'opt_geoj', self.opt_geoj.get())
         config.set('filters', 'opt_rast', self.opt_rast.get())
-        config.set('filters', 'opt_gdb', self.opt_gdb.get())
+        config.set('filters', 'opt_egdb', self.opt_egdb.get())
+        config.set('filters', 'opt_spadb', self.opt_spadb.get())
         config.set('filters', 'opt_cdao', self.opt_cdao.get())
         config.set('filters', 'opt_pdf', self.opt_pdf.get())
         # databse settings
@@ -654,7 +676,9 @@ class DicoGIS(Tk):
         self.li_dgn = []
         self.li_cdao = []
         self.li_raster = []
-        self.li_gdb = []
+        self.li_fdb = []
+        self.li_egdb = []
+        self.li_spadb = []
         self.li_pdf = []
         self.browsetarg.config(state=DISABLED)
 
@@ -673,7 +697,7 @@ class DicoGIS(Tk):
                     full_path = path.join(root, d.decode('latin1'))
                 if full_path[-4:].lower() == '.gdb':
                     # add complete path of Esri FileGeoDatabase
-                    self.li_gdb.append(path.abspath(full_path))
+                    self.li_egdb.append(path.abspath(full_path))
                 else:
                     pass
             for f in files:
@@ -734,6 +758,10 @@ class DicoGIS(Tk):
                     """ listing MicroStation DGN """
                     # add complete path of DGN file
                     self.li_dgn.append(full_path)
+                elif path.splitext(full_path.lower())[1] == '.sqlite':
+                    """ listing Spatialite DB """
+                    # add complete path of DGN file
+                    self.li_spadb.append(full_path)
                 else:
                     continue
 
@@ -741,6 +769,9 @@ class DicoGIS(Tk):
         self.li_cdao.extend(self.li_dxf)
         self.li_cdao.extend(self.li_dwg)
         self.li_cdao.extend(self.li_dgn)
+        # grouping File geodatabases
+        self.li_fdb.extend(self.li_egdb)
+        self.li_fdb.extend(self.li_spadb)
         # end of listing
         self.prog_layers.stop()
         self.logger.info('End of folders parsing: {0} shapefiles - \
@@ -749,16 +780,18 @@ class DicoGIS(Tk):
           {3} GML - \
           {4} GeoJSON\
           {5} rasters - \
-          {6} FileGDB - \
-          {7} CAO/DAO - \
-          {8} PDF - \
-          in {9}{10}'.format(len(self.li_shp),
+          {6} Esri FileGDB - \
+          {7} Spatialite - \
+          {8} CAO/DAO - \
+          {9} PDF - \
+          in {10}{11}'.format(len(self.li_shp),
                             len(self.li_tab),
                             len(self.li_kml),
                             len(self.li_gml),
                             len(self.li_geoj),
                             len(self.li_raster),
-                            len(self.li_gdb),
+                            len(self.li_egdb),
+                            len(self.li_spadb),
                             len(self.li_cdao),
                             len(self.li_pdf),
                             self.num_folders,
@@ -783,8 +816,12 @@ class DicoGIS(Tk):
         self.li_gml = tuple(self.li_gml)
         self.li_geoj.sort()
         self.li_geoj = tuple(self.li_geoj)
-        self.li_gdb.sort()
-        self.li_gdb = tuple(self.li_gdb)
+        self.li_egdb.sort()
+        self.li_egdb = tuple(self.li_egdb)
+        self.li_spadb.sort()
+        self.li_spadb = tuple(self.li_spadb)
+        self.li_fdb.sort()
+        self.li_fdb = tuple(self.li_fdb)
         self.li_dxf.sort()
         self.li_dxf = tuple(self.li_dxf)
         self.li_dwg.sort()
@@ -802,7 +839,7 @@ class DicoGIS(Tk):
 {3} GML - \
 {4} GeoJSON\
 \n{5} rasters - \
-{6} Esri FileGDB - \
+{6} file databases - \
 {7} CAO/DAO - \
 {8} PDF - \
 in {9}{10}'.format(len(self.li_shp),
@@ -811,7 +848,7 @@ in {9}{10}'.format(len(self.li_shp),
                   len(self.li_gml),
                   len(self.li_geoj),
                   len(self.li_raster),
-                  len(self.li_gdb),
+                  len(self.li_fdb),
                   len(self.li_cdao),
                   len(self.li_pdf),
                   self.num_folders,
@@ -822,8 +859,9 @@ in {9}{10}'.format(len(self.li_shp),
         self.val.config(state=ACTIVE)
         # End of function
         return foldertarget, self.li_shp, self.li_tab, self.li_kml,\
-            self.li_gml, self.li_geoj, self.li_raster, self.li_gdb,\
-            self.li_dxf, self.li_dwg, self.li_dgn, self.li_cdao
+            self.li_gml, self.li_geoj, self.li_raster, self.li_egdb,\
+            self.li_dxf, self.li_dwg, self.li_dgn, self.li_cdao,\
+            self.li_fdb, self.li_spadb
 
     def process(self):
         """ check needed info and launch different processes """
@@ -848,7 +886,7 @@ in {9}{10}'.format(len(self.li_shp),
         # check if at least a format has been choosen
         if (self.opt_shp.get() + self.opt_tab.get() + self.opt_kml.get() +
            self.opt_gml.get() + self.opt_geoj.get() + self.opt_rast.get() +
-           self.opt_gdb.get() + self.opt_cdao.get() + self.opt_pdf.get()):
+           self.opt_egdb.get() + self.opt_cdao.get() + self.opt_pdf.get()):
             pass
         else:
             avert('DicoGIS - User error', self.blabla.get('noformat'))
@@ -856,7 +894,7 @@ in {9}{10}'.format(len(self.li_shp),
         # check if there are some layers into the folder structure
         if (len(self.li_vectors)
             + len(self.li_raster)
-            + len(self.li_gdb)
+            + len(self.li_egdb)
             + len(self.li_cdao)
             + len(self.li_pdf)):
             pass
@@ -892,8 +930,12 @@ in {9}{10}'.format(len(self.li_shp),
             total_files += len(self.li_raster)
         else:
             pass
-        if self.opt_gdb.get() and len(self.li_gdb) > 0:
-            total_files += len(self.li_gdb)
+        if self.opt_egdb.get() and len(self.li_egdb) > 0:
+            total_files += len(self.li_egdb)
+        else:
+            pass
+        if self.opt_spadb.get() and len(self.li_spadb) > 0:
+            total_files += len(self.li_spadb)
         else:
             pass
         if self.opt_cdao.get() and len(self.li_cdao) > 0:
@@ -911,7 +953,7 @@ in {9}{10}'.format(len(self.li_shp),
         # line_folders = 1    # line rank of directories dictionary
         line_vectors = 1    # line rank of vectors dictionary
         line_rasters = 1    # line rank of rasters dictionary
-        line_gdb = 1        # line rank of GDB dictionary
+        line_fdb = 1        # line rank of File DB dictionary
         line_cdao = 1       # line rank of CAO/DAO dictionary
         line_maps = 1       # line rank of maps & plans dictionary
 
@@ -921,6 +963,9 @@ in {9}{10}'.format(len(self.li_shp),
                 """ looping on shapefiles list """
                 self.status.set(path.basename(shp))
                 self.logger.info('\n' + shp)
+                # increment the progress bar
+                self.prog_layers["value"] = self.prog_layers["value"] + 1
+                self.update()
                 # reset recipient data
                 self.dico_layer.clear()
                 self.dico_fields.clear()
@@ -935,13 +980,16 @@ in {9}{10}'.format(len(self.li_shp),
                 except AttributeError, e:
                     """ empty files """
                     self.logger.error(e)
+                    self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 except RuntimeError, e:
                     """ corrupt files """
                     self.logger.error(e)
+                    self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 except Exception, e:
                     self.logger.error(e)
+                    self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
                 self.dictionarize_vectors(self.dico_layer,
@@ -951,9 +999,6 @@ in {9}{10}'.format(len(self.li_shp),
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_vectors = line_vectors + 1
-                # increment the progress bar
-                self.prog_layers["value"] = self.prog_layers["value"] + 1
-                self.update()
         else:
             self.logger.info('\tIgnoring {0} shapefiles'.format(len(self.li_shp)))
             pass
@@ -964,6 +1009,9 @@ in {9}{10}'.format(len(self.li_shp),
                 """ looping on MapInfo tables list """
                 self.status.set(path.basename(tab))
                 self.logger.info('\n' + tab)
+                # increment the progress bar
+                self.prog_layers["value"] = self.prog_layers["value"] + 1
+                self.update()
                 # reset recipient data
                 self.dico_layer.clear()
                 self.dico_fields.clear()
@@ -991,9 +1039,6 @@ in {9}{10}'.format(len(self.li_shp),
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_vectors = line_vectors + 1
-                # increment the progress bar
-                self.prog_layers["value"] = self.prog_layers["value"] + 1
-                self.update()
         else:
             self.logger.info('\tIgnoring {0} MapInfo tables'.format(len(self.li_tab)))
             pass
@@ -1004,6 +1049,9 @@ in {9}{10}'.format(len(self.li_shp),
                 """ looping on KML list """
                 self.status.set(path.basename(kml))
                 self.logger.info('\n' + kml)
+                # increment the progress bar
+                self.prog_layers["value"] = self.prog_layers["value"] + 1
+                self.update()
                 # reset recipient data
                 self.dico_layer.clear()
                 self.dico_fields.clear()
@@ -1032,9 +1080,6 @@ in {9}{10}'.format(len(self.li_shp),
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_vectors = line_vectors + 1
-                # increment the progress bar
-                self.prog_layers["value"] = self.prog_layers["value"] + 1
-                self.update()
         else:
             self.logger.info('\tIgnoring {0} KML'.format(len(self.li_kml)))
             pass
@@ -1045,6 +1090,9 @@ in {9}{10}'.format(len(self.li_shp),
                 """ looping on GML list """
                 self.status.set(path.basename(gml))
                 self.logger.info('\n' + gml)
+                # increment the progress bar
+                self.prog_layers["value"] = self.prog_layers["value"] + 1
+                self.update()
                 # reset recipient data
                 self.dico_layer.clear()
                 self.dico_fields.clear()
@@ -1072,9 +1120,6 @@ in {9}{10}'.format(len(self.li_shp),
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_vectors = line_vectors + 1
-                # increment the progress bar
-                self.prog_layers["value"] = self.prog_layers["value"] + 1
-                self.update()
         else:
             self.logger.info('\tIgnoring {0} GML'.format(len(self.li_gml)))
             pass
@@ -1085,6 +1130,9 @@ in {9}{10}'.format(len(self.li_shp),
                 """ looping on GeoJSON list """
                 self.status.set(path.basename(geojson))
                 self.logger.info('\n' + geojson)
+                # increment the progress bar
+                self.prog_layers["value"] = self.prog_layers["value"] + 1
+                self.update()
                 # reset recipient data
                 self.dico_layer.clear()
                 self.dico_fields.clear()
@@ -1113,9 +1161,6 @@ in {9}{10}'.format(len(self.li_shp),
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_vectors = line_vectors + 1
-                # increment the progress bar
-                self.prog_layers["value"] = self.prog_layers["value"] + 1
-                self.update()
         else:
             self.logger.info('\tIgnoring {0} GeoJSON'.format(len(self.li_geoj)))
             pass
@@ -1125,8 +1170,10 @@ in {9}{10}'.format(len(self.li_shp),
             for raster in self.li_raster:
                 """ looping on rasters list """
                 self.status.set(path.basename(raster))
-                self.update()
                 self.logger.info('\n' + raster)
+                # increment the progress bar
+                self.prog_layers["value"] = self.prog_layers["value"] + 1
+                self.update()
                 # reset recipient data
                 self.dico_raster.clear()
                 self.dico_bands.clear()
@@ -1155,25 +1202,26 @@ in {9}{10}'.format(len(self.li_shp),
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_rasters = line_rasters + 1
-                # increment the progress bar
-                self.prog_layers["value"] = self.prog_layers["value"] + 1
-                self.update()
         else:
             self.logger.info('\tIgnoring {0} rasters'.format(len(self.li_raster)))
             pass
 
-        if self.opt_gdb.get() and len(self.li_gdb) > 0:
+        if self.opt_egdb.get() and len(self.li_egdb) > 0:
             self.logger.info('\n\tProcessing Esri FileGDB: start')
-            for gdb in self.li_gdb:
+            for gdb in self.li_egdb:
                 """ looping on FileGDB list """
                 self.status.set(path.basename(gdb))
                 self.logger.info('\n' + gdb)
+                # increment the progress bar
+                self.prog_layers["value"] = self.prog_layers["value"] + 1
+                self.update()
                 # reset recipient data
-                self.dico_gdb.clear()
+                self.dico_fdb.clear()
+                self.dico_fields.clear()
                 # getting the informations
                 try:
                     Read_GDB(path.abspath(gdb),
-                             self.dico_gdb,
+                             self.dico_fdb,
                              'Esri FileGeoDataBase',
                              self.blabla)
                     self.logger.info('\t Infos OK')
@@ -1189,17 +1237,55 @@ in {9}{10}'.format(len(self.li_shp),
                     self.logger.error(e)
                     continue
                 # writing to the Excel dictionary
-                self.dictionarize_gdb(self.dico_gdb,
+                self.dictionarize_fdb(self.dico_fdb,
                                       self.feuyFGDB,
-                                      line_gdb)
+                                      line_fdb)
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
-                line_gdb += self.dico_gdb.get('layers_count') + 1
+                line_fdb += self.dico_fdb.get('layers_count') + 1
+        else:
+            self.logger.info('\tIgnoring {0} Esri FileGDB'.format(len(self.li_egdb)))
+            pass
+
+        if self.opt_spadb.get() and len(self.li_spadb) > 0:
+            self.logger.info('\n\tProcessing Spatialite DB: start')
+            for spadb in self.li_spadb:
+                """ looping on Spatialite DBs list """
+                self.status.set(path.basename(spadb))
+                self.logger.info('\n' + spadb)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
+                # reset recipient data
+                self.dico_fdb.clear()
+                self.dico_fields.clear()
+                # getting the informations
+                try:
+                    Read_SpaDB(path.abspath(spadb),
+                               self.dico_fdb,
+                               'Spatialite',
+                               self.blabla)
+                    self.logger.info('\t Infos OK')
+                except AttributeError, e:
+                    """ empty files """
+                    self.logger.error(e)
+                    continue
+                except RuntimeError, e:
+                    """ corrupt files """
+                    self.logger.error(e)
+                    continue
+                except Exception, e:
+                    self.logger.error(e)
+                    continue
+                # writing to the Excel dictionary
+                self.dictionarize_fdb(self.dico_fdb,
+                                      self.feuyFGDB,
+                                      line_fdb)
+                self.logger.info('\t Wrote into the dictionary')
+                # increment the line number
+                line_fdb += self.dico_fdb.get('layers_count') + 1
         else:
-            self.logger.info('\tIgnoring {0} FileGDB'.format(len(self.li_gdb)))
+            self.logger.info('\tIgnoring {0} Spatialite DB'.format(len(self.li_spadb)))
             pass
 
         if self.opt_cdao.get() and len(self.li_cdao) > 0:
@@ -1208,6 +1294,9 @@ in {9}{10}'.format(len(self.li_shp),
                 """ looping on DXF list """
                 self.status.set(path.basename(dxf))
                 self.logger.info('\n' + dxf)
+                # increment the progress bar
+                self.prog_layers["value"] = self.prog_layers["value"] + 1
+                self.update()
                 # reset recipient data
                 self.dico_cdao.clear()
                 # getting the informations
@@ -1235,15 +1324,14 @@ in {9}{10}'.format(len(self.li_shp),
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_cdao += self.dico_cdao.get('layers_count') + 1
-                # increment the progress bar
-                self.prog_layers["value"] = self.prog_layers["value"] + 1
-                self.update()
 
             for dwg in self.li_dwg:
                 """ looping on DWG list """
                 self.status.set(path.basename(dwg))
                 self.logger.info('\n' + dwg)
-
+                # increment the progress bar
+                self.prog_layers["value"] = self.prog_layers["value"] + 1
+                self.update()
                 # just writing filename and link to parent folder
                 self.feuyCDAO.write(line_cdao, 0, path.basename(dwg))
 
@@ -1267,9 +1355,6 @@ in {9}{10}'.format(len(self.li_shp),
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_cdao += 1
-                # # increment the progress bar
-                self.prog_layers["value"] = self.prog_layers["value"] + 1
-                self.update()
         else:
             self.logger.info('\tIgnoring {0} CAO/DAO files'.format(len(self.li_cdao)))
             pass
@@ -1280,6 +1365,9 @@ in {9}{10}'.format(len(self.li_shp),
                 """ looping on PDF list """
                 self.status.set(path.basename(pdf))
                 self.logger.info('\n' + pdf)
+                # increment the progress bar
+                self.prog_layers["value"] = self.prog_layers["value"] + 1
+                self.update()
                 # reset recipient data
                 self.dico_pdf.clear()
                 # getting the informations
@@ -1307,9 +1395,6 @@ in {9}{10}'.format(len(self.li_shp),
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_maps += self.dico_pdf.get('layers_count') + 1
-                # increment the progress bar
-                self.prog_layers["value"] = self.prog_layers["value"] + 1
-                self.update()
         else:
             self.logger.info('\tIgnoring {0} Geospatial PDF'.format(len(self.li_pdf)))
             pass
@@ -1579,8 +1664,8 @@ in {9}{10}'.format(len(self.li_shp),
             pass
 
         if self.typo.get() == 1\
-           and self.opt_gdb.get()\
-           and len(self.li_gdb) > 0:
+           and (self.opt_spadb.get() + self.opt_egdb.get())\
+           and len(self.li_fdb) > 0:
             """ adding a new sheet for flat geodatabases informations """
             # sheet
             self.feuyFGDB = self.book.add_sheet(self.blabla.get('sheet_filedb'),
@@ -1603,7 +1688,7 @@ in {9}{10}'.format(len(self.li_shp),
             self.feuyFGDB.write(0, 14, self.blabla.get('li_chps'), self.entete)
             self.logger.info('Sheet Esri FileGDB created')
             # tunning headers
-            lg_gdb_names = [len(lg) for lg in self.li_gdb]
+            lg_gdb_names = [len(lg) for lg in self.li_egdb]
             self.feuyFGDB.col(0).width = max(lg_gdb_names) * 100
             self.feuyFGDB.col(1).width = len(self.blabla.get('browse')) * 256
             self.feuyFGDB.col(4).width = len(self.blabla.get('date_crea')) * 256
@@ -1952,11 +2037,8 @@ in {9}{10}'.format(len(self.li_shp),
         # End of function
         return line, sheet
 
-    def dictionarize_gdb(self, gdb_infos, sheet, line):
+    def dictionarize_fdb(self, gdb_infos, sheet, line):
         u""" write the infos of the FileGDB into the Excel workbook """
-        # local variables
-        champs = ""
-
         # in case of a source error
         if gdb_infos.get('error'):
             self.logger.warning('\tproblem detected')
@@ -2022,12 +2104,13 @@ in {9}{10}'.format(len(self.li_shp),
                                            gdb_infos.get(u'layers_names')):
             # increment line
             line += 1
+            champs = ""
             # get the layer informations
             try:
-                gdb_layer = gdb_infos.get('{0}_{1}'.format(layer_idx, 
+                gdb_layer = gdb_infos.get('{0}_{1}'.format(layer_idx,
                                                            layer_name))
             except UnicodeDecodeError:
-                gdb_layer = gdb_infos.get('{0}_{1}'.format(layer_idx, 
+                gdb_layer = gdb_infos.get('{0}_{1}'.format(layer_idx,
                                                            unicode(layer_name.decode('latin1'))))
             # in case of a source error
             if gdb_layer.get('error'):

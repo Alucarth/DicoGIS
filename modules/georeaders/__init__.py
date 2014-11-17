@@ -8,3 +8,4 @@ from Infos_GJSON import Read_GeoJSON
 from Infos_PostGIS import Read_PostGIS
 from Infos_DXF import Read_DXF
 from Infos_GeoPDF import Read_GeoPDF
+from Infos_Spatialite import Read_SpaDB
