@@ -2251,6 +2251,7 @@ in {9}{10}'.format(len(self.li_shp),
                                            dico_cdao.get(u'layers_names')):
             # increment line
             line += 1
+            champs = ""
             # get the layer informations
             cdao_layer = dico_cdao.get('{0}_{1}'.format(layer_idx, layer_name))
 
@@ -2319,9 +2320,6 @@ in {9}{10}'.format(len(self.li_shp),
 
     def dictionarize_mapdocs(self, mapdoc_infos, sheet, line):
         u""" write the infos of the map document into the Excel workbook """
-        # local variables
-        champs = ""
-
         # in case of a source error
         if mapdoc_infos.get('error'):
             self.logger.warning('\tproblem detected')
@@ -2407,6 +2405,7 @@ in {9}{10}'.format(len(self.li_shp),
                                            mapdoc_infos.get(u'layers_names')):
             # increment line
             line += 1
+            champs = ""
             # get the layer informations
             try:
                 mapdoc_layer = mapdoc_infos.get('{0}_{1}'.format(layer_idx,
