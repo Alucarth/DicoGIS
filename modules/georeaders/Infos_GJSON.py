@@ -138,6 +138,7 @@ class Read_GeoJSON():
 
     def infos_basics(self, layerpath, dico_layer, txt):
         u""" get the global informations about the layer """
+        ## SRS
         # srs type
         srsmetod = [
                     (self.srs.IsCompound(), txt.get('srs_comp')),
@@ -146,11 +147,40 @@ class Read_GeoJSON():
                     (self.srs.IsLocal(), txt.get('srs_loca')),
                     (self.srs.IsProjected(), txt.get('srs_proj')),
                     (self.srs.IsVertical(), txt.get('srs_vert'))
-                    ]
+                   ]
+        # searching for a match with one of srs types
         for srsmet in srsmetod:
             if srsmet[0] == 1:
                 typsrs = srsmet[1]
-        dico_layer[u'srs_type'] = unicode(typsrs)
+            else:
+                continue
+        # in case of not match
+        try:
+            dico_layer[u'srs_type'] = unicode(typsrs)
+        except UnboundLocalError:
+            typsrs = txt.get('srs_nr')
+            dico_layer[u'srs_type'] = unicode(typsrs)
+
+        # Handling exception in srs names'encoding
+        try:
+            if self.srs.GetAttrValue('PROJCS') != 'unnamed':
+                dico_layer[u'srs'] = unicode(self.srs.GetAttrValue('PROJCS')).replace('_', ' ')
+            else:
+                dico_layer[u'srs'] = unicode(self.srs.GetAttrValue('PROJECTION')).replace('_', ' ')
+        except UnicodeDecodeError:
+            if self.srs.GetAttrValue('PROJCS') != 'unnamed':
+                dico_layer[u'srs'] = self.srs.GetAttrValue('PROJCS').decode('latin1').replace('_', ' ')
+            else:
+                dico_layer[u'srs'] = self.srs.GetAttrValue('PROJECTION').decode('latin1').replace('_', ' ')
+        finally:
+            dico_layer[u'EPSG'] = unicode(self.srs.GetAttrValue("AUTHORITY", 1))
+
+        # World SRS default
+        if dico_layer[u'EPSG'] == u'4326' and dico_layer[u'srs'] == u'None':
+            dico_layer[u'srs'] = u'WGS 84'
+        else:
+            pass
+
         # Storing into the dictionary
         dico_layer[u'name'] = path.basename(layerpath)
         dico_layer[u'folder'] = path.dirname(layerpath)
@@ -170,28 +200,11 @@ class Read_GeoJSON():
         dico_layer[u"total_size"] = self.sizeof(total_size)
         dependencies.pop(-1)
 
-        # Handling exception in srs names'encoding
-        try:
-            if self.srs.GetAttrValue('PROJCS') != 'unnamed':
-                dico_layer[u'srs'] = unicode(self.srs.GetAttrValue('PROJCS')).replace('_', ' ')
-            else:
-                dico_layer[u'srs'] = unicode(self.srs.GetAttrValue('PROJECTION')).replace('_', ' ')
-        except UnicodeDecodeError, e:
-            if self.srs.GetAttrValue('PROJCS') != 'unnamed':
-                dico_layer[u'srs'] = self.srs.GetAttrValue('PROJCS').decode('latin1').replace('_', ' ')
-            else:
-                dico_layer[u'srs'] = self.srs.GetAttrValue('PROJECTION').decode('latin1').replace('_', ' ')
-        dico_layer[u'EPSG'] = unicode(self.srs.GetAttrValue("AUTHORITY", 1))
         # Getting basic dates
         dico_layer[u'date_actu'] = strftime('%Y-%m-%d',
                                             localtime(path.getmtime(layerpath)))
         dico_layer[u'date_crea'] = strftime('%Y-%m-%d',
                                             localtime(path.getctime(layerpath)))
-        # SRS exception handling
-        if dico_layer[u'EPSG'] == u'4326' and dico_layer[u'srs'] == u'None':
-            print dico_layer[u'srs']
-            dico_layer[u'srs'] = u'WGS 84'
-            print dico_layer[u'srs']
 
         # end of function
         return dico_layer
