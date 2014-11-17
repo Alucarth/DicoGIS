@@ -2087,7 +2087,7 @@ in {9}{10}'.format(len(self.li_shp),
                     champs = champs + chp + u" ({0}) ; ".format(tipo)
                 except UnicodeDecodeError:
                     # write a notification into the log file
-                    self.dico_err[mapdoc_infos.get('name')] = self.blabla.get(u'err_encod') + \
+                    self.dico_err[gdb_layer.get('name')] = self.blabla.get(u'err_encod') + \
                                                               chp.decode('latin1') + \
                                                               u"\n\n"
                     self.logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
@@ -2099,6 +2099,9 @@ in {9}{10}'.format(len(self.li_shp),
 
             # Once all fieds explored, write them
             sheet.write(line, 14, champs)
+
+            # write layer's name into the log
+            self.logger.info('\t -- {0} = OK'.format(gdb_layer.get(u'title')))
 
         # End of function
         return self.feuyFGDB, line
@@ -2224,6 +2227,9 @@ in {9}{10}'.format(len(self.li_shp),
 
             # Once all fieds explored, write them
             sheet.write(line, 14, champs)
+
+            # write layer's name into the log
+            self.logger.info('\t -- {0} = OK'.format(cdao_layer.get(u'title')))
 
         # End of function
         return self.feuyCDAO, line
@@ -2364,6 +2370,9 @@ in {9}{10}'.format(len(self.li_shp),
 
             # Once all fieds explored, write them
             sheet.write(line, 19, champs)
+
+            # write layer's name into the log
+            self.logger.info('\t -- {0} = OK'.format(mapdoc_layer.get(u'title')))
 
         # End of function
         return self.feuyMAPS, line
