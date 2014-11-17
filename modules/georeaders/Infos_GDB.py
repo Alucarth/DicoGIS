@@ -4,8 +4,7 @@ from __future__ import unicode_literals
 
 #------------------------------------------------------------------------------
 # Name:         InfosGDB
-# Purpose:      Use arcpy, Python bundle dinto ArcGIS products (ESRI inc) to
-#                   extract informations about geographic data.
+# Purpose:      Uses OGR to read into Esri File GeoDataBase.
 #
 # Author:       Julien Moura (https://github.com/Guts/)
 #
@@ -333,10 +332,9 @@ if __name__ == '__main__':
     # searching for File GeoDataBase
     num_folders = 0
     li_gdb = [
-              # r'Points.gdb',
-              # r'Polygons.gdb',
-              # r'AAHH.gdb',
-              r'LBR.gdb'
+              r'Points.gdb',
+              r'Polygons.gdb',
+              r'AAHH.gdb'
               ]
     for root, dirs, files in walk(r'..\test\datatest'):
             num_folders = num_folders + len(dirs)
