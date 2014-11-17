@@ -76,7 +76,8 @@ class OGRErrorHandler(object):
 
 class Read_SpaDB():
     def __init__(self, spadbpath, dico_spadb, tipo, txt=''):
-        u""" Uses OGR functions to extract basic informations about
+        u"""
+        Uses OGR functions to extract basic informations about
         geographic vector file
         and store into dictionaries.
 
@@ -116,14 +117,7 @@ class Read_SpaDB():
         dico_spadb['layers_idx'] = li_layers_idx
         
         # cumulated size
-        total_size = 0
-        for chemins in walk(spadbpath):
-            for file in chemins[2]:
-                chem_complete = path.join(chemins[0], file)
-                if path.isfile(chem_complete):
-                    total_size = total_size + path.getsize(chem_complete)
-                else:
-                    pass
+        total_size = path.getsize(spadbpath)
         dico_spadb[u"total_size"] = self.sizeof(total_size)
 
         # global dates
