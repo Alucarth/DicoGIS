@@ -99,9 +99,8 @@ class Read_GDB():
         self.alert = 0
 
         # opening GDB
-        dr_gdb_o = ogr.GetDriverByName(str("OpenFileGDB"))
         try:
-            gdb = dr_gdb_o.Open(gdbpath, 0)
+            gdb = ogr.Open(gdbpath, 0)
         except Exception:
             self.erratum(dico_gdb, gdbpath, u'err_corrupt')
             self.alert = self.alert + 1
