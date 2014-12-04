@@ -28,6 +28,8 @@ git clone https://github.com/Guts/DicoGIS.git
 
 ##FR
 
+Pour une présentation plus sympa, consulter [l'article sur GeoTribu](http://geotribu.net/dicogis).
+
 Crée un dictionnaire des données géographiques (shapefiles et tables MapInfo) contenues dans une arborescence de répertoire. Le dictionnaire prend la forme d'un fichier Excel (.xls).
 
 ###Sous Windows
@@ -52,6 +54,8 @@ git clone https://github.com/Guts/DicoGIS.git
 ```
 
 ##ES
+
+Para una presentación mas completa, ver [el articulo en Mapping GIS](http://mappinggis.com/2014/10/dicogis-el-diccionario-de-datos-gis/).
 
 Automatiza la creación de un diccionario de los datos geográficos (shapefiles y tablas MapInfo) contenidos en una estructura de carpetas. El archivo final es una tabla Excel (.xls).
 
