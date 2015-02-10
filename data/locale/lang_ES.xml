@@ -48,7 +48,7 @@
 	<sheet_vectors>Vectores</sheet_vectors>
 	<sheet_rasters>Gráficos de trama</sheet_rasters>
 	<sheet_filedb>Base de datos archivo</sheet_filedb>
-	<sheet_cdao>CAO / DAO</sheet_cdao>
+	<sheet_cdao>CAO y DAO</sheet_cdao>
 	<sheet_maplans>Documentos cartográficos</sheet_maplans>
 	<nomfic>Nombre del archivo</nomfic>
 	<path>Ruta</path>
