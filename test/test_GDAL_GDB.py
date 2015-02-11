@@ -65,6 +65,9 @@ class Read_GDB_o():
         # playing with driver
         print "\nLet's play with OGR OpenGDB driver".upper()
         print("GDB available methods: {0}".format(dir(gdb)))
+
+
+
         print gdb.__sizeof__()
         # print(gdb.GetStyleTable())
         print("{0} layers found into.".format(gdb.GetLayerCount()))
@@ -96,7 +99,7 @@ class Read_GDB_o():
 
             print typsrs
 
-            print("\n\n\t\tLayer available methods: {0}\n".format(dir(layer)))
+            print("\n==============================================\n\t\tLayer available methods: {0}\n".format(dir(layer)))
             print("\nLayer: {0}".format(layer.GetName()))
             print("Xmin = {0} - Xmax = {1} \n\
 Ymin = {2} - Ymax = {3}".format(layer.GetExtent()[0],
@@ -149,7 +152,7 @@ if __name__ == '__main__':
     # libraries import
     from os import getcwd, chdir, path
     # test FileGDB
-    gdb = r'..\test\datatest\GDB_Test.gdb'
+    gdb = r'datatest\FileGDB\Esri_FileGDB\GDB_Test.gdb'
 
     # OGR: FileGDB (see: http://www.gdal.org/drv_filegdb.html)
     # try:
