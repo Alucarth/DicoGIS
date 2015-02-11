@@ -11,7 +11,7 @@ from __future__ import unicode_literals
 #
 # Python:       2.7.x
 # Created:      14/02/2013
-# Updated:      11/11/2014
+# Updated:      01/12/2014
 #
 # Licence:      GPL 3
 #------------------------------------------------------------------------------
@@ -73,7 +73,7 @@ from modules import Read_GML        # extractor for GML
 from modules import Read_GeoJSON    # extractor for GeoJSON
 from modules import Read_PostGIS    # extractor for PostGIS databases
 from modules import Read_GDB        # extractor for Esri FileGeoDataBase
-from modules import Read_SpaDB        # extractor for Spatialite DB
+from modules import Read_SpaDB      # extractor for Spatialite DB
 from modules import Read_DXF        # extractor for AutoCAD DXF
 from modules import Read_GeoPDF     # extractor for Geospatial PDF
 
@@ -162,7 +162,7 @@ class DicoGIS(Tk):
         self.li_dgn = []      # list for MicroStation DGN paths
         # formats / type: maps documents
         self.li_pdf = []    # list for GeoPDF path
-        
+
         # dictionaries to store informations
         self.dico_layer = OD()      # dict for vectors informations
         self.dico_fields = OD()     # dict for fields informations
@@ -172,7 +172,17 @@ class DicoGIS(Tk):
         self.dico_cdao = OD()       # dict for CAO/DAO
         self.dico_pdf = OD()        # dict for Geospatial PDF
         self.dico_err = OD()        # errors list
-        
+
+        # metrics
+        self.global_total_layers = 0
+        self.global_total_fields = 0
+        self.global_total_features = 0
+        self.global_total_errors = 0
+        self.global_total_warnings = 0
+        self.global_total_srs_proj = 0
+        self.global_total_srs_geog = 0
+        self.global_total_srs_none = 0
+        self.global_ignored = 0    # files ignored by an user filter
         # GUI fonts
         ft_tit = tkFont.Font(family="Times", size=10, weight=tkFont.BOLD)
 
@@ -204,8 +214,8 @@ class DicoGIS(Tk):
         self.opt_kml = IntVar(self.FrFilters)   # able/disable KML
         self.opt_gml = IntVar(self.FrFilters)   # able/disable GML
         self.opt_geoj = IntVar(self.FrFilters)  # able/disable GeoJSON
-        self.opt_egdb = IntVar(self.FrFilters)   # able/disable Esri FileGDB
-        self.opt_spadb = IntVar(self.FrFilters)   # able/disable Spatalite DB
+        self.opt_egdb = IntVar(self.FrFilters)  # able/disable Esri FileGDB
+        self.opt_spadb = IntVar(self.FrFilters)  # able/disable Spatalite DB
         self.opt_rast = IntVar(self.FrFilters)  # able/disable rasters
         self.opt_cdao = IntVar(self.FrFilters)  # able/disable CAO/DAO files
         self.opt_pdf = IntVar(self.FrFilters)   # able/disable Geospatial PDF
@@ -394,7 +404,7 @@ class DicoGIS(Tk):
         self.prox_ent_P.grid(row=1, column=3, columnspan=2,
                              sticky="NSEW", padx=2, pady=2)
         caz_ntlm.grid(row=2, column=0,
-                            sticky="NSEW", padx=2, pady=2)
+                             sticky="NSEW", padx=2, pady=2)
         self.prox_lb_M.grid(row=2, column=1,
                             sticky="NSEW", padx=2, pady=2)
         self.prox_ent_M.grid(row=2, column=2, columnspan=2,
@@ -693,7 +703,7 @@ class DicoGIS(Tk):
                 try:
                     unicode(path.join(root, d))
                     full_path = path.join(root, d)
-                except UnicodeDecodeError, e:
+                except UnicodeDecodeError:
                     full_path = path.join(root, d.decode('latin1'))
                 if full_path[-4:].lower() == '.gdb':
                     # add complete path of Esri FileGeoDatabase
@@ -705,7 +715,7 @@ class DicoGIS(Tk):
                 try:
                     unicode(path.join(root, f))
                     full_path = path.join(root, f)
-                except UnicodeDecodeError, e:
+                except UnicodeDecodeError:
                     full_path = path.join(root, f.decode('latin1'))
                 # Looping on files contained
                 if path.splitext(full_path.lower())[1].lower() == '.shp'\
@@ -726,8 +736,9 @@ class DicoGIS(Tk):
                     """ listing MapInfo tables """
                     # add complete path of MapInfo file
                     self.li_tab.append(full_path)
-                elif path.splitext(full_path.lower())[1] == '.kml':
-                    """ listing KML """
+                elif path.splitext(full_path.lower())[1] == '.kml'\
+                    or path.splitext(full_path.lower())[1] == '.kmz':
+                    """ listing KML and KMZ """
                     # add complete path of KML file
                     self.li_kml.append(full_path)
                 elif path.splitext(full_path.lower())[1] == '.gml':
@@ -894,7 +905,7 @@ in {9}{10}'.format(len(self.li_shp),
         # check if there are some layers into the folder structure
         if (len(self.li_vectors)
             + len(self.li_raster)
-            + len(self.li_egdb)
+            + len(self.li_fdb)
             + len(self.li_cdao)
             + len(self.li_pdf)):
             pass
@@ -1044,9 +1055,9 @@ in {9}{10}'.format(len(self.li_shp),
             pass
 
         if self.opt_kml.get() and len(self.li_kml) > 0:
-            self.logger.info('\n\tProcessing KML: start')
+            self.logger.info('\n\tProcessing KML-KMZ: start')
             for kml in self.li_kml:
-                """ looping on KML list """
+                """ looping on KML/KMZ list """
                 self.status.set(path.basename(kml))
                 self.logger.info('\n' + kml)
                 # increment the progress bar
@@ -1060,7 +1071,7 @@ in {9}{10}'.format(len(self.li_shp),
                     Read_KML(path.abspath(kml),
                              self.dico_layer,
                              self.dico_fields,
-                             'KML',
+                             'Google KML/KMZ',
                              self.blabla)
                     self.logger.info('\t Infos OK')
                 except AttributeError, e:
@@ -1399,6 +1410,9 @@ in {9}{10}'.format(len(self.li_shp),
             self.logger.info('\tIgnoring {0} Geospatial PDF'.format(len(self.li_pdf)))
             pass
 
+        # writing global metrics about the dictionary
+        self.dictionarize_metrics()
+
         # saving dictionary
         self.val.config(state=ACTIVE)
         self.savedico()
@@ -1582,14 +1596,37 @@ in {9}{10}'.format(len(self.li_shp),
         self.xls_date = easyxf(num_format_str='DD/MM/YYYY')
 
         # columns headers
+        if self.typo.get() == 1:
+            """ adding a new sheet for metrics """
+            # sheet
+            self.feuySTATS = self.book.add_sheet('Metrics',
+                                                 cell_overwrite_ok=True)
+            # headers
+            self.feuySTATS.write(0, 0, "Totals", self.entete)
+            self.feuySTATS.write(0, 1, "=== Global Statistics ===", self.entete)
+            self.feuySTATS.write(1, 0, self.blabla.get('feats_class'), self.entete)
+            self.feuySTATS.write(2, 0, self.blabla.get('num_attrib'), self.entete)
+            self.feuySTATS.write(3, 0, self.blabla.get('num_objets'), self.entete)
+            self.feuySTATS.write(4, 0, self.blabla.get('gdal_warn'), self.entete)
+            self.feuySTATS.write(6, 0, self.blabla.get('geometrie'), self.entete)
+            self.logger.info('Sheet for global statistics adedd')
+            # tunning headers
+            # lg_shp_names = [len(lg) for lg in self.li_shp]
+            # lg_tab_names = [len(lg) for lg in self.li_tab]
+            # self.feuySTATS.col(0).width = max(lg_shp_names + lg_tab_names) * 100
+            # self.feuySTATS.col(1).width = len(self.blabla.get('browse')) * 256
+            # self.feuySTATS.col(9).width = 35 * 256
+        else:
+            pass
+
         if self.typo.get() == 1 \
             and (self.opt_shp.get() + self.opt_tab.get() + self.opt_kml.get()
                  + self.opt_gml.get() + self.opt_geoj.get()) > 0\
-            and len(self.li_vectors) >0:
+            and len(self.li_vectors) > 0:
             """ adding a new sheet for vectors informations """
             # sheet
             self.feuyVC = self.book.add_sheet(self.blabla.get('sheet_vectors'),
-                                             cell_overwrite_ok=True)
+                                              cell_overwrite_ok=True)
             # headers
             self.feuyVC.write(0, 0, self.blabla.get('nomfic'), self.entete)
             self.feuyVC.write(0, 1, self.blabla.get('path'), self.entete)
@@ -1628,7 +1665,7 @@ in {9}{10}'.format(len(self.li_shp),
             """ adding a new sheet for rasters informations """
             # sheet
             self.feuyRS = self.book.add_sheet(self.blabla.get('sheet_rasters'),
-                                             cell_overwrite_ok=True)
+                                              cell_overwrite_ok=True)
             # headers
             self.feuyRS.write(0, 0, self.blabla.get('nomfic'), self.entete)
             self.feuyRS.write(0, 1, self.blabla.get('path'), self.entete)
@@ -1669,7 +1706,7 @@ in {9}{10}'.format(len(self.li_shp),
             """ adding a new sheet for flat geodatabases informations """
             # sheet
             self.feuyFGDB = self.book.add_sheet(self.blabla.get('sheet_filedb'),
-                                             cell_overwrite_ok=True)
+                                                cell_overwrite_ok=True)
             # headers
             self.feuyFGDB.write(0, 0, self.blabla.get('nomfic'), self.entete)
             self.feuyFGDB.write(0, 1, self.blabla.get('path'), self.entete)
@@ -1831,7 +1868,7 @@ in {9}{10}'.format(len(self.li_shp),
             link = 'HYPERLINK("{0}"; "{1}")'.format(layer_infos.get(u'folder'),
                                                     self.blabla.get('browse'))
             sheet.write(line, 1, Formula(link), self.url)
-            
+
             # Interruption of function
             return self.book, self.feuyVC
         else:
@@ -1850,7 +1887,6 @@ in {9}{10}'.format(len(self.li_shp),
             # decode the fucking path name
             link = 'HYPERLINK("{0}"; "{1}")'.format(layer_infos.get(u'folder').decode('utf8'),
                                                     self.blabla.get('browse'))
-            
         sheet.write(line, 1, Formula(link), self.url)
 
         # Name of parent folder
@@ -1965,7 +2001,6 @@ in {9}{10}'.format(len(self.li_shp),
             # decode the fucking path name
             link = 'HYPERLINK("{0}"; "{1}")'.format(dico_raster.get(u'folder').decode('utf8'),
                                                     self.blabla.get('browse'))
-            
         sheet.write(line, 1, Formula(link), self.url)
 
         # Name of parent folder
@@ -1976,7 +2011,7 @@ in {9}{10}'.format(len(self.li_shp),
             sheet.write(line, 2, path.basename(dico_raster.get(u'folder')))
         else:
             sheet.write(line, 2, path.basename(path.dirname(dico_raster.get(u'folder'))))
-        
+
         # Image dimensions
         sheet.write(line, 3, dico_raster.get(u'num_rows'))
         sheet.write(line, 4, dico_raster.get(u'num_cols'))
@@ -2068,7 +2103,7 @@ in {9}{10}'.format(len(self.li_shp),
             # decode the fucking path name
             link = 'HYPERLINK("{0}"; "{1}")'.format(gdb_infos.get(u'folder').decode('utf8'),
                                                     self.blabla.get('browse'))
-            
+
         sheet.write(line, 1, Formula(link), self.url)
 
         # Name of parent folder
@@ -2223,7 +2258,7 @@ in {9}{10}'.format(len(self.li_shp),
             # decode the fucking path name
             link = 'HYPERLINK("{0}"; "{1}")'.format(dico_cdao.get(u'folder').decode('utf8'),
                                                     self.blabla.get('browse'))
-            
+
         sheet.write(line, 1, Formula(link), self.url)
 
         # Name of parent folder
@@ -2351,7 +2386,7 @@ in {9}{10}'.format(len(self.li_shp),
             # decode the fucking path name
             link = 'HYPERLINK("{0}"; "{1}")'.format(mapdoc_infos.get(u'folder').decode('utf8'),
                                                     self.blabla.get('browse'))
-            
+
         sheet.write(line, 1, Formula(link), self.url)
 
         # Name of parent folder
@@ -2479,7 +2514,7 @@ in {9}{10}'.format(len(self.li_shp),
 
         # Name
         sheet.write(line, 0, layer_infos.get('name'))
-        
+
         # Connection chain to reach database
         sheet.write(line, 1, "{0}:{1}-{2}".format(self.host.get(),
                                                   self.port.get(),
@@ -2544,6 +2579,14 @@ in {9}{10}'.format(len(self.li_shp),
 
         # End of function
         return self.book, self.feuyPG
+
+    def dictionarize_metrics(self):
+        """ Write global statistices about datas examined """
+        # total count of layers
+        self.feuySTATS.write(1, 1, self.global_total_layers)
+
+        # end of function
+        return
 
     def savedico(self):
         u""" Save the Excel file """
