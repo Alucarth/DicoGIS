@@ -164,7 +164,8 @@ class Read_KML():
         # dependencies
         dependencies = [f for f in listdir(path.dirname(layerpath))
                         if path.splitext(path.abspath(f))[0] == path.splitext(layerpath)[0]
-                        and not path.splitext(path.abspath(f).lower())[1] == ".kml"]
+                        and not path.splitext(path.abspath(f).lower())[1] == ".kml"
+                        and not path.splitext(path.abspath(f).lower())[1] == ".kmz"]
         dico_layer[u'dependencies'] = dependencies
 
         # total file and dependencies size
@@ -263,7 +264,10 @@ if __name__ == '__main__':
     from os import getcwd
     # test files
     li_kml = [path.join(getcwd(),
-                        r'..\..\test\datatest\vectors\kml\wc2014_MapTour.kml')]  # kml
+                        r'..\..\test\datatest\vectors\kml\wc2014_MapTour.kml'), # kml
+              path.join(getcwd(),
+                        r'..\..\test\datatest\vectors\kml\PPRI_Loire_sept2014.kmz')]  # kmz
+
     # test text dictionary
     textos = OD()
     textos['srs_comp'] = u'Compound'
@@ -292,4 +296,3 @@ if __name__ == '__main__':
                             'KML',
                             textos)
         print '\n', dico_layer, dico_fields
-
