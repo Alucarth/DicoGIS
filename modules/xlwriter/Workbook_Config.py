@@ -110,31 +110,30 @@ class ConfigExcel(Workbook):
         #     sheet.set_horz_split_pos(1)
         #     sheet.set_vert_split_pos(1)
 
-
-    def add_vectors_sheet(self):
+    def add_vectors_sheet(self, xls_workbook, text, style_headers):
         """
         sets sheet dedicated to vectors information
         """
         # sheet
-        self.feuyVC = self.add_sheet(self.text.get('sheet_vectors'),
-                                         cell_overwrite_ok=True)
+        feuyVC = workbook.add_sheet(text.get('sheet_vectors'),
+                                    cell_overwrite_ok=True)
         # headers
-        self.feuyVC.write(0, 0, self.text.get('nomfic'), self.entete)
-        self.feuyVC.write(0, 1, self.text.get('path'), self.entete)
-        self.feuyVC.write(0, 2, self.text.get('theme'), self.entete)
-        self.feuyVC.write(0, 3, self.text.get('num_attrib'), self.entete)
-        self.feuyVC.write(0, 4, self.text.get('num_objets'), self.entete)
-        self.feuyVC.write(0, 5, self.text.get('geometrie'), self.entete)
-        self.feuyVC.write(0, 6, self.text.get('srs'), self.entete)
-        self.feuyVC.write(0, 7, self.text.get('srs_type'), self.entete)
-        self.feuyVC.write(0, 8, self.text.get('codepsg'), self.entete)
-        self.feuyVC.write(0, 9, self.text.get('emprise'), self.entete)
-        self.feuyVC.write(0, 10, self.text.get('date_crea'), self.entete)
-        self.feuyVC.write(0, 11, self.text.get('date_actu'), self.entete)
-        self.feuyVC.write(0, 12, self.text.get('format'), self.entete)
-        self.feuyVC.write(0, 13, self.text.get('li_depends'), self.entete)
-        self.feuyVC.write(0, 14, self.text.get('tot_size'), self.entete)
-        self.feuyVC.write(0, 15, self.text.get('li_chps'), self.entete)
+        feuyVC.write(0, 0, text.get('nomfic'), entete)
+        feuyVC.write(0, 1, text.get('path'), entete)
+        feuyVC.write(0, 2, text.get('theme'), entete)
+        feuyVC.write(0, 3, text.get('num_attrib'), entete)
+        feuyVC.write(0, 4, text.get('num_objets'), entete)
+        feuyVC.write(0, 5, text.get('geometrie'), entete)
+        feuyVC.write(0, 6, text.get('srs'), entete)
+        feuyVC.write(0, 7, text.get('srs_type'), entete)
+        feuyVC.write(0, 8, text.get('codepsg'), entete)
+        feuyVC.write(0, 9, text.get('emprise'), entete)
+        feuyVC.write(0, 10, text.get('date_crea'), entete)
+        feuyVC.write(0, 11, text.get('date_actu'), entete)
+        feuyVC.write(0, 12, text.get('format'), entete)
+        feuyVC.write(0, 13, text.get('li_depends'), entete)
+        feuyVC.write(0, 14, text.get('tot_size'), entete)
+        feuyVC.write(0, 15, text.get('li_chps'), entete)
         self.logger.info('Sheet vectors adedd')
         # tunning headers
         lg_shp_names = [len(lg) for lg in self.li_shp]
