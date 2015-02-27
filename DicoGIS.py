@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 from __future__ import unicode_literals
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         DicoGIS
 # Purpose:      Automatize the creation of a dictionnary of geographic data
 #                   contained in a folders structures.
@@ -11,10 +11,10 @@ from __future__ import unicode_literals
 #
 # Python:       2.7.x
 # Created:      14/02/2013
-# Updated:      01/12/2014
+# Updated:      25/02/2015
 #
 # Licence:      GPL 3
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 DGversion = "2.1.0"
 
@@ -82,7 +82,7 @@ from modules import TextsManager
 # Imports depending on operating system
 if opersys == 'win32':
     u""" windows """
-    from os import startfile                            # to open a folder/file
+    from os import startfile        # to open a folder/file
 else:
     pass
 
@@ -129,6 +129,9 @@ class DicoGIS(Tk):
             self.logger.info('Operating system: {0}'.format(platform.platform()))
         self.resizable(width=False, height=False)
         self.focus_force()
+
+        # getting the GDAL version
+        self.logger.info('GDAL version: {}'.format(gdal.__version__))
 
         ## Variables
         # settings
@@ -283,10 +286,10 @@ class DicoGIS(Tk):
                       sticky="NSWE",
                       padx=2, pady=2)
         caz_egdb.grid(row=2,
-                     column=2,
-                     columnspan=2,
-                     sticky="NSWE",
-                     padx=2, pady=2)
+                      column=2,
+                      columnspan=2,
+                      sticky="NSWE",
+                      padx=2, pady=2)
         caz_cdao.grid(row=2,
                       column=4,
                       columnspan=1,
@@ -454,7 +457,7 @@ class DicoGIS(Tk):
         s = Style(self)
         s.configure('Kim.TButton', foreground='DodgerBlue', borderwidth=0)
         Button(self,
-               text='by Julien M.\n      2014',
+               text='by Julien M.\n      2015',
                style='Kim.TButton',
                command=lambda: open_new('https://github.com/Guts')).grid(row=6,
                                                                          padx=2,
@@ -508,7 +511,7 @@ class DicoGIS(Tk):
         """
         if self.opt_proxy.get():
             self.FrProx.grid(row=5, column=0, columnspan=4,
-                      sticky="NSWE", padx=2, pady=2)
+                             sticky="NSWE", padx=2, pady=2)
         else:
             self.FrProx.grid_forget()
         # end of function
