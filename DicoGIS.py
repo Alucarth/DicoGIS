@@ -991,17 +991,8 @@ in {9}{10}'.format(len(self.li_shp),
                              'Esri shapefiles',
                              self.blabla)
                     self.logger.info('\t Infos OK')
-                except AttributeError, e:
+                except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
-                    self.logger.error(e)
-                    self.prog_layers["value"] = self.prog_layers["value"] + 1
-                    continue
-                except RuntimeError, e:
-                    """ corrupt files """
-                    self.logger.error(e)
-                    self.prog_layers["value"] = self.prog_layers["value"] + 1
-                    continue
-                except Exception, e:
                     self.logger.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
@@ -1037,14 +1028,10 @@ in {9}{10}'.format(len(self.li_shp),
                              'MapInfo tab',
                              self.blabla)
                     self.logger.info('\t Infos OK')
-                except AttributeError, e:
+                except (AttributeError, RuntimeError, Exception) as e:
+                    """ empty files """
                     self.logger.error(e)
-                    continue
-                except RuntimeError, e:
-                    self.logger.error(e)
-                    continue
-                except Exception, e:
-                    self.logger.error(e)
+                    self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
                 self.dictionarize_vectors(self.dico_layer,
@@ -1077,14 +1064,10 @@ in {9}{10}'.format(len(self.li_shp),
                              'Google KML/KMZ',
                              self.blabla)
                     self.logger.info('\t Infos OK')
-                except AttributeError, e:
+                except (AttributeError, RuntimeError, Exception) as e:
+                    """ empty files """
                     self.logger.error(e)
-                    continue
-                except RuntimeError, e:
-                    self.logger.error(e)
-                    continue
-                except Exception, e:
-                    self.logger.error(e)
+                    self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
                 self.dictionarize_vectors(self.dico_layer,
@@ -1118,14 +1101,10 @@ in {9}{10}'.format(len(self.li_shp),
                              'GML',
                              self.blabla)
                     self.logger.info('\t Infos OK')
-                except AttributeError, e:
+                except (AttributeError, RuntimeError, Exception) as e:
+                    """ empty files """
                     self.logger.error(e)
-                    continue
-                except RuntimeError, e:
-                    self.logger.error(e)
-                    continue
-                except Exception, e:
-                    self.logger.error(e)
+                    self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
                 self.dictionarize_vectors(self.dico_layer,
@@ -1158,14 +1137,10 @@ in {9}{10}'.format(len(self.li_shp),
                                  'GeoJSON',
                                  self.blabla)
                     self.logger.info('\t Infos OK')
-                except AttributeError, e:
+                except (AttributeError, RuntimeError, Exception) as e:
+                    """ empty files """
                     self.logger.error(e)
-                    continue
-                except RuntimeError, e:
-                    self.logger.error(e)
-                    continue
-                except Exception, e:
-                    self.logger.error(e)
+                    self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
                 self.dictionarize_vectors(self.dico_layer,
@@ -1199,14 +1174,10 @@ in {9}{10}'.format(len(self.li_shp),
                                  path.splitext(raster)[1],
                                  self.blabla)
                     self.logger.info('\t Infos OK')
-                except AttributeError, e:
+                except (AttributeError, RuntimeError, Exception) as e:
+                    """ empty files """
                     self.logger.error(e)
-                    continue
-                except RuntimeError, e:
-                    self.logger.error(e)
-                    continue
-                except Exception, e:
-                    self.logger.error(e)
+                    self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
                 self.dictionarize_rasters(self.dico_raster,
@@ -1239,16 +1210,10 @@ in {9}{10}'.format(len(self.li_shp),
                              'Esri FileGeoDataBase',
                              self.blabla)
                     self.logger.info('\t Infos OK')
-                except AttributeError, e:
+                except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
                     self.logger.error(e)
-                    continue
-                except RuntimeError, e:
-                    """ corrupt files """
-                    self.logger.error(e)
-                    continue
-                except Exception, e:
-                    self.logger.error(e)
+                    self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
                 self.dictionarize_fdb(self.dico_fdb,
@@ -1280,16 +1245,10 @@ in {9}{10}'.format(len(self.li_shp),
                                'Spatialite',
                                self.blabla)
                     self.logger.info('\t Infos OK')
-                except AttributeError, e:
+                except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
                     self.logger.error(e)
-                    continue
-                except RuntimeError, e:
-                    """ corrupt files """
-                    self.logger.error(e)
-                    continue
-                except Exception, e:
-                    self.logger.error(e)
+                    self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
                 self.dictionarize_fdb(self.dico_fdb,
@@ -1320,16 +1279,10 @@ in {9}{10}'.format(len(self.li_shp),
                              'AutoCAD DXF',
                              self.blabla)
                     self.logger.info('\t Infos OK')
-                except AttributeError, e:
+                except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
                     self.logger.error(e)
-                    continue
-                except RuntimeError, e:
-                    """ corrupt files """
-                    self.logger.error(e)
-                    continue
-                except Exception, e:
-                    self.logger.error(e)
+                    self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
                 self.dictionarize_cdao(self.dico_cdao,
@@ -1391,16 +1344,10 @@ in {9}{10}'.format(len(self.li_shp),
                                 'Geospatial PDF',
                                 self.blabla)
                     self.logger.info('\t Infos OK')
-                except AttributeError, e:
+                except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
                     self.logger.error(e)
-                    continue
-                except RuntimeError, e:
-                    """ corrupt files """
-                    self.logger.error(e)
-                    continue
-                except Exception, e:
-                    self.logger.error(e)
+                    self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
                 self.dictionarize_mapdocs(self.dico_pdf,
