@@ -132,7 +132,7 @@ class Read_SHP():
             pass
 
         # get first feature
-        obj = self.layer.GetFeature(0)
+        obj = self.layer.GetNextFeature()
         # get the geometry from the first feature
         self.geom = obj.GetGeometryRef()
         # get layer definitions
