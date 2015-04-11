@@ -588,9 +588,12 @@ class DicoGIS(Tk):
         config.set('database', 'opt_views', self.opt_pgvw.get())
         # Writing the configuration file
         with open(confile, 'wb') as configfile:
-            config.write(configfile)
-        # log
-        self.logger.info('Options saved')
+            try:
+                config.write(configfile)
+                self.logger.info('Options saved')
+            except (UnicodeEncodeError, UnicodeDecodeError), e:
+                self.logger.error("Options couldn't be saved because of: {0}".format(e))
+
         # End of function
         return config
 
