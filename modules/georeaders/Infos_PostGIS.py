@@ -73,7 +73,7 @@ class Read_PostGIS():
 
         # raising forbidden access
         try:
-            obj = layer.GetFeature(1)          # get the first object (shp)
+            obj = layer.GetNextFeature()  # get the first object
         except RuntimeError, e:
             if u'permission denied' in str(e):
                 mess = str(e).split('\n')[0]
@@ -83,10 +83,16 @@ class Read_PostGIS():
             else:
                 pass
 
-        self.geom = obj.GetGeometryRef()        # get the geometry
-        self.def_couche = layer.GetLayerDefn() # get layer definitions
-        self.srs = layer.GetSpatialRef()   # get spatial system reference
-        self.srs.AutoIdentifyEPSG()             # try to determine the EPSG code
+        try:
+            self.geom = obj.GetGeometryRef()        # get the geometry
+            self.def_couche = layer.GetLayerDefn()  # get layer definitions
+            self.srs = layer.GetSpatialRef()   # get spatial system reference
+            self.srs.AutoIdentifyEPSG()  # try to determine the EPSG code
+        except AttributeError:
+            mess = "No geodata"
+            self.alert = self.alert + 1
+            self.erratum(dico_layer, layer, mess)
+            return None
 
         # basic information
         dico_layer[u'type'] = tipo
@@ -180,8 +186,8 @@ class Read_PostGIS():
         for i in range(self.def_couche.GetFieldCount()):
             champomy = self.def_couche.GetFieldDefn(i) # ordered list of fields
             dico_fields[champomy.GetName()] = champomy.GetTypeName(),\
-                                           champomy.GetWidth(),\
-                                           champomy.GetPrecision()
+                                              champomy.GetWidth(),\
+                                              champomy.GetPrecision()
         # End of function
         return dico_fields
 
@@ -202,7 +208,7 @@ class Read_PostGIS():
         # End of function
         return dicolayer, layer
 
-################################################################################
+###############################################################################
 ###### Stand alone program ########
 ###################################
 
@@ -226,29 +232,34 @@ if __name__ == '__main__':
     dico_layer = OD()     # dictionary where will be stored informations
     dico_fields = OD()     # dictionary for fields information
     # PostGIS database settings
-    test_host = 'postgresql1.alwaysdata.com'
+    test_host = 'postgresql-guts.alwaysdata.net'
     test_db = 'guts_gis'
     test_user = 'guts_player'
     test_pwd = 'letsplay'
+
+    # include views
+    gdal.SetConfigOption(str("PG_LIST_ALL_TABLES"), str("YES"))
     try:
-        conn = ogr.Open("PG: host=%s dbname=%s user=%s password=%s" %(test_host, 
-                                                                      test_db, 
-                                                                      test_user, 
+        conn = ogr.Open("PG: host=%s dbname=%s user=%s password=%s" %(test_host,
+                                                                      test_db,
+                                                                      test_user,
                                                                       test_pwd))
         print("Access granted : connecting people!")
         print("Layer count: {0}".format(conn.GetLayerCount()))
-        sql_version = "SELECT version();"
-        version = conn.ExecuteSQL(sql_version)
+        # sql_version = "SELECT PostGIS_full_version();"
+        # version = conn.ExecuteSQL(sql_version)
+        # print("Version: {0}".format(version))
+        # print(version)
+
         # schemas list
-        sql_schemas =  "select nspname from pg_catalog.pg_namespace;"
+        sql_schemas = "select nspname from pg_catalog.pg_namespace;"
         schemas = conn.ExecuteSQL(sql_schemas)
-  
         print("Driver name: {0}".format(conn.GetDriver().GetName()))
-        print(dir(conn))
     except Exception, e:
         print 'Connection to database failed. Check your connection settings: {0}'.format(str(e))
         exit()
-    # parsing the layers
+
+    # parsing layers
     for layer in conn:
         dico_layer.clear()
         dico_fields.clear()
