@@ -11,7 +11,7 @@ from __future__ import unicode_literals
 #
 # Python:       2.7.x
 # Created:      14/02/2013
-# Updated:      25/02/2015
+# Updated:      12/04/2015
 #
 # Licence:      GPL 3
 # ------------------------------------------------------------------------------
@@ -71,6 +71,7 @@ from modules import Read_TAB        # extractor for MapInfo Tables
 from modules import Read_KML        # extractor for KML
 from modules import Read_GML        # extractor for GML
 from modules import Read_GeoJSON    # extractor for GeoJSON
+from modules import ReadGXT    # extractor for Geoconcept eXport Text
 from modules import Read_PostGIS    # extractor for PostGIS databases
 from modules import Read_GDB        # extractor for Esri FileGeoDataBase
 from modules import Read_SpaDB      # extractor for Spatialite DB
@@ -149,7 +150,8 @@ class DicoGIS(Tk):
         self.li_tab = []        # list for MapInfo tables path
         self.li_kml = []        # list for KML path
         self.li_gml = []        # list for GML path
-        self.li_geoj = []       # list for GeoJSON path
+        self.li_geoj = []       # list for GeoJSON paths
+        self.li_gxt = []       # list for GXT paths
         self.li_vectors = []    # list for all vectors
         # formats / type: rasters
         self.li_raster = []     # list for rasters paths
@@ -217,6 +219,7 @@ class DicoGIS(Tk):
         self.opt_kml = IntVar(self.FrFilters)   # able/disable KML
         self.opt_gml = IntVar(self.FrFilters)   # able/disable GML
         self.opt_geoj = IntVar(self.FrFilters)  # able/disable GeoJSON
+        self.opt_gxt = IntVar(self.FrFilters)  # able/disable GXT
         self.opt_egdb = IntVar(self.FrFilters)  # able/disable Esri FileGDB
         self.opt_spadb = IntVar(self.FrFilters)  # able/disable Spatalite DB
         self.opt_rast = IntVar(self.FrFilters)  # able/disable rasters
@@ -239,6 +242,9 @@ class DicoGIS(Tk):
         caz_geoj = Checkbutton(self.FrFilters,
                                text=u'.geojson',
                                variable=self.opt_geoj)
+        caz_gxt = Checkbutton(self.FrFilters,
+                              text=u'.geojson',
+                              variable=self.opt_gxt)
         caz_egdb = Checkbutton(self.FrFilters,
                                text=u'Esri FileGDB',
                                variable=self.opt_egdb)
@@ -686,6 +692,7 @@ class DicoGIS(Tk):
         self.li_kml = []
         self.li_gml = []
         self.li_geoj = []
+        self.li_gxt = []
         self.li_vectors = []
         self.li_dxf = []
         self.li_dwg = []
@@ -759,6 +766,10 @@ class DicoGIS(Tk):
                     """ listing GeoPDF """
                     # add complete path of PDF file
                     self.li_pdf.append(full_path)
+                elif path.splitext(full_path.lower())[1] == '.gxt':
+                    """ listing Geoconcept eXport Text (GXT) """
+                    # add complete path of GXT file
+                    self.li_gxt.append(full_path)
                 elif path.splitext(full_path.lower())[1] in self.li_raster_formats:
                     """ listing compatible rasters """
                     # add complete path of raster file
@@ -801,24 +812,22 @@ class DicoGIS(Tk):
           {7} Spatialite - \
           {8} CAO/DAO - \
           {9} PDF - \
-          in {10}{11}'.format(len(self.li_shp),
-                            len(self.li_tab),
-                            len(self.li_kml),
-                            len(self.li_gml),
-                            len(self.li_geoj),
-                            len(self.li_raster),
-                            len(self.li_egdb),
-                            len(self.li_spadb),
-                            len(self.li_cdao),
-                            len(self.li_pdf),
-                            self.num_folders,
-                            self.blabla.get('log_numfold')))
+          {10} PDF - \
+          in {11}{12}'.format(len(self.li_shp), len(self.li_tab),
+                              len(self.li_kml), len(self.li_gml),
+                              len(self.li_geoj), len(self.li_raster),
+                              len(self.li_egdb), len(self.li_spadb),
+                              len(self.li_cdao), len(self.li_pdf),
+                              len(self.li_gxt),
+                              self.num_folders,
+                              self.blabla.get('log_numfold')))
         # grouping vectors lists
         self.li_vectors.extend(self.li_shp)
         self.li_vectors.extend(self.li_tab)
         self.li_vectors.extend(self.li_kml)
         self.li_vectors.extend(self.li_gml)
         self.li_vectors.extend(self.li_geoj)
+        self.li_vectors.extend(self.li_gxt)
 
         # Lists ordering and tupling
         self.li_shp.sort()
@@ -833,6 +842,8 @@ class DicoGIS(Tk):
         self.li_gml = tuple(self.li_gml)
         self.li_geoj.sort()
         self.li_geoj = tuple(self.li_geoj)
+        self.li_gxt.sort()
+        self.li_gxt = tuple(self.li_gxt)
         self.li_egdb.sort()
         self.li_egdb = tuple(self.li_egdb)
         self.li_spadb.sort()
@@ -855,15 +866,17 @@ class DicoGIS(Tk):
 {2} KML - \
 {3} GML - \
 {4} GeoJSON\
-\n{5} rasters - \
-{6} file databases - \
-{7} CAO/DAO - \
-{8} PDF - \
-in {9}{10}'.format(len(self.li_shp),
+{5} GXT\
+\n{6} rasters - \
+{7} file databases - \
+{8} CAO/DAO - \
+{9} PDF - \
+in {10}{11}'.format(len(self.li_shp),
                   len(self.li_tab),
                   len(self.li_kml),
                   len(self.li_gml),
                   len(self.li_geoj),
+                  len(self.li_gxt),
                   len(self.li_raster),
                   len(self.li_fdb),
                   len(self.li_cdao),
@@ -876,9 +889,9 @@ in {9}{10}'.format(len(self.li_shp),
         self.val.config(state=ACTIVE)
         # End of function
         return foldertarget, self.li_shp, self.li_tab, self.li_kml,\
-            self.li_gml, self.li_geoj, self.li_raster, self.li_egdb,\
-            self.li_dxf, self.li_dwg, self.li_dgn, self.li_cdao,\
-            self.li_fdb, self.li_spadb
+            self.li_gml, self.li_geoj, self.li_gxt, self.li_raster,\
+            self.li_egdb, self.li_dxf, self.li_dwg, self.li_dgn,\
+            self.li_cdao, self.li_fdb, self.li_spadb
 
     def process(self):
         """ check needed info and launch different processes """
@@ -910,10 +923,10 @@ in {9}{10}'.format(len(self.li_shp),
             return
         # check if there are some layers into the folder structure
         if (len(self.li_vectors)
-            + len(self.li_raster)
-            + len(self.li_fdb)
-            + len(self.li_cdao)
-            + len(self.li_pdf)):
+          + len(self.li_raster)
+          + len(self.li_fdb)
+          + len(self.li_cdao)
+          + len(self.li_pdf)):
             pass
         else:
             avert('DicoGIS - User error', self.blabla.get('nodata'))
@@ -941,6 +954,10 @@ in {9}{10}'.format(len(self.li_shp),
             pass
         if self.opt_geoj.get() and len(self.li_geoj) > 0:
             total_files += len(self.li_geoj)
+        else:
+            pass
+        if self.opt_gxt.get() and len(self.li_gxt) > 0:
+            total_files += len(self.li_gxt)
         else:
             pass
         if self.opt_rast.get() and len(self.li_raster) > 0:
@@ -1494,6 +1511,7 @@ in {9}{10}'.format(len(self.li_shp),
                 pass
         else:
             self.logger.info("No proxy configured.")
+
         # checking if user chose to list PostGIS views
         if self.opt_pgvw.get():
             gdal.SetConfigOption(str("PG_LIST_ALL_TABLES"), str("YES"))
@@ -1501,11 +1519,15 @@ in {9}{10}'.format(len(self.li_shp),
         else:
             gdal.SetConfigOption(str("PG_LIST_ALL_TABLES"), str("NO"))
             self.logger.info("PostgreSQL views disabled.")
+
         # testing connection settings
         try:
             conn = ogr.Open("PG: host={0} port={1} dbname={2} user={3} password={4}".format(
                             self.host.get(), self.port.get(), self.dbnb.get(), self.user.get(),
                             self.pswd.get()))
+            conn.GetLayerCount()
+            # sql_version = "SELECT PostGIS_full_version();"
+            # version = conn.ExecuteSQL(sql_version)
         except Exception, e:
             self.logger.warning("Connection failed: {0}.".format(e))
             self.status.set("Connection failed: {0}.".format(e))
