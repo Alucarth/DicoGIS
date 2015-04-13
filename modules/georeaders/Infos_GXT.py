@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
-from __future__ import unicode_literals
-#------------------------------------------------------------------------------
+# from __future__ import unicode_literals
+# -----------------------------------------------------------------------------
 # Name:         InfosSHP
 # Purpose:      Use GDAL/OGR library to extract informations about
 #                   geographic data. It permits a more friendly use as
@@ -13,7 +13,7 @@ from __future__ import unicode_literals
 # Created:      11/04/2015
 # Updated:      11/04/2015
 # Licence:      GPL 3
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 ###############################################################################
 ########### Libraries #############
@@ -262,8 +262,8 @@ class ReadGXT():
         for i in range(self.def_couche.GetFieldCount()):
             champomy = self.def_couche.GetFieldDefn(i) # fields ordered
             dico_fields[champomy.GetName()] = champomy.GetTypeName(),\
-                                           champomy.GetWidth(),\
-                                           champomy.GetPrecision()
+                                              champomy.GetWidth(),\
+                                              champomy.GetPrecision()
 
         # end of function
         return dico_fields
@@ -299,7 +299,7 @@ class ReadGXT():
 if __name__ == '__main__':
     u""" standalone execution for tests. Paths are relative considering a test
     within the official repository (https://github.com/Guts/DicoGIS/)"""
-    from os import chdir
+    from os import chdir, walk
     # sample files
     chdir(r'..\..\test')
     li_gxt = []
@@ -332,14 +332,16 @@ if __name__ == '__main__':
 
     # recipient datas
     dico_gxt = OD()
-
+    dico_fields = OD()    # dictionary for fields information
     # read GXT
     for gxtpath in li_gxt:
         dico_gxt.clear()
+        dico_fields.clear()
         if path.isfile(gxtpath):
             print("\n{0}: ".format(gxtpath))
             ReadGXT(gxtpath,
                     dico_gxt,
+                    dico_fields,
                     'Geoconcept eXport Text',
                     textos)
             # print results
