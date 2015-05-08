@@ -11,7 +11,7 @@ from __future__ import unicode_literals
 #
 # Python:       2.7.x
 # Created:      14/02/2013
-# Updated:      12/04/2015
+# Updated:      13/04/2015
 #
 # Licence:      GPL 3
 # ------------------------------------------------------------------------------
@@ -79,6 +79,7 @@ from modules import Read_DXF        # extractor for AutoCAD DXF
 from modules import Read_GeoPDF     # extractor for Geospatial PDF
 
 from modules import TextsManager
+from modules import MetricsManager
 
 # Imports depending on operating system
 if opersys == 'win32':
@@ -179,6 +180,7 @@ class DicoGIS(Tk):
         self.dico_err = OD()        # errors list
 
         # metrics
+        self.dico_metrics = OD()
         self.global_total_layers = 0
         self.global_total_fields = 0
         self.global_total_features = 0
@@ -188,8 +190,13 @@ class DicoGIS(Tk):
         self.global_total_srs_geog = 0
         self.global_total_srs_none = 0
         self.global_ignored = 0    # files ignored by an user filter
+        self.global_dico_fields = OD()
+
         # GUI fonts
         ft_tit = tkFont.Font(family="Times", size=10, weight=tkFont.BOLD)
+
+        # loading previous options
+        self.load_settings()
 
         # fillfulling text
         TextsManager().load_texts(dico_texts=self.blabla,
@@ -243,7 +250,7 @@ class DicoGIS(Tk):
                                text=u'.geojson',
                                variable=self.opt_geoj)
         caz_gxt = Checkbutton(self.FrFilters,
-                              text=u'.geojson',
+                              text=u'.gxt',
                               variable=self.opt_gxt)
         caz_egdb = Checkbutton(self.FrFilters,
                                text=u'Esri FileGDB',
@@ -281,6 +288,10 @@ class DicoGIS(Tk):
                       column=4,
                       sticky="NSWE",
                       padx=2, pady=2)
+        caz_gxt.grid(row=1,
+                     column=7,
+                     sticky="NSWE",
+                     padx=2, pady=2)
         caz_pdf.grid(row=1,
                      column=5,
                      columnspan=2,
@@ -339,11 +350,11 @@ class DicoGIS(Tk):
         self.pswd = StringVar(self.FrDb)
 
         # proxy specific variables
-        self.opt_ntlm = IntVar(self.FrProx)  # proxy NTLM protocol option
+        self.opt_ntlm = IntVar(self.FrProx, 0)  # proxy NTLM protocol option
         self.prox_server = StringVar(self.FrProx, 'proxy.server.com')
         self.prox_port = IntVar(self.FrProx, 80)
-        self.prox_user = StringVar(self.FrProx, 'postgres')
-        self.prox_pswd = StringVar(self.FrProx)
+        self.prox_user = StringVar(self.FrProx, 'proxy_user')
+        self.prox_pswd = StringVar(self.FrProx, '****')
 
         # Form widgets
         self.ent_H = Entry(self.FrDb, textvariable=self.host)
@@ -353,7 +364,7 @@ class DicoGIS(Tk):
         self.ent_M = Entry(self.FrDb, textvariable=self.pswd, show='*')
 
         caz_pgvw = Checkbutton(self.FrDb,
-                               text=u'See views?',
+                               text=self.blabla.get('gui_views'),
                                variable=self.opt_pgvw)
         caz_prox = Checkbutton(self.FrDb,
                                text=u'Proxy',
@@ -475,6 +486,7 @@ class DicoGIS(Tk):
                                  width=5)
         self.ddl_lang.current(li_lang.index(self.def_lang))
         self.ddl_lang.bind("<<ComboboxSelected>>", self.change_lang)
+
         # type switcher
         rd_file = Radiobutton(self,
                               text=self.blabla.get('gui_tab1'),
@@ -508,8 +520,10 @@ class DicoGIS(Tk):
         self.FrProg.grid(row=5, column=1, sticky="NSWE", padx=2, pady=2)
         self.FrOutp.grid(row=6, column=1, sticky="NSWE", padx=2, pady=2)
 
-        # loading previous options
+        # load previous settings
         self.load_settings()
+        self.proxy_form()
+
 
     def proxy_form(self):
         u"""
@@ -538,6 +552,7 @@ class DicoGIS(Tk):
             self.opt_kml.set(config.get('filters', 'opt_kml'))
             self.opt_gml.set(config.get('filters', 'opt_gml'))
             self.opt_geoj.set(config.get('filters', 'opt_geoj'))
+            self.opt_gxt.set(config.get('filters', 'opt_gxt'))
             self.opt_rast.set(config.get('filters', 'opt_rast'))
             self.opt_egdb.set(config.get('filters', 'opt_egdb'))
             self.opt_spadb.set(config.get('filters', 'opt_spadb'))
@@ -549,11 +564,18 @@ class DicoGIS(Tk):
             self.dbnb.set(config.get('database', 'db_name'))
             self.user.set(config.get('database', 'user'))
             self.opt_pgvw.set(config.get('database', 'opt_views'))
+            # proxy settings
+            self.opt_proxy.set(config.get('proxy', 'proxy_needed'))
+            self.opt_ntlm.set(config.get('proxy', 'proxy_type'))
+            self.prox_server.set(config.get('proxy', 'proxy_server'))
+            self.prox_port.set(config.get('proxy', 'proxy_port'))
+            self.prox_user.set(config.get('proxy', 'proxy_user'))
             # log
             self.logger.info('Last options loaded')
-        except:
+        except Exception as e:
             # log
-            self.logger.info('1st use.')
+            self.logger.info('1st use: {0}'.format(e))
+
         # End of function
         return self.def_rep, self.def_lang
 
@@ -566,6 +588,7 @@ class DicoGIS(Tk):
         config.add_section('basics')
         config.add_section('filters')
         config.add_section('database')
+        config.add_section('proxy')
         # config
         config.set('config', 'DicoGIS_version', DGversion)
         config.set('config', 'OS', platform.platform())
@@ -581,17 +604,25 @@ class DicoGIS(Tk):
         config.set('filters', 'opt_kml', self.opt_kml.get())
         config.set('filters', 'opt_gml', self.opt_gml.get())
         config.set('filters', 'opt_geoj', self.opt_geoj.get())
+        config.set('filters', 'opt_gxt', self.opt_gxt.get())
         config.set('filters', 'opt_rast', self.opt_rast.get())
         config.set('filters', 'opt_egdb', self.opt_egdb.get())
         config.set('filters', 'opt_spadb', self.opt_spadb.get())
         config.set('filters', 'opt_cdao', self.opt_cdao.get())
         config.set('filters', 'opt_pdf', self.opt_pdf.get())
-        # databse settings
+        # database settings
         config.set('database', 'host', self.host.get())
         config.set('database', 'port', self.port.get())
         config.set('database', 'db_name', self.dbnb.get())
         config.set('database', 'user', self.user.get())
         config.set('database', 'opt_views', self.opt_pgvw.get())
+        # proxy settings
+        config.set('proxy', 'proxy_needed', self.opt_proxy.get())
+        config.set('proxy', 'proxy_type', self.opt_ntlm.get())
+        config.set('proxy', 'proxy_server', self.prox_server.get())
+        config.set('proxy', 'proxy_port', self.prox_port.get())
+        config.set('proxy', 'proxy_user', self.prox_user.get())
+
         # Writing the configuration file
         with open(confile, 'wb') as configfile:
             try:
@@ -865,7 +896,7 @@ class DicoGIS(Tk):
 {1} tables (MapInfo) - \
 {2} KML - \
 {3} GML - \
-{4} GeoJSON\
+{4} GeoJSON - \
 {5} GXT\
 \n{6} rasters - \
 {7} file databases - \
@@ -983,6 +1014,10 @@ in {10}{11}'.format(len(self.li_shp),
         self.prog_layers["maximum"] = total_files
         self.prog_layers["value"]
 
+        # initializing metrics
+        statistiker = MetricsManager(self.dico_metrics).init_metrics()
+        print statistiker
+
         # getting the infos from files selected
         # line_folders = 1    # line rank of directories dictionary
         line_vectors = 1    # line rank of vectors dictionary
@@ -1022,6 +1057,9 @@ in {10}{11}'.format(len(self.li_shp),
                                           self.feuyVC,
                                           line_vectors)
                 self.logger.info('\t Wrote into the dictionary')
+                # writing to the Excel dictionary
+                statistiker.store_metrics(self.dico_layer, self.dico_fields, "vector")
+                self.logger.info('\t Added to global metrics')
                 # increment the line number
                 line_vectors = line_vectors + 1
         else:
@@ -1172,6 +1210,43 @@ in {10}{11}'.format(len(self.li_shp),
                 line_vectors = line_vectors + 1
         else:
             self.logger.info('\tIgnoring {0} GeoJSON'.format(len(self.li_geoj)))
+            pass
+
+        if self.opt_gxt.get() and len(self.li_gxt) > 0:
+            self.logger.info('\n\tProcessing GXT: start')
+            for gxtpath in self.li_gxt:
+                """ looping on gxt list """
+                self.status.set(path.basename(gxtpath))
+                self.logger.info('\n' + gxtpath)
+                # increment the progress bar
+                self.prog_layers["value"] = self.prog_layers["value"] + 1
+                self.update()
+                # reset recipient data
+                self.dico_layer.clear()
+                self.dico_fields.clear()
+                # getting the informations
+                try:
+                    Read_SHP(path.abspath(gxtpath),
+                             self.dico_layer,
+                             self.dico_fields,
+                             'Geoconcept eXport Text',
+                             self.blabla)
+                    self.logger.info('\t Infos OK')
+                except (AttributeError, RuntimeError, Exception) as e:
+                    """ empty files """
+                    self.logger.error(e)
+                    self.prog_layers["value"] = self.prog_layers["value"] + 1
+                    continue
+                # writing to the Excel dictionary
+                self.dictionarize_vectors(self.dico_layer,
+                                          self.dico_fields,
+                                          self.feuyVC,
+                                          line_vectors)
+                self.logger.info('\t Wrote into the dictionary')
+                # increment the line number
+                line_vectors = line_vectors + 1
+        else:
+            self.logger.info('\tIgnoring {0} Geoconcept eXport Text'.format(len(self.li_gxt)))
             pass
 
         if self.opt_rast.get() and len(self.li_raster) > 0:
@@ -2587,7 +2662,8 @@ in {10}{11}'.format(len(self.li_shp),
                 avert(title=u'Concurrent access',
                       message=u'Please close Microsoft Excel before saving.')
         else:
-            avert(title=u'Erreur', message=mess)
+            avert(title=u'Not saved', message="You cancelled saving operation")
+            exit()
 
         # End of function
         return self.book, saved
