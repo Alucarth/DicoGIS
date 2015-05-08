@@ -1,8 +1,8 @@
 ﻿# -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 #-------------------------------------------------------------------------------
-# Name:         metadator2exe
-# Purpose:      Script to transform Metadator scripts into an Windows executable
+# Name:         dicogis2exe
+# Purpose:      Script to transform DicoGIS scripts into an Windows executable
 #                   software. It uses py2exe.
 #
 # Author:       Julien Moura (https://github.com/Guts/)
@@ -36,7 +36,6 @@ from modules import *
 # adding py2exe to the env path
 sys.argv.append('py2exe')
 
-
 # Specific data for gdal
 gdal_dir = r'data/gdal'
 gdal_files = [os.path.join(gdal_dir, i) for i in os.listdir(gdal_dir)]
@@ -66,12 +65,12 @@ build_options = dict(
 py2exe_options = dict(
                         excludes=['_ssl',  # Exclude _ssl
                                   'pyreadline', 'doctest', 'email',
-                                  'optparse', 'pickle'],  # Exclude standard library
-                        dll_excludes = ['MSVCP90.dll'],
+                                  'optparse', 'pickle'],  # Exclude standard lib
+                        dll_excludes=['MSVCP90.dll'],
                         compressed=1,  # Compress library.zip
-                        optimize = 2,
+                        optimize=2,
                         # bundle_files = 1,
-                        dist_dir = 'setup/DicoGIS_{}'.format(DGversion)
+                        dist_dir='setup/DicoGIS_{}'.format(DGversion)
                       )
 
 
@@ -79,9 +78,9 @@ setup(name="DicoGIS",
       version=DGversion,
       description="Dictionary of geographic datas",
       author="Julien Moura",
-      url = "https://github.com/Guts/DicoGIS",
+      url="https://github.com/Guts/DicoGIS",
       license="license GPL v3.0",
-      data_files = [
+      data_files=[
                     # # pywin and numpy
                     # ("Microsoft.VC90.MFC", mfcfiles, "C:\\Python27\\Lib\\site-packages\\numpy\\core\\libiomp5md.dll"),
                     # gdal
@@ -96,14 +95,14 @@ setup(name="DicoGIS",
                     ("", ["DicoGIS.ico"]),
                     ("data/img", ["data/img/DicoGIS_logo.gif"]),
                     # documentation
-                    ("doc",["README.md",
-                            "doc/DicoGIS_Presentacion_ES.html",
-                            "doc/DicoGIS_Presentation_FR.html",
-                            "doc/DicoGIS_ReadMe.html",
-                            "doc/DicoGIS_GitHub.url"])
+                    ("doc", ["README.md",
+                             "doc/DicoGIS_Presentacion_ES.html",
+                             "doc/DicoGIS_Presentation_FR.html",
+                             "doc/DicoGIS_ReadMe.html",
+                             "doc/DicoGIS_GitHub.url"])
                     ],
       options={'py2exe': py2exe_options, 'build': build_options},
-      windows = [
+      windows=[
             {
             "script": "DicoGIS.py",                     # main script
             "icon_resources": [(1, "DicoGIS.ico")]      # Icone
