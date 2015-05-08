@@ -19,6 +19,7 @@
 	<gui_fr4> Fichier en sortie </gui_fr4>
 	<gui_path>Chemin du dossier : </gui_path>
 	<gui_fic>Nom du fichier en sortie : </gui_fic>
+	<gui_views>Vues logiques ? </gui_views>
 	<gui_host>Hôte : </gui_host>
 	<gui_port>Port : </gui_port>
 	<gui_db>Base de données : </gui_db>
