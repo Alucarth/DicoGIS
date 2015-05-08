@@ -114,8 +114,8 @@ class Read_GeoJSON():
             self.erratum(dico_layer, layerpath, u'err_nobjet')
             self.alert = self.alert + 1
             return None
-        
-        obj = self.layer.GetFeature(1)        # get the first object (shp)
+
+        obj = self.layer.GetNextFeature()  # get the first object
         self.geom = obj.GetGeometryRef()       # get the geometry
 
         self.def_couche = self.layer.GetLayerDefn()  # get layer definitions

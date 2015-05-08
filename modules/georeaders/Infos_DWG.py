@@ -225,7 +225,7 @@ class Read_DWG():
 
         # first feature and geometry type
         try:
-            first_obj = layer_obj.GetFeature(1)
+            first_obj = layer_obj.GetNextFeature()
             geom = first_obj.GetGeometryRef()
         except AttributeError, e:
             print e, layer_obj.GetName()

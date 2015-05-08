@@ -245,13 +245,13 @@ class Read_GDB():
 
         # first feature and geometry type
         try:
-            first_obj = layer_obj.GetFeature(1)
+            first_obj = layer_obj.GetNextFeature()
             geom = first_obj.GetGeometryRef()
         except AttributeError, e:
             print e, layer_obj.GetName(), layer_obj.GetFeatureCount()
             first_obj = layer_obj.GetNextFeature()
             geom = first_obj.GetGeometryRef()
-            
+
         # geometry type human readable
         if geom.GetGeometryName() == u'POINT':
             dico_layer[u'type_geom'] = txt.get('geom_point')

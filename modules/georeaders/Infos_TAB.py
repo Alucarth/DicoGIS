@@ -118,7 +118,7 @@ class Read_TAB():
         else:
             pass
 
-        obj = self.layer.GetFeature(1)        # get the first object (tab)
+        obj = self.layer.GetNextFeature()  # get the first object
         self.geom = obj.GetGeometryRef()      # get the geometry
 
         self.def_couche = self.layer.GetLayerDefn()  # get layer definitions
