@@ -19,6 +19,7 @@
 	<gui_fr4> Archivo final </gui_fr4>
 	<gui_path>Ruta de la carpeta: </gui_path>
 	<gui_fic>Nombre del diccionario: </gui_fic>
+	<gui_views>Vistas lógicas? </gui_views>
 	<gui_host>Servidor: </gui_host>
 	<gui_port>Puerto: </gui_port>
 	<gui_db>Base de datos: </gui_db>

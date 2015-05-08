@@ -19,6 +19,7 @@
 	<gui_fr4> Output file </gui_fr4>
 	<gui_path>Folder path: </gui_path>
 	<gui_fic>Name of output file: </gui_fic>
+	<gui_views>See views? </gui_views>
 	<gui_host>Host: </gui_host>
 	<gui_port>Port: </gui_port>
 	<gui_db>Database: </gui_db>
