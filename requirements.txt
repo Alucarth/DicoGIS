@@ -11,11 +11,10 @@
 # python-setuptools, python-pip, python-dev, python-tk, python-gdal, python-software-properties
 
 # via pypi
-pyttk
-python-dateutil
-xlwt
 dxfgrabber
-
-
-# only for windows
-# pywin32
+OWSLib
+python-dateutil
+pyttk
+pytz
+six
+xlwt
