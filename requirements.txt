@@ -17,5 +17,6 @@ OWSLib
 python-dateutil
 pyttk
 pytz
+requests
 six
 xlwt
