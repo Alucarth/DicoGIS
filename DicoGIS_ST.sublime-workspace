@@ -4,6 +4,30 @@
 		"selected_items":
 		[
 			[
+				"row",
+				"row_count"
+			],
+			[
+				"head",
+				"header_al"
+			],
+			[
+				"hea",
+				"header_ft"
+			],
+			[
+				"total_",
+				"global_total_warnings"
+			],
+			[
+				"glo",
+				"global_dico_fields"
+			],
+			[
+				"glob",
+				"global_total_layers"
+			],
+			[
 				"out",
 				"outWorkspace"
 			],
@@ -490,66 +514,42 @@
 			[
 				"se",
 				"search_rez"
-			],
-			[
-				"seac",
-				"search_resp"
-			],
-			[
-				"req",
-				"req_search"
-			],
-			[
-				"re",
-				"req_search"
-			],
-			[
-				"shar",
-				"share_id"
-			],
-			[
-				"req_",
-				"req_MD"
-			],
-			[
-				"techno",
-				"technos_get"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
+			"file": "test/test_openpyxl.py",
+			"settings":
+			{
+				"buffer_size": 4749,
+				"line_ending": "Windows"
+			}
+		},
+		{
 			"file": "DicoGIS.py",
 			"settings":
 			{
-				"buffer_size": 125766,
+				"buffer_size": 125984,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "/C/Users/julien.moura/Documents/GitHub/Isogeo/isogeo-api-samples/Isogeo_OpenCatalog2xls.py",
+			"file": "test/test_openpyxl_sample.py",
 			"settings":
 			{
-				"buffer_size": 5200,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "requirements.txt",
-			"settings":
-			{
-				"buffer_size": 535,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "test/test_isogeo_api.py",
-			"settings":
-			{
-				"buffer_size": 2823,
+				"buffer_size": 537,
 				"line_ending": "Windows",
-				"name": "import os"
+				"name": "from openpyxl import Workbook"
+			}
+		},
+		{
+			"file": "/D/Mes documents/GitHub/Perso/Paris-Beer-Week-2015/data/raw_data/pbw_geocoder.py",
+			"settings":
+			{
+				"buffer_size": 8087,
+				"line_ending": "Windows"
 			}
 		}
 	],
@@ -667,10 +667,17 @@
 	},
 	"expanded_folders":
 	[
-		"/C/Users/julien.moura/Documents/GitHub/JM/DicoGIS"
+		"/D/Mes documents/GitHub/Perso/DicoGIS",
+		"/D/Mes documents/GitHub/Perso/DicoGIS/modules",
+		"/D/Mes documents/GitHub/Perso/DicoGIS/modules/utils"
 	],
 	"file_history":
 	[
+		"/D/Mes documents/GitHub/Perso/Paris-Beer-Week-2015/data/raw_data/pbw_geocoder.py",
+		"/D/Mes documents/GitHub/Perso/DicoGIS/modules/utils/metrics.py",
+		"/D/Mes documents/GitHub/Perso/DicoGIS/requirements.txt",
+		"/D/Mes documents/GitHub/Perso/DicoGIS/test/test_isogeo_api.py",
+		"/C/Users/julien.moura/Documents/GitHub/Isogeo/isogeo-api-samples/Isogeo_OpenCatalog2xls.py",
 		"/C/Users/julien.moura/Documents/ArcGIS/arcgis-web-appbuilder-1.2/server/proxy.js",
 		"/C/Users/julien.moura/Documents/GitHub/JM/DicoGIS/DicoGIS.log",
 		"/C/Users/julien.moura/Downloads/item.pitem",
@@ -793,16 +800,11 @@
 		"/C/Users/julien.moura/Google Drive/Racine Isogeo/Community Management/Aide en ligne/changeset_211_212",
 		"/C/Users/julien.moura/Documents/GitHub/Isogeo/isogeo-help/package.json",
 		"/C/Users/julien.moura/Documents/GitHub/JM/elpaso/templates/jobs/multibarchart.js",
-		"/C/Users/julien.moura/Documents/GitHub/JM/elpaso/requirements.txt",
-		"/C/Users/julien.moura/AppData/Roaming/nltk_data/tokenizers/punkt/french.pickle",
-		"/C/Users/julien.moura/AppData/Roaming/nltk_data/tokenizers/punkt/czech.pickle",
-		"/C/Users/julien.moura/Documents/GitHub/JM/elpaso/static/json/last50.json",
-		"/C/Users/julien.moura/Documents/GitHub/JM/elpaso/utils/output.txt",
-		"/C/Users/julien.moura/Documents/GitHub/JM/elpaso/elpaso_ST.sublime-project"
+		"/C/Users/julien.moura/Documents/GitHub/JM/elpaso/requirements.txt"
 	],
 	"find":
 	{
-		"height": 35.0
+		"height": 36.0
 	},
 	"find_in_files":
 	{
@@ -818,6 +820,17 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"confige",
+			"global_total_",
+			"size",
+			"global_total_",
+			"global_total_objs",
+			"global_total_",
+			"global_total_layers",
+			"statisti",
+			"self.dico_me",
+			"statistiker",
+			"requests",
 			"li_pdf",
 			"self.opt_shp",
 			".shp",
@@ -934,18 +947,7 @@
 			"row = ",
 			"state = ",
 			"parent = ",
-			"title = ",
-			"name = ",
-			"text = ",
-			"data.gouv.fr",
-			"http://data.gouv.fr",
-			"datagouv.fr",
-			"section2",
-			"\\",
-			"Mots",
-			"250952",
-			"252351",
-			"click"
+			"title = "
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1091,130 +1093,136 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 1,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "DicoGIS.py",
+					"file": "test/test_openpyxl.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 125766,
+						"buffer_size": 4749,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								44156,
-								44157
+								1851,
+								1798
 							]
 						],
 						"settings":
 						{
 							"WordCountShouldRun": false,
 							"WordCountSyntax": "python",
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 18875.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "/C/Users/julien.moura/Documents/GitHub/Isogeo/isogeo-api-samples/Isogeo_OpenCatalog2xls.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 5200,
-						"regions":
-						{
-						},
-						"selection":
-						[
+							"rulers":
 							[
-								657,
-								657
-							]
-						],
-						"settings":
-						{
-							"WordCountShouldRun": false,
-							"WordCountSyntax": "python",
+								80
+							],
 							"syntax": "Packages/Python/Python.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 304.0,
+						"translation.y": 740.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 2,
-					"file": "requirements.txt",
+					"buffer": 1,
+					"file": "DicoGIS.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 535,
+						"buffer_size": 125984,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								73690,
+								73690
 							]
 						],
 						"settings":
 						{
-							"WordCountShouldRun": true,
-							"WordCountSyntax": "plain text",
-							"syntax": "Packages/Text/Plain text.tmLanguage"
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 33250.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 3,
-					"file": "test/test_isogeo_api.py",
+					"buffer": 2,
+					"file": "test/test_openpyxl_sample.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2823,
+						"buffer_size": 537,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2823,
-								2823
+								537,
+								537
 							]
 						],
 						"settings":
 						{
-							"WordCountSyntax": "python",
-							"auto_name": "import os",
+							"auto_name": "from openpyxl import Workbook",
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 3,
+					"file": "/D/Mes documents/GitHub/Perso/Paris-Beer-Week-2015/data/raw_data/pbw_geocoder.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8087,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2254,
+								2218
+							]
+						],
+						"settings":
+						{
 							"syntax": "Packages/Python/Python.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 605.0,
+						"translation.y": 1320.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
@@ -1240,11 +1248,18 @@
 				0,
 				1,
 				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
 			]
 		],
 		"cols":
 		[
 			0.0,
+			0.52380952381,
 			1.0
 		],
 		"rows":
@@ -1256,7 +1271,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 246.0
+		"height": 275.0
 	},
 	"output.find_results":
 	{
@@ -1266,7 +1281,7 @@
 	{
 		"height": 94.0
 	},
-	"pinned_build_system": "",
+	"pinned_build_system": "Packages/Python/Python.sublime-build",
 	"project": "DicoGIS_ST.sublime-project",
 	"replace":
 	{
