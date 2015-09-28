@@ -12,6 +12,7 @@
 
 # via pypi
 dxfgrabber
+openpyxl
 OWSLib
 python-dateutil
 pyttk
