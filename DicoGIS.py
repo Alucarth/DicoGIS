@@ -168,6 +168,9 @@ class DicoGIS(Tk):
         self.li_dgn = []      # list for MicroStation DGN paths
         # formats / type: maps documents
         self.li_pdf = []    # list for GeoPDF path
+        self.li_lyr = []    # list for LYR path
+        self.li_mxd = []    # list for MXD path
+        self.li_qgs = []    # list for QGS path
 
         # dictionaries to store informations
         self.dico_layer = OD()      # dict for vectors informations
@@ -219,6 +222,9 @@ class DicoGIS(Tk):
         self.FrOutp = Labelframe(self,
                                  name='output',
                                  text=self.blabla.get('gui_fr4'))
+        self.FrWebS = Labelframe(self,
+                                 name='output',
+                                 text=self.blabla.get('gui_fr4'))
             ## Frame 1: path of geofiles
         # formats options
         self.opt_shp = IntVar(self.FrFilters)   # able/disable shapefiles
@@ -232,6 +238,9 @@ class DicoGIS(Tk):
         self.opt_rast = IntVar(self.FrFilters)  # able/disable rasters
         self.opt_cdao = IntVar(self.FrFilters)  # able/disable CAO/DAO files
         self.opt_pdf = IntVar(self.FrFilters)   # able/disable Geospatial PDF
+        self.opt_lyr = IntVar(self.FrFilters)   # able/disable Geospatial Lyr
+        self.opt_mxd = IntVar(self.FrFilters)   # able/disable Geospatial MXD
+        self.opt_qgs = IntVar(self.FrFilters)   # able/disable Geospatial QGS
 
         # format choosen: check buttons
         caz_shp = Checkbutton(self.FrFilters,
@@ -267,6 +276,15 @@ class DicoGIS(Tk):
         caz_pdf = Checkbutton(self.FrFilters,
                               text=u'Geospatial PDF',
                               variable=self.opt_pdf)
+        caz_lyr = Checkbutton(self.FrFilters,
+                              text=u'.lyr',
+                              variable=self.opt_lyr)
+        caz_mxd = Checkbutton(self.FrFilters,
+                              text=u'.mxd',
+                              variable=self.opt_mxd)
+        caz_qgs = Checkbutton(self.FrFilters,
+                              text=u'.qgs',
+                              variable=self.opt_qgs)
         # widgets placement
         caz_shp.grid(row=1,
                      column=0,
@@ -317,6 +335,21 @@ class DicoGIS(Tk):
                        columnspan=2,
                        sticky="NSWE",
                        padx=2, pady=2)
+        caz_lyr.grid(row=3,
+                     column=0,
+                     columnspan=2,
+                     sticky="NSWE",
+                     padx=2, pady=2)
+        caz_mxd.grid(row=3,
+                     column=1,
+                     columnspan=2,
+                     sticky="NSWE",
+                     padx=2, pady=2)
+        caz_qgs.grid(row=3,
+                     column=2,
+                     columnspan=2,
+                     sticky="NSWE",
+                     padx=2, pady=2)
         # target folder
         self.labtarg = Label(self.FrPath, text=self.blabla.get('gui_path'))
         self.target = Entry(master=self.FrPath, width=35)
@@ -734,6 +767,9 @@ class DicoGIS(Tk):
         self.li_egdb = []
         self.li_spadb = []
         self.li_pdf = []
+        self.li_lyr = []
+        self.li_mxd = []
+        self.li_qgs = []
         self.browsetarg.config(state=DISABLED)
 
         # Looping in folders structure
@@ -797,6 +833,18 @@ class DicoGIS(Tk):
                     """ listing GeoPDF """
                     # add complete path of PDF file
                     self.li_pdf.append(full_path)
+                elif path.splitext(full_path.lower())[1] == '.lyr':
+                    """ listing Esri Layer Definition """
+                    # add complete path of LYR file
+                    self.li_lyr.append(full_path)
+                elif path.splitext(full_path.lower())[1] == '.mxd':
+                    """ listing Esri map document """
+                    # add complete path of PDF file
+                    self.li_mxd.append(full_path)
+                elif path.splitext(full_path.lower())[1] == '.qgs':
+                    """ listing QGIS map document """
+                    # add complete path of QGS file
+                    self.li_qgs.append(full_path)
                 elif path.splitext(full_path.lower())[1] == '.gxt':
                     """ listing Geoconcept eXport Text (GXT) """
                     # add complete path of GXT file
@@ -843,7 +891,7 @@ class DicoGIS(Tk):
           {7} Spatialite - \
           {8} CAO/DAO - \
           {9} PDF - \
-          {10} PDF - \
+          {10} GXT - \
           in {11}{12}'.format(len(self.li_shp), len(self.li_tab),
                               len(self.li_kml), len(self.li_gml),
                               len(self.li_geoj), len(self.li_raster),
@@ -891,6 +939,12 @@ class DicoGIS(Tk):
         self.li_cdao = tuple(self.li_cdao)
         self.li_pdf.sort()
         self.li_pdf = tuple(self.li_pdf)
+        self.li_lyr.sort()
+        self.li_lyr = tuple(self.li_lyr)
+        self.li_mxd.sort()
+        self.li_mxd = tuple(self.li_mxd)
+        self.li_qgs.sort()
+        self.li_qgs = tuple(self.li_qgs)
         # status message
         self.status.set(u'{0} shapefiles - \
 {1} tables (MapInfo) - \
