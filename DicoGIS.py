@@ -1069,8 +1069,7 @@ in {10}{11}'.format(len(self.li_shp),
         self.prog_layers["value"]
 
         # initializing metrics
-        statistiker = MetricsManager(self.dico_metrics).init_metrics()
-        print statistiker
+
 
         # getting the infos from files selected
         # line_folders = 1    # line rank of directories dictionary
@@ -1111,8 +1110,8 @@ in {10}{11}'.format(len(self.li_shp),
                                           self.feuyVC,
                                           line_vectors)
                 self.logger.info('\t Wrote into the dictionary')
-                # writing to the Excel dictionary
-                statistiker.store_metrics(self.dico_layer, self.dico_fields, "vector")
+                # getting for metrics analysis
+                
                 self.logger.info('\t Added to global metrics')
                 # increment the line number
                 line_vectors = line_vectors + 1
@@ -2018,8 +2017,10 @@ in {10}{11}'.format(len(self.li_shp),
         sheet.write(line, 8, layer_infos.get(u'EPSG'))
         # Number of fields
         sheet.write(line, 3, layer_infos.get(u'num_fields'))
+        self.global_total_fields += layer_infos.get(u'num_fields')
         # Name of objects
         sheet.write(line, 4, layer_infos.get(u'num_obj'))
+        self.global_total_features += layer_infos.get(u'num_obj')
         # Creation date
         sheet.write(line, 10, layer_infos.get(u'date_crea'))
         # Last update date
@@ -2686,8 +2687,11 @@ in {10}{11}'.format(len(self.li_shp),
 
     def dictionarize_metrics(self):
         """ Write global statistices about datas examined """
-        # total count of layers
-        self.feuySTATS.write(1, 1, self.global_total_layers)
+        self.feuySTATS.write(1, 1, self.global_total_layers)  # total of layers
+        self.feuySTATS.write(2, 1, self.global_total_fields)  # total of fields
+        self.feuySTATS.write(3, 1, self.global_total_features)
+        self.feuySTATS.write(4, 1, self.global_total_errors)
+        self.feuySTATS.write(6, 1, self.global_total_warnings)
 
         # end of function
         return
