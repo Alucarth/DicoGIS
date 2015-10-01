@@ -222,9 +222,10 @@ class DicoGIS(Tk):
         self.FrOutp = Labelframe(self,
                                  name='output',
                                  text=self.blabla.get('gui_fr4'))
-        self.FrWebS = Labelframe(self,
-                                 name='output',
-                                 text=self.blabla.get('gui_fr4'))
+        self.FrIsogeo = Labelframe(self,
+                                   name='isogeo',
+                                   text=self.blabla.get('Isogeo'))
+
             ## Frame 1: path of geofiles
         # formats options
         self.opt_shp = IntVar(self.FrFilters)   # able/disable shapefiles
@@ -457,7 +458,7 @@ class DicoGIS(Tk):
         self.prox_ent_P.grid(row=1, column=3, columnspan=2,
                              sticky="NSEW", padx=2, pady=2)
         caz_ntlm.grid(row=2, column=0,
-                             sticky="NSEW", padx=2, pady=2)
+                      sticky="NSEW", padx=2, pady=2)
         self.prox_lb_M.grid(row=2, column=1,
                             sticky="NSEW", padx=2, pady=2)
         self.prox_ent_M.grid(row=2, column=2, columnspan=2,
@@ -485,6 +486,22 @@ class DicoGIS(Tk):
                              sticky="NSWE", padx=2, pady=2)
         self.output.grid(row=0, column=2, columnspan=2,
                          sticky="NSWE", padx=2, pady=2)
+
+            ## Frame 5: OpenCatalog Isogeo
+        # variables
+        self.url_OpenCatalog = StringVar(self.FrDb, 'localhost')
+        # widgets
+        self.lb_urlOC = Label(self.FrIsogeo,
+                              text=self.blabla.get('gui_fic'))
+        self.ent_urlOC = Entry(self.FrIsogeo,
+                               width=35,
+                               textvariable=self.url_OpenCatalog)
+        # widgets placement
+        self.nameoutput.grid(row=0, column=1,
+                             sticky="NSWE", padx=2, pady=2)
+        self.output.grid(row=0, column=2, columnspan=2,
+                         sticky="NSWE", padx=2, pady=2)
+
 
             ## Main frame
         self.typo = IntVar(self, 1)    # type value (files or database)
