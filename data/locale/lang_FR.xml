@@ -13,6 +13,7 @@
 	<gui_go>Lancer</gui_go>
 	<gui_quit>Quitter</gui_quit>
 	<gui_tab1> Fichiers </gui_tab1>
+	<gui_tab2> Base de données </gui_tab2>
 	<gui_fr1> Arborescence cible </gui_fr1>
 	<gui_fr2> Base de données cible </gui_fr2>
 	<gui_fr3> Formats </gui_fr3>

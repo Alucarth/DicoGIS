@@ -13,6 +13,7 @@
 	<gui_go>Go!</gui_go>
 	<gui_quit>Quit</gui_quit>
 	<gui_tab1> Files </gui_tab1>
+	<gui_tab2> Database </gui_tab2>
 	<gui_fr1> Folders structure target </gui_fr1>
 	<gui_fr2> Database target </gui_fr2>
 	<gui_fr3> Formats </gui_fr3>
