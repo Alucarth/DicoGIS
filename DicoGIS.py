@@ -16,7 +16,7 @@ from __future__ import unicode_literals
 # Licence:      GPL 3
 # ------------------------------------------------------------------------------
 
-DGversion = "2.1.0-beta3"
+DGversion = "2.5.0-beta1"
 
 ###############################################################################
 ########### Libraries #############
@@ -27,8 +27,8 @@ from Tkinter import Tk, StringVar, IntVar, Image    # GUI
 from Tkinter import W, PhotoImage, ACTIVE, DISABLED, END
 from tkFileDialog import askdirectory, asksaveasfilename    # dialogs
 from tkMessageBox import showinfo as info, showerror as avert
-from ttk import Combobox, Progressbar, Style, Labelframe
-from ttk import Label, Button, Entry, Radiobutton, Checkbutton  # widgets
+from ttk import Combobox, Progressbar, Style, Labelframe, Frame
+from ttk import Label, Button, Entry, Checkbutton, Notebook  # widgets
 import tkFont   # font library
 
 from sys import exit, platform as opersys
@@ -167,10 +167,11 @@ class DicoGIS(Tk):
         self.li_dwg = []      # list for AutoCAD DWG paths
         self.li_dgn = []      # list for MicroStation DGN paths
         # formats / type: maps documents
-        self.li_pdf = []    # list for GeoPDF path
-        self.li_lyr = []    # list for LYR path
-        self.li_mxd = []    # list for MXD path
-        self.li_qgs = []    # list for QGS path
+        self.li_mapdocs = []  # list for all map & documents
+        self.li_pdf = []      # list for GeoPDF path
+        self.li_lyr = []      # list for LYR path
+        self.li_mxd = []      # list for MXD path
+        self.li_qgs = []      # list for QGS path
 
         # dictionaries to store informations
         self.dico_layer = OD()      # dict for vectors informations
@@ -206,27 +207,51 @@ class DicoGIS(Tk):
                                   lang=self.def_lang,
                                   locale_folder=r'data/locale')
 
+        # Notebook
+        self.nb = Notebook(self)
+        # tabs
+        self.tab_files = Frame(self.nb)         # tab_id = 0
+        self.tab_sgbd = Frame(self.nb)          # tab_id = 1
+        self.tab_webservices = Frame(self.nb)   # tab_id = 2
+        self.tab_isogeo = Frame(self.nb)        # tab_id = 3
+        self.tab_about = Frame(self.nb)         # tab_id = 4
+
         # Frames
-        self.FrPath = Labelframe(self,
+
+        # self.FrIsogeo = Labelframe(self,
+        #                            name='isogeo',
+        #                            text=self.blabla.get('gui_frIsogeo'))
+
+        # ## TAB 1: FILES ##
+        self.nb.add(self.tab_files,
+                    text=self.blabla.get('gui_tab1'),
+                    padding=3)
+
+        # Frame: target folder
+        self.FrPath = Labelframe(self.tab_files,
                                  name='files',
                                  text=self.blabla.get('gui_fr1'))
-        self.FrFilters = Labelframe(self,
+        # target folder
+        self.labtarg = Label(self.FrPath, text=self.blabla.get('gui_path'))
+        self.target = Entry(master=self.FrPath, width=35)
+        self.browsetarg = Button(self.FrPath,       # browse button
+                                 text=self.blabla.get('gui_choix'),
+                                 command=lambda: self.setpathtarg(),
+                                 takefocus=True)
+        self.browsetarg.focus_force()               # force the focus on
+
+        # widgets placement
+        self.labtarg.grid(row=1, column=1, columnspan=1,
+                          sticky="NSWE", padx=2, pady=2)
+        self.target.grid(row=1, column=2, columnspan=1,
+                         sticky="NSWE", padx=2, pady=2)
+        self.browsetarg.grid(row=1, column=3,
+                             sticky="NSWE", padx=2, pady=2)
+
+        # Frame: filters of formats
+        self.FrFilters = Labelframe(self.tab_files,
                                     name='filters',
                                     text=self.blabla.get('gui_fr3'))
-        self.FrDb = Labelframe(self,
-                               name='database',
-                               text=self.blabla.get('gui_fr2'))
-        self.FrProg = Labelframe(self,
-                                 name='progression',
-                                 text=self.blabla.get('gui_prog'))
-        self.FrOutp = Labelframe(self,
-                                 name='output',
-                                 text=self.blabla.get('gui_fr4'))
-        self.FrIsogeo = Labelframe(self,
-                                   name='isogeo',
-                                   text=self.blabla.get('Isogeo'))
-
-            ## Frame 1: path of geofiles
         # formats options
         self.opt_shp = IntVar(self.FrFilters)   # able/disable shapefiles
         self.opt_tab = IntVar(self.FrFilters)   # able/disable MapInfo tables
@@ -351,24 +376,23 @@ class DicoGIS(Tk):
                      columnspan=2,
                      sticky="NSWE",
                      padx=2, pady=2)
-        # target folder
-        self.labtarg = Label(self.FrPath, text=self.blabla.get('gui_path'))
-        self.target = Entry(master=self.FrPath, width=35)
-        self.browsetarg = Button(self.FrPath,       # browse button
-                                 text=self.blabla.get('gui_choix'),
-                                 command=lambda: self.setpathtarg(),
-                                 takefocus=True)
-        self.browsetarg.focus_force()               # force the focus on
-        # widgets placement
-        self.labtarg.grid(row=1, column=1, columnspan=1,
-                          sticky="NSWE", padx=2, pady=2)
-        self.target.grid(row=1, column=2, columnspan=1,
-                         sticky="NSWE", padx=2, pady=2)
-        self.browsetarg.grid(row=1, column=3,
-                             sticky="NSWE", padx=2, pady=2)
 
-            ## Frame 2: Database
+        # frames placement
+        self.FrPath.grid(row=3, column=1,
+                         padx=2, pady=2, sticky="NSWE")
+        self.FrFilters.grid(row=4, column=1,
+                            padx=2, pady=2, sticky="NSWE")
+
+# =================================================================================
+
+        # ## TAB 2: Database ##
+        self.nb.add(self.tab_sgbd,
+                    text=self.blabla.get('gui_tab2'), padding=3)
+
         # subframe
+        self.FrDb = Labelframe(self.tab_sgbd,
+                               name='database',
+                               text=self.blabla.get('gui_fr2'))
         self.FrProx = Labelframe(self.FrDb,
                                  name='proxy',
                                  text=self.blabla.get('gui_fr2'))
@@ -464,7 +488,56 @@ class DicoGIS(Tk):
         self.prox_ent_M.grid(row=2, column=2, columnspan=2,
                              sticky="NSEW", padx=2, pady=2)
 
-            ## Frame 3: Progression bar
+        # frames placement
+        self.FrProx.grid(row=5, column=0, columnspan=4,
+                         sticky="NSWE", padx=2, pady=2)
+        self.FrDb.grid(row=3, column=1, sticky="NSWE", padx=2, pady=2)
+
+
+# =================================================================================
+        # ## TAB 4: Isogeo ##
+        self.nb.add(self.tab_isogeo,
+                    text='Isogeo', padding=3)
+        # variables
+        self.url_OpenCatalog = StringVar(self.tab_isogeo, 'http://open.isogeo.com')
+        # widgets
+        self.lb_urlOC = Label(self.tab_isogeo,
+                              text='OpenCatalog')
+        self.ent_urlOC = Entry(self.tab_isogeo,
+                               width=75,
+                               textvariable=self.url_OpenCatalog)
+        # widgets placement
+        self.lb_urlOC.grid(row=0, column=1,
+                           sticky="NSWE", padx=2, pady=2)
+        self.ent_urlOC.grid(row=0, column=2, columnspan=2,
+                            sticky="NSWE", padx=2, pady=2)
+
+# =================================================================================
+        # ## MAIN FRAME ##
+        # welcome message
+        self.welcome = Label(self,
+                             text=self.blabla.get('hi') + self.uzer,
+                             font=ft_tit,
+                             foreground="red2")
+
+        # Frame: Output
+        self.FrOutp = Labelframe(self,
+                                 name='output',
+                                 text=self.blabla.get('gui_fr4'))
+        # widgets
+        self.nameoutput = Label(self.FrOutp,
+                                text=self.blabla.get('gui_fic'))
+        self.output = Entry(self.FrOutp, width=35)
+        # widgets placement
+        self.nameoutput.grid(row=0, column=1,
+                             sticky="NSWE", padx=2, pady=2)
+        self.output.grid(row=0, column=2, columnspan=2,
+                         sticky="NSWE", padx=2, pady=2)
+
+        # Frame: Progression bar
+        self.FrProg = Labelframe(self,
+                                 name='progression',
+                                 text=self.blabla.get('gui_prog'))
         # variables
         self.status = StringVar(self.FrProg, '')
         # widgets
@@ -476,60 +549,23 @@ class DicoGIS(Tk):
         # widgets placement
         self.prog_layers.pack(expand=1, fill='both')
 
-            ## Frame 4: Output configuration
-        # widgets
-        self.nameoutput = Label(self.FrOutp,
-                                text=self.blabla.get('gui_fic'))
-        self.output = Entry(self.FrOutp, width=35)
-        # widgets placement
-        self.nameoutput.grid(row=0, column=1,
-                             sticky="NSWE", padx=2, pady=2)
-        self.output.grid(row=0, column=2, columnspan=2,
-                         sticky="NSWE", padx=2, pady=2)
-
-            ## Frame 5: OpenCatalog Isogeo
-        # variables
-        self.url_OpenCatalog = StringVar(self.FrDb, 'localhost')
-        # widgets
-        self.lb_urlOC = Label(self.FrIsogeo,
-                              text=self.blabla.get('gui_fic'))
-        self.ent_urlOC = Entry(self.FrIsogeo,
-                               width=35,
-                               textvariable=self.url_OpenCatalog)
-        # widgets placement
-        self.nameoutput.grid(row=0, column=1,
-                             sticky="NSWE", padx=2, pady=2)
-        self.output.grid(row=0, column=2, columnspan=2,
-                         sticky="NSWE", padx=2, pady=2)
-
-
-            ## Main frame
-        self.typo = IntVar(self, 1)    # type value (files or database)
-        # Hola
-        self.welcome = Label(self,
-                             text=self.blabla.get('hi') + self.uzer,
-                             font=ft_tit,
-                             foreground="red2")
-        # Imagen
+        # logo
         self.icone = PhotoImage(file=r'data/img/DicoGIS_logo.gif')
         Label(self,
               borderwidth=2,
-              image=self.icone).grid(row=1,
-                                     rowspan=5,
-                                     column=0,
-                                     padx=2,
-                                     pady=2,
-                                     sticky=W)
+              image=self.icone).grid(row=1, rowspan=2,
+                                     column=0, padx=2,
+                                     pady=2, sticky=W)
         # credits
         s = Style(self)
         s.configure('Kim.TButton', foreground='DodgerBlue', borderwidth=0)
         Button(self,
-               text='by Julien M.\n      2015',
+               text='by @GeoJulien\nGPL3 - 2015',
                style='Kim.TButton',
-               command=lambda: open_new('https://github.com/Guts')).grid(row=6,
-                                                                         padx=2,
-                                                                         pady=2,
-                                                                         sticky="WE")
+               command=lambda: open_new('https://github.com/Guts/DicoGIS')).grid(row=3,
+                                                                                 padx=2,
+                                                                                 pady=2,
+                                                                                 sticky="WE")
         # language switcher
         self.ddl_lang = Combobox(self,
                                  values=li_lang,
@@ -537,17 +573,6 @@ class DicoGIS(Tk):
         self.ddl_lang.current(li_lang.index(self.def_lang))
         self.ddl_lang.bind("<<ComboboxSelected>>", self.change_lang)
 
-        # type switcher
-        rd_file = Radiobutton(self,
-                              text=self.blabla.get('gui_tab1'),
-                              variable=self.typo,
-                              value=1,
-                              command=lambda: self.change_type())
-        rd_pg = Radiobutton(self,
-                            text='PostGIS',
-                            variable=self.typo,
-                            value=2,
-                            command=lambda: self.change_type())
         # Basic buttons
         self.val = Button(self,
                           text=self.blabla.get('gui_go'),
@@ -560,20 +585,16 @@ class DicoGIS(Tk):
         self.welcome.grid(row=1, column=1, columnspan=1, sticky="NS",
                           padx=2, pady=2)
         self.ddl_lang.grid(row=1, column=1, sticky="NSE", padx=2, pady=2)
-        rd_file.grid(row=2, column=1, sticky="NSW", padx=2, pady=2)
-        rd_pg.grid(row=2, column=1, sticky="NSE", padx=2, pady=2)
-        self.val.grid(row=7, column=1, columnspan=2,
+        self.nb.grid(row=2, column=1)    # notebook
+        self.FrProg.grid(row=3, column=1, sticky="NSWE", padx=2, pady=2)
+        self.FrOutp.grid(row=4, column=1, sticky="NSWE", padx=2, pady=2)
+        self.val.grid(row=5, column=1, columnspan=2,
                       sticky="NSWE", padx=2, pady=2)
-        self.can.grid(row=7, column=0, sticky="NSWE", padx=2, pady=2)
-        # Frames placement
-        rd_file.invoke()    # to provoc the type (frame 2) placement
-        self.FrProg.grid(row=5, column=1, sticky="NSWE", padx=2, pady=2)
-        self.FrOutp.grid(row=6, column=1, sticky="NSWE", padx=2, pady=2)
+        self.can.grid(row=6, column=0, sticky="NSWE", padx=2, pady=2)
 
         # load previous settings
         self.load_settings()
         self.proxy_form()
-
 
     def proxy_form(self):
         u"""
@@ -608,6 +629,9 @@ class DicoGIS(Tk):
             self.opt_spadb.set(config.get('filters', 'opt_spadb'))
             self.opt_cdao.set(config.get('filters', 'opt_cdao'))
             self.opt_pdf.set(config.get('filters', 'opt_pdf'))
+            self.opt_lyr.set(config.get('filters', 'opt_lyr'))
+            self.opt_qgs.set(config.get('filters', 'opt_qgs'))
+            self.opt_mxd.set(config.get('filters', 'opt_mxd'))
             # database settings
             self.host.set(config.get('database', 'host'))
             self.port.set(config.get('database', 'port'))
@@ -620,6 +644,8 @@ class DicoGIS(Tk):
             self.prox_server.set(config.get('proxy', 'proxy_server'))
             self.prox_port.set(config.get('proxy', 'proxy_port'))
             self.prox_user.set(config.get('proxy', 'proxy_user'))
+            # Isogeo settings
+            self.url_OpenCatalog.set(config.get('isogeo', 'def_OC'))
             # log
             self.logger.info('Last options loaded')
         except Exception as e:
@@ -639,6 +665,7 @@ class DicoGIS(Tk):
         config.add_section('filters')
         config.add_section('database')
         config.add_section('proxy')
+        config.add_section('isogeo')
         # config
         config.set('config', 'DicoGIS_version', DGversion)
         config.set('config', 'OS', platform.platform())
@@ -660,6 +687,9 @@ class DicoGIS(Tk):
         config.set('filters', 'opt_spadb', self.opt_spadb.get())
         config.set('filters', 'opt_cdao', self.opt_cdao.get())
         config.set('filters', 'opt_pdf', self.opt_pdf.get())
+        config.set('filters', 'opt_lyr', self.opt_lyr.get())
+        config.set('filters', 'opt_qgs', self.opt_qgs.get())
+        config.set('filters', 'opt_mxd', self.opt_mxd.get())
         # database settings
         config.set('database', 'host', self.host.get())
         config.set('database', 'port', self.port.get())
@@ -672,6 +702,8 @@ class DicoGIS(Tk):
         config.set('proxy', 'proxy_server', self.prox_server.get())
         config.set('proxy', 'proxy_port', self.prox_port.get())
         config.set('proxy', 'proxy_user', self.prox_user.get())
+        # Isogeo settings
+        config.set('isogeo', 'def_OC', self.url_OpenCatalog.get())
 
         # Writing the configuration file
         with open(confile, 'wb') as configfile:
@@ -712,25 +744,6 @@ class DicoGIS(Tk):
 
         # End of function
         return self.blabla
-
-    def change_type(self):
-        u""" switch between the available types of data (files or database) """
-        if self.typo.get() == 1:
-            self.logger.info('Type switched to: files structure')
-            self.FrDb.grid_forget()
-            self.status.set('')
-            self.FrPath.grid(row=3, column=1, padx=2, pady=2,
-                             sticky="NSWE")
-            self.FrFilters.grid(row=4, column=1, padx=2, pady=2,
-                                sticky="NSWE")
-        elif self.typo.get() == 2:
-            self.logger.info('Type switched to: database')
-            self.FrPath.grid_forget()
-            self.FrFilters.grid_forget()
-            self.status.set('')
-            self.FrDb.grid(row=3, column=1, sticky="NSWE", padx=2, pady=2)
-        # End of function
-        return self.typo
 
     def setpathtarg(self):
         """ ...browse and insert the path of target folder """
@@ -896,6 +909,11 @@ class DicoGIS(Tk):
         # grouping File geodatabases
         self.li_fdb.extend(self.li_egdb)
         self.li_fdb.extend(self.li_spadb)
+        # grouping map & docs
+        self.li_mapdocs.extend(self.li_pdf)
+        self.li_mapdocs.extend(self.li_lyr)
+        self.li_mapdocs.extend(self.li_qgs)
+        self.li_mapdocs.extend(self.li_mxd)
         # end of listing
         self.prog_layers.stop()
         self.logger.info('End of folders parsing: {0} shapefiles - \
@@ -962,6 +980,8 @@ class DicoGIS(Tk):
         self.li_mxd = tuple(self.li_mxd)
         self.li_qgs.sort()
         self.li_qgs = tuple(self.li_qgs)
+        self.li_mapdocs.sort()
+        self.li_mapdocs = tuple(self.li_mapdocs)
         # status message
         self.status.set(u'{0} shapefiles - \
 {1} tables (MapInfo) - \
@@ -973,18 +993,24 @@ class DicoGIS(Tk):
 {7} file databases - \
 {8} CAO/DAO - \
 {9} PDF - \
-in {10}{11}'.format(len(self.li_shp),
-                  len(self.li_tab),
-                  len(self.li_kml),
-                  len(self.li_gml),
-                  len(self.li_geoj),
-                  len(self.li_gxt),
-                  len(self.li_raster),
-                  len(self.li_fdb),
-                  len(self.li_cdao),
-                  len(self.li_pdf),
-                  self.num_folders,
-                  self.blabla.get('log_numfold')))
+{10} LYR - \
+{11} QGS - \
+{12} MXD - \
+in {13}{14}'.format(len(self.li_shp),
+                    len(self.li_tab),
+                    len(self.li_kml),
+                    len(self.li_gml),
+                    len(self.li_geoj),
+                    len(self.li_gxt),
+                    len(self.li_raster),
+                    len(self.li_fdb),
+                    len(self.li_cdao),
+                    len(self.li_pdf),
+                    len(self.li_lyr),
+                    len(self.li_qgs),
+                    len(self.li_mxd),
+                    self.num_folders,
+                    self.blabla.get('log_numfold')))
 
         # reactivating the buttons
         self.browsetarg.config(state=ACTIVE)
@@ -1086,8 +1112,6 @@ in {10}{11}'.format(len(self.li_shp),
         self.prog_layers["value"]
 
         # initializing metrics
-
-
         # getting the infos from files selected
         # line_folders = 1    # line rank of directories dictionary
         line_vectors = 1    # line rank of vectors dictionary
@@ -1128,7 +1152,6 @@ in {10}{11}'.format(len(self.li_shp),
                                           line_vectors)
                 self.logger.info('\t Wrote into the dictionary')
                 # getting for metrics analysis
-                
                 self.logger.info('\t Added to global metrics')
                 # increment the line number
                 line_vectors = line_vectors + 1
@@ -1296,11 +1319,11 @@ in {10}{11}'.format(len(self.li_shp),
                 self.dico_fields.clear()
                 # getting the informations
                 try:
-                    Read_SHP(path.abspath(gxtpath),
-                             self.dico_layer,
-                             self.dico_fields,
-                             'Geoconcept eXport Text',
-                             self.blabla)
+                    ReadGXT(path.abspath(gxtpath),
+                            self.dico_layer,
+                            self.dico_fields,
+                            'Geoconcept eXport Text',
+                            self.blabla)
                     self.logger.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
@@ -1945,7 +1968,7 @@ in {10}{11}'.format(len(self.li_shp),
             """ adding a new sheet for PostGIS informations """
             # sheet
             self.feuyPG = self.book.add_sheet(u'PostGIS',
-                                             cell_overwrite_ok=True)
+                                              cell_overwrite_ok=True)
             # headers
             self.feuyPG.write(0, 0, self.blabla.get('nomfic'), self.entete)
             self.feuyPG.write(0, 1, self.blabla.get('conn_chain'), self.entete)
