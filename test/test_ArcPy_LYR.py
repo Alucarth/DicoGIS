@@ -46,16 +46,29 @@ from arcpy.mapping import Layer, ListLayers
 ###############################################################################
 ########## Functions ############
 #################################
-def read_lyr(lyr):
+def read_lyr(layer):
     """
 
     """
     # open layer file
 
     # Define the projection to wgs84 — factory code is 4326
-    print shapefile + " : " + arcpy.GetCount_management(shapefile) + " entities."
+    print "Name String: " + layer.nameString
+    print "Where Clause: " + layer.whereClause
+
+    # Find out if the layer represents a feature class
+    if layer.dataElement.dataType != "FeatureClass":
+        print("\nThis is not a featureclass")
+        sys.exit()
+    else:
+        print "Feature class:      " + layer.dataElement.catalogPath
+        print "Feature class Type: " + layer.featureClass.featureType
+
+    #
+    layers_in = ListLayers(layer)
 
     # End update_shapefiles
+    return layer
 
 def main():
     """
