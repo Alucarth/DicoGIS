@@ -73,7 +73,7 @@ class GdalErrorHandler(object):
         # propagating
         self.err_level = err_level
         self.err_type = err_type
-        self.err_msg = err_msg
+        self.err_msg = unicode(err_msg)
 
         # end of function
         return self.err_level, self.err_type, self.err_msg
