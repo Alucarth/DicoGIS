@@ -216,12 +216,7 @@ class DicoGIS(Tk):
         self.tab_isogeo = Frame(self.nb)        # tab_id = 3
         self.tab_about = Frame(self.nb)         # tab_id = 4
 
-        # Frames
-
-        # self.FrIsogeo = Labelframe(self,
-        #                            name='isogeo',
-        #                            text=self.blabla.get('gui_frIsogeo'))
-
+# =================================================================================
         # ## TAB 1: FILES ##
         self.nb.add(self.tab_files,
                     text=self.blabla.get('gui_tab1'),
@@ -493,6 +488,12 @@ class DicoGIS(Tk):
                          sticky="NSWE", padx=2, pady=2)
         self.FrDb.grid(row=3, column=1, sticky="NSWE", padx=2, pady=2)
 
+# =================================================================================
+        # ## TAB 3: web services ##
+        self.nb.add(self.tab_webservices,
+                    text=self.blabla.get('gui_tab3'), padding=3)
+
+
 
 # =================================================================================
         # ## TAB 4: Isogeo ##
@@ -590,7 +591,7 @@ class DicoGIS(Tk):
         self.FrOutp.grid(row=4, column=1, sticky="NSWE", padx=2, pady=2)
         self.val.grid(row=5, column=1, columnspan=2,
                       sticky="NSWE", padx=2, pady=2)
-        self.can.grid(row=6, column=0, sticky="NSWE", padx=2, pady=2)
+        self.can.grid(row=5, column=0, sticky="NSWE", padx=2, pady=2)
 
         # load previous settings
         self.load_settings()
@@ -1025,19 +1026,39 @@ in {13}{14}'.format(len(self.li_shp),
         """ check needed info and launch different processes """
         # saving settings
         self.save_settings()
+        
+        # get the active tab ID
+        self.typo = self.nb.index(self.nb.select())
+        
+        # disabling UI to avoid unattended actions
         self.val.config(state=DISABLED)
+        self.nb.tab(0, state=DISABLED)
+        self.nb.tab(1, state=DISABLED)
+        self.nb.tab(2, state=DISABLED)
+        self.nb.tab(3, state=DISABLED)
+
         # process files or PostGIS database
-        if self.typo.get() == 1:
+        if self.typo == 0:
+            self.nb.select(0)
             self.logger.info('=> files process started')
             self.process_files()
-        elif self.typo.get() == 2:
+        elif self.typo == 1:
+            self.nb.select(0)
             self.logger.info('=> DB process started')
             self.check_fields()
+        elif self.typo == 2:
+            self.nb.select(0)
+            self.logger.info('=> web services process started')
+            # self.check_fields()
+        elif self.typo == 3:
+            self.nb.select(0)
+            self.logger.info('=> Isogeo started')
+            # self.check_fields()
         else:
             pass
         self.val.config(state=ACTIVE)
         # end of function
-        return self.typo.get()
+        return self.typo
 
     def process_files(self):
         u""" launch the different processes """
@@ -1739,7 +1760,7 @@ in {13}{14}'.format(len(self.li_shp),
         self.xls_date = easyxf(num_format_str='DD/MM/YYYY')
 
         # columns headers
-        if self.typo.get() == 1:
+        if self.typo == 0:
             """ adding a new sheet for metrics """
             # sheet
             self.feuySTATS = self.book.add_sheet('Metrics',
@@ -1762,7 +1783,7 @@ in {13}{14}'.format(len(self.li_shp),
         else:
             pass
 
-        if self.typo.get() == 1 \
+        if self.typo == 0 \
             and (self.opt_shp.get() + self.opt_tab.get() + self.opt_kml.get()
                  + self.opt_gml.get() + self.opt_geoj.get()) > 0\
             and len(self.li_vectors) > 0:
@@ -1802,7 +1823,7 @@ in {13}{14}'.format(len(self.li_shp),
         else:
             pass
 
-        if self.typo.get() == 1\
+        if self.typo == 0\
            and self.opt_rast.get() == 1\
            and len(self.li_raster) > 0:
             """ adding a new sheet for rasters informations """
@@ -1843,7 +1864,7 @@ in {13}{14}'.format(len(self.li_shp),
         else:
             pass
 
-        if self.typo.get() == 1\
+        if self.typo == 0\
            and (self.opt_spadb.get() + self.opt_egdb.get())\
            and len(self.li_fdb) > 0:
             """ adding a new sheet for flat geodatabases informations """
@@ -1882,7 +1903,7 @@ in {13}{14}'.format(len(self.li_shp),
         else:
             pass
 
-        if self.typo.get() == 1\
+        if self.typo == 0\
            and self.opt_pdf.get()\
            and len(self.li_pdf) > 0:
             """ adding a new sheet for maps documents informations """
@@ -1926,7 +1947,7 @@ in {13}{14}'.format(len(self.li_shp),
         else:
             pass
 
-        if self.typo.get() == 1\
+        if self.typo == 0\
            and self.opt_cdao.get() == 1\
            and len(self.li_cdao) > 0:
             """ adding a new sheet for CAO informations """
@@ -1964,7 +1985,7 @@ in {13}{14}'.format(len(self.li_shp),
         else:
             pass
 
-        if self.typo.get() == 2:
+        if self.typo == 1:
             """ adding a new sheet for PostGIS informations """
             # sheet
             self.feuyPG = self.book.add_sheet(u'PostGIS',
