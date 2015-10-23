@@ -30,7 +30,7 @@ def update_shapefiles(shapefile):
 
 def main():
     # Create a pool class and run the jobs–the number of jobs is equal to the number of shapefiles
-    workspace = r'D:\Mes documents\GIS DataBase\Exemples_Tests\Alaska\shapefiles'
+    workspace = r'datatest\vectors\shp'
     arcpy.env.workspace = workspace
     fcs = arcpy.ListFeatureClasses('*')
     fc_list = [os.path.join(workspace, fc) for fc in fcs]
