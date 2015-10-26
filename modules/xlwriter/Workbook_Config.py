@@ -20,10 +20,6 @@ from __future__ import unicode_literals
 ###################################
 
 # Standard library
-from time import strftime
-import threading    # handling various subprocesses
-import platform  # about operating systems
-
 import logging      # log files
 from logging.handlers import RotatingFileHandler
 
@@ -31,21 +27,16 @@ from logging.handlers import RotatingFileHandler
 from collections import OrderedDict as OD   # ordered dictionary
 
 # 3rd party libraries
-from xlwt import Workbook, easyxf, Formula  # excel writer
-
-# Custom modules
-
-# Imports depending on operating system
-
+from xlwt import Workbook, easyxf   # excel writer
 
 ###############################################################################
 ############# Classes #############
 ###################################
 
 
-class ConfigExcel(Workbook):
-    def __init__(self, opt_vec=1, opt_rast=1, opt_gdb=1, opt_maps=1,
-                 opt_cdao=1, opt_pgis=1, creator="", text=OD()):
+class ConfigExcel():
+    def __init__(self, workbook, opt_vec=0, opt_rast=0, opt_gdb=0, opt_maps=0,
+                 opt_cdao=0, opt_pgis=0, opt_isogeo=0, text=OD()):
         u"""
         Set the global configuration of Excel workbook (styles, headers, etc.)
 
@@ -55,10 +46,8 @@ class ConfigExcel(Workbook):
         opt_cdao = option to add and set sheet for CAD files
         opt_maps = option to add and set sheet for maps documents
         opt_pgis = option to add and set sheet for PostGIS tables & views
+        opt_isogeo = option to add and set sheet for Isogeo Open Catalog
         """
-        # set book owner
-        self.set_owner('DicoGIS')
-
         # Some customization: fonts and styles
         # headers style
         self.entete = easyxf('pattern: pattern solid, fore_colour black;'
@@ -74,33 +63,48 @@ class ConfigExcel(Workbook):
         # date cell style
         self.xls_date = easyxf(num_format_str='DD/MM/YYYY')
 
-        # 
+        #
+        self.text = text
+
+        # vectors files
         if opt_vec:
             self.add_vectors_sheet()
         else:
             pass
 
-        # 
+        # rasters files
         if opt_rast:
             self.add_rasters_sheet()
         else:
             pass
 
-        # 
+        # file geodatabases
         if opt_gdb:
             self.add_gdb_sheet()
         else:
             pass
 
-        # 
+        # maps & documents
         if opt_maps:
             self.add_maps_sheet()
         else:
             pass
 
-        # 
+        # CAD files
         if opt_cdao:
             self.add_cdao_sheet()
+        else:
+            pass
+
+        # PostGIS database
+        if opt_pgis:
+            self.add_postgis_sheet()
+        else:
+            pass
+
+        # Isogeo OpenCatalog
+        if opt_isogeo:
+            self.add_isogeo_sheet(workbook)
         else:
             pass
 
@@ -154,7 +158,7 @@ class ConfigExcel(Workbook):
         sets sheet dedicated to rasters information
         """
         self.feuyRS = self.book.add_sheet(self.text.get('sheet_rasters'),
-                                         cell_overwrite_ok=True)
+                                          cell_overwrite_ok=True)
         # headers
         self.feuyRS.write(0, 0, self.text.get('nomfic'), self.entete)
         self.feuyRS.write(0, 1, self.text.get('path'), self.entete)
@@ -183,7 +187,6 @@ class ConfigExcel(Workbook):
         self.feuyRS.col(0).width = max(lg_rast_names) * 100
         self.feuyRS.col(1).width = len(self.text.get('browse')) * 256
 
-        
         # end of function
         return
 
@@ -273,7 +276,7 @@ class ConfigExcel(Workbook):
         # end of function
         return
 
-    def add_PostGIS_sheet(self):
+    def add_postgis_sheet(self):
         """
         sets sheet dedicated to PostGIS tables & views information
         """
@@ -306,13 +309,41 @@ class ConfigExcel(Workbook):
         # end of function
         return
 
+    def add_isogeo_sheet(self, xls_wb):
+        """
+        sets sheet dedicated to Isogeo OpenCatalog metadata
+        """
+        # sheet
+        self.feuyIsogeo = xls_wb.add_sheet(u'Isogeo',
+                                           cell_overwrite_ok=True)
+        # headers
+        self.feuyIsogeo.write(0, 0, "Titre", self.entete)
+        self.feuyIsogeo.write(0, 1, "Nom de la ressource", self.entete)
+        self.feuyIsogeo.write(0, 2, "Emplacement", self.entete)
+        self.feuyIsogeo.write(0, 3, "Mots-clés", self.entete)
+        self.feuyIsogeo.write(0, 4, "Résumé", self.entete)
+        self.feuyIsogeo.write(0, 5, "Thématiques INPIRES", self.entete)
+        self.feuyIsogeo.write(0, 6, "Type", self.entete)
+        self.feuyIsogeo.write(0, 7, "Format", self.entete)
+        self.feuyIsogeo.write(0, 8, "SRS", self.entete)
+        self.feuyIsogeo.write(0, 9, "Nombre d'objets", self.entete)
+        self.feuyIsogeo.write(0, 10, "Visualiser sur l'OpenCatalog", self.entete)
+        self.feuyIsogeo.write(0, 11, "Editer sur Isogeo", self.entete)
 
- 
+        # tunning headers
+        self.feuyIsogeo.col(1).width = len(self.text.get('browse')) * 256
+        # freezing headers line and first column
+        self.feuyIsogeo.set_panes_frozen(True)
+        self.feuyIsogeo.set_horz_split_pos(1)
+        self.feuyIsogeo.set_vert_split_pos(1)
+
+        # end of function
+        return self.feuyIsogeo
+
 ###############################################################################
 ###### Stand alone program ########
 ###################################
 
 if __name__ == '__main__':
     """ standalone execution """
-    from .
-    app = ConfigExcel()
+    print("not ready to be launched standalone")
