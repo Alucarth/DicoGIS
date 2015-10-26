@@ -10,7 +10,7 @@ directoryToZip = os.path.dirname(FME_LogFileName) + '\\' + FME_MacroValues['dest
 headers = {'Access-Control-Allow-Origin': '*'}
 payload = {
     'client_id': 'isogeo-app',
-    'client_secret': 'T6d3Szuos22DhHYvq8uo',
+    'client_secret': '',
     'grant_type': 'password',
     'username': FME_MacroValues['isogeo_user'],
     'password': FME_MacroValues['isogeo_password']}
