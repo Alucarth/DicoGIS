@@ -620,6 +620,7 @@ class DicoGIS(Tk):
             # basics
             self.def_lang = config.get('basics', 'def_codelang')
             self.def_rep = config.get('basics', 'def_rep')
+            self.nb.select(config.get('basics', 'def_tab'))
             # filters
             self.opt_shp.set(config.get('filters', 'opt_shp'))
             self.opt_tab.set(config.get('filters', 'opt_tab'))
@@ -678,6 +679,7 @@ class DicoGIS(Tk):
             config.set('basics', 'def_rep', self.target.get())
         else:
             config.set('basics', 'def_rep', self.def_rep)
+        config.set('basics', 'def_tab', self.nb.index(self.nb.select()))
         # filters
         config.set('filters', 'opt_shp', self.opt_shp.get())
         config.set('filters', 'opt_tab', self.opt_tab.get())
@@ -1045,15 +1047,15 @@ in {13}{14}'.format(len(self.li_shp),
             self.logger.info('=> files process started')
             self.process_files()
         elif self.typo == 1:
-            self.nb.select(0)
+            self.nb.select(1)
             self.logger.info('=> DB process started')
             self.check_fields()
         elif self.typo == 2:
-            self.nb.select(0)
+            self.nb.select(2)
             self.logger.info('=> web services process started')
             # self.check_fields()
         elif self.typo == 3:
-            self.nb.select(0)
+            self.nb.select(3)
             self.logger.info('=> Isogeo started')
             self.process_isogeo()
         else:
