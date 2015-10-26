@@ -77,9 +77,11 @@ from modules import Read_GDB        # extractor for Esri FileGeoDataBase
 from modules import Read_SpaDB      # extractor for Spatialite DB
 from modules import Read_DXF        # extractor for AutoCAD DXF
 from modules import Read_GeoPDF     # extractor for Geospatial PDF
+from modules import Read_IsogeoOpenCatalog  # Isogeo catalogs
 
 from modules import TextsManager
 from modules import MetricsManager
+from modules import ConfigExcel
 
 # Imports depending on operating system
 if opersys == 'win32':
@@ -1026,10 +1028,10 @@ in {13}{14}'.format(len(self.li_shp),
         """ check needed info and launch different processes """
         # saving settings
         self.save_settings()
-        
+
         # get the active tab ID
         self.typo = self.nb.index(self.nb.select())
-        
+
         # disabling UI to avoid unattended actions
         self.val.config(state=DISABLED)
         self.nb.tab(0, state=DISABLED)
@@ -1053,7 +1055,7 @@ in {13}{14}'.format(len(self.li_shp),
         elif self.typo == 3:
             self.nb.select(0)
             self.logger.info('=> Isogeo started')
-            # self.check_fields()
+            self.process_isogeo()
         else:
             pass
         self.val.config(state=ACTIVE)
@@ -1587,7 +1589,9 @@ in {13}{14}'.format(len(self.li_shp),
         return
 
     def process_db(self, conn):
-        u""" launch the different processes """
+        u"""
+        launch the different processes
+        """
         # creating the Excel workbook
         self.configexcel()
         self.logger.info('Excel file created')
@@ -1737,6 +1741,66 @@ in {13}{14}'.format(len(self.li_shp),
         self.process_db(conn)
         # end of function
         return conn
+
+    def process_isogeo(self):
+        u"""
+        Read and extract Isogeo metadata catalog into an Excel worksheet
+        """
+        # getting and checking the OpenCatalog given
+        url_oc = self.url_OpenCatalog.get()
+        if url_oc[:4] != "http":
+            print(url_oc[:4])
+        else:
+            pass
+
+        # extracting metadata with the API
+        dico_md = OD()
+        lang = self.ddl_lang.get()
+        Read_IsogeoOpenCatalog(url_oc, lang, dico_md)
+
+        # creating the Excel file
+        self.configexcel()
+        sheet_isogeo = self.book._Workbook__worksheets[0]
+
+        offset = 0
+        # fillfulling metadata
+        for md in dico_md.get('resources'):
+            # incrémente le numéro de ligne
+            offset += 1
+            # extraction des mots-clés et thématiques
+            tags = md.get("tags")
+            li_motscles = [tags.get(tag) for tag in tags.keys() if tag.startswith('keyword:isogeo')]
+            li_theminspire = [tags.get(tag) for tag in tags.keys() if tag.startswith('keyword:inspire-theme')]
+
+            # formatage des liens pour visualiser et éditer
+            link_visu = 'HYPERLINK("{0}"; "{1}")'.format(url_oc + "/m/" + md.get('_id'),
+                                                         "Visualiser")
+            link_edit = 'HYPERLINK("{0}"; "{1}")'.format("https://app.isogeo.com/resources/" + md.get('_id'),
+                                                         "Editer")
+            # écriture des informations dans chaque colonne correspondante
+            sheet_isogeo.write(offset, 0, md.get("title"))
+            sheet_isogeo.write(offset, 1, md.get("name"))
+            sheet_isogeo.write(offset, 2, md.get("path"))
+            sheet_isogeo.write(offset, 3, " ; ".join(li_motscles))
+            sheet_isogeo.write(offset, 4, md.get("abstract"))
+            sheet_isogeo.write(offset, 5, " ; ".join(li_theminspire))
+            sheet_isogeo.write(offset, 6, md.get("type"))
+            sheet_isogeo.write(offset, 7, md.get("format"))
+            sheet_isogeo.write(offset, 9, md.get("features"))
+            sheet_isogeo.write(offset, 10, Formula(link_visu), self.url)
+            sheet_isogeo.write(offset, 11, Formula(link_edit), self.url)
+
+        # saving dictionary
+        self.savedico()
+        self.logger.info('\n\tWorkbook saved: %s', self.output.get())
+
+        # quit and exit
+        self.open_dir_file(self.output.get())
+        self.destroy()
+        exit()
+
+        # end of function
+        return
 
     def configexcel(self):
         u""" create and configure the Excel workbook """
@@ -2012,6 +2076,11 @@ in {13}{14}'.format(len(self.li_shp),
             self.feuyPG.set_panes_frozen(True)
             self.feuyPG.set_horz_split_pos(1)
             self.feuyPG.set_vert_split_pos(1)
+        else:
+            pass
+
+        if self.typo == 3:
+            ConfigExcel(workbook=self.book, opt_isogeo=1, text=self.blabla)
         else:
             pass
 
@@ -2820,13 +2889,6 @@ in {13}{14}'.format(len(self.li_shp),
 
         # end of function
         return proc
-
-    def erreurStop(self, mess):
-        u""" In case of error, close the GUI and stop the program """
-        avert(title=u'Erreur', message=mess)
-        self.logger.error(mess)
-        self.root.destroy()
-        exit()
 
 ###############################################################################
 ###### Stand alone program ########
