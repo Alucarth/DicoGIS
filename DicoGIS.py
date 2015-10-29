@@ -78,6 +78,7 @@ from modules import Read_SpaDB      # extractor for Spatialite DB
 from modules import Read_DXF        # extractor for AutoCAD DXF
 from modules import Read_GeoPDF     # extractor for Geospatial PDF
 from modules import Read_IsogeoOpenCatalog  # Isogeo catalogs
+from modules import Read_LYR  # Esri LYR files
 
 from modules import TextsManager
 from modules import MetricsManager
@@ -1069,7 +1070,8 @@ in {13}{14}'.format(len(self.li_shp),
         # check if at least a format has been choosen
         if (self.opt_shp.get() + self.opt_tab.get() + self.opt_kml.get() +
            self.opt_gml.get() + self.opt_geoj.get() + self.opt_rast.get() +
-           self.opt_egdb.get() + self.opt_cdao.get() + self.opt_pdf.get()):
+           self.opt_egdb.get() + self.opt_cdao.get() + self.opt_pdf.get() +
+           self.opt_lyr.get()):
             pass
         else:
             avert('DicoGIS - User error', self.blabla.get('noformat'))
@@ -1079,7 +1081,8 @@ in {13}{14}'.format(len(self.li_shp),
           + len(self.li_raster)
           + len(self.li_fdb)
           + len(self.li_cdao)
-          + len(self.li_pdf)):
+          + len(self.li_pdf)
+          + len(self.li_mapdocs)):
             pass
         else:
             avert('DicoGIS - User error', self.blabla.get('nodata'))
@@ -1133,6 +1136,11 @@ in {13}{14}'.format(len(self.li_shp),
             total_files += len(self.li_pdf)
         else:
             pass
+        if self.opt_lyr.get() and len(self.li_lyr) > 0:
+            total_files += len(self.li_lyr)
+        else:
+            pass
+
         self.prog_layers["maximum"] = total_files
         self.prog_layers["value"]
 
@@ -1573,6 +1581,41 @@ in {13}{14}'.format(len(self.li_shp),
             self.logger.info('\tIgnoring {0} Geospatial PDF'.format(len(self.li_pdf)))
             pass
 
+        if self.opt_lyr.get() and len(self.li_lyr) > 0:
+            self.logger.info('\n\tProcessing Esri LYR : start')
+            for lyr in self.li_lyr:
+                """ looping on lyr list """
+                self.status.set(path.basename(lyr))
+                self.logger.info('\n' + lyr)
+                # increment the progress bar
+                self.prog_layers["value"] = self.prog_layers["value"] + 1
+                self.update()
+                # reset recipient data
+                self.dico_layer.clear()
+                self.dico_fields.clear()
+                # getting the informations
+                try:
+                    Read_LYR(path.abspath(lyr),
+                             self.dico_layer,
+                             'Esri LYR',
+                             self.blabla)
+                    self.logger.info('\t Infos OK')
+                except (AttributeError, RuntimeError, Exception) as e:
+                    """ empty files """
+                    self.logger.error(e)
+                    self.prog_layers["value"] = self.prog_layers["value"] + 1
+                    continue
+                # writing to the Excel dictionary
+                self.dictionarize_lyr(self.dico_layer,
+                                          self.feuyMAPS,
+                                          line_maps)
+                self.logger.info('\t Wrote into the dictionary')
+                # increment the line number
+                line_maps += self.dico_layer.get('layers_count')
+        else:
+            self.logger.info('\tIgnoring {0} Esri LYR'.format(len(self.li_lyr)))
+            pass
+
         # writing global metrics about the dictionary
         self.dictionarize_metrics()
 
@@ -1970,8 +2013,9 @@ in {13}{14}'.format(len(self.li_shp),
             pass
 
         if self.typo == 0\
-           and self.opt_pdf.get()\
-           and len(self.li_pdf) > 0:
+            and (self.opt_pdf.get() + self.opt_lyr.get() + self.opt_qgs.get()
+                 + self.opt_mxd.get()) > 0\
+            and len(self.li_mapdocs) > 0:
             """ adding a new sheet for maps documents informations """
             # sheet
             self.feuyMAPS = self.book.add_sheet(self.blabla.get('sheet_maplans'),
@@ -1999,7 +2043,7 @@ in {13}{14}'.format(len(self.li_shp),
             self.feuyMAPS.write(0, 19, self.blabla.get('li_chps'), self.entete)
             self.logger.info('Sheet Maps & Documents created')
             # tunning headers
-            lg_maps_names = [len(lg) for lg in self.li_pdf]
+            lg_maps_names = [len(lg) for lg in self.li_mapdocs]
             self.feuyMAPS.col(0).width = max(lg_maps_names) * 100
             self.feuyMAPS.col(1).width = len(self.blabla.get('browse')) * 256
             self.feuyMAPS.col(4).width = len(self.blabla.get('date_crea')) * 256
@@ -2673,6 +2717,11 @@ in {13}{14}'.format(len(self.li_shp),
         sheet.write(line, 18, mapdoc_infos.get(u'total_objs'))
 
         # parsing layers
+        if mapdoc_infos.get(u'layers_count') == 1:
+            return
+        else:
+            pass
+
         for (layer_idx, layer_name) in zip(mapdoc_infos.get(u'layers_idx'),
                                            mapdoc_infos.get(u'layers_names')):
             # increment line
@@ -2730,6 +2779,142 @@ in {13}{14}'.format(len(self.li_shp),
 
         # End of function
         return self.feuyMAPS, line
+
+    def dictionarize_lyr(self, mapdoc_infos, sheet, line):
+        u""" write the infos of the map document into the Excel workbook """
+        # in case of a source error
+        if mapdoc_infos.get('error'):
+            self.logger.warning('\tproblem detected')
+            # source name
+            sheet.write(line, 0, mapdoc_infos.get('name'))
+            # link to parent folder
+            link = 'HYPERLINK("{0}"; "{1}")'.format(mapdoc_infos.get(u'folder'),
+                                                    self.blabla.get('browse'))
+            sheet.write(line, 1, Formula(link), self.url)
+            sheet.write(line, 2, self.blabla.get(mapdoc_infos.get('error')),
+                                 self.xls_erreur)
+            # incrementing line
+            mapdoc_infos['layers_count'] = 0
+            # exiting function
+            return sheet, line
+        else:
+            pass
+
+        # PDF source name
+        sheet.write(line, 0, mapdoc_infos.get('name'))
+
+        # Path of parent folder formatted to be a hyperlink
+        try:
+            link = 'HYPERLINK("{0}"; "{1}")'.format(mapdoc_infos.get(u'folder'),
+                                                    self.blabla.get('browse'))
+        except UnicodeDecodeError:
+            # write a notification into the log file
+            self.logger.warning('Path name with special letters: {}'.format(mapdoc_infos.get(u'folder').decode('utf8')))
+            # decode the fucking path name
+            link = 'HYPERLINK("{0}"; "{1}")'.format(mapdoc_infos.get(u'folder').decode('utf8'),
+                                                    self.blabla.get('browse'))
+
+        sheet.write(line, 1, Formula(link), self.url)
+
+        # Name of parent folder
+        sheet.write(line, 2, path.basename(mapdoc_infos.get(u'folder')))
+
+        # Document title
+        sheet.write(line, 3, mapdoc_infos.get(u'title'))
+
+        # Type of lyr
+        sheet.write(line, 4, mapdoc_infos.get(u'type'))
+
+        # Type of lyr
+        sheet.write(line, 5, mapdoc_infos.get(u'license'))
+
+        # subject
+        sheet.write(line, 6, mapdoc_infos.get(u'description'))
+
+        # total size
+        sheet.write(line, 8, mapdoc_infos.get(u'total_size'))
+
+        # Creation date
+        sheet.write(line, 9, mapdoc_infos.get(u'date_crea'), self.xls_date)
+        # Last update date
+        sheet.write(line, 10, mapdoc_infos.get(u'date_actu'), self.xls_date)
+
+
+        if mapdoc_infos.get(u'type') in ['Feature', 'Raster']:
+            # Spatial extent
+            emprise = u"Xmin : {0} - Xmax : {1} \
+                       \nYmin : {2} - Ymax : {3}".format(unicode(mapdoc_infos.get(u'Xmin')),
+                                                         unicode(mapdoc_infos.get(u'Xmax')),
+                                                         unicode(mapdoc_infos.get(u'Ymin')),
+                                                         unicode(mapdoc_infos.get(u'Ymax'))
+                                                         )
+            sheet.write(line, 11, emprise, self.xls_wrap)
+
+            # SRS name
+            sheet.write(line, 13, mapdoc_infos.get(u'srs'))
+            # Type of SRS
+            sheet.write(line, 14, mapdoc_infos.get(u'srs_type'))
+            # EPSG code
+            sheet.write(line, 15, mapdoc_infos.get(u'EPSG')[0])
+        else:
+            pass
+
+        if mapdoc_infos.get(u'type') == u'Group':
+            # Layers count
+            sheet.write(line, 16, mapdoc_infos.get(u'layers_count'))
+             # layer's name
+            sheet.write(line+1, 16, ' ; '.join(mapdoc_infos.get(u'layers_names')))
+        else:
+            pass
+
+        if mapdoc_infos.get(u'type') == u'Feature':
+            # number of fields
+            sheet.write(line, 17, mapdoc_infos.get(u'num_fields'))
+
+            # number of objects
+            sheet.write(line, 18, mapdoc_infos.get(u'num_obj'))
+
+            # definition query
+            sheet.write(line, 7, mapdoc_infos.get(u'defquery'))
+
+            # fields domain
+            fields_info = mapdoc_infos.get(u'fields')
+            champs = ""
+            for chp in fields_info.keys():
+                tipo = fields_info.get(chp)[0]
+                # concatenation of field informations
+                try:
+                    champs = champs + chp +\
+                              u" (" + tipo + self.blabla.get(u'longueur') +\
+                              unicode(fields_info.get(chp)[1]) +\
+                              self.blabla.get(u'precision') +\
+                              unicode(fields_info.get(chp)[2]) + u") ; "
+                except UnicodeDecodeError:
+                    # write a notification into the log file
+                    self.dico_err[layer_infos.get('name')] = self.blabla.get(u'err_encod')\
+                                                        + chp.decode('latin1') \
+                                                        + u"\n\n"
+                    self.logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
+                    # decode the fucking field name
+                    champs = champs + chp.decode('latin1') \
+                    + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
+                                                            fields_info.get(chp)[1],
+                                                            fields_info.get(chp)[2])
+                    # then continue
+                    continue
+
+            # Once all fieds explored, write them
+            sheet.write(line, 19, champs)
+
+            # write layer's name into the log
+            # self.logger.info('\t -- {0} = OK'.format(mapdoc_layer.get(u'title')))
+
+        else:
+            pass
+
+        # End of function
+        return self.feuyMAPS, line
+
 
     def dictionarize_pg(self, layer_infos, fields_info, sheet, line):
         u""" write the infos of the layer into the Excel workbook """

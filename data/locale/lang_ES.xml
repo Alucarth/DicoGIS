@@ -111,6 +111,13 @@
 	<srs_proj>Projectada</srs_proj>
 	<srs_vert>Vertical</srs_vert>
 	<srs_nr>Sin información</srs_nr>
+<!-- Esri LYR types -->
+    <lyr_featL>Feature</lyr_featL>
+    <lyr_rastL>Raster</lyr_rastL>
+    <lyr_rastzL>Rasterizing</lyr_rastzL>
+    <lyr_netwaL>Network Analyst</lyr_netwaL>
+    <lyr_servL>Web Service</lyr_servL>
+    <lyr_groupL>Group</lyr_groupL>
 <!-- Gestion erreurs -->
 	<nofolder>Ninguna carpeta seleccionada</nofolder>
 	<nodata>Ningún dato compatible encontrado.</nodata>

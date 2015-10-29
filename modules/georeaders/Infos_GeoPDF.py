@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 ########### Libraries #############
 ###################################
 # Standard library
-from os import chdir, path       # files and folder managing
+from os import chdir, listdir, path       # files and folder managing
 from time import localtime, strftime
 
 # Python 3 backported
@@ -441,13 +441,10 @@ if __name__ == '__main__':
     u""" standalone execution for tests. Paths are relative considering a test
     within the official repository (https://github.com/Guts/GIS)"""
     # sample files
-    chdir(r'../../test/datatest/pdf')
-    li_pdf = [
-              r'US_Country_Populations.pdf',
-              r'Advanced_geospatial_PDF_made_with_GDAL.pdf',
-              r'Geospatial_OpenStreetMap_vector_and_raster_map.pdf',
-              r'NC_Windsor_North_20110909_TM_geo.pdf'
-              ]
+    dir_pdf = path.abspath(r'..\..\test\datatest\maps_docs\pdf')
+    chdir(path.abspath(dir_pdf))
+    li_pdf = listdir(path.abspath(dir_pdf))
+    li_pdf = [path.abspath(pdf) for pdf in li_pdf if path.splitext(pdf)[1].lower()=='.pdf']
     
     # test txt dictionary
     textos = OD()
