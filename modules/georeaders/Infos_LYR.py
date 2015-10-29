@@ -27,16 +27,17 @@ from collections import OrderedDict as OD
 # 3rd party libraries
 try:
     from arcpy import env as enviro, Describe
+    from arcpy import GetCount_management as obj_count, ListFields
     from arcpy.mapping import Layer, ListLayers
 except ImportError:
-    pass
+    print("Mmmm, something's wrong with arcpy!")
 
 ###############################################################################
 ########### Classes #############
 #################################
 
 class Read_LYR():
-    def __init__(self, lyrpath, dico_lyr, tipo, txt=''):
+    def __init__(self, lyr_path, dico_lyr, tipo, txt=''):
         u""" Uses OGR functions to extract basic informations about
         geographic vector file (handles shapefile or MapInfo tables)
         and store into dictionaries.
@@ -49,201 +50,233 @@ class Read_LYR():
         see: http://resources.arcgis.com/fr/help/main/10.2/index.html#//00s300000008000000
         """
         # changing working directory to layer folder
-        chdir(path.dirname(lyrpath))
+        chdir(path.dirname(lyr_path))
 
         # raising arcpy specific exceptions
         self.alert = 0
 
         # opening LYR
-        layer = Describe(lyrpath)
-        print "Name String:        " + layer.nameString
-        print "Where Clause:       " + layer.whereClause
+        layer_obj = Layer(lyr_path)
+        # layer_des = Describe(lyrpath)
 
-        # Find out if the layer represents a feature class
-        if layer.dataElement.dataType != "FeatureClass":
-            self.alert += 1
-            self.erratum(dico_lyr, lyrpath, u'err_incomp')
+        # basics
+        dico_lyr[u'name'] = layer_obj.name
+        dico_lyr[u'description'] = layer_obj.description
+        dico_lyr[u'folder'] = path.dirname(lyr_path)
+        # by default let's start considering there is only one layer
+        dico_lyr[u'layers_count'] = 1
+
+        # determining type of lyr
+        if layer_obj.isFeatureLayer:
+            dico_lyr[u'type'] = txt.get('lyr_featL')
+            self.infos_geos(layer_obj, dico_lyr)
+            self.infos_basics(layer_obj, dico_lyr)
+            # features
+            dico_lyr[u'num_obj'] = int(obj_count(lyr_path).getOutput(0))
+            # fields
+            dico_fields = OD()
+            self.infos_fields(lyr_path, dico_lyr, dico_fields)
+            dico_lyr[u'fields'] = dico_fields
+        elif layer_obj.isRasterLayer:
+            dico_lyr[u'type'] = txt.get('lyr_rastL')
+            self.infos_geos(layer_obj, dico_lyr)
+            self.infos_basics(layer_obj, dico_lyr)
+        elif layer_obj.isRasterizingLayer:
+            dico_lyr[u'type'] = txt.get('lyr_rastzL')
+            self.infos_basics(layer_obj, dico_lyr)
+        elif layer_obj.isServiceLayer:
+            dico_lyr[u'type'] = txt.get('lyr_servL')
+            self.infos_basics(layer_obj, dico_lyr)
+            if layer_obj.supports("SERVICEPROPERTIES"):
+                self.infos_service(layer_obj.serviceProperties, dico_lyr)
+            else:
+                self.erratum(dico_lyr, lyr_path, u'err_incomp')
+                self.alert = self.alert + 1
+                return None
+        elif layer_obj.isNetworkAnalystLayer:
+            dico_lyr['type'] = txt.get('lyr_netwaL')
+            self.infos_basics(layer_obj, dico_lyr)
+        elif layer_obj.isGroupLayer:
+            dico_lyr['type'] = txt.get('lyr_groupL')
+            self.infos_basics(layer_obj, dico_lyr)
+            # layers inside
+            sublayers = ListLayers(layer_obj)
+            dico_lyr['layers_count'] = len(sublayers) -1
+            dico_lyr['layers_names'] = [sublyr.name for sublyr in sublayers[1:]]
         else:
-            print "Feature class:      " + layer.dataElement.catalogPath
-            print "Feature class Type: " + layer.featureClass.featureType
+            self.erratum(dico_lyr, lyr_path, u'err_incomp')
+            self.alert = self.alert + 1
+            return None
 
-        # LYR name and parent folder
-        dico_lyr['name'] = layer.nameString
-        dico_lyr['folder'] = path.dirname(lyrpath)
+        # scale
+        dico_lyr['maxScale'] = layer_obj.maxScale
+        dico_lyr['minScale'] = layer_obj.minScale
 
-        # layers count and names
-        dico_lyr['layers_count'] = layer.GetLayerCount()
-        li_layers_names = []
-        li_layers_idx = []
-        dico_lyr['layers_names'] = li_layers_names
-        dico_lyr['layers_idx'] = li_layers_idx
+        # secondary
+        dico_lyr['license'] = layer_obj.credits
+        dico_lyr['broken'] = layer_obj.isBroken
 
         # dependencies
-        dependencies = [f for f in listdir(path.dirname(lyrpath))
-                        if path.splitext(path.abspath(f))[0] == path.splitext(lyrpath)[0]
-                        and not path.splitext(path.abspath(f).lower())[1] == ".lyr"]
+        dependencies = [f for f in listdir(path.dirname(lyr_path))
+                        if path.splitext(path.abspath(f))[0] == path.splitext(lyr_path)[0]
+                        and not path.splitext(path.abspath(f).lower())[1] == ".lyr"
+                        or path.isfile('%s.xml' % f[:-4])]
         dico_lyr[u'dependencies'] = dependencies
 
         # cumulated size
-        dependencies.append(lyrpath)
+        dependencies.append(lyr_path)
         total_size = sum([path.getsize(f) for f in dependencies])
         dico_lyr[u"total_size"] = self.sizeof(total_size)
         dependencies.pop(-1)
 
         # global dates
         dico_lyr[u'date_actu'] = strftime('%d/%m/%Y',
-                                          localtime(path.getmtime(lyrpath)))
+                                          localtime(path.getmtime(lyr_path)))
         dico_lyr[u'date_crea'] = strftime('%d/%m/%Y',
-                                          localtime(path.getctime(lyrpath)))
-        # total fields count
-        total_fields = 0
-        dico_lyr['total_fields'] = total_fields
-        # total objects count
-        total_objs = 0
-        dico_lyr['total_objs'] = total_objs
-        # parsing layers
-    #     for layer_idx in range(lyr.GetLayerCount()):
-    #         # dictionary where will be stored informations
-    #         dico_layer = OD()
-    #         # parent LYR
-    #         dico_layer['lyr_name'] = path.basename(lyr.GetName())
-    #         # getting layer object
-    #         layer = lyr.GetLayerByIndex(layer_idx)
-    #         # layer name
-    #         li_layers_names.append(layer.GetName())
-    #         # layer index
-    #         li_layers_idx.append(layer_idx)
-    #         # getting layer globlal informations
-    #         self.infos_basics(layer, dico_layer, txt)
-    #         # storing layer into the LYR dictionary
-    #         dico_lyr['{0}_{1}'.format(layer_idx,
-    #                                   layer.GetName())] = dico_layer
-    #         # summing fields number
-    #         total_fields += dico_layer.get(u'num_fields')
-    #         # summing objects number
-    #         total_objs += dico_layer.get(u'num_obj')
-    #         # deleting dictionary to ensure having cleared space
-    #         del dico_layer
-    #     # storing fileds and objects sum
-    #     dico_lyr['total_fields'] = total_fields
-    #     dico_lyr['total_objs'] = total_objs
+                                          localtime(path.getctime(lyr_path)))
 
-    # def infos_basics(self, layer_obj, dico_layer, txt):
-    #     u""" get the global informations about the layer """
-    #     # title and features count
-    #     dico_layer[u'title'] = layer_obj.GetName()
-    #     dico_layer[u'num_obj'] = layer_obj.GetFeatureCount()
+        # # total fields count
+        # total_fields = 0
+        # dico_lyr['total_fields'] = total_fields
 
-    #     # getting geography and geometry informations
-    #     srs = layer_obj.GetSpatialRef()
-    #     self.infos_geos(layer_obj, srs, dico_layer, txt)
+        # # total objects count
+        # total_objs = 0
+        # dico_lyr['total_objs'] = total_objs
 
-    #     # getting fields informations
-    #     dico_fields = OD()
-    #     layer_def = layer_obj.GetLayerDefn()
-    #     dico_layer['num_fields'] = layer_def.GetFieldCount()
-    #     self.infos_fields(layer_def, dico_fields)
-    #     dico_layer['fields'] = dico_fields
+        # # parsing layers
 
-    #     # end of function
-    #     return dico_layer
+    def infos_basics(self, layer_obj, dico_lyr):
+        u""" get the global informations about the layer """
+        # dataset title
+        if layer_obj.supports("WORKSPACEPATH"):
+            dico_lyr[u'wkspace'] = layer_obj.workspacePath
+        else:
+            pass
 
-    # def infos_geos(self, layer_obj, srs, dico_layer, txt):
-    #     u""" get the informations about geography and geometry """
-    #     if srs:
-    #         # SRS
-    #         srs.AutoIdentifyEPSG()
-    #         # srs type
-    #         srsmetod = [(srs.IsCompound(), txt.get('srs_comp')),
-    #                     (srs.IsGeocentric(), txt.get('srs_geoc')),
-    #                     (srs.IsGeographic(), txt.get('srs_geog')),
-    #                     (srs.IsLocal(), txt.get('srs_loca')),
-    #                     (srs.IsProjected(), txt.get('srs_proj')),
-    #                     (srs.IsVertical(), txt.get('srs_vert'))]
-    #         # searching for a match with one of srs types
-    #         for srsmet in srsmetod:
-    #             if srsmet[0] == 1:
-    #                 typsrs = srsmet[1]
-    #             else:
-    #                 continue
-    #         # in case of not match
-    #         try:
-    #             dico_layer[u'srs_type'] = unicode(typsrs)
-    #         except UnboundLocalError:
-    #             typsrs = txt.get('srs_nr')
-    #             dico_layer[u'srs_type'] = unicode(typsrs)
+        # dataset title
+        if layer_obj.supports("DATASETNAME"):
+            dico_lyr[u'title'] = layer_obj.datasetName
+        else:
+            pass
 
-    #         # handling exceptions in srs names'encoding
-    #         try:
-    #             if srs.GetAttrValue('PROJCS') != 'unnamed':
-    #                 dico_layer[u'srs'] = unicode(srs.GetAttrValue('PROJCS')).replace('_', ' ')
-    #             else:
-    #                 dico_layer[u'srs'] = unicode(srs.GetAttrValue('PROJECTION')).replace('_', ' ')
-    #         except UnicodeDecodeError:
-    #             if srs.GetAttrValue('PROJCS') != 'unnamed':
-    #                 dico_layer[u'srs'] = srs.GetAttrValue('PROJCS').decode('latin1').replace('_', ' ')
-    #             else:
-    #                 dico_layer[u'srs'] = srs.GetAttrValue('PROJECTION').decode('latin1').replace('_', ' ')
-    #         finally:
-    #             dico_layer[u'EPSG'] = unicode(srs.GetAttrValue("AUTHORITY", 1))
+        # if a selection is active
+        if layer_obj.supports("DEFINITIONQUERY"):
+            dico_lyr[u'defquery'] = layer_obj.definitionQuery
+        else:
+            pass
 
-    #         # World SRS default
-    #         if dico_layer[u'EPSG'] == u'4326' and dico_layer[u'srs'] == u'None':
-    #             dico_layer[u'srs'] = u'WGS 84'
-    #         else:
-    #             pass
-    #     else:
-    #         typsrs = txt.get('srs_nr')
-    #         dico_layer[u'srs_type'] = unicode(typsrs)
+        # if labels are displayed
+        if layer_obj.supports("SHOWLABELS"):
+            dico_lyr[u'labelsDisplay'] = layer_obj.showLabels
+        else:
+            pass
 
-    #     # first feature and geometry type
-    #     try:
-    #         first_obj = layer_obj.GetNextFeature()
-    #         geom = first_obj.GetGeometryRef()
-    #     except AttributeError, e:
-    #         print e, layer_obj.GetName()
-    #         first_obj = layer_obj.GetNextFeature()
-    #         geom = first_obj.GetGeometryRef()
+        # transparency level
+        if layer_obj.supports("TRANSPARENCY"):
+            dico_lyr[u'transpar'] = layer_obj.transparency
+        else:
+            pass
 
-    #     # geometry type human readable
-    #     if geom.GetGeometryName() == u'POINT':
-    #         dico_layer[u'type_geom'] = txt.get('geom_point')
-    #     elif u'LINESTRING' in geom.GetGeometryName():
-    #         dico_layer[u'type_geom'] = txt.get('geom_ligne')
-    #     elif u'POLYGON' in geom.GetGeometryName():
-    #         dico_layer[u'type_geom'] = txt.get('geom_polyg')
-    #     else:
-    #         dico_layer[u'type_geom'] = geom.GetGeometryName()
+        # transparency level
+        if layer_obj.supports("BRIGHTNESS"):
+            dico_lyr[u'brightness'] = layer_obj.brightness
+        else:
+            pass
 
-    #     # spatial extent (bounding box)
-    #     dico_layer[u'Xmin'] = round(layer_obj.GetExtent()[0], 2)
-    #     dico_layer[u'Xmax'] = round(layer_obj.GetExtent()[1], 2)
-    #     dico_layer[u'Ymin'] = round(layer_obj.GetExtent()[2], 2)
-    #     dico_layer[u'Ymax'] = round(layer_obj.GetExtent()[3], 2)
+        # transparency level
+        if layer_obj.supports("CONTRAST"):
+            dico_lyr[u'contrast'] = layer_obj.contrast
+        else:
+            pass
 
-    #     # end of function
-    #     return dico_layer
+        # end of function
+        return
 
-    # def infos_fields(self, layer_def, dico_fields):
-    #     u""" get the informations about fields definitions """
-    #     for i in range(layer_def.GetFieldCount()):
-    #         champomy = layer_def.GetFieldDefn(i)  # fields ordered
-    #         dico_fields[champomy.GetName()] = champomy.GetTypeName()
-    #     # end of function
-    #     return dico_fields
+    def infos_geos(self, layer_obj, dico_lyr):
+        u"""
+        Gets informations about geography and geometry
+        """
+        # spatial extent
+        extent = layer_obj.getExtent()
+        dico_lyr[u'Xmin'] = round(extent.XMin, 2)
+        dico_lyr[u'Xmax'] = round(extent.XMax, 2)
+        dico_lyr[u'Ymin'] = round(extent.YMin, 2)
+        dico_lyr[u'Ymax'] = round(extent.YMax, 2)
+
+        # SRS
+        srs = extent.spatialReference
+        dico_lyr[u'srs'] = srs.name
+        dico_lyr[u'srs_type'] = srs.type
+        if srs.type == u'Projected':
+            dico_lyr[u'EPSG'] = srs.PCSCode, srs.PCSName, srs.projectionCode, srs.projectionName
+        elif srs.type == u'Geographic':
+            dico_lyr[u'EPSG'] = srs.GCSCode, srs.GCSName, srs.datumCode, srs.datumName
+        else:
+            dico_lyr[u'EPSG'] = (srs.PCSCode, srs.PCSName, srs.projectionCode, srs.projectionName),\
+                                (srs.GCSCode, srs.GCSName, srs.datumCode, srs.datumName)
+
+        # end of function
+        return
+
+
+    def infos_service(self, lyr_serv_prop, dico_lyr):
+        u"""
+        specific informations for service layer
+        """
+        if lyr_serv_prop["ServiceType"] != "SDE":
+            dico_lyr['servType'] = lyr_serv_prop.get('ServiceType', 'N/A')
+            dico_lyr['servName'] = lyr_serv_prop.get('ServiceName', 'N/A')
+            dico_lyr['WMSName'] = lyr_serv_prop.get('WMSName', 'N/A')
+            dico_lyr['WMSTitle'] = lyr_serv_prop.get('WMSTitle', 'N/A')
+            dico_lyr['URL'] = lyr_serv_prop.get('URL', 'N/A')
+            dico_lyr['connection'] = lyr_serv_prop.get('Connection', 'N/A')
+            dico_lyr['server'] = lyr_serv_prop.get('Server', 'N/A')
+            dico_lyr['cache'] = str(lyr_serv_prop.get('Cache', 'N/A'))
+            dico_lyr['user'] = lyr_serv_prop.get('UserName', 'N/A')
+            dico_lyr['pwd'] = lyr_serv_prop.get('Password', 'N/A')
+        else:
+            dico_lyr['servType'] = lyr_serv_prop.get('ServiceType', 'N/A')
+            dico_lyr['database'] = lyr_serv_prop.get('Database', 'N/A')
+            dico_lyr['server'] = lyr_serv_prop.get('Server', 'N/A')
+            dico_lyr['service'] = lyr_serv_prop.get('Service', 'N/A')
+            dico_lyr['version'] = lyr_serv_prop.get('Version', 'N/A')
+            dico_lyr['user'] = lyr_serv_prop.get('UserName', 'N/A')
+            dico_lyr['authentication'] = lyr_serv_prop.get('AuthenticationMode', 'N/A')
+
+        # end of function
+        return
+
+    def infos_fields(self, lyr_path, dico_lyr, dico_fields):
+        u"""
+        get the informations about fields definitions
+        """
+        fields = ListFields(lyr_path)
+        dico_lyr[u'num_fields'] = len(fields)
+        for field in fields:
+            if field.name not in [u'FID', u'SHAPE', u'Shape', u'OBJECTID']:
+                dico_fields[field.name] = field.type, field.length, field.precision,\
+                                      field.aliasName, field.required
+            else:
+                pass
+            
+        # end of function
+        return dico_fields
 
     def sizeof(self, os_size):
-        u""" return size in different units depending on size
-        see http://stackoverflow.com/a/1094933 """
+        u"""
+        Returns size in different units depending on size
+        see http://stackoverflow.com/a/1094933
+        """
         for size_cat in ['octets', 'Ko', 'Mo', 'Go']:
             if os_size < 1024.0:
                 return "%3.1f %s" % (os_size, size_cat)
             os_size /= 1024.0
+        # end of function
         return "%3.1f %s" % (os_size, " To")
 
 
     def erratum(self, dico_lyr, lyrpath, mess):
-        u""" errors handling """
+        u""" errors handler """
         # storing minimal informations to give clues to solve later
         dico_lyr[u'name'] = path.basename(lyrpath)
         dico_lyr[u'folder'] = path.dirname(lyrpath)
@@ -256,13 +289,16 @@ class Read_LYR():
 ###################################
 
 if __name__ == '__main__':
-    u""" standalone execution for tests. Paths are relative considering a test
-    within the official repository (https://github.com/Guts/DicoGIS/)"""
-    # searching for DX Files
-    num_folders = 0
-    li_lyr = [r'..\..\test\datatest\maps_docs\lyr\PRIF 2014.lyr',
-              r'..\..\test\datatest\maps_docs\lyr\PRIF 2013.lyr',
-              r'..\..\test\datatest\maps_docs\lyr\PRIF 2012.lyr']
+    u"""
+    Standalone execution for development and tests. Paths are relative considering
+    a test within the official repository (https://github.com/Guts/DicoGIS/)
+    """
+    # searching for lyr Files
+    dir_lyr = path.abspath(r'..\..\test\datatest\maps_docs\lyr')
+    # dir_lyr = path.abspath(r'\\Copernic\SIG_RESSOURCES\1_lyr\ADMINISTRATIF')
+    chdir(path.abspath(dir_lyr))
+    li_lyr = listdir(path.abspath(dir_lyr))
+    li_lyr = [path.abspath(lyr) for lyr in li_lyr if path.splitext(lyr)[1].lower()=='.lyr']
 
     # recipient datas
     dico_lyr = OD()
@@ -279,17 +315,24 @@ if __name__ == '__main__':
     textos['geom_ligne'] = u'Line'
     textos['geom_polyg'] = u'Polygon'
 
+    textos['lyr_featL'] = u'Feature'
+    textos['lyr_rastL'] = u'Raster'
+    textos['lyr_rastzL'] = u'Rasterizing'
+    textos['lyr_netwaL'] = u'Network Analyst'
+    textos['lyr_servL'] = u'Web Service'
+    textos['lyr_groupL'] = u'Group'
+
     # read LYR
     for lyrpath in li_lyr:
         dico_lyr.clear()
-        lyrpath = path.abspath(lyrpath)
         if path.isfile(lyrpath):
             print("\n{0}: ".format(lyrpath))
             Read_LYR(lyrpath,
                      dico_lyr,
-                     'Esri LYR')
+                     'Esri LYR',
+                     txt=textos)
             # print results
             print(dico_lyr)
         else:
             print("{0} is not a recognized file".format(lyrpath))
-            pass
+            continue
