@@ -11,7 +11,7 @@ from __future__ import unicode_literals
 #
 # Python:       2.7.x
 # Created:      14/02/2013
-# Updated:      13/04/2015
+# Updated:      01/12/2015
 #
 # Licence:      GPL 3
 # ------------------------------------------------------------------------------
@@ -3058,7 +3058,7 @@ in {13}{14}'.format(len(self.li_shp),
 
         # open the directory or the file according to the os
         if opersys == 'win32':  # Windows
-            proc = startfile(target)
+            proc = startfile(path.normpath(target))
 
         elif opersys.startswith('linux'):  # Linux:
             proc = subprocess.Popen(['xdg-open', target],
