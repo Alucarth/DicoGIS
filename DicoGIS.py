@@ -1788,6 +1788,7 @@ in {13}{14}'.format(len(self.li_shp),
             sheet_isogeo.write(offset, 5, " ; ".join(li_theminspire))
             sheet_isogeo.write(offset, 6, md.get("type"))
             sheet_isogeo.write(offset, 7, md.get("format"))
+            sheet_isogeo.write(offset, 7, md.get("coordinate-system"))
             sheet_isogeo.write(offset, 9, md.get("features"))
             sheet_isogeo.write(offset, 10, Formula(link_visu), self.url)
             sheet_isogeo.write(offset, 11, Formula(link_edit), self.url)
