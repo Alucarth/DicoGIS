@@ -111,6 +111,13 @@
 	<srs_proj>Projected</srs_proj>
 	<srs_vert>Vertical</srs_vert>
 	<srs_nr>Not specified</srs_nr>
+<!-- Esri LYR types -->
+    <lyr_featL>Feature</lyr_featL>
+    <lyr_rastL>Raster</lyr_rastL>
+    <lyr_rastzL>Rasterizing</lyr_rastzL>
+    <lyr_netwaL>Network Analyst</lyr_netwaL>
+    <lyr_servL>Web Service</lyr_servL>
+    <lyr_groupL>Group</lyr_groupL>
 <!-- Gestion erreurs -->
 	<nofolder>Any folder selected</nofolder>
 	<nodata>Any compatible geographic data (.shp / .tab) has been found.</nodata>

@@ -46,36 +46,42 @@ from arcpy.mapping import Layer, ListLayers
 ###############################################################################
 ########## Functions ############
 #################################
-def read_lyr(layer):
+def read_lyr(lyr_path):
     """
 
     """
     # open layer file
+    layer = Layer(lyr_path)
 
-    # Define the projection to wgs84 — factory code is 4326
-    print "Name String: " + layer.nameString
-    print "Where Clause: " + layer.whereClause
+    # 
+    print(layer.name)
+    print(layer.description)
+    
 
-    # Find out if the layer represents a feature class
-    if layer.dataElement.dataType != "FeatureClass":
-        print("\nThis is not a featureclass")
-        sys.exit()
-    else:
-        print "Feature class:      " + layer.dataElement.catalogPath
-        print "Feature class Type: " + layer.featureClass.featureType
+    # # Define the projection to wgs84 — factory code is 4326
+    # print "Name String: " + layer.nameString
+    # print "Where Clause: " + layer.whereClause
 
-    #
-    layers_in = ListLayers(layer)
+    # # Find out if the layer represents a feature class
+    # if layer.dataElement.dataType != "FeatureClass":
+    #     print("\nThis is not a featureclass")
+    #     sys.exit()
+    # else:
+    #     print "Feature class:      " + layer.dataElement.catalogPath
+    #     print "Feature class Type: " + layer.featureClass.featureType
+
+    # #
+    # layers_in = ListLayers(layer)
 
     # End update_shapefiles
-    return layer
+    return
 
 def main():
     """
     Create a pool class and run the jobs–the number of jobs is equal to the number of shapefiles
     """
     # setting the workspace
-    workspace = r'datatest\maps_docs\lyr'
+    workspace = path.abspath(r'datatest\maps_docs\lyr')
     enviro.workspace = workspace
 
     # listing lyr files
@@ -86,9 +92,12 @@ def main():
     fc_list = [path.join(workspace, fc) for fc in fcs]
     print(fc_list)
 
+    # 
+    dico_lyr = {}
+
     # creating the pool to process and the mapping between task and objects
     pool = multiprocessing.Pool()
-    pool.map(read_lyr, fc_list)
+    pool.apply_async(read_lyr, fc_list)
 
     # Synchronize the main process with the job processes to ensure proper cleanup.
     pool.close()
