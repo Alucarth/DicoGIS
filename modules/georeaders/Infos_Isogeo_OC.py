@@ -60,10 +60,8 @@ class Read_IsogeoOpenCatalog():
         # if language passed is not available, then force switch into English
         lang_available = ['en', 'fr']
         if lang.lower() not in lang_available:
-            lang = 'en'
-            print("Language asked is not supported by the API.\n\
-                   Should be one of: {0}. \
-                   Has been automatically switched into English".format(', '.join(lang_available)))
+            lang = 'fr'
+            print("Language asked is not supported by the API.\nShould be one of: {0}.\nHas been automatically switched into English".format(', '.join(lang_available)))
         else:
             pass
 
@@ -85,8 +83,11 @@ class Read_IsogeoOpenCatalog():
         # tags
         tags = search_rez.get('tags')
         dico_mds['tags'] = tags
+        print(tags.keys())
         # getting different owners (= workgroups)
         dico_mds['owners'] = [tags.get(tag) for tag in tags.keys() if tag.startswith('owner')]
+        # getting different SRS (=coordinate systems)
+        dico_mds['srs'] = [tags.get(tag) for tag in tags.keys() if tag.startswith('coordinate-system')]
 
         # metadatas
         tot_results = search_rez.get('total')
@@ -100,6 +101,7 @@ class Read_IsogeoOpenCatalog():
             for idx in range(1, int(ceil(tot_results / 100)) + 1):
                 start = idx * 100 + 1
                 search_req = Request('http://v1.api.isogeo.com/resources/search?ct={0}&s={1}&_limit=100&_lang={2}&_offset={3}'.format(share_token, share_id, lang, start))
+                print(search_req)
                 try:
                     search_resp = urlopen(search_req)
                     search_rez = json.load(search_resp)
@@ -119,7 +121,7 @@ if __name__ == '__main__':
     """ standalone execution """
     # test variables
     url_catalog = "http://open.isogeo.com/s/ad6451f1f9ca405ca6f78fabf46aeb10/Bue0ySfhmGOPw33jHMyaJtcOM4MY0"
-    lang = "es"
+    lang = "fr"
     dico_md = OD()
 
     # testing class
