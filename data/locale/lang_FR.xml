@@ -111,6 +111,13 @@
 	<srs_proj>Projetée</srs_proj>
 	<srs_vert>Verticale</srs_vert>
 	<srs_nr>Non renseignée</srs_nr>
+<!-- Esri LYR types -->
+    <lyr_featL>Feature</lyr_featL>
+    <lyr_rastL>Raster</lyr_rastL>
+    <lyr_rastzL>Rasterizing</lyr_rastzL>
+    <lyr_netwaL>Network Analyst</lyr_netwaL>
+    <lyr_servL>Web Service</lyr_servL>
+    <lyr_groupL>Group</lyr_groupL>
 <!-- Gestion erreurs -->
 	<nofolder>Aucun dossier sélectionné</nofolder>
 	<nodata>Aucune donnée géographique compatible trouvée.</nodata>
