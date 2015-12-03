@@ -3059,7 +3059,7 @@ in {13}{14}'.format(len(self.li_shp),
 
         # open the directory or the file according to the os
         if opersys == 'win32':  # Windows
-            proc = startfile(path.normpath(target))
+            proc = startfile(path.realpath(target))
 
         elif opersys.startswith('linux'):  # Linux:
             proc = subprocess.Popen(['xdg-open', target],
