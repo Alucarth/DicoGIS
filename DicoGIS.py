@@ -11,12 +11,12 @@ from __future__ import unicode_literals
 #
 # Python:       2.7.x
 # Created:      14/02/2013
-# Updated:      01/12/2015
+# Updated:      15/12/2015
 #
 # Licence:      GPL 3
 # ------------------------------------------------------------------------------
 
-DGversion = "2.5.0-beta1"
+DGversion = "2.5.0-beta2"
 
 ###############################################################################
 ########### Libraries #############
@@ -217,7 +217,7 @@ class DicoGIS(Tk):
         self.tab_sgbd = Frame(self.nb)          # tab_id = 1
         self.tab_webservices = Frame(self.nb)   # tab_id = 2
         self.tab_isogeo = Frame(self.nb)        # tab_id = 3
-        self.tab_about = Frame(self.nb)         # tab_id = 4
+        self.tab_options = Frame(self.nb)       # tab_id = 4
 
 # =================================================================================
         # ## TAB 1: FILES ##
@@ -391,26 +391,14 @@ class DicoGIS(Tk):
         self.FrDb = Labelframe(self.tab_sgbd,
                                name='database',
                                text=self.blabla.get('gui_fr2'))
-        self.FrProx = Labelframe(self.FrDb,
-                                 name='proxy',
-                                 text=self.blabla.get('gui_fr2'))
 
         # DB variables
         self.opt_pgvw = IntVar(self.FrDb)   # able/disable PostGIS views
-        self.opt_proxy = IntVar(self.FrDb)  # proxy option
-
         self.host = StringVar(self.FrDb, 'localhost')
         self.port = IntVar(self.FrDb, 5432)
         self.dbnb = StringVar(self.FrDb)
         self.user = StringVar(self.FrDb, 'postgres')
         self.pswd = StringVar(self.FrDb)
-
-        # proxy specific variables
-        self.opt_ntlm = IntVar(self.FrProx, 0)  # proxy NTLM protocol option
-        self.prox_server = StringVar(self.FrProx, 'proxy.server.com')
-        self.prox_port = IntVar(self.FrProx, 80)
-        self.prox_user = StringVar(self.FrProx, 'proxy_user')
-        self.prox_pswd = StringVar(self.FrProx, '****')
 
         # Form widgets
         self.ent_H = Entry(self.FrDb, textvariable=self.host)
@@ -422,10 +410,7 @@ class DicoGIS(Tk):
         caz_pgvw = Checkbutton(self.FrDb,
                                text=self.blabla.get('gui_views'),
                                variable=self.opt_pgvw)
-        caz_prox = Checkbutton(self.FrDb,
-                               text=u'Proxy',
-                               variable=self.opt_proxy,
-                               command=lambda: self.proxy_form())
+
         # Label widgets
         self.lb_H = Label(self.FrDb, text=self.blabla.get('gui_host'))
         self.lb_P = Label(self.FrDb, text=self.blabla.get('gui_port'))
@@ -455,40 +440,8 @@ class DicoGIS(Tk):
                        sticky="NSWE", padx=2, pady=2)
         caz_pgvw.grid(row=4, column=0,
                       sticky="NSWE", padx=2, pady=2)
-        caz_prox.grid(row=4, column=2,
-                      sticky="NSWE", padx=2, pady=2)
 
-        # Proxy form widgets
-        self.prox_ent_H = Entry(self.FrProx, textvariable=self.prox_server)
-        self.prox_ent_P = Entry(self.FrProx, textvariable=self.prox_port)
-        self.prox_ent_M = Entry(self.FrProx, textvariable=self.prox_pswd, show='*')
-
-        self.prox_lb_H = Label(self.FrProx, text=self.blabla.get('gui_prox_server'))
-        self.prox_lb_P = Label(self.FrProx, text=self.blabla.get('gui_port'))
-        caz_ntlm = Checkbutton(self.FrProx,
-                               text=u'NTLM',
-                               variable=self.opt_ntlm)
-        self.prox_lb_M = Label(self.FrProx, text=self.blabla.get('gui_mdp'))
-
-        # proxy widgets placement
-        self.prox_lb_H.grid(row=1, column=0,
-                            sticky="NSEW", padx=2, pady=2)
-        self.prox_ent_H.grid(row=1, column=1, columnspan=2,
-                             sticky="NSEW", padx=2, pady=2)
-        self.prox_lb_P.grid(row=1, column=2,
-                            sticky="NSEW", padx=2, pady=2)
-        self.prox_ent_P.grid(row=1, column=3, columnspan=2,
-                             sticky="NSEW", padx=2, pady=2)
-        caz_ntlm.grid(row=2, column=0,
-                      sticky="NSEW", padx=2, pady=2)
-        self.prox_lb_M.grid(row=2, column=1,
-                            sticky="NSEW", padx=2, pady=2)
-        self.prox_ent_M.grid(row=2, column=2, columnspan=2,
-                             sticky="NSEW", padx=2, pady=2)
-
-        # frames placement
-        self.FrProx.grid(row=5, column=0, columnspan=4,
-                         sticky="NSWE", padx=2, pady=2)
+        # frame position
         self.FrDb.grid(row=3, column=1, sticky="NSWE", padx=2, pady=2)
 
 # =================================================================================
@@ -497,8 +450,8 @@ class DicoGIS(Tk):
                     text=self.blabla.get('gui_tab3'), padding=3)
 
 
-
 # =================================================================================
+
         # ## TAB 4: Isogeo ##
         self.nb.add(self.tab_isogeo,
                     text='Isogeo', padding=3)
@@ -515,6 +468,66 @@ class DicoGIS(Tk):
                            sticky="NSWE", padx=2, pady=2)
         self.ent_urlOC.grid(row=0, column=2, columnspan=2,
                             sticky="NSWE", padx=2, pady=2)
+
+# =================================================================================
+
+        # ## TAB 5: Options ##
+        self.nb.add(self.tab_options,
+                    text='Options', padding=3)
+
+        # subframe: Proxy
+        self.FrProx = Labelframe(self.tab_options,
+                                 name='proxy',
+                                 text=self.blabla.get('gui_fr2'))
+
+        # PROXY
+        self.opt_proxy = IntVar(self.tab_options)  # proxy option
+
+        # proxy specific variables
+        self.opt_ntlm = IntVar(self.FrProx, 0)  # proxy NTLM protocol option
+        self.prox_server = StringVar(self.FrProx, 'proxy.server.com')
+        self.prox_port = IntVar(self.FrProx, 80)
+        self.prox_user = StringVar(self.FrProx, 'proxy_user')
+        self.prox_pswd = StringVar(self.FrProx, '****')
+
+        # Proxy form widgets
+        caz_prox = Checkbutton(self.tab_options,
+                               text=u'Proxy',
+                               variable=self.opt_proxy,
+                               command=lambda: self.proxy_form())
+
+        self.prox_ent_H = Entry(self.FrProx, textvariable=self.prox_server)
+        self.prox_ent_P = Entry(self.FrProx, textvariable=self.prox_port)
+        self.prox_ent_M = Entry(self.FrProx, textvariable=self.prox_pswd, show='*')
+
+        self.prox_lb_H = Label(self.FrProx, text=self.blabla.get('gui_prox_server'))
+        self.prox_lb_P = Label(self.FrProx, text=self.blabla.get('gui_port'))
+        caz_ntlm = Checkbutton(self.FrProx,
+                               text=u'NTLM',
+                               variable=self.opt_ntlm)
+        self.prox_lb_M = Label(self.FrProx, text=self.blabla.get('gui_mdp'))
+
+        # proxy widgets position
+        caz_prox.grid(row=4, column=2,
+                      sticky="NSWE", padx=2, pady=2)
+        self.prox_lb_H.grid(row=1, column=0,
+                            sticky="NSEW", padx=2, pady=2)
+        self.prox_ent_H.grid(row=1, column=1, columnspan=2,
+                             sticky="NSEW", padx=2, pady=2)
+        self.prox_lb_P.grid(row=1, column=2,
+                            sticky="NSEW", padx=2, pady=2)
+        self.prox_ent_P.grid(row=1, column=3, columnspan=2,
+                             sticky="NSEW", padx=2, pady=2)
+        caz_ntlm.grid(row=2, column=0,
+                      sticky="NSEW", padx=2, pady=2)
+        self.prox_lb_M.grid(row=2, column=1,
+                            sticky="NSEW", padx=2, pady=2)
+        self.prox_ent_M.grid(row=2, column=2, columnspan=2,
+                             sticky="NSEW", padx=2, pady=2)
+
+        # frame position
+        self.FrProx.grid(row=5, column=0, columnspan=4,
+                         sticky="NSWE", padx=2, pady=2)
 
 # =================================================================================
         # ## MAIN FRAME ##
