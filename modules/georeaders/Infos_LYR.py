@@ -29,6 +29,7 @@ try:
     from arcpy import env as enviro, Describe
     from arcpy import GetCount_management as obj_count, ListFields
     from arcpy.mapping import Layer, ListLayers
+    from arcpy.da import SearchCursor
 except ImportError:
     print("Mmmm, something's wrong with arcpy!")
 
@@ -72,11 +73,21 @@ class Read_LYR():
             self.infos_geos(layer_obj, dico_lyr)
             self.infos_basics(layer_obj, dico_lyr)
             # features
-            dico_lyr[u'num_obj'] = int(obj_count(lyr_path).getOutput(0))
+            # dico_lyr[u'num_obj'] = int(obj_count(lyr_path).getOutput(0))
             # fields
             dico_fields = OD()
             self.infos_fields(lyr_path, dico_lyr, dico_fields)
             dico_lyr[u'fields'] = dico_fields
+
+            # count features
+            with SearchCursor(lyr_path, [dico_fields.keys()[0]]) as cursor:
+                rows = {row[0] for row in cursor}
+ 
+            count = 0
+            for row in rows:
+                count += 1
+            dico_lyr[u'num_obj'] = count
+
         elif layer_obj.isRasterLayer:
             dico_lyr[u'type'] = txt.get('lyr_rastL')
             self.infos_geos(layer_obj, dico_lyr)
