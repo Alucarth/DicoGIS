@@ -1,22 +1,22 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
-from __future__ import unicode_literals
+from __future__ import (absolute_import, print_function, unicode_literals)
 # -----------------------------------------------------------------------------
 # Name:         DicoGIS
 # Purpose:      Automatize the creation of a dictionnary of geographic data
 #                   contained in a folders structures.
 #                   It produces an Excel output file (.xls)
 #
-# Author:       Julien Moura (https://twitter.com/geojulien)
+# Author:       Julien Moura (@geojulien)
 #
 # Python:       2.7.x
 # Created:      14/02/2013
-# Updated:      15/12/2015
+# Updated:      15/02/2016
 #
 # Licence:      GPL 3
 # ------------------------------------------------------------------------------
 
-DGversion = "2.5.0-beta2"
+DGversion = "2.5.0-beta3"
 
 ###############################################################################
 ########### Libraries #############
