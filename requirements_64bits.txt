@@ -27,11 +27,16 @@ openpyxl==2.3.3
 xlwt==1.0.0
 
 # Geographic
-numpy
-.\lib\GDAL-1.11.3-cp27-none-win_amd64.whl
+# numpy
+.\lib\numpy-1.10.4+mkl-cp27-none-win_amd64.whl==1.10.4
+#.\lib\GDAL-1.11.3-cp27-none-win_amd64.whl
+.\lib\GDAL-2.0.2-cp27-none-win_amd64.whl==2.0.2
 OWSLib==0.10.3
 dxfgrabber==0.7.5
 
+
+## Packaging
+.\lib\py2exe-0.6.10a1-cp27-none-win_amd64.whl==0.6.10.a1
 
 # -----------------------
 # All dependencies

@@ -26,12 +26,17 @@ requests==2.9.1
 openpyxl==2.3.3
 xlwt==1.0.0
 
-# Geographic
-numpy
-.\lib\lxml-3.5.0-cp27-none-win32.whl
+#Geospatial
+# numpy
+.\lib\numpy-1.10.4+mkl-cp27-none-win32.whl
+#.\lib\GDAL-1.11.3-cp27-none-win32.whl
+.\lib\GDAL-2.0.2-cp27-none-win32.whl
 OWSLib==0.10.3
 dxfgrabber==0.7.5
 
+
+## Packaging
+.\lib\py2exe-0.6.10a1-cp27-none-win32.whl
 
 # -----------------------
 # All dependencies
