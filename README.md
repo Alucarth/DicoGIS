@@ -32,12 +32,14 @@ python setup2exe_DicoGIS.py py2exe
 
 You can [download this repository](https://github.com/Guts/DicoGIS/archive/master.zip) or run these commands:
 ```bash
-sudo apt-get install -y git python-software-propertie
+sudo apt-get install -y git python-software-properties
 sudo add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
 sudo apt-get update && sudo apt-get dist-upgrade
 sudo apt-get install -y python-setuptools python-pip python-dev python-tk python-gdal
-sudo pip install -r requirements.txt
 git clone https://github.com/Guts/DicoGIS.git
+cd DicoGIS/
+sudo pip install -r requirements.txt
+
 ```
 
 ## FR
@@ -61,12 +63,13 @@ python setup2exe_DicoGIS.py py2exe
 ###Ubuntu (ou toute autre distribution Debian a priori)
 Vous pouvez télécharger [l'ensemble du dépôt](https://github.com/Guts/DicoGIS/archive/master.zip) ou bien lancer ces commandes dans un terminal :
 ```bash
-sudo apt-get install -y git python-software-propertie
+sudo apt-get install -y git python-software-properties
 sudo add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
 sudo apt-get update && sudo apt-get dist-upgrade
 sudo apt-get install -y python-setuptools python-pip python-dev python-tk python-gdal
-sudo pip install -r requirements.txt
 git clone https://github.com/Guts/DicoGIS.git
+cd DicoGIS/
+sudo pip install -r requirements.txt
 ```
 
 ##ES
