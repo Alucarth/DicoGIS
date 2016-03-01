@@ -23,7 +23,7 @@ DGversion = "2.5.0-beta3"
 ###################################
 
 # Standard library
-from Tkinter import Tk, StringVar, IntVar, Image    # GUI
+from Tkinter import Tk, StringVar, IntVar, Image, Frame    # GUI
 from Tkinter import W, PhotoImage, ACTIVE, DISABLED, END
 from tkFileDialog import askdirectory, asksaveasfilename    # dialogs
 from tkMessageBox import showinfo as info, showerror as avert
@@ -38,7 +38,7 @@ from time import strftime
 from webbrowser import open_new
 import threading    # handling various subprocesses
 
-import ConfigParser  # to manipulate the options.ini file
+from ConfigParser import RawConfigParser, SafeConfigParser  # handling options.ini file
 
 import platform  # about operating systems
 
@@ -475,41 +475,66 @@ class DicoGIS(Tk):
         self.nb.add(self.tab_options,
                     text='Options', padding=3)
 
-        # subframe: Proxy
-        self.FrProx = Labelframe(self.tab_options,
-                                 name='proxy',
-                                 text=self.blabla.get('gui_fr2'))
+        # subframes
 
-        # PROXY
+        self.FrOptProxy = Labelframe(self.tab_options,
+                                     name='settings-proxy',
+                                     text=self.blabla.get('gui_fr2')
+                                    )
+        self.FrOptIsogeo = Frame(self.tab_options,
+                                      name='settings-isogeo',
+                                      # text='Isogeo'
+                                      )
+
+        # options values
         self.opt_proxy = IntVar(self.tab_options)  # proxy option
+        self.opt_isogeo = IntVar(self.tab_options)  # Isogeo option
 
-        # proxy specific variables
-        self.opt_ntlm = IntVar(self.FrProx, 0)  # proxy NTLM protocol option
-        self.prox_server = StringVar(self.FrProx, 'proxy.server.com')
-        self.prox_port = IntVar(self.FrProx, 80)
-        self.prox_user = StringVar(self.FrProx, 'proxy_user')
-        self.prox_pswd = StringVar(self.FrProx, '****')
-
-        # Proxy form widgets
+        # Options form widgets
         caz_prox = Checkbutton(self.tab_options,
                                text=u'Proxy',
                                variable=self.opt_proxy,
-                               command=lambda: self.proxy_form())
+                               command=lambda: self.ui_switch(self.opt_proxy,
+                                                              self.FrOptProxy))
+        caz_isogeo = Checkbutton(self.tab_options,
+                                 text=u'Isogeo',
+                                 variable=self.opt_isogeo,
+                                 command=lambda: self.ui_switch(self.opt_isogeo,
+                                                                self.FrOptIsogeo))
 
-        self.prox_ent_H = Entry(self.FrProx, textvariable=self.prox_server)
-        self.prox_ent_P = Entry(self.FrProx, textvariable=self.prox_port)
-        self.prox_ent_M = Entry(self.FrProx, textvariable=self.prox_pswd, show='*')
+        # positionning
+        caz_prox.grid(row=0, column=0,
+                      sticky="NSWE", padx=2, pady=2)
+        self.FrOptProxy.grid(row=0, column=1, columnspan=8,
+                             sticky="NSWE", padx=2, pady=2,
+                             rowspan=3)
+        caz_isogeo.grid(row=3, column=0,
+                        sticky="NSWE", padx=2, pady=2)
+        self.FrOptIsogeo.grid(row=3, column=1, columnspan=8,
+                              sticky="NSWE", padx=2, pady=2,
+                              rowspan=4)
 
-        self.prox_lb_H = Label(self.FrProx, text=self.blabla.get('gui_prox_server'))
-        self.prox_lb_P = Label(self.FrProx, text=self.blabla.get('gui_port'))
-        caz_ntlm = Checkbutton(self.FrProx,
+        # ------------------------------------------------------------------------
+        # proxy specific variables
+        self.opt_ntlm = IntVar(self.FrOptProxy, 0)  # proxy NTLM protocol option
+        self.prox_server = StringVar(self.FrOptProxy, 'proxy.server.com')
+        self.prox_port = IntVar(self.FrOptProxy, 80)
+        self.prox_user = StringVar(self.FrOptProxy, 'proxy_user')
+        self.prox_pswd = StringVar(self.FrOptProxy, '****')
+
+        # widgets
+        self.prox_ent_H = Entry(self.FrOptProxy, textvariable=self.prox_server)
+        self.prox_ent_P = Entry(self.FrOptProxy, textvariable=self.prox_port)
+        self.prox_ent_M = Entry(self.FrOptProxy, textvariable=self.prox_pswd, show='*')
+
+        self.prox_lb_H = Label(self.FrOptProxy, text=self.blabla.get('gui_prox_server'))
+        self.prox_lb_P = Label(self.FrOptProxy, text=self.blabla.get('gui_port'))
+        caz_ntlm = Checkbutton(self.FrOptProxy,
                                text=u'NTLM',
                                variable=self.opt_ntlm)
-        self.prox_lb_M = Label(self.FrProx, text=self.blabla.get('gui_mdp'))
+        self.prox_lb_M = Label(self.FrOptProxy, text=self.blabla.get('gui_mdp'))
 
         # proxy widgets position
-        caz_prox.grid(row=4, column=2,
-                      sticky="NSWE", padx=2, pady=2)
         self.prox_lb_H.grid(row=1, column=0,
                             sticky="NSEW", padx=2, pady=2)
         self.prox_ent_H.grid(row=1, column=1, columnspan=2,
@@ -525,9 +550,30 @@ class DicoGIS(Tk):
         self.prox_ent_M.grid(row=2, column=2, columnspan=2,
                              sticky="NSEW", padx=2, pady=2)
 
-        # frame position
-        self.FrProx.grid(row=5, column=0, columnspan=4,
-                         sticky="NSWE", padx=2, pady=2)
+        # ------------------------------------------------------------------------
+        # Isogeo application variables
+        self.isog_app_id = StringVar(self.FrOptIsogeo, 'application_id')
+        self.isog_app_tk = StringVar(self.FrOptIsogeo, 'secret')
+
+        # widgets
+        isog_ent_id = Entry(self.FrOptIsogeo,
+                            textvariable=self.isog_app_id)
+        isog_ent_tk = Entry(self.FrOptIsogeo,
+                            textvariable=self.isog_app_tk)
+
+        isog_lb_id = Label(self.FrOptIsogeo, text="Application ID")
+        isog_lb_tk = Label(self.FrOptIsogeo, text="Application secret")
+
+        # Isogeo widgets position
+        isog_lb_id.grid(row=1, column=1,
+                        sticky="NSEW", padx=2, pady=2)
+        isog_ent_id.grid(row=1, column=2, columnspan=2,
+                         sticky="NSEW", padx=2, pady=2)
+        isog_lb_tk.grid(row=2, column=1,
+                        sticky="NSEW", padx=2, pady=2)
+        isog_ent_tk.grid(row=2, column=2, columnspan=2,
+                         sticky="NSEW", padx=2, pady=2)
+
 
 # =================================================================================
         # ## MAIN FRAME ##
@@ -611,24 +657,27 @@ class DicoGIS(Tk):
 
         # load previous settings
         self.load_settings()
-        self.proxy_form()
 
-    def proxy_form(self):
-        u"""
-        Activate or deactivate the proxy configuration form.
+    def ui_switch(self, cb_value, parent):
+        """ Easy change state of  all children widgets
+        within a parent class
+
+        cb_value=boolean
+        parent=Tkinter class with children (Frame, Labelframe, Tk, etc.)
         """
-        if self.opt_proxy.get():
-            self.FrProx.grid(row=5, column=0, columnspan=4,
-                             sticky="NSWE", padx=2, pady=2)
+        if cb_value.get():
+            for child in parent.winfo_children():
+                child.configure(state=ACTIVE)
         else:
-            self.FrProx.grid_forget()
+            for child in parent.winfo_children():
+                child.configure(state=DISABLED)
         # end of function
         return
 
     def load_settings(self):
         u""" load settings from last execution """
         confile = 'options.ini'
-        config = ConfigParser.RawConfigParser()
+        config = SafeConfigParser()
         try:
             config.read(confile)
             # basics
@@ -664,6 +713,9 @@ class DicoGIS(Tk):
             self.prox_user.set(config.get('proxy', 'proxy_user'))
             # Isogeo settings
             self.url_OpenCatalog.set(config.get('isogeo', 'def_OC'))
+            self.isog_app_id.set(config.get('isogeo', 'app_id'))
+            self.isog_app_tk.set(config.get('isogeo', 'app_secret'))
+
             # log
             self.logger.info('Last options loaded')
         except Exception as e:
@@ -676,7 +728,7 @@ class DicoGIS(Tk):
     def save_settings(self):
         u""" save last options in order to make the next excution more easy """
         confile = 'options.ini'
-        config = ConfigParser.RawConfigParser()
+        config = RawConfigParser()
         # add sections
         config.add_section('config')
         config.add_section('basics')
@@ -693,6 +745,7 @@ class DicoGIS(Tk):
             config.set('basics', 'def_rep', self.target.get())
         else:
             config.set('basics', 'def_rep', self.def_rep)
+        print(self.nb.index(self.nb.select()))
         config.set('basics', 'def_tab', self.nb.index(self.nb.select()))
         # filters
         config.set('filters', 'opt_shp', self.opt_shp.get())
@@ -723,6 +776,8 @@ class DicoGIS(Tk):
         config.set('proxy', 'proxy_user', self.prox_user.get())
         # Isogeo settings
         config.set('isogeo', 'def_OC', self.url_OpenCatalog.get())
+        config.set('isogeo', 'app_id', self.isog_app_id.get())
+        config.set('isogeo', 'app_secret', self.isog_app_tk.get())
 
         # Writing the configuration file
         with open(confile, 'wb') as configfile:
