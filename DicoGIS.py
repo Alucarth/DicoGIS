@@ -45,6 +45,7 @@ import platform  # about operating systems
 import logging      # log files
 from logging.handlers import RotatingFileHandler
 
+import socket
 import subprocess
 
 # Python 3 backported
@@ -448,7 +449,9 @@ class DicoGIS(Tk):
         # ## TAB 3: web services ##
         self.nb.add(self.tab_webservices,
                     text=self.blabla.get('gui_tab3'), padding=3)
-
+        # variables
+        self.url_service = StringVar(self.tab_webservices,
+                                     'http://suite.opengeo.org/geoserver/wfs?request=GetCapabilities')
 
 # =================================================================================
 
@@ -477,14 +480,14 @@ class DicoGIS(Tk):
 
         # subframes
 
-        self.FrOptProxy = Labelframe(self.tab_options,
-                                     name='settings-proxy',
-                                     text=self.blabla.get('gui_fr2')
-                                    )
+        self.FrOptProxy = Frame(self.tab_options,
+                                name='settings-proxy',
+                                # text=self.blabla.get('gui_fr2')
+                                )
         self.FrOptIsogeo = Frame(self.tab_options,
-                                      name='settings-isogeo',
-                                      # text='Isogeo'
-                                      )
+                                 name='settings-isogeo',
+                                 # text='Isogeo'
+                                 )
 
         # options values
         self.opt_proxy = IntVar(self.tab_options)  # proxy option
@@ -657,6 +660,18 @@ class DicoGIS(Tk):
 
         # load previous settings
         self.load_settings()
+
+        # checking connection
+        if self.check_internet_connection():
+            self.logger.info("Internet connection: OK")
+            # self.nb.tab(2, state=NORMAL)
+            # self.nb.tab(3, state=NORMAL)
+        else:
+            self.logger.info("Internet connection failed.")
+            self.nb.tab(2, state=DISABLED)
+            self.nb.tab(3, state=DISABLED)
+
+# =================================================================================
 
     def ui_switch(self, cb_value, parent):
         """ Easy change state of  all children widgets
@@ -2279,7 +2294,7 @@ in {13}{14}'.format(len(self.li_shp),
         # Field informations
         for chp in fields_info.keys():
             # field type
-            if fields_info[chp][0] == 'Integer':
+            if 'Integer' in fields_info[chp][0]:
                 tipo = self.blabla.get(u'entier')
             elif fields_info[chp][0] == 'Real':
                 tipo = self.blabla.get(u'reel')
@@ -2287,6 +2302,10 @@ in {13}{14}'.format(len(self.li_shp),
                 tipo = self.blabla.get(u'string')
             elif fields_info[chp][0] == 'Date':
                 tipo = self.blabla.get(u'date')
+            else:
+                tipo = "unknown"
+                print(chp, " unknown type")
+
             # concatenation of field informations
             try:
                 champs = champs + chp +\
@@ -3145,6 +3164,25 @@ in {13}{14}'.format(len(self.li_shp),
 
         # end of function
         return proc
+
+    def check_internet_connection(self, remote_server="www.isogeo.com"):
+        """ Test if an internet connection is operational
+        source: http://stackoverflow.com/a/20913928/2556577
+        """
+        try:
+            # see if we can resolve the host name -- tells us if there is
+            # a DNS listening
+            host = socket.gethostbyname(remote_server)
+            # connect to the host -- tells us if the host is actually
+            # reachable
+            s = socket.create_connection((host, 80), 2)
+            print(s)
+            return True
+        except:
+            pass
+        # end of method
+        return False
+
 
 ###############################################################################
 ###### Stand alone program ########
