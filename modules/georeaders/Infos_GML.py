@@ -29,12 +29,14 @@ from collections import OrderedDict as OD
 # 3rd party libraries
 try:
     from osgeo import gdal
-    from osgeo import ogr  # handler for vector spatial files
+    from osgeo import ogr
     from osgeo import osr
+    from osgeo.gdalconst import *
 except ImportError:
     import gdal
-    import ogr  # handler for vector spatial files
+    import ogr
     import osr
+    from gdalconst import *
 
 ###############################################################################
 ########### Classes #############
@@ -63,7 +65,7 @@ class OGRErrorHandler(object):
                     }
         # getting type
         err_type = err_class.get(err_type, 'None')
-        
+
         # cleaning message
         err_msg = err_msg.replace('\n', ' ')
 
@@ -102,6 +104,7 @@ class Read_GML():
 
         # changing working directory to layer folder
         chdir(path.dirname(layerpath))
+        print(layerpath)
         # raising source issues
         source = ogr.Open(layerpath, 0)     # OGR driver
         if not source:
@@ -109,13 +112,19 @@ class Read_GML():
             print 'no compatible source'
             self.erratum(dico_layer, layerpath, u'err_nobjet')
             self.alert = self.alert + 1
+            return None
+        else:
+            pass
         self.layer = source.GetLayer()          # get the layer
+        # checking if there is any object inside
         if self.layer.GetFeatureCount() == 0:
             u""" if layer doesn't have any object, return an error """
             self.erratum(dico_layer, layerpath, u'err_nobjet')
             self.alert = self.alert + 1
             return None
-        
+        else:
+            pass
+
         obj = self.layer.GetFeature(1)        # get the first object (shp)
         self.geom = obj.GetGeometryRef()       # get the geometry
 
@@ -258,11 +267,10 @@ class Read_GML():
 if __name__ == '__main__':
     u""" standalone execution for tests. Paths are relative considering a test
     within the official repository (https://github.com/Guts/DicoGIS)"""
-    # libraries import
-    from os import getcwd
+    # GDAL variables
+    gdal.SetConfigOption(str('GDAL_DATA'), str(path.abspath(r'../../data/gdal')))
     # test files
-    li_gml = [path.join(getcwd(),
-                        r'..\..\test\datatest\vectors\gml\airports.gml')]  # gml
+    li_gml = [path.realpath(r'..\..\test\datatest\vectors\gml\airports.gml')]  # gml
     # test text dictionary
     textos = OD()
     textos['srs_comp'] = u'Compound'
@@ -284,11 +292,10 @@ if __name__ == '__main__':
         dico_layer.clear()
         dico_fields.clear()
         # getting the informations
-        print gml
+        print(gml)
         info_gml = Read_GML(path.abspath(gml),
                             dico_layer,
                             dico_fields,
                             'GML',
                             textos)
-        print '\n', dico_layer, dico_fields
-
+        print ('\n', dico_layer, dico_fields)

@@ -62,7 +62,7 @@ class OGRErrorHandler(object):
                     }
         # getting type
         err_type = err_class.get(err_type, 'None')
-        
+
         # cleaning message
         err_msg = err_msg.replace('\n', ' ')
 
@@ -296,7 +296,7 @@ if __name__ == '__main__':
         dico_layer.clear()
         dico_fields.clear()
         # getting the informations
-        print geoj
+        print(geoj)
         info_geoj = Read_GeoJSON(path.abspath(geoj),
                                  dico_layer,
                                  dico_fields,

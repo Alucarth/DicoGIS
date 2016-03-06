@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
-from __future__ import unicode_literals
+from __future__ import (absolute_import, print_function, unicode_literals)
 
 #-------------------------------------------------------------------------------
 # Name:         InfosGDB
@@ -52,7 +52,7 @@ except ImportError:
 
 def read_featureClass(featureclass):
     """  """
-    print featureclass
+    print(featureclass)
 
     # end of function
     return
@@ -101,7 +101,7 @@ class Read_GDB_arc():
             fcs = [path.join(dataset, feature) for feature in ListFeatureClasses("*", "", dataset)]
             li_featuresclasses += fcs
         li_featuresclasses += ListFeatureClasses()
-            
+
         # end of function
         return li_featuresclasses
 
@@ -121,15 +121,15 @@ class Read_GDB_arc():
         """ get information about a feature class """
         description = Describe(featureclass)
 
-        print "\n" + featureclass + " (in: " + description.catalogPath + ")"
-        print "geometry: " + description.shapeType + " (" + description.featureType + ")"
-        print "# entities: " + str(GetCount_management(featureclass))
+        print("\n" + featureclass + " (in: " + description.catalogPath + ")")
+        print("geometry: " + description.shapeType + " (" + description.featureType + ")")
+        print("# entities: " + str(GetCount_management(featureclass)))
 
-        print "# fields:"
+        print("# fields:")
         for nomchp in ListFields(featureclass):
-            print nomchp.name + " (" + nomchp.type + ")"
+            print(nomchp.name + " (" + nomchp.type + ")")
 
-        print "SRS " + description.spatialReference.name        
+        print("SRS " + description.spatialReference.name)
 
         # end of function
         return featureclass
@@ -144,7 +144,7 @@ class Read_GDB_arc():
     #     print('pool mapped')
 
     #     # Synchronize the main process with the job processes to ensure proper cleanup.
-    #     pool.close()      
+    #     pool.close()
     #     pool.join()
 
     #     # end of function
@@ -176,14 +176,14 @@ if __name__ == '__main__':
                     # add complete path of shapefile
                     li_gdb.append(path.abspath(full_path))
 
-    print li_gdb
-    
+    print(li_gdb)
+
     # recipient datas
     dico_datasets = OD()
     dico_raster = OD()      # dictionary where will be stored informations
     dico_bands = OD()       # dictionary for fields information
-    
-    # launch   
+
+    # launch
     # def read_featureClass(featureclass):
     #     """  """
     #     print featureclass
@@ -208,8 +208,10 @@ if __name__ == '__main__':
     # print('pool mapped')
 
     # # Synchronize the main process with the job processes to ensure proper cleanup.
-    # pool.close()      
+    # pool.close()
     # pool.join()
 
     for gdb in li_gdb:
-        Read_GDB_arc(gdb,dico_datasets, dico_raster, 'gdb')
+        Read_GDB_arc(gdb,
+                     dico_datasets,
+                     dico_raster,'gdb')
