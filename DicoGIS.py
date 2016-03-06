@@ -23,7 +23,7 @@ DGversion = "2.5.0-beta3"
 ###################################
 
 # Standard library
-from Tkinter import Tk, StringVar, IntVar, Image, Frame    # GUI
+from Tkinter import Tk, StringVar, IntVar, Image    # GUI
 from Tkinter import W, PhotoImage, ACTIVE, DISABLED, END
 from tkFileDialog import askdirectory, asksaveasfilename    # dialogs
 from tkMessageBox import showinfo as info, showerror as avert
@@ -38,7 +38,7 @@ from time import strftime
 from webbrowser import open_new
 import threading    # handling various subprocesses
 
-from ConfigParser import RawConfigParser, SafeConfigParser  # handling options.ini file
+from ConfigParser import RawConfigParser, SafeConfigParser  # for ini files
 
 import platform  # about operating systems
 
@@ -136,8 +136,21 @@ class DicoGIS(Tk):
         self.resizable(width=False, height=False)
         self.focus_force()
 
-        # getting the GDAL version
+        # GDAL settings
         self.logger.info('GDAL version: {}'.format(gdal.__version__))
+        if "GDAL_DATA" not in env.keys():
+            try:
+                gdal.SetConfigOption(str('GDAL_DATA'),
+                                     str(path.abspath(r'data/gdal')))
+                self.logger.info("GDAL_DATA path not found in environment variable.\
+                                  DicoGIS'll use its own: "
+                                + path.abspath(r'data/gdal'))
+            except:
+                self.logger.error("Oups! Something's wrong with GDAL_DATA path.")
+        else:
+            self.logger.info("GDAL_DATA path found in environment variable: {}.\
+                              DicoGIS'll use it.".format(env.get("GDAL_DATA")))
+            pass
 
         ## Variables
         # settings
@@ -453,6 +466,17 @@ class DicoGIS(Tk):
         self.url_service = StringVar(self.tab_webservices,
                                      'http://suite.opengeo.org/geoserver/wfs?request=GetCapabilities')
 
+        # widgets
+        self.lb_url_service = Label(self.tab_webservices,
+                                    text='OpenCatalog')
+        self.ent_url_service = Entry(self.tab_webservices,
+                                     width=75,
+                                     textvariable=self.url_service)
+
+        # widgets placement
+        self.ent_url_service.grid(row=0, column=1,
+                           sticky="NSWE", padx=2, pady=2)
+
 # =================================================================================
 
         # ## TAB 4: Isogeo ##
@@ -626,7 +650,7 @@ class DicoGIS(Tk):
         s = Style(self)
         s.configure('Kim.TButton', foreground='DodgerBlue', borderwidth=0)
         Button(self,
-               text='by @GeoJulien\nGPL3 - 2015',
+               text='by @GeoJulien\nGPL3 - 2016',
                style='Kim.TButton',
                command=lambda: open_new('https://github.com/Guts/DicoGIS')).grid(row=3,
                                                                                  padx=2,
@@ -661,11 +685,15 @@ class DicoGIS(Tk):
         # load previous settings
         self.load_settings()
 
+        # set UI options tab
+        self.ui_switch(self.opt_proxy,
+                       self.FrOptProxy)
+        self.ui_switch(self.opt_isogeo,
+                       self.FrOptIsogeo)
+
         # checking connection
         if self.check_internet_connection():
             self.logger.info("Internet connection: OK")
-            # self.nb.tab(2, state=NORMAL)
-            # self.nb.tab(3, state=NORMAL)
         else:
             self.logger.info("Internet connection failed.")
             self.nb.tab(2, state=DISABLED)
@@ -2561,7 +2589,7 @@ in {13}{14}'.format(len(self.li_shp),
             fields_info = gdb_layer.get(u'fields')
             for chp in fields_info.keys():
                 # field type
-                if fields_info[chp][0] == 'Integer':
+                if 'Integer' in fields_info[chp][0]:
                     tipo = self.blabla.get(u'entier')
                 elif fields_info[chp][0] == 'Real':
                     tipo = self.blabla.get(u'reel')
@@ -2691,7 +2719,7 @@ in {13}{14}'.format(len(self.li_shp),
             fields_info = cdao_layer.get(u'fields')
             for chp in fields_info.keys():
                 # field type
-                if fields_info[chp] == 'Integer':
+                if 'Integer' in fields_info[chp]:
                     tipo = self.blabla.get(u'entier')
                 elif fields_info[chp] == 'Real':
                     tipo = self.blabla.get(u'reel')
@@ -3055,7 +3083,7 @@ in {13}{14}'.format(len(self.li_shp),
         # Field informations
         for chp in fields_info.keys():
             # field type
-            if fields_info[chp][0] == 'Integer':
+            if 'Integer' in fields_info[chp][0]:
                 tipo = self.blabla.get(u'entier')
             elif fields_info[chp][0] == 'Real':
                 tipo = self.blabla.get(u'reel')
@@ -3175,8 +3203,7 @@ in {13}{14}'.format(len(self.li_shp),
             host = socket.gethostbyname(remote_server)
             # connect to the host -- tells us if the host is actually
             # reachable
-            s = socket.create_connection((host, 80), 2)
-            print(s)
+            socket.create_connection((host, 80), 2)
             return True
         except:
             pass
