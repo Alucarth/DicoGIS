@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
-# from __future__ import unicode_literals
+# from __future__ import (absolute_import, print_function, unicode_literals)
 
 #------------------------------------------------------------------------------
 # Name:         Infos LYR
