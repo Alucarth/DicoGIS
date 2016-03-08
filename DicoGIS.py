@@ -16,8 +16,6 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 # Licence:      GPL 3
 # ------------------------------------------------------------------------------
 
-DGversion = "2.5.0-beta3"
-
 ###############################################################################
 ########### Libraries #############
 ###################################
@@ -84,6 +82,7 @@ from modules import Read_LYR  # Esri LYR files
 from modules import TextsManager
 from modules import MetricsManager
 from modules import ConfigExcel
+from modules import CheckNorris
 
 # Imports depending on operating system
 if opersys == 'win32':
@@ -98,6 +97,9 @@ else:
 
 
 class DicoGIS(Tk):
+    # attributes
+    DGversion = "2.5.0-beta3"
+
     def __init__(self):
         u""" Main window constructor
         Creates 1 frame and 2 labelled subframes"""
@@ -112,11 +114,14 @@ class DicoGIS(Tk):
         logfile.setFormatter(log_form)
         self.logger.addHandler(logfile)
         self.logger.info('\t\t ============== DicoGIS =============')  # start
-        self.logger.info('Version: {0}'.format(DGversion))
+        self.logger.info('Version: {0}'.format(self.DGversion))
+
+        # Invoke Check Norris
+        checker = CheckNorris()
 
         # basics settings
         Tk.__init__(self)               # constructor of parent graphic class
-        self.title(u'DicoGIS {0}'.format(DGversion))
+        self.title(u'DicoGIS {0}'.format(self.DGversion))
         if opersys == 'win32':
             self.logger.info('Operating system: {0}'.format(platform.platform()))
             self.iconbitmap('DicoGIS.ico')    # windows icon
@@ -691,13 +696,21 @@ class DicoGIS(Tk):
         self.ui_switch(self.opt_isogeo,
                        self.FrOptIsogeo)
 
-        # checking connection
-        if self.check_internet_connection():
-            self.logger.info("Internet connection: OK")
+        # check ArcPy
+        if not checker.check_arcpy()[0]:
+            caz_lyr.config(state=DISABLED)
+            caz_mxd.config(state=DISABLED)
+            self.opt_lyr.set(0)
+            self.opt_mxd.set(0)
         else:
-            self.logger.info("Internet connection failed.")
+            pass
+
+        # checking connection
+        if not checker.check_internet_connection():
             self.nb.tab(2, state=DISABLED)
             self.nb.tab(3, state=DISABLED)
+        else:
+            pass
 
 # =================================================================================
 
