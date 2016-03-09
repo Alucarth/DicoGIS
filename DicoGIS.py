@@ -29,6 +29,7 @@ from ttk import Combobox, Progressbar, Style, Labelframe, Frame
 from ttk import Label, Button, Entry, Checkbutton, Notebook  # widgets
 import tkFont   # font library
 
+import locale
 from sys import exit, platform as opersys
 from os import listdir, walk, path         # files and folder managing
 from os import environ as env, access, R_OK
@@ -43,24 +44,12 @@ import platform  # about operating systems
 import logging      # log files
 from logging.handlers import RotatingFileHandler
 
-import socket
 import subprocess
 
 # Python 3 backported
 from collections import OrderedDict as OD   # ordered dictionary
 
 # 3rd party libraries
-try:
-    from osgeo import gdal
-    from osgeo import ogr
-    from osgeo import osr
-    from osgeo.gdalconst import *
-except ImportError:
-    import gdal
-    import ogr
-    import osr
-    from gdalconst import *
-
 from xlwt import Workbook, easyxf, Formula  # excel writer
 
 # Custom modules
@@ -83,6 +72,7 @@ from modules import TextsManager
 from modules import MetricsManager
 from modules import ConfigExcel
 from modules import CheckNorris
+from modules import files2xlsx
 
 # Imports depending on operating system
 if opersys == 'win32':
@@ -142,20 +132,7 @@ class DicoGIS(Tk):
         self.focus_force()
 
         # GDAL settings
-        self.logger.info('GDAL version: {}'.format(gdal.__version__))
-        if "GDAL_DATA" not in env.keys():
-            try:
-                gdal.SetConfigOption(str('GDAL_DATA'),
-                                     str(path.abspath(r'data/gdal')))
-                self.logger.info("GDAL_DATA path not found in environment variable.\
-                                  DicoGIS'll use its own: "
-                                + path.abspath(r'data/gdal'))
-            except:
-                self.logger.error("Oups! Something's wrong with GDAL_DATA path.")
-        else:
-            self.logger.info("GDAL_DATA path found in environment variable: {}.\
-                              DicoGIS'll use it.".format(env.get("GDAL_DATA")))
-            pass
+        checker.check_gdal()
 
         ## Variables
         # settings
@@ -712,6 +689,24 @@ class DicoGIS(Tk):
         else:
             pass
 
+
+        # TESTING
+        self.wb = files2xlsx(texts=self.blabla)
+        self.wb.set_worksheets(has_vector=1,
+                               has_raster=1,
+                               has_filegdb=1,
+                               has_mapdocs=1,
+                               has_cad=1,
+                               has_sgbd=1)
+
+
+
+
+
+
+
+
+
 # =================================================================================
 
     def ui_switch(self, cb_value, parent):
@@ -793,7 +788,7 @@ class DicoGIS(Tk):
         config.add_section('proxy')
         config.add_section('isogeo')
         # config
-        config.set('config', 'DicoGIS_version', DGversion)
+        config.set('config', 'DicoGIS_version', self.DGversion)
         config.set('config', 'OS', platform.platform())
         # basics
         config.set('basics', 'def_codelang', self.ddl_lang.get())
@@ -871,6 +866,14 @@ class DicoGIS(Tk):
         self.lb_D.config(text=self.blabla.get('gui_db'))
         self.lb_U.config(text=self.blabla.get('gui_user'))
         self.lb_M.config(text=self.blabla.get('gui_mdp'))
+
+        # setting locale according to the language passed
+        if new_lang.lower() == "fr":
+            locale.setlocale(locale.LC_ALL, str("fra_fra"))
+        elif new_lang.lower() == "es":
+            locale.setlocale(locale.LC_ALL, str("esp_esp"))
+        else:
+            locale.setlocale(locale.LC_ALL, str("uk_UK"))
 
         # End of function
         return self.blabla
@@ -1307,6 +1310,12 @@ in {13}{14}'.format(len(self.li_shp),
                                           self.dico_fields,
                                           self.feuyVC,
                                           line_vectors)
+
+                ### TESTING
+                self.wb.store_md_vector(self.dico_layer,
+                                        self.dico_fields)
+
+
                 self.logger.info('\t Wrote into the dictionary')
                 # getting for metrics analysis
                 self.logger.info('\t Added to global metrics')
@@ -1976,7 +1985,7 @@ in {13}{14}'.format(len(self.li_shp),
         u""" create and configure the Excel workbook """
         # Basic configuration
         self.book = Workbook(encoding='utf8')
-        self.book.set_owner(str('DicoGIS_') + str(DGversion))
+        self.book.set_owner(str('DicoGIS_') + str(self.DGversion))
         self.logger.info('Workbook created')
         # Some customization: fonts and styles
         # headers style
@@ -2121,7 +2130,7 @@ in {13}{14}'.format(len(self.li_shp),
             self.feuyFGDB.write(0, 12, self.blabla.get('codepsg'), self.entete)
             self.feuyFGDB.write(0, 13, self.blabla.get('emprise'), self.entete)
             self.feuyFGDB.write(0, 14, self.blabla.get('li_chps'), self.entete)
-            self.logger.info('Sheet Esri FileGDB created')
+            self.logger.info('Sheet FileGDB created')
             # tunning headers
             lg_gdb_names = [len(lg) for lg in self.li_egdb]
             self.feuyFGDB.col(0).width = max(lg_gdb_names) * 100
@@ -3169,6 +3178,8 @@ in {13}{14}'.format(len(self.li_shp),
             avert(title=u'Not saved', message="You cancelled saving operation")
             exit()
 
+
+        self.wb.save(path.join(self.target.get(), r"test.xlsx"))
         # End of function
         return self.book, saved
 
@@ -3205,24 +3216,6 @@ in {13}{14}'.format(len(self.li_shp),
 
         # end of function
         return proc
-
-    def check_internet_connection(self, remote_server="www.isogeo.com"):
-        """ Test if an internet connection is operational
-        source: http://stackoverflow.com/a/20913928/2556577
-        """
-        try:
-            # see if we can resolve the host name -- tells us if there is
-            # a DNS listening
-            host = socket.gethostbyname(remote_server)
-            # connect to the host -- tells us if the host is actually
-            # reachable
-            socket.create_connection((host, 80), 2)
-            return True
-        except:
-            pass
-        # end of method
-        return False
-
 
 ###############################################################################
 ###### Stand alone program ########
