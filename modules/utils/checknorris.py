@@ -43,6 +43,49 @@ class CheckNorris(object):
 
     # -- 1 method, 1 check ----------------------------------------------------
 
+    def check_gdal(self):
+        """ Checks if OSGeo libs work and if GDAL_DATA is well refrenced.
+        Returns:
+        -- 1: GDAL_DATA already exists as environment variable
+        -- 2: GDAL_DATA didn't exist as environment variable then has been added
+        -- 3: GDAL_DATA didn't exist as environment variable then has been added
+        """
+        # GDAL install
+        try:
+            try:
+                from osgeo import gdal
+                from osgeo import ogr
+                from osgeo import osr
+                from osgeo.gdalconst import *
+            except ImportError:
+                import gdal
+                import ogr
+                import osr
+                from gdalconst import *
+            logging.info('GDAL version: {}'.format(gdal.__version__))
+        except:
+            logging.error("GDAL is not installed or not reachable. DicoGIS is going to close.")
+            return 1
+        
+        # GDAL_DATA variable
+        if "GDAL_DATA" not in env.keys():
+            try:
+                gdal.SetConfigOption(str('GDAL_DATA'),
+                                     str(path.abspath(r'data/gdal')))
+                logging.info("GDAL_DATA path not found in environment variable.\
+                                  DicoGIS'll use its own: "
+                             + path.abspath(r'data/gdal'))
+                return 2
+            except:
+                logging.error("Oups! Something's wrong with GDAL_DATA path.")
+                return 3
+        else:
+            logging.info("GDAL_DATA path found in environment variable: {}.\
+                         DicoGIS'll use it.".format(env.get("GDAL_DATA")))
+            return 4
+        # end of method
+        return
+
     def check_arcpy(self):
         """ Checks if arcpy and which version is installed
         """
@@ -142,6 +185,9 @@ if __name__ == '__main__':
     # ------------ Real start ----------------
     # instanciating the class
     checker = CheckNorris()
+
+    # checking arcpy installation
+    print("GDAL: ", checker.check_gdal())
 
     # checking arcpy installation
     print("ArcPy: ", checker.check_arcpy())
