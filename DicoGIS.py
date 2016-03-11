@@ -16,9 +16,9 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 # Licence:      GPL 3
 # ------------------------------------------------------------------------------
 
-###############################################################################
-########### Libraries #############
-###################################
+# ##############################################################################
+# ########## Libraries #############
+# ##################################
 
 # Standard library
 from Tkinter import Tk, StringVar, IntVar, Image    # GUI
@@ -73,6 +73,7 @@ from modules import MetricsManager
 from modules import ConfigExcel
 from modules import CheckNorris
 from modules import files2xlsx
+from modules import Isogeo
 
 # Imports depending on operating system
 if opersys == 'win32':
@@ -81,9 +82,9 @@ if opersys == 'win32':
 else:
     pass
 
-###############################################################################
-############# Classes #############
-###################################
+# ##############################################################################
+# ############ Classes #############
+# ##################################
 
 
 class DicoGIS(Tk):
@@ -98,7 +99,7 @@ class DicoGIS(Tk):
         self.logger = logging.getLogger()
         logging.captureWarnings(True)
         self.logger.setLevel(logging.DEBUG)  # all errors will be get
-        log_form = logging.Formatter('%(asctime)s || %(levelname)s || %(message)s')
+        log_form = logging.Formatter('%(asctime)s || %(module)s || %(levelname)s || %(message)s')
         logfile = RotatingFileHandler('DicoGIS.log', 'a', 5000000, 1)
         logfile.setLevel(logging.DEBUG)
         logfile.setFormatter(log_form)
@@ -134,7 +135,7 @@ class DicoGIS(Tk):
         # GDAL settings
         checker.check_gdal()
 
-        ## Variables
+        # # Variables
         # settings
         self.num_folders = 0
         self.def_rep = ""       # default folder to search for
@@ -687,7 +688,19 @@ class DicoGIS(Tk):
             self.nb.tab(2, state=DISABLED)
             self.nb.tab(3, state=DISABLED)
         else:
-            pass
+            # checking Isogeo
+            try:
+                isogeo = Isogeo(client_id=self.isog_app_id.get(),
+                                client_secret=self.isog_app_tk.get(),
+                                lang=self.def_lang)
+                self.isogeo_token = isogeo.connect()
+            except ValueError, e:
+                if e[0] == 1:
+                    self.nb.tab(3, state=DISABLED)
+                elif e[0] == 2:
+                    self.nb.tab(3, state=DISABLED)
+                else:
+                    pass
 
 
         # TESTING
@@ -700,7 +713,10 @@ class DicoGIS(Tk):
                                has_sgbd=1)
 
 
-
+        Read_LYR(r"test\datatest\maps_docs\lyr\airports.lyr",
+                 self.dico_layer,
+                 'Esri LYR',
+                 txt=self.blabla)
 
 
 

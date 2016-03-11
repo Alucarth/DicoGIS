@@ -12,3 +12,4 @@ from Infos_GeoPDF import Read_GeoPDF
 from Infos_Spatialite import Read_SpaDB
 from Infos_Isogeo_OC import Read_IsogeoOpenCatalog
 from Infos_LYR import Read_LYR
+from Infos_MXD import ReadMXD

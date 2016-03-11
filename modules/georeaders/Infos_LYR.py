@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
-# from __future__ import (absolute_import, print_function, unicode_literals)
+from __future__ import (absolute_import, print_function, unicode_literals)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         Infos LYR
 # Purpose:      Get some metadata abour LYR files (Esri symbology layer))
 #
@@ -12,11 +12,11 @@
 # Created:      28/09/2015
 # Updated:      12/10/2015
 # Licence:      GPL 3
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
-###############################################################################
-########### Libraries #############
-###################################
+# ############################################################################
+# ########## Libraries #############
+# ##################################
 # Standard library
 from os import path, chdir, listdir   # files and folder managing
 from time import localtime, strftime
@@ -26,16 +26,18 @@ from collections import OrderedDict as OD
 
 # 3rd party libraries
 try:
-    from arcpy import env as enviro, Describe
+    from arcpy import env as enviro
     from arcpy import GetCount_management as obj_count, ListFields
     from arcpy.mapping import Layer, ListLayers
     from arcpy.da import SearchCursor
 except ImportError:
-    print("Mmmm, something's wrong with arcpy!")
+    print("mmm")
+    # raise ImportError("ArcPy couldn't be reached")
 
-###############################################################################
-########### Classes #############
-#################################
+# #############################################################################
+# ########## Classes #############
+# ################################
+
 
 class Read_LYR():
     def __init__(self, lyr_path, dico_lyr, tipo, txt=''):
@@ -57,17 +59,21 @@ class Read_LYR():
         self.alert = 0
 
         # opening LYR
-        layer_obj = Layer(lyr_path)
-        # layer_des = Describe(lyrpath)
+        try:
+            layer_obj = Layer(lyr_path)
+        except:
+            print("unable to open this file.")
+            return None
 
-        # basics
+        # ------------ Basics ----------------
         dico_lyr[u'name'] = layer_obj.name
         dico_lyr[u'description'] = layer_obj.description
         dico_lyr[u'folder'] = path.dirname(lyr_path)
         # by default let's start considering there is only one layer
         dico_lyr[u'layers_count'] = 1
+        dico_lyr['broken'] = layer_obj.isBroken
 
-        # determining type of lyr
+        # ------------ LYR type ----------------
         if layer_obj.isFeatureLayer:
             dico_lyr[u'type'] = txt.get('lyr_featL')
             self.infos_geos(layer_obj, dico_lyr)
@@ -76,13 +82,25 @@ class Read_LYR():
             # dico_lyr[u'num_obj'] = int(obj_count(lyr_path).getOutput(0))
             # fields
             dico_fields = OD()
-            self.infos_fields(lyr_path, dico_lyr, dico_fields)
-            dico_lyr[u'fields'] = dico_fields
+            if layer_obj.isBroken:
+                self.erratum(dico_lyr, lyr_path, u'err_corrupt')
+                self.alert = self.alert + 1
+                return None
+            else:
+                pass
+
+            try:
+                self.infos_fields(layer_obj, dico_lyr, dico_fields)
+                dico_lyr[u'fields'] = dico_fields
+            except RuntimeError:
+                self.erratum(dico_lyr, lyr_path, u'err_corrupt')
+                self.alert = self.alert + 1
+                return None
 
             # count features
             with SearchCursor(lyr_path, [dico_fields.keys()[0]]) as cursor:
                 rows = {row[0] for row in cursor}
- 
+
             count = 0
             for row in rows:
                 count += 1
@@ -112,8 +130,11 @@ class Read_LYR():
             self.infos_basics(layer_obj, dico_lyr)
             # layers inside
             sublayers = ListLayers(layer_obj)
-            dico_lyr['layers_count'] = len(sublayers) -1
+            dico_lyr['layers_count'] = len(sublayers) - 1
             dico_lyr['layers_names'] = [sublyr.name for sublyr in sublayers[1:]]
+            dico_lyr['layers_sources'] = [sublyr.dataSource
+                                          for sublyr in sublayers[1:]
+                                          if sublyr.supports("DATASOURCE")]
         else:
             self.erratum(dico_lyr, lyr_path, u'err_incomp')
             self.alert = self.alert + 1
@@ -229,7 +250,6 @@ class Read_LYR():
         # end of function
         return
 
-
     def infos_service(self, lyr_serv_prop, dico_lyr):
         u"""
         specific informations for service layer
@@ -261,7 +281,7 @@ class Read_LYR():
         u"""
         get the informations about fields definitions
         """
-        fields = ListFields(lyr_path)
+        fields = ListFields(lyr_path.dataSource)
         dico_lyr[u'num_fields'] = len(fields)
         for field in fields:
             if field.name not in [u'FID', u'SHAPE', u'Shape', u'OBJECTID']:
@@ -269,7 +289,7 @@ class Read_LYR():
                                       field.aliasName, field.required
             else:
                 pass
-            
+
         # end of function
         return dico_fields
 
@@ -285,7 +305,6 @@ class Read_LYR():
         # end of function
         return "%3.1f %s" % (os_size, " To")
 
-
     def erratum(self, dico_lyr, lyrpath, mess):
         u""" errors handler """
         # storing minimal informations to give clues to solve later
@@ -295,15 +314,45 @@ class Read_LYR():
         # End of function
         return dico_lyr
 
-###############################################################################
-###### Stand alone program ########
-###################################
+# ##############################################################################
+# ##### Stand alone program ########
+# ##################################
 
-if __name__ == '__main__':
+if __name__ == '__main__' and __package__ is None:
     u"""
     Standalone execution for development and tests. Paths are relative considering
     a test within the official repository (https://github.com/Guts/DicoGIS/)
     """
+    # ------------ Specific imports ----------------
+    # standard
+    from os import sys
+    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+
+    # custom
+    from utils.checknorris import CheckNorris
+
+    # ------------ checking arcpy installation ----------------
+    # Invoke Check Norris
+    checker = CheckNorris()
+
+    if not checker.check_arcpy()[0]:
+        from sys import exit
+        exit('ArcPy not found. Check your installation.')
+    else:
+        print("ArcPy: ", checker.check_arcpy())
+        pass
+
+    # ------------ import arcpy ----------------
+    # 3rd party libraries
+    try:
+        from arcpy import env as enviro
+        from arcpy import GetCount_management as obj_count, ListFields
+        from arcpy.mapping import Layer, ListLayers
+        from arcpy.da import SearchCursor
+    except ImportError:
+        print("mmm")
+
+    # ------------ Real start ----------------
     # searching for lyr Files
     dir_lyr = path.abspath(r'..\..\test\datatest\maps_docs\lyr')
     # dir_lyr = path.abspath(r'\\Copernic\SIG_RESSOURCES\1_lyr\ADMINISTRATIF')

@@ -2,7 +2,7 @@
 #!/usr/bin/env python
 from __future__ import unicode_literals
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         Infos MXD
 # Purpose:      Get some metadata abour MXD files (Esri symbology layer))
 #
@@ -12,11 +12,11 @@ from __future__ import unicode_literals
 # Created:      28/09/2015
 # Updated:      12/12/2015
 # Licence:      GPL 3
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
-###############################################################################
-########### Libraries #############
-###################################
+# #############################################################################
+# ########## Libraries #############
+# ##################################
 # Standard library
 from os import path, chdir, listdir   # files and folder managing
 from time import localtime, strftime
@@ -29,13 +29,14 @@ try:
     from arcpy import env as enviro, Describe
     from arcpy.mapping import MapDocument, ListLayers, ListBrokenDataSources, ListDataFrames
 except ImportError:
-    print("Mmmm, something's wrong with arcpy!")
+    # raise ImportError("ArcPy could be reached")
+    print("oups")
 
-###############################################################################
-########### Classes #############
-#################################
+# #############################################################################
+# ########## Classes #############
+# ################################
 
-class Read_MXD():
+class ReadMXD():
     def __init__(self, mxd_path, dico_mxd, tipo, txt=''):
         u""" Uses arcpy functions to extract basic informations about
         Esri map documents and store into dictionaries.
@@ -184,15 +185,35 @@ class Read_MXD():
         # End of function
         return dico_mxd
 
-###############################################################################
-###### Stand alone program ########
-###################################
+# ##############################################################################
+# ##### Stand alone program ########
+# ##################################
 
-if __name__ == '__main__':
+if __name__ == '__main__' and __package__ is None:
     u"""
     Standalone execution for development and tests. Paths are relative considering
     a test within the official repository (https://github.com/Guts/DicoGIS/)
     """
+    # ------------ Specific imports ----------------
+    # standard
+    from os import sys
+    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+
+    # custom
+    from utils.checknorris import CheckNorris
+
+    # ------------ checking arcpy installation ----------------
+    # Invoke Check Norris
+    checker = CheckNorris()
+
+    if not checker.check_arcpy()[0]:
+        from sys import exit
+        exit('ArcPy not found. Check your installation.')
+    else:
+        print("ArcPy: ", checker.check_arcpy())
+        pass
+
+    # ------------ Real start ----------------
     # searching for mxd Files
     dir_mxd = path.abspath(r'..\..\test\datatest\maps_docs\mxd')
     # dir_mxd = path.abspath(r'\\Copernic\SIG_RESSOURCES\1_mxd\ADMINISTRATIF')
@@ -220,7 +241,7 @@ if __name__ == '__main__':
         dico_mxd.clear()
         if path.isfile(mxdpath):
             print("\n{0}: ".format(mxdpath))
-            Read_MXD(mxdpath,
+            ReadMXD(mxdpath,
                      dico_mxd,
                      'Esri MXD',
                      txt=textos)
