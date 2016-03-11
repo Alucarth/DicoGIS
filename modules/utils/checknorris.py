@@ -186,7 +186,7 @@ if __name__ == '__main__':
     # instanciating the class
     checker = CheckNorris()
 
-    # checking arcpy installation
+    # checking GDAL installation and configuration
     print("GDAL: ", checker.check_gdal())
 
     # checking arcpy installation
