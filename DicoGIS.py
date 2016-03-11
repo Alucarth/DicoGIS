@@ -1313,8 +1313,8 @@ in {13}{14}'.format(len(self.li_shp),
 
                 ### TESTING
                 self.wb.store_md_vector(self.dico_layer,
-                                        self.dico_fields)
-
+                                        self.dico_fields,
+                                        self.li_vectors_formats)
 
                 self.logger.info('\t Wrote into the dictionary')
                 # getting for metrics analysis
