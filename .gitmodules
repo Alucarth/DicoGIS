@@ -1,6 +1,3 @@
-[submodule "modules/isogeo-api-py-minsdk"]
-	path = modules/isogeo-api-py-minsdk
-	url = https://github.com/Guts/isogeo-api-py-minsdk.git
 [submodule "modules/isogeo"]
 	path = modules/isogeo
 	url = https://github.com/Guts/isogeo-api-py-minsdk.git
