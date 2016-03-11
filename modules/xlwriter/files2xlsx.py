@@ -19,6 +19,7 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 # ##################################
 
 # Standard library
+from os import path
 
 # Python 3 backported
 from collections import OrderedDict     # ordered dictionary
@@ -53,7 +54,8 @@ class files2xlsx(Workbook):
                       "tot_size",
                       "li_chps",
                       "gdal_warn"
-                       ]
+                     ]
+
     li_cols_raster = [
                      "nomfic",
                      "path",
@@ -155,7 +157,7 @@ class files2xlsx(Workbook):
                       ]
 
     def __init__(self, lang="EN", texts=OrderedDict()):
-        """ 
+        """ TO DOC
 
         Keyword arguments:
 
@@ -168,64 +170,64 @@ class files2xlsx(Workbook):
         ws = self.active
         self.remove_sheet(ws)
 
-
     # ------------ Setting workbook ---------------------
 
-    def set_worksheets(self, has_vector=0, has_raster=0, has_filegdb=0, has_mapdocs=0, has_cad=0, has_sgbd=0):
+    def set_worksheets(self, has_vector=0, has_raster=0, has_filegdb=0,
+                       has_mapdocs=0, has_cad=0, has_sgbd=0):
         """ adds news sheets depending on present metadata types
         """
         # SHEETS & HEADERS
         if has_vector:
-            self.ws_vectors = self.create_sheet(title=self.texts.get("sheet_vectors"))
+            self.ws_v = self.create_sheet(title=self.texts.get("sheet_vectors"))
             # headers
-            self.ws_vectors.append([self.texts.get(i) for i in self.li_cols_vector])
+            self.ws_v.append([self.texts.get(i) for i in self.li_cols_vector])
             # initialize line counter
-            self.idx_vector = 1
+            self.idx_v = 1
         else:
             pass
 
         if has_raster:
-            self.ws_rasters = self.create_sheet(title=self.texts.get("sheet_rasters"))
+            self.ws_r = self.create_sheet(title=self.texts.get("sheet_rasters"))
             # headers
-            self.ws_rasters.append([self.texts.get(i) for i in self.li_cols_raster])
+            self.ws_r.append([self.texts.get(i) for i in self.li_cols_raster])
             # initialize line counter
-            self.idx_raster = 1
+            self.idx_r = 1
         else:
             pass
 
         if has_filegdb:
-            self.ws_services = self.create_sheet(title=self.texts.get("sheet_filedb"))
+            self.ws_fgdb = self.create_sheet(title=self.texts.get("sheet_filedb"))
             # headers
-            self.ws_services.append([self.texts.get(i) for i in self.li_cols_filegdb])
+            self.ws_fgdb.append([self.texts.get(i) for i in self.li_cols_filegdb])
             # initialize line counter
-            self.idx_service = 1
+            self.idx_f = 1
         else:
             pass
 
         if has_mapdocs:
-            self.ws_resources = self.create_sheet(title=self.texts.get("sheet_maplans"))
+            self.ws_mdocs = self.create_sheet(title=self.texts.get("sheet_maplans"))
             # headers
-            self.ws_resources.append([self.texts.get(i) for i in self.li_cols_mapdocs])
+            self.ws_mdocs.append([self.texts.get(i) for i in self.li_cols_mapdocs])
             # initialize line counter
-            self.idx_resource = 1
+            self.idx_m = 1
         else:
             pass
 
         if has_cad:
-            self.ws_resources = self.create_sheet(title=self.texts.get("sheet_cdao"))
+            self.ws_cad = self.create_sheet(title=self.texts.get("sheet_cdao"))
             # headers
-            self.ws_resources.append([self.texts.get(i) for i in self.li_cols_caodao])
+            self.ws_cad.append([self.texts.get(i) for i in self.li_cols_caodao])
             # initialize line counter
-            self.idx_resource = 1
+            self.idx_c = 1
         else:
             pass
 
         if has_sgbd:
-            self.ws_resources = self.create_sheet(title="PostGIS")
+            self.ws_sgbd = self.create_sheet(title="PostGIS")
             # headers
-            self.ws_resources.append([self.texts.get(i) for i in self.li_cols_sgbd])
+            self.ws_sgbd.append([self.texts.get(i) for i in self.li_cols_sgbd])
             # initialize line counter
-            self.idx_resource = 1
+            self.idx_s = 1
         else:
             pass
 
@@ -254,37 +256,56 @@ class files2xlsx(Workbook):
         """ TO DOCUMENT
         """
         if kind == "vectorDataset":
-            self.idx_vector += 1
+            self.idx_v += 1
             self.store_md_vector(metadata)
             return
         elif metadata.get("type") == "rasterDataset":
-            self.idx_raster += 1
+            self.idx_r += 1
             self.store_md_raster(metadata)
             return
         elif metadata.get("type") == "service":
-            self.idx_service += 1
+            self.idx_f += 1
             self.store_md_service(metadata)
             return
         elif metadata.get("type") == "resource":
-            self.idx_resource += 1
+            self.idx_m += 1
             self.store_md_resource(metadata)
-            return     
+            return
         else:
             print("Type of metadata is not recognized/handled: " + metadata.get("type"))
             pass
         # end of method
         return
 
-    def store_md_vector(self, layer_infos, fields_info):
+    def store_md_vector(self, layer, fields, li_formats):
         """ TO DOCUMENT
         """
         # increment line
-        self.idx_vector += 1
-        # writing
-        self.ws_vectors["A{}".format(self.idx_vector)] = layer_infos.get('name')
-        link = r'=HYPERLINK("http://www.example.com","XXX")'
-        self.ws_vectors["B{}".format(self.idx_vector)] = link
+        self.idx_v += 1
 
+        # writing
+        self.ws_v["A{}".format(self.idx_v)] = layer.get('name')
+        link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
+                                                 self.texts.get('browse'))
+        self.ws_v["B{}".format(self.idx_v)] = link
+
+        # Name of parent folder with an exception if this is the format name
+        if not path.basename(layer.get(u'folder')).lower() in li_formats:
+            self.ws_v["C{}".format(self.idx_v)] = path.basename(layer.get(u'folder'))
+        else:
+            self.ws_v["C{}".format(self.idx_v)] = path.basename(path.dirname(layer.get(u'folder')))
+
+        # Geometry type
+        self.ws_v["D{}".format(self.idx_v)] = layer.get(u'type_geom')
+        # Spatial extent
+        emprise = u"Xmin : {0} - Xmax : {1} | \nYmin : {2} - Ymax : {3}"\
+                  .format(unicode(layer.get(u'Xmin')),
+                          unicode(layer.get(u'Xmax')),
+                          unicode(layer.get(u'Ymin')),
+                          unicode(layer.get(u'Ymax')))
+        self.ws_v["E{}".format(self.idx_v)] = emprise
+        # Name of srs
+        self.ws_v["F{}".format(self.idx_v)] = layer.get(u'srs')
 
         # end of method
         return
@@ -293,8 +314,8 @@ class files2xlsx(Workbook):
     def store_md_raster(self, md_raster):
         """ TO DOCUMENT
         """
-        self.ws_rasters["A{}".format(self.idx_raster)] = md_raster.get('title')
-        self.ws_rasters["B{}".format(self.idx_raster)] = md_raster.get('abstract')
+        self.ws_r["A{}".format(self.idx_raster)] = md_raster.get('title')
+        self.ws_r["B{}".format(self.idx_raster)] = md_raster.get('abstract')
 
 
         # end of method
@@ -304,8 +325,8 @@ class files2xlsx(Workbook):
     def store_md_service(self, md_service):
         """ TO DOCUMENT
         """
-        self.ws_services["A{}".format(self.idx_service)] = md_service.get('title')
-        self.ws_services["B{}".format(self.idx_service)] = md_service.get('abstract')
+        self.ws_fgdb["A{}".format(self.idx_service)] = md_service.get('title')
+        self.ws_fgdb["B{}".format(self.idx_service)] = md_service.get('abstract')
 
 
         # end of method
@@ -315,8 +336,8 @@ class files2xlsx(Workbook):
     def store_md_resource(self, md_resource):
         """ TO DOCUMENT
         """
-        self.ws_resources["A{}".format(self.idx_resource)] = md_resource.get('title')
-        self.ws_resources["B{}".format(self.idx_resource)] = md_resource.get('abstract')
+        self.ws_mdocs["A{}".format(self.idx_resource)] = md_resource.get('title')
+        self.ws_mdocs["B{}".format(self.idx_resource)] = md_resource.get('abstract')
 
 
 
