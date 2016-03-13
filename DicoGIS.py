@@ -11,7 +11,7 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 #
 # Python:       2.7.x
 # Created:      14/02/2013
-# Updated:      15/02/2016
+# Updated:      15/03/2016
 #
 # Licence:      GPL 3
 # ------------------------------------------------------------------------------
@@ -74,6 +74,7 @@ from modules import ConfigExcel
 from modules import CheckNorris
 from modules import files2xlsx
 from modules import Isogeo
+from modules import OptionsManager
 
 # Imports depending on operating system
 if opersys == 'win32':
@@ -99,7 +100,7 @@ class DicoGIS(Tk):
         self.logger = logging.getLogger()
         logging.captureWarnings(True)
         self.logger.setLevel(logging.DEBUG)  # all errors will be get
-        log_form = logging.Formatter('%(asctime)s || %(module)s || %(levelname)s || %(message)s')
+        log_form = logging.Formatter('%(asctime)s || %(levelname)s || %(module)s || %(message)s')
         logfile = RotatingFileHandler('DicoGIS.log', 'a', 5000000, 1)
         logfile.setLevel(logging.DEBUG)
         logfile.setFormatter(log_form)
@@ -107,6 +108,8 @@ class DicoGIS(Tk):
         self.logger.info('\t\t ============== DicoGIS =============')  # start
         self.logger.info('Version: {0}'.format(self.DGversion))
 
+        # manage settings outside the main class
+        self.settings = OptionsManager(r"options.ini")
         # Invoke Check Norris
         checker = CheckNorris()
 
@@ -199,14 +202,6 @@ class DicoGIS(Tk):
         # GUI fonts
         ft_tit = tkFont.Font(family="Times", size=10, weight=tkFont.BOLD)
 
-        # loading previous options
-        self.load_settings()
-
-        # fillfulling text
-        TextsManager().load_texts(dico_texts=self.blabla,
-                                  lang=self.def_lang,
-                                  locale_folder=r'data/locale')
-
         # Notebook
         self.nb = Notebook(self)
         # tabs
@@ -215,6 +210,11 @@ class DicoGIS(Tk):
         self.tab_webservices = Frame(self.nb)   # tab_id = 2
         self.tab_isogeo = Frame(self.nb)        # tab_id = 3
         self.tab_options = Frame(self.nb)       # tab_id = 4
+
+        # fillfulling text
+        TextsManager().load_texts(dico_texts=self.blabla,
+                                  lang=self.def_lang,
+                                  locale_folder=r'data/locale')
 
 # =================================================================================
         # ## TAB 1: FILES ##
@@ -665,9 +665,6 @@ class DicoGIS(Tk):
                       sticky="NSWE", padx=2, pady=2)
         self.can.grid(row=5, column=0, sticky="NSWE", padx=2, pady=2)
 
-        # load previous settings
-        self.load_settings()
-
         # set UI options tab
         self.ui_switch(self.opt_proxy,
                        self.FrOptProxy)
@@ -687,6 +684,8 @@ class DicoGIS(Tk):
         if not checker.check_internet_connection():
             self.nb.tab(2, state=DISABLED)
             self.nb.tab(3, state=DISABLED)
+        elif self.opt_isogeo.get() == 0:
+            self.nb.tab(3, state=DISABLED)
         else:
             # checking Isogeo
             try:
@@ -695,13 +694,13 @@ class DicoGIS(Tk):
                                 lang=self.def_lang)
                 self.isogeo_token = isogeo.connect()
             except ValueError, e:
+                print("bouh", e)
                 if e[0] == 1:
                     self.nb.tab(3, state=DISABLED)
                 elif e[0] == 2:
                     self.nb.tab(3, state=DISABLED)
                 else:
                     pass
-
 
         # TESTING
         self.wb = files2xlsx(texts=self.blabla)
@@ -712,16 +711,10 @@ class DicoGIS(Tk):
                                has_cad=1,
                                has_sgbd=1)
 
-
-        Read_LYR(r"test\datatest\maps_docs\lyr\airports.lyr",
-                 self.dico_layer,
-                 'Esri LYR',
-                 txt=self.blabla)
-
-
-
-
-
+        # loading previous options
+        self.settings.load_settings(parent=self)
+        self.ddl_lang.set(self.def_lang)
+        self.change_lang(1)
 
 # =================================================================================
 
@@ -741,126 +734,9 @@ class DicoGIS(Tk):
         # end of function
         return
 
-    def load_settings(self):
-        u""" load settings from last execution """
-        confile = 'options.ini'
-        config = SafeConfigParser()
-        try:
-            config.read(confile)
-            # basics
-            self.def_lang = config.get('basics', 'def_codelang')
-            self.def_rep = config.get('basics', 'def_rep')
-            self.nb.select(config.get('basics', 'def_tab'))
-            # filters
-            self.opt_shp.set(config.get('filters', 'opt_shp'))
-            self.opt_tab.set(config.get('filters', 'opt_tab'))
-            self.opt_kml.set(config.get('filters', 'opt_kml'))
-            self.opt_gml.set(config.get('filters', 'opt_gml'))
-            self.opt_geoj.set(config.get('filters', 'opt_geoj'))
-            self.opt_gxt.set(config.get('filters', 'opt_gxt'))
-            self.opt_rast.set(config.get('filters', 'opt_rast'))
-            self.opt_egdb.set(config.get('filters', 'opt_egdb'))
-            self.opt_spadb.set(config.get('filters', 'opt_spadb'))
-            self.opt_cdao.set(config.get('filters', 'opt_cdao'))
-            self.opt_pdf.set(config.get('filters', 'opt_pdf'))
-            self.opt_lyr.set(config.get('filters', 'opt_lyr'))
-            self.opt_qgs.set(config.get('filters', 'opt_qgs'))
-            self.opt_mxd.set(config.get('filters', 'opt_mxd'))
-            # database settings
-            self.host.set(config.get('database', 'host'))
-            self.port.set(config.get('database', 'port'))
-            self.dbnb.set(config.get('database', 'db_name'))
-            self.user.set(config.get('database', 'user'))
-            self.opt_pgvw.set(config.get('database', 'opt_views'))
-            # proxy settings
-            self.opt_proxy.set(config.get('proxy', 'proxy_needed'))
-            self.opt_ntlm.set(config.get('proxy', 'proxy_type'))
-            self.prox_server.set(config.get('proxy', 'proxy_server'))
-            self.prox_port.set(config.get('proxy', 'proxy_port'))
-            self.prox_user.set(config.get('proxy', 'proxy_user'))
-            # Isogeo settings
-            self.url_OpenCatalog.set(config.get('isogeo', 'def_OC'))
-            self.isog_app_id.set(config.get('isogeo', 'app_id'))
-            self.isog_app_tk.set(config.get('isogeo', 'app_secret'))
-
-            # log
-            self.logger.info('Last options loaded')
-        except Exception as e:
-            # log
-            self.logger.info('1st use: {0}'.format(e))
-
-        # End of function
-        return self.def_rep, self.def_lang
-
-    def save_settings(self):
-        u""" save last options in order to make the next excution more easy """
-        confile = 'options.ini'
-        config = RawConfigParser()
-        # add sections
-        config.add_section('config')
-        config.add_section('basics')
-        config.add_section('filters')
-        config.add_section('database')
-        config.add_section('proxy')
-        config.add_section('isogeo')
-        # config
-        config.set('config', 'DicoGIS_version', self.DGversion)
-        config.set('config', 'OS', platform.platform())
-        # basics
-        config.set('basics', 'def_codelang', self.ddl_lang.get())
-        if self.target.get():
-            config.set('basics', 'def_rep', self.target.get())
-        else:
-            config.set('basics', 'def_rep', self.def_rep)
-        print(self.nb.index(self.nb.select()))
-        config.set('basics', 'def_tab', self.nb.index(self.nb.select()))
-        # filters
-        config.set('filters', 'opt_shp', self.opt_shp.get())
-        config.set('filters', 'opt_tab', self.opt_tab.get())
-        config.set('filters', 'opt_kml', self.opt_kml.get())
-        config.set('filters', 'opt_gml', self.opt_gml.get())
-        config.set('filters', 'opt_geoj', self.opt_geoj.get())
-        config.set('filters', 'opt_gxt', self.opt_gxt.get())
-        config.set('filters', 'opt_rast', self.opt_rast.get())
-        config.set('filters', 'opt_egdb', self.opt_egdb.get())
-        config.set('filters', 'opt_spadb', self.opt_spadb.get())
-        config.set('filters', 'opt_cdao', self.opt_cdao.get())
-        config.set('filters', 'opt_pdf', self.opt_pdf.get())
-        config.set('filters', 'opt_lyr', self.opt_lyr.get())
-        config.set('filters', 'opt_qgs', self.opt_qgs.get())
-        config.set('filters', 'opt_mxd', self.opt_mxd.get())
-        # database settings
-        config.set('database', 'host', self.host.get())
-        config.set('database', 'port', self.port.get())
-        config.set('database', 'db_name', self.dbnb.get())
-        config.set('database', 'user', self.user.get())
-        config.set('database', 'opt_views', self.opt_pgvw.get())
-        # proxy settings
-        config.set('proxy', 'proxy_needed', self.opt_proxy.get())
-        config.set('proxy', 'proxy_type', self.opt_ntlm.get())
-        config.set('proxy', 'proxy_server', self.prox_server.get())
-        config.set('proxy', 'proxy_port', self.prox_port.get())
-        config.set('proxy', 'proxy_user', self.prox_user.get())
-        # Isogeo settings
-        config.set('isogeo', 'def_OC', self.url_OpenCatalog.get())
-        config.set('isogeo', 'app_id', self.isog_app_id.get())
-        config.set('isogeo', 'app_secret', self.isog_app_tk.get())
-
-        # Writing the configuration file
-        with open(confile, 'wb') as configfile:
-            try:
-                config.write(configfile)
-                self.logger.info('Options saved')
-            except (UnicodeEncodeError, UnicodeDecodeError), e:
-                self.logger.error("Options couldn't be saved because of: {0}".format(e))
-
-        # End of function
-        return config
-
     def change_lang(self, event):
         u""" update the texts dictionary with the language selected """
-        new_lang = event.widget.get()
-        self.logger.info('\tLanguage switched to: {0}'.format(event.widget.get()))
+        new_lang = self.ddl_lang.get()
         # change to the new language selected
         TextsManager().load_texts(dico_texts=self.blabla,
                                   lang=new_lang,
@@ -890,6 +766,9 @@ class DicoGIS(Tk):
             locale.setlocale(locale.LC_ALL, str("esp_esp"))
         else:
             locale.setlocale(locale.LC_ALL, str("uk_UK"))
+
+        self.logger.info('Language switched to: {0}'\
+                         .format(self.ddl_lang.get()))
 
         # End of function
         return self.blabla
@@ -1173,7 +1052,8 @@ in {13}{14}'.format(len(self.li_shp),
     def process(self):
         """ check needed info and launch different processes """
         # saving settings
-        self.save_settings()
+        # self.save_settings()
+        self.settings.save_settings(self)
 
         # get the active tab ID
         self.typo = self.nb.index(self.nb.select())
