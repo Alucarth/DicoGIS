@@ -1052,7 +1052,6 @@ in {13}{14}'.format(len(self.li_shp),
     def process(self):
         """ check needed info and launch different processes """
         # saving settings
-        # self.save_settings()
         self.settings.save_settings(self)
 
         # get the active tab ID
