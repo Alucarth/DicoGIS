@@ -87,10 +87,14 @@ class CheckNorris(object):
         try:
             import arcpy
             esri_info = arcpy.GetInstallInfo()
-            logging.info("ArcPy imported.")
+            logging.info("ArcPy imported from ArcGIS {} v{} in ({})".format(
+                         esri_info.get("ProductName"),
+                         esri_info.get("Version"),
+                         esri_info.get("InstallDir")))
+            # end of method
             return True, esri_info
         except ImportError:
-            logging.info("ArcGIS isn't registered in the SYSPATH. Trying to find it automatically.")
+            logging.info("ArcGIS isn't in the SYSPATH. Trying to find it automatically.")
             # checks if ArcGIS is installed
             if not path.isdir(path.join(env.get("PROGRAMFILES(x86)"), "ArcGIS"))\
                and not path.isdir(path.join(env.get("PROGRAMFILES"), "ArcGIS")):

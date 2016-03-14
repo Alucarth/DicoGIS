@@ -18,6 +18,7 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 # ########## Libraries #############
 # ##################################
 # Standard library
+import logging
 from os import path, chdir, listdir   # files and folder managing
 from time import localtime, strftime
 
@@ -31,8 +32,7 @@ try:
     from arcpy.mapping import Layer, ListLayers
     from arcpy.da import SearchCursor
 except ImportError:
-    print("mmm")
-    # raise ImportError("ArcPy couldn't be reached")
+    logging.error("ArcPy is not installed.")
 
 # #############################################################################
 # ########## Classes #############
@@ -45,7 +45,7 @@ class Read_LYR():
         geographic vector file (handles shapefile or MapInfo tables)
         and store into dictionaries.
 
-        lyrpath = path to the LYR file
+        lyr_path = path to the LYR file
         dico_lyr = dictionary for global informations
         tipo = format
         text = dictionary of text in the selected language
@@ -62,7 +62,7 @@ class Read_LYR():
         try:
             layer_obj = Layer(lyr_path)
         except:
-            print("unable to open this file.")
+            logging.error("Unable to open this file: ", lyr_path)
             return None
 
         # ------------ Basics ----------------
@@ -305,11 +305,11 @@ class Read_LYR():
         # end of function
         return "%3.1f %s" % (os_size, " To")
 
-    def erratum(self, dico_lyr, lyrpath, mess):
+    def erratum(self, dico_lyr, lyr_path, mess):
         u""" errors handler """
         # storing minimal informations to give clues to solve later
-        dico_lyr[u'name'] = path.basename(lyrpath)
-        dico_lyr[u'folder'] = path.dirname(lyrpath)
+        dico_lyr[u'name'] = path.basename(lyr_path)
+        dico_lyr[u'folder'] = path.dirname(lyr_path)
         dico_lyr[u'error'] = mess
         # End of function
         return dico_lyr

@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 # ########## Libraries #############
 # ##################################
 # Standard library
+import logging
 from os import path, chdir, listdir   # files and folder managing
 from time import localtime, strftime
 
@@ -29,8 +30,8 @@ try:
     from arcpy import env as enviro, Describe
     from arcpy.mapping import MapDocument, ListLayers, ListBrokenDataSources, ListDataFrames
 except ImportError:
-    # raise ImportError("ArcPy could be reached")
-    print("oups")
+    logging.error("ArcPy is not installed.")
+
 
 # #############################################################################
 # ########## Classes #############
