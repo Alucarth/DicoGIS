@@ -96,24 +96,29 @@ class OptionsManager(object):
         u""" save last options in order to make the next excution more easy """
 
         # add sections
-        self.config.add_section('config')
-        self.config.add_section('basics')
-        self.config.add_section('filters')
-        self.config.add_section('database')
-        self.config.add_section('proxy')
-        self.config.add_section('isogeo')
-        self.config.add_section('youpi')
+        try:
+            self.config.add_section('config')
+            self.config.add_section('basics')
+            self.config.add_section('filters')
+            self.config.add_section('database')
+            self.config.add_section('proxy')
+            self.config.add_section('isogeo')
+            self.config.add_section('youpi')
+        except ConfigParser.DuplicateSectionError:
+            pass
+
         # config
         self.config.set('config', 'DicoGIS_version', parent.DGversion)
         self.config.set('config', 'OS', platform.platform())
         # basics
-        self.config.set('basics', 'def_codelang', self.ddl_lang.get())
-        if self.target.get():
-            self.config.set('basics', 'def_rep', self.target.get())
+        self.config.set('basics', 'def_codelang', parent.ddl_lang.get())
+        if parent.target.get():
+            self.config.set('basics', 'def_rep', parent.target.get())
         else:
-            self.config.set('basics', 'def_rep', self.def_rep)
-        print(self.nb.index(self.nb.select()))
-        self.config.set('basics', 'def_tab', self.nb.index(self.nb.select()))
+            self.config.set('basics', 'def_rep', parent.def_rep)
+        self.config.set('basics', 'def_tab', unicode(
+                                                parent.nb.index(
+                                                    parent.nb.select())))
         # filters
         self.config.set('filters', 'opt_shp', parent.opt_shp.get())
         self.config.set('filters', 'opt_tab', parent.opt_tab.get())
