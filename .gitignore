@@ -242,3 +242,4 @@ options.ini
 \test\datatestGDB*
 *.xls
 *.xlsx
+arcpy.pth

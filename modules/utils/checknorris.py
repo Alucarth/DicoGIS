@@ -54,19 +54,13 @@ class CheckNorris(object):
         try:
             try:
                 from osgeo import gdal
-                from osgeo import ogr
-                from osgeo import osr
-                from osgeo.gdalconst import *
             except ImportError:
                 import gdal
-                import ogr
-                import osr
-                from gdalconst import *
             logging.info('GDAL version: {}'.format(gdal.__version__))
         except:
             logging.error("GDAL is not installed or not reachable. DicoGIS is going to close.")
             return 1
-        
+
         # GDAL_DATA variable
         if "GDAL_DATA" not in env.keys():
             try:
@@ -93,10 +87,10 @@ class CheckNorris(object):
         try:
             import arcpy
             esri_info = arcpy.GetInstallInfo()
+            logging.info("ArcPy imported.")
             return True, esri_info
         except ImportError:
-            logging.info("ArcGIS isn't registered in the SYSPATH.\
-                          Trying to find it automatically.")
+            logging.info("ArcGIS isn't registered in the SYSPATH. Trying to find it automatically.")
             # checks if ArcGIS is installed
             if not path.isdir(path.join(env.get("PROGRAMFILES(x86)"), "ArcGIS"))\
                and not path.isdir(path.join(env.get("PROGRAMFILES"), "ArcGIS")):
@@ -115,8 +109,24 @@ class CheckNorris(object):
             sys.path.append(path.join(arcgis_path, "ArcToolbox\Scripts"))
             try:
                 import arcpy
+                import site
                 esri_info = arcpy.GetInstallInfo()
                 logging.info("ArcGIS configuration has been fixed.")
+                if hasattr(sys, 'real_prefix'):
+                    # inside a venv
+                    logging.info("Executing inside a virtualenv. Nice!")
+                    pypacks = [p for p in sys.path if p.endswith('site-packages')][-1]
+                else:
+                    # using system install
+                    logging.info("Executing from the main Python install.")
+                    pypacks = site.getsitepackages()[1]
+
+                # creatring pth file for future runs
+                with open(path.join(pypacks, 'arcpy.pth'), 'w') as pth_arcpy:
+                    pth_arcpy.write(path.realpath(path.join(arcgis_path, "arcpy")) + "\n")
+                    pth_arcpy.write(path.realpath(path.join(arcgis_path, "bin")) + "\n")
+                    pth_arcpy.write(path.realpath(path.join(arcgis_path, "ArcToolbox\Scripts")) + "\n")
+                # end of method
                 return True, esri_info
             except:
                 logging.info("ArcGIS automatic configuration failed.")
