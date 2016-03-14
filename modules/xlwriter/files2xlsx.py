@@ -19,6 +19,7 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 # ##################################
 
 # Standard library
+import logging
 from os import path
 
 # Python 3 backported
@@ -282,6 +283,24 @@ class files2xlsx(Workbook):
         """
         # increment line
         self.idx_v += 1
+
+        # local variables
+        champs = ""
+
+        # in case of a source error
+        if layer.get('error'):
+            # sheet.row(line).set_style(self.xls_erreur)
+            err_mess = self.texts.get(layer.get('error'))
+            logging.warning('\tproblem detected')
+            self.ws_v["A{}".format(self.idx_v)] = layer.get('name')
+            self.ws_v["C{}".format(self.idx_v)] = err_mess
+            link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
+                                                     self.texts.get('browse'))
+            self.ws_v["B{}".format(self.idx_v)] = link
+            # Interruption of function
+            return False
+        else:
+            pass
 
         # writing
         self.ws_v["A{}".format(self.idx_v)] = layer.get('name')
