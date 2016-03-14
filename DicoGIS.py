@@ -665,6 +665,14 @@ class DicoGIS(Tk):
                       sticky="NSWE", padx=2, pady=2)
         self.can.grid(row=5, column=0, sticky="NSWE", padx=2, pady=2)
 
+        # loading previous options
+        if not self.settings.first_use:
+            self.settings.load_settings(parent=self)
+        else:
+            pass
+        self.ddl_lang.set(self.def_lang)
+        self.change_lang(1)
+
         # set UI options tab
         self.ui_switch(self.opt_proxy,
                        self.FrOptProxy)
@@ -672,7 +680,7 @@ class DicoGIS(Tk):
                        self.FrOptIsogeo)
 
         # check ArcPy
-        if not checker.check_arcpy()[0]:
+        if not checker.check_arcpy()[0] or opersys != 'win32':
             caz_lyr.config(state=DISABLED)
             caz_mxd.config(state=DISABLED)
             self.opt_lyr.set(0)
@@ -694,7 +702,6 @@ class DicoGIS(Tk):
                                 lang=self.def_lang)
                 self.isogeo_token = isogeo.connect()
             except ValueError, e:
-                print("bouh", e)
                 if e[0] == 1:
                     self.nb.tab(3, state=DISABLED)
                 elif e[0] == 2:
@@ -710,11 +717,6 @@ class DicoGIS(Tk):
                                has_mapdocs=1,
                                has_cad=1,
                                has_sgbd=1)
-
-        # loading previous options
-        self.settings.load_settings(parent=self)
-        self.ddl_lang.set(self.def_lang)
-        self.change_lang(1)
 
 # =================================================================================
 
