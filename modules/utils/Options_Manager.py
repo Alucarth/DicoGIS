@@ -40,7 +40,10 @@ class OptionsManager(object):
         # first use or not
         if not path.isfile(self.confile):
             logging.info("No options.ini file found. First use: welcome!")
+            self.first_use = 1
         else:
+            logging.info("Options.ini file found. ")
+            self.first_use = 0
             pass
 
         # using safe parser
@@ -96,15 +99,14 @@ class OptionsManager(object):
         u""" save last options in order to make the next excution more easy """
 
         # add sections
-        try:
+        if self.first_use:
             self.config.add_section('config')
             self.config.add_section('basics')
             self.config.add_section('filters')
             self.config.add_section('database')
             self.config.add_section('proxy')
             self.config.add_section('isogeo')
-            self.config.add_section('youpi')
-        except ConfigParser.DuplicateSectionError:
+        else:
             pass
 
         # config
@@ -116,44 +118,44 @@ class OptionsManager(object):
             self.config.set('basics', 'def_rep', parent.target.get())
         else:
             self.config.set('basics', 'def_rep', parent.def_rep)
-        self.config.set('basics', 'def_tab', unicode(
+        self.config.set('basics', 'def_tab', str(
                                                 parent.nb.index(
                                                     parent.nb.select())))
         # filters
-        self.config.set('filters', 'opt_shp', parent.opt_shp.get())
-        self.config.set('filters', 'opt_tab', parent.opt_tab.get())
-        self.config.set('filters', 'opt_kml', parent.opt_kml.get())
-        self.config.set('filters', 'opt_gml', parent.opt_gml.get())
-        self.config.set('filters', 'opt_geoj', parent.opt_geoj.get())
-        self.config.set('filters', 'opt_gxt', parent.opt_gxt.get())
-        self.config.set('filters', 'opt_rast', parent.opt_rast.get())
-        self.config.set('filters', 'opt_egdb', parent.opt_egdb.get())
-        self.config.set('filters', 'opt_spadb', parent.opt_spadb.get())
-        self.config.set('filters', 'opt_cdao', parent.opt_cdao.get())
-        self.config.set('filters', 'opt_pdf', parent.opt_pdf.get())
-        self.config.set('filters', 'opt_lyr', parent.opt_lyr.get())
-        self.config.set('filters', 'opt_qgs', parent.opt_qgs.get())
-        self.config.set('filters', 'opt_mxd', parent.opt_mxd.get())
+        self.config.set('filters', 'opt_shp', unicode(parent.opt_shp.get()))
+        self.config.set('filters', 'opt_tab', unicode(parent.opt_tab.get()))
+        self.config.set('filters', 'opt_kml', unicode(parent.opt_kml.get()))
+        self.config.set('filters', 'opt_gml', unicode(parent.opt_gml.get()))
+        self.config.set('filters', 'opt_geoj', unicode(parent.opt_geoj.get()))
+        self.config.set('filters', 'opt_gxt', unicode(parent.opt_gxt.get()))
+        self.config.set('filters', 'opt_rast', unicode(parent.opt_rast.get()))
+        self.config.set('filters', 'opt_egdb', unicode(parent.opt_egdb.get()))
+        self.config.set('filters', 'opt_spadb', unicode(parent.opt_spadb.get()))
+        self.config.set('filters', 'opt_cdao', unicode(parent.opt_cdao.get()))
+        self.config.set('filters', 'opt_pdf', unicode(parent.opt_pdf.get()))
+        self.config.set('filters', 'opt_lyr', unicode(parent.opt_lyr.get()))
+        self.config.set('filters', 'opt_qgs', unicode(parent.opt_qgs.get()))
+        self.config.set('filters', 'opt_mxd', unicode(parent.opt_mxd.get()))
         # database settings
         self.config.set('database', 'host', parent.host.get())
-        self.config.set('database', 'port', parent.port.get())
+        self.config.set('database', 'port', unicode(parent.port.get()))
         self.config.set('database', 'db_name', parent.dbnb.get())
         self.config.set('database', 'user', parent.user.get())
-        self.config.set('database', 'opt_views', parent.opt_pgvw.get())
+        self.config.set('database', 'opt_views', unicode(parent.opt_pgvw.get()))
         # proxy settings
-        self.config.set('proxy', 'proxy_needed', parent.opt_proxy.get())
-        self.config.set('proxy', 'proxy_type', parent.opt_ntlm.get())
+        self.config.set('proxy', 'proxy_needed', unicode(parent.opt_proxy.get()))
+        self.config.set('proxy', 'proxy_type', unicode(parent.opt_ntlm.get()))
         self.config.set('proxy', 'proxy_server', parent.prox_server.get())
-        self.config.set('proxy', 'proxy_port', parent.prox_port.get())
+        self.config.set('proxy', 'proxy_port', unicode(parent.prox_port.get()))
         self.config.set('proxy', 'proxy_user', parent.prox_user.get())
         # Isogeo settings
-        self.config.set('isogeo', 'opt_isogeo', parent.opt_isogeo.get())
+        self.config.set('isogeo', 'opt_isogeo', unicode(parent.opt_isogeo.get()))
         self.config.set('isogeo', 'def_OC', parent.url_OpenCatalog.get())
         self.config.set('isogeo', 'app_id', parent.isog_app_id.get())
         self.config.set('isogeo', 'app_secret', parent.isog_app_tk.get())
 
         # Writing the configuration file
-        with open(confile, 'wb') as configfile:
+        with open(self.confile, 'wb') as configfile:
             try:
                 self.config.write(configfile)
                 logging.info('Options saved.')
