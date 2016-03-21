@@ -1211,8 +1211,7 @@ in {13}{14}'.format(len(self.li_shp),
 
                 ### TESTING
                 self.wb.store_md_vector(self.dico_layer,
-                                        self.dico_fields,
-                                        self.li_vectors_formats)
+                                        self.dico_fields)
 
                 self.logger.info('\t Wrote into the dictionary')
                 # getting for metrics analysis
@@ -1252,6 +1251,11 @@ in {13}{14}'.format(len(self.li_shp),
                 self.dictionarize_vectors(self.dico_layer,
                                           self.dico_fields,
                                           self.feuyVC, line_vectors)
+
+                ### TESTING
+                self.wb.store_md_vector(self.dico_layer,
+                                        self.dico_fields)
+
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_vectors = line_vectors + 1
@@ -1289,6 +1293,11 @@ in {13}{14}'.format(len(self.li_shp),
                                           self.dico_fields,
                                           self.feuyVC,
                                           line_vectors)
+
+                ### TESTING
+                self.wb.store_md_vector(self.dico_layer,
+                                        self.dico_fields)
+
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_vectors = line_vectors + 1
@@ -1325,6 +1334,11 @@ in {13}{14}'.format(len(self.li_shp),
                 self.dictionarize_vectors(self.dico_layer,
                                           self.dico_fields,
                                           self.feuyVC, line_vectors)
+
+                ### TESTING
+                self.wb.store_md_vector(self.dico_layer,
+                                        self.dico_fields)
+
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_vectors = line_vectors + 1
@@ -1362,6 +1376,11 @@ in {13}{14}'.format(len(self.li_shp),
                                           self.dico_fields,
                                           self.feuyVC,
                                           line_vectors)
+
+                ### TESTING
+                self.wb.store_md_vector(self.dico_layer,
+                                        self.dico_fields)
+
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_vectors = line_vectors + 1
@@ -1399,6 +1418,11 @@ in {13}{14}'.format(len(self.li_shp),
                                           self.dico_fields,
                                           self.feuyVC,
                                           line_vectors)
+
+                ### TESTING
+                self.wb.store_md_vector(self.dico_layer,
+                                        self.dico_fields)
+
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_vectors = line_vectors + 1
@@ -1436,6 +1460,11 @@ in {13}{14}'.format(len(self.li_shp),
                                           self.dico_bands,
                                           self.feuyRS,
                                           line_rasters)
+
+                ### TESTING
+                self.wb.store_md_raster(self.dico_raster,
+                                        self.dico_bands)
+
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_rasters = line_rasters + 1
