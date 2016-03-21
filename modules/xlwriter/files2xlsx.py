@@ -278,7 +278,7 @@ class files2xlsx(Workbook):
         # end of method
         return
 
-    def store_md_vector(self, layer, fields, li_formats):
+    def store_md_vector(self, layer, fields):
         """ TO DOCUMENT
         """
         # increment line
@@ -311,10 +311,7 @@ class files2xlsx(Workbook):
         self.ws_v["B{}".format(self.idx_v)] = link
 
         # Name of parent folder with an exception if this is the format name
-        if not path.basename(layer.get(u'folder')).lower() in li_formats:
-            self.ws_v["C{}".format(self.idx_v)] = path.basename(layer.get(u'folder'))
-        else:
-            self.ws_v["C{}".format(self.idx_v)] = path.basename(path.dirname(layer.get(u'folder')))
+        self.ws_v["C{}".format(self.idx_v)] = path.basename(layer.get(u'folder'))
 
         # Fields count
         self.ws_v["D{}".format(self.idx_v)] = layer.get(u'num_fields')
@@ -373,10 +370,6 @@ class files2xlsx(Workbook):
                           self.texts.get(u'precision') +\
                           unicode(fields[chp][2]) + u") ; "
             except UnicodeDecodeError:
-                # write a notification into the log file
-                # self.dico_err[fields.get('name')] = self.texts.get(u'err_encod')\
-                #                                     + chp.decode('latin1') \
-                #                                     + u"\n\n"
                 logging.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
                 # decode the fucking field name
                 champs = champs + chp.decode('latin1') \
@@ -401,12 +394,86 @@ class files2xlsx(Workbook):
         return
 
 
-    def store_md_raster(self, md_raster):
+    def store_md_raster(self, layer, bands):
         """ TO DOCUMENT
         """
-        self.ws_r["A{}".format(self.idx_raster)] = md_raster.get('title')
-        self.ws_r["B{}".format(self.idx_raster)] = md_raster.get('abstract')
+        # increment line
+        self.idx_r += 1
 
+        # in case of a source error
+        if layer.get('error'):
+            # sheet.row(line).set_style(self.xls_erreur)
+            err_mess = self.texts.get(layer.get('error'))
+            logging.warning('\tproblem detected')
+            self.ws_r["A{}".format(self.idx_r)] = layer.get('name')
+            link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
+                                                     self.texts.get('browse'))
+            self.ws_r["B{}".format(self.idx_r)] = link
+            self.ws_r["C{}".format(self.idx_r)] = err_mess
+            # Interruption of function
+            return False
+        else:
+            pass
+
+        # Name
+        self.ws_r["A{}".format(self.idx_r)] = layer.get('name')
+
+        # Path of parent folder formatted to be a hyperlink
+        link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
+                                                 self.texts.get('browse'))
+        self.ws_r["B{}".format(self.idx_r)] = link
+
+        # Name of parent folder with an exception if this is the format name
+        self.ws_r["C{}".format(self.idx_r)] = path.basename(layer.get(u'folder'))
+
+        # Image dimensions
+        self.ws_r["D{}".format(self.idx_r)] = layer.get(u'num_rows')
+        self.ws_r["E{}".format(self.idx_r)] = layer.get(u'num_cols')
+
+        # Pixel dimensions
+        self.ws_r["F{}".format(self.idx_r)] = layer.get(u'pixelWidth')
+        self.ws_r["G{}".format(self.idx_r)] = layer.get(u'pixelHeight')
+
+        # Image dimensions
+        self.ws_r["H{}".format(self.idx_r)] = layer.get(u'xOrigin')
+        self.ws_r["I{}".format(self.idx_r)] = layer.get(u'yOrigin')
+
+        # Type of SRS
+        self.ws_r["J{}".format(self.idx_r)] = layer.get(u'srs_type')
+        # EPSG code
+        self.ws_r["K{}".format(self.idx_r)] = layer.get(u'EPSG')
+
+        # Creation date
+        self.ws_r["M{}".format(self.idx_r)] = layer.get(u'date_crea')
+        # Last update date
+        self.ws_r["N{}".format(self.idx_r)] = layer.get(u'date_actu')
+
+        # Number of bands
+        self.ws_r["O{}".format(self.idx_r)] = layer.get(u'num_bands')
+
+        # Format of data
+        self.ws_r["P{}".format(self.idx_r)] = "{0} {1}".format(layer.get(u'format'),
+                                               layer.get('format_version'))
+        # Compression rate
+        self.ws_r["Q{}".format(self.idx_r)] = layer.get(u'compr_rate')
+
+        # Color referential
+        self.ws_r["R{}".format(self.idx_r)] = layer.get(u'color_ref')
+
+        # Dependencies
+        self.ws_r["S{}".format(self.idx_v)].style.alignment.wrap_text = True
+        self.ws_r.cell("S{}".format(self.idx_v)).value = u' |\n '.join(layer.get(u'dependencies'))
+
+        # total size of file and its dependencies
+        self.ws_r["T{}".format(self.idx_r)] = layer.get(u'total_size')
+
+        # in case of a source error
+        if layer.get('err_gdal')[0] != 0:
+            logging.warning('\tproblem detected')
+            self.ws_r["U{}".format(self.idx_r)] = "{0} : {1}".format(layer.get('err_gdal')[0],
+                                                                     layer.get('err_gdal')[1])
+        else:
+            pass
 
         # end of method
         return
