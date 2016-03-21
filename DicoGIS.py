@@ -37,8 +37,6 @@ from time import strftime
 from webbrowser import open_new
 import threading    # handling various subprocesses
 
-from ConfigParser import RawConfigParser, SafeConfigParser  # for ini files
-
 import platform  # about operating systems
 
 import logging      # log files
@@ -667,7 +665,10 @@ class DicoGIS(Tk):
 
         # loading previous options
         if not self.settings.first_use:
-            self.settings.load_settings(parent=self)
+            try:
+                self.settings.load_settings(parent=self)
+            except:
+                self.logger.error("Load settings failed: option or section is missing.")
         else:
             pass
         self.ddl_lang.set(self.def_lang)
@@ -3076,7 +3077,7 @@ in {13}{14}'.format(len(self.li_shp),
             exit()
 
 
-        self.wb.save(path.join(self.target.get(), r"test.xlsx"))
+        self.wb.save(path.join(self.target.get(), r"DicoGIS_test.xlsx"))
         # End of function
         return self.book, saved
 
