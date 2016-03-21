@@ -293,17 +293,19 @@ class files2xlsx(Workbook):
             err_mess = self.texts.get(layer.get('error'))
             logging.warning('\tproblem detected')
             self.ws_v["A{}".format(self.idx_v)] = layer.get('name')
-            self.ws_v["C{}".format(self.idx_v)] = err_mess
             link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
                                                      self.texts.get('browse'))
             self.ws_v["B{}".format(self.idx_v)] = link
+            self.ws_v["C{}".format(self.idx_v)] = err_mess
             # Interruption of function
             return False
         else:
             pass
 
-        # writing
+        # Name
         self.ws_v["A{}".format(self.idx_v)] = layer.get('name')
+
+        # Path of parent folder formatted to be a hyperlink
         link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
                                                  self.texts.get('browse'))
         self.ws_v["B{}".format(self.idx_v)] = link
@@ -314,17 +316,86 @@ class files2xlsx(Workbook):
         else:
             self.ws_v["C{}".format(self.idx_v)] = path.basename(path.dirname(layer.get(u'folder')))
 
+        # Fields count
+        self.ws_v["D{}".format(self.idx_v)] = layer.get(u'num_fields')
+        # Objects count
+        self.ws_v["E{}".format(self.idx_v)] = layer.get(u'num_obj')
         # Geometry type
-        self.ws_v["D{}".format(self.idx_v)] = layer.get(u'type_geom')
+        self.ws_v["F{}".format(self.idx_v)] = layer.get(u'type_geom')
+        # Name of srs
+        self.ws_v["G{}".format(self.idx_v)] = layer.get(u'srs')
+        # Type of SRS
+        self.ws_v["H{}".format(self.idx_v)] = layer.get(u'srs_type')
+        # EPSG code
+        self.ws_v["I{}".format(self.idx_v)] = layer.get(u'EPSG')
         # Spatial extent
         emprise = u"Xmin : {0} - Xmax : {1} | \nYmin : {2} - Ymax : {3}"\
                   .format(unicode(layer.get(u'Xmin')),
                           unicode(layer.get(u'Xmax')),
                           unicode(layer.get(u'Ymin')),
                           unicode(layer.get(u'Ymax')))
-        self.ws_v["E{}".format(self.idx_v)] = emprise
-        # Name of srs
-        self.ws_v["F{}".format(self.idx_v)] = layer.get(u'srs')
+        self.ws_v["J{}".format(self.idx_v)].style.alignment.wrap_text = True
+        self.ws_v["J{}".format(self.idx_v)] = emprise
+        # self.ws_v.cell("E{}".format(self.idx_v)).style.alignment.wrap_text = True
+
+        # Creation date
+        self.ws_v["K{}".format(self.idx_v)] = layer.get(u'date_crea')
+        # Last update date
+        self.ws_v["L{}".format(self.idx_v)] = layer.get(u'date_actu')
+        # Format of data
+        self.ws_v["M{}".format(self.idx_v)] = layer.get(u'type')
+        # dependencies
+        self.ws_v["N{}".format(self.idx_v)].style.alignment.wrap_text = True
+        self.ws_v.cell("N{}".format(self.idx_v)).value = u' |\n '.join(layer.get(u'dependencies'))
+        # total size
+        self.ws_v["O{}".format(self.idx_v)] = layer.get(u'total_size')
+
+        # Field informations
+        for chp in fields.keys():
+            # field type
+            if 'Integer' in fields[chp][0]:
+                tipo = self.texts.get(u'entier')
+            elif fields[chp][0] == 'Real':
+                tipo = self.texts.get(u'reel')
+            elif fields[chp][0] == 'String':
+                tipo = self.texts.get(u'string')
+            elif fields[chp][0] == 'Date':
+                tipo = self.texts.get(u'date')
+            else:
+                tipo = "unknown"
+                print(chp, " unknown type")
+
+            # concatenation of field informations
+            try:
+                champs = champs + chp +\
+                          u" (" + tipo + self.texts.get(u'longueur') +\
+                          unicode(fields[chp][1]) +\
+                          self.texts.get(u'precision') +\
+                          unicode(fields[chp][2]) + u") ; "
+            except UnicodeDecodeError:
+                # write a notification into the log file
+                # self.dico_err[fields.get('name')] = self.texts.get(u'err_encod')\
+                #                                     + chp.decode('latin1') \
+                #                                     + u"\n\n"
+                logging.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
+                # decode the fucking field name
+                champs = champs + chp.decode('latin1') \
+                + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
+                                                        fields[chp][1],
+                                                        fields[chp][2])
+                # then continue
+                continue
+
+        # Once all fieds explored, write them
+        self.ws_v["P{}".format(self.idx_v)] = champs
+
+        # in case of a source error
+        if layer.get('err_gdal')[0] != 0:
+            logging.warning('\tproblem detected')
+            self.ws_v["Q{}".format(self.idx_v)] = "{0} : {1}".format(layer.get('err_gdal')[0],
+                                                                     layer.get('err_gdal')[1])
+        else:
+            pass
 
         # end of method
         return
