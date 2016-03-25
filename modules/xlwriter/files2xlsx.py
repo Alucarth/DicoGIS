@@ -81,7 +81,7 @@ class files2xlsx(Workbook):
                      "gdal_warn",
                      ]
 
-    li_cols_filegdb = [
+    li_cols_filedb = [
                       "nomfic",
                       "path",
                       "theme",
@@ -173,7 +173,7 @@ class files2xlsx(Workbook):
 
     # ------------ Setting workbook ---------------------
 
-    def set_worksheets(self, has_vector=0, has_raster=0, has_filegdb=0,
+    def set_worksheets(self, has_vector=0, has_raster=0, has_filedb=0,
                        has_mapdocs=0, has_cad=0, has_sgbd=0):
         """ adds news sheets depending on present metadata types
         """
@@ -196,10 +196,10 @@ class files2xlsx(Workbook):
         else:
             pass
 
-        if has_filegdb:
-            self.ws_fgdb = self.create_sheet(title=self.texts.get("sheet_filedb"))
+        if has_filedb:
+            self.ws_fdb = self.create_sheet(title=self.texts.get("sheet_filedb"))
             # headers
-            self.ws_fgdb.append([self.texts.get(i) for i in self.li_cols_filegdb])
+            self.ws_fdb.append([self.texts.get(i) for i in self.li_cols_filedb])
             # initialize line counter
             self.idx_f = 1
         else:
@@ -393,7 +393,6 @@ class files2xlsx(Workbook):
         # end of method
         return
 
-
     def store_md_raster(self, layer, bands):
         """ TO DOCUMENT
         """
@@ -478,23 +477,78 @@ class files2xlsx(Workbook):
         # end of method
         return
 
-
-    def store_md_service(self, md_service):
+    def store_md_fdb(self, filedb):
         """ TO DOCUMENT
         """
-        self.ws_fgdb["A{}".format(self.idx_service)] = md_service.get('title')
-        self.ws_fgdb["B{}".format(self.idx_service)] = md_service.get('abstract')
+        # increment line
+        self.idx_f += 1
 
+        # in case of a source error
+        if filedb.get('error'):
+            # sheet.row(line).set_style(self.xls_erreur)
+            err_mess = self.texts.get(filedb.get('error'))
+            logging.warning('\tproblem detected')
+            self.ws_fdb["A{}".format(self.idx_f)] = filedb.get('name')
+            link = r'=HYPERLINK("{0}","{1}")'.format(filedb.get(u'folder'),
+                                                     self.texts.get('browse'))
+            self.ws_fdb["B{}".format(self.idx_f)] = link
+            self.ws_fdb["C{}".format(self.idx_f)] = err_mess
+            # Interruption of function
+            return False
+        else:
+            pass
+
+        # Name
+        self.ws_fdb["A{}".format(self.idx_f)] = filedb.get('name')
+
+        # Path of parent folder formatted to be a hyperlink
+        link = r'=HYPERLINK("{0}","{1}")'.format(filedb.get(u'folder'),
+                                                 self.texts.get('browse'))
+        self.ws_fdb["B{}".format(self.idx_f)] = link
+
+        # Name of parent folder with an exception if this is the format name
+        self.ws_fdb["C{}".format(self.idx_f)] = path.basename(filedb.get(u'folder'))
+        self.ws_fdb["D{}".format(self.idx_f)] = filedb.get(u'total_size')
+        self.ws_fdb["E{}".format(self.idx_f)] = filedb.get(u'date_crea')
+        self.ws_fdb["F{}".format(self.idx_f)] = filedb.get(u'date_actu')
+        self.ws_fdb["G{}".format(self.idx_f)] = filedb.get(u'layers_count')
+        self.ws_fdb["H{}".format(self.idx_f)] = filedb.get(u'total_fields')
+        self.ws_fdb["I{}".format(self.idx_f)] = filedb.get(u'total_objs')
 
         # end of method
         return
 
-
-    def store_md_resource(self, md_resource):
+    def store_md_mapdocs(self, md_resource):
         """ TO DOCUMENT
         """
-        self.ws_mdocs["A{}".format(self.idx_resource)] = md_resource.get('title')
-        self.ws_mdocs["B{}".format(self.idx_resource)] = md_resource.get('abstract')
+        # increment line
+        self.idx_v += 1
+
+        # local variables
+        champs = ""
+
+        # in case of a source error
+        if layer.get('error'):
+            # sheet.row(line).set_style(self.xls_erreur)
+            err_mess = self.texts.get(layer.get('error'))
+            logging.warning('\tproblem detected')
+            self.ws_v["A{}".format(self.idx_v)] = layer.get('name')
+            link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
+                                                     self.texts.get('browse'))
+            self.ws_v["B{}".format(self.idx_v)] = link
+            self.ws_v["C{}".format(self.idx_v)] = err_mess
+            # Interruption of function
+            return False
+        else:
+            pass
+
+        # Name
+        self.ws_v["A{}".format(self.idx_v)] = layer.get('name')
+
+        # Path of parent folder formatted to be a hyperlink
+        link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
+                                                 self.texts.get('browse'))
+        self.ws_v["B{}".format(self.idx_v)] = link
 
 
 

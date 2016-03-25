@@ -714,7 +714,7 @@ class DicoGIS(Tk):
         self.wb = files2xlsx(texts=self.blabla)
         self.wb.set_worksheets(has_vector=1,
                                has_raster=1,
-                               has_filegdb=1,
+                               has_filedb=1,
                                has_mapdocs=1,
                                has_cad=1,
                                has_sgbd=1)
@@ -1500,6 +1500,9 @@ in {13}{14}'.format(len(self.li_shp),
                 self.dictionarize_fdb(self.dico_fdb,
                                       self.feuyFGDB,
                                       line_fdb)
+                # ## TESTING
+                self.wb.store_md_fdb(self.dico_fdb)
+
                 self.logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_fdb += self.dico_fdb.get('layers_count') + 1
