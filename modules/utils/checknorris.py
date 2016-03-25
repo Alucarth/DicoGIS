@@ -93,6 +93,9 @@ class CheckNorris(object):
                          esri_info.get("InstallDir")))
             # end of method
             return True, esri_info
+        except RuntimeError:
+            logging.error("ArcPy is installed, but not licensed.")
+            return False, "ArcGIS is installed, but not licensed."
         except ImportError:
             logging.info("ArcGIS isn't in the SYSPATH. Trying to find it automatically.")
             # checks if ArcGIS is installed

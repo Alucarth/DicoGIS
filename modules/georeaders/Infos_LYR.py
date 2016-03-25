@@ -33,6 +33,8 @@ try:
     from arcpy.da import SearchCursor
 except ImportError:
     logging.error("ArcPy is not installed.")
+except RuntimeError:
+    logging.error("ArcPy is installed, but not licensed.")
 
 # #############################################################################
 # ########## Classes #############
