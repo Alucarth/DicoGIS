@@ -763,15 +763,26 @@ class DicoGIS(Tk):
         self.lb_M.config(text=self.blabla.get('gui_mdp'))
 
         # setting locale according to the language passed
-        if new_lang.lower() == "fr":
-            locale.setlocale(locale.LC_ALL, str("fra_fra"))
-        elif new_lang.lower() == "es":
-            locale.setlocale(locale.LC_ALL, str("esp_esp"))
-        else:
-            locale.setlocale(locale.LC_ALL, str("uk_UK"))
+        try:
+            if opersys == 'win32':
+                if new_lang.lower() == "fr":
+                    locale.setlocale(locale.LC_ALL, str("fra_fra"))
+                elif new_lang.lower() == "es":
+                    locale.setlocale(locale.LC_ALL, str("esp_esp"))
+                else:
+                    locale.setlocale(locale.LC_ALL, str("uk_UK"))
+            else:
+                if new_lang.lower() == "fr":
+                    locale.setlocale(locale.LC_ALL, str("fr_FR.utf8"))
+                elif new_lang.lower() == "es":
+                    locale.setlocale(locale.LC_ALL, str("es_ES.utf8"))
+                else:
+                    locale.setlocale(locale.LC_ALL, str("en_GB.utf8"))            
 
-        self.logger.info('Language switched to: {0}'\
-                         .format(self.ddl_lang.get()))
+            logging.info('Language switched to: {0}'\
+                             .format(self.ddl_lang.get()))
+        except locale.Error:
+            logging.error('Selected locale is not installed')
 
         # End of function
         return self.blabla
