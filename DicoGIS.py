@@ -681,7 +681,7 @@ class DicoGIS(Tk):
                        self.FrOptIsogeo)
 
         # check ArcPy
-        if not checker.check_arcpy()[0] or opersys != 'win32':
+        if opersys != 'win32' or not checker.check_arcpy()[0]:
             caz_lyr.config(state=DISABLED)
             caz_mxd.config(state=DISABLED)
             self.opt_lyr.set(0)
