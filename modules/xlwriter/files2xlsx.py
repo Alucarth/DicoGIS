@@ -360,7 +360,7 @@ class files2xlsx(Workbook):
                 tipo = self.texts.get(u'date')
             else:
                 tipo = "unknown"
-                print(chp, " unknown type")
+                logging.warning(chp, " unknown type")
 
             # concatenation of field informations
             try:
@@ -506,7 +506,6 @@ class files2xlsx(Workbook):
                                                  self.texts.get('browse'))
         self.ws_fdb["B{}".format(self.idx_f)] = link
 
-        # Name of parent folder with an exception if this is the format name
         self.ws_fdb["C{}".format(self.idx_f)] = path.basename(filedb.get(u'folder'))
         self.ws_fdb["D{}".format(self.idx_f)] = filedb.get(u'total_size')
         self.ws_fdb["E{}".format(self.idx_f)] = filedb.get(u'date_crea')
@@ -514,6 +513,104 @@ class files2xlsx(Workbook):
         self.ws_fdb["G{}".format(self.idx_f)] = filedb.get(u'layers_count')
         self.ws_fdb["H{}".format(self.idx_f)] = filedb.get(u'total_fields')
         self.ws_fdb["I{}".format(self.idx_f)] = filedb.get(u'total_objs')
+
+        # in case of a source error
+        if filedb.get('err_gdal')[0] != 0:
+            logging.warning('\tproblem detected')
+            self.ws_fdb["P{}".format(self.idx_f)] = "{0} : {1}".format(filedb.get('err_gdal')[0],
+                                                                       filedb.get('err_gdal')[1])
+        else:
+            pass
+
+        # parsing layers
+        for (layer_idx, layer_name) in zip(filedb.get(u'layers_idx'),
+                                           filedb.get(u'layers_names')):
+            # increment line
+            self.idx_f += 1
+            champs = ""
+            # get the layer informations
+            try:
+                gdb_layer = filedb.get('{0}_{1}'.format(layer_idx,
+                                                        layer_name))
+            except UnicodeDecodeError:
+                gdb_layer = filedb.get('{0}_{1}'.format(layer_idx,
+                                                        unicode(layer_name.decode('latin1'))))
+            # in case of a source error
+            if gdb_layer.get('error'):
+                err_mess = self.texts.get(gdb_layer.get('error'))
+                logging.warning('\tproblem detected: \
+                                  {0} in {1}'.format(err_mess,
+                                                     gdb_layer.get(u'title')))
+                sheet.write(line, 6, gdb_layer.get(u'title'), self.xls_erreur)
+                sheet.write(line, 7, err_mess, self.xls_erreur)
+                # Interruption of function
+                continue
+            else:
+                pass
+            # in case of a source error
+            if gdb_layer.get('error'):
+                # sheet.row(line).set_style(self.xls_erreur)
+                err_mess = self.texts.get(gdb_layer.get('error'))
+                logging.warning('\tproblem detected')
+                self.ws_fdb["A{}".format(self.idx_f)] = gdb_layer.get('title')
+                self.ws_fdb["C{}".format(self.idx_f)] = err_mess
+                # keep looping
+                continue
+            else:
+                pass
+
+            self.ws_fdb["G{}".format(self.idx_f)] = gdb_layer.get('title')
+            self.ws_fdb["H{}".format(self.idx_f)] = gdb_layer.get(u'num_fields')
+            self.ws_fdb["I{}".format(self.idx_f)] = gdb_layer.get(u'num_obj')
+            self.ws_fdb["J{}".format(self.idx_f)] = gdb_layer.get(u'type_geom')
+            self.ws_fdb["K{}".format(self.idx_f)] = gdb_layer.get(u'srs')
+            self.ws_fdb["L{}".format(self.idx_f)] = gdb_layer.get(u'srs_type')
+            self.ws_fdb["M{}".format(self.idx_f)] = gdb_layer.get(u'EPSG')
+
+            # Spatial extent
+            emprise = u"Xmin : {0} - Xmax : {1} | \nYmin : {2} - Ymax : {3}"\
+                      .format(unicode(gdb_layer.get(u'Xmin')),
+                              unicode(gdb_layer.get(u'Xmax')),
+                              unicode(gdb_layer.get(u'Ymin')),
+                              unicode(gdb_layer.get(u'Ymax')))
+            self.ws_fdb["N{}".format(self.idx_f)].style.alignment.wrap_text = True
+            self.ws_fdb["N{}".format(self.idx_f)] = emprise
+
+            # Field informations
+            fields = gdb_layer.get(u'fields')
+            for chp in fields.keys():
+                # field type
+                if 'Integer' in fields[chp][0]:
+                    tipo = self.texts.get(u'entier')
+                elif fields[chp][0] == 'Real':
+                    tipo = self.texts.get(u'reel')
+                elif fields[chp][0] == 'String':
+                    tipo = self.texts.get(u'string')
+                elif fields[chp][0] == 'Date':
+                    tipo = self.texts.get(u'date')
+                else:
+                    tipo = "unknown"
+                    logging.warning(chp, " unknown type")
+
+                # concatenation of field informations
+                try:
+                    champs = champs + chp +\
+                              u" (" + tipo + self.texts.get(u'longueur') +\
+                              unicode(fields[chp][1]) +\
+                              self.texts.get(u'precision') +\
+                              unicode(fields[chp][2]) + u") ; "
+                except UnicodeDecodeError:
+                    logging.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
+                    # decode the fucking field name
+                    champs = champs + chp.decode('latin1') \
+                    + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
+                                                            fields[chp][1],
+                                                            fields[chp][2])
+                    # then continue
+                    continue
+
+            # Once all fieds explored, write them
+            self.ws_fdb["O{}".format(self.idx_f)] = champs
 
         # end of method
         return
