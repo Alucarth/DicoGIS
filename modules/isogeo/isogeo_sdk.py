@@ -512,19 +512,22 @@ if __name__ == '__main__':
     # print(share[0].keys(), share[0].get("applications"))
 
     # get thesauri
-    thesauri = isogeo.thesaurus(jeton, "http")
-    print(len(thesauri), thesauri)
+    # thesauri = isogeo.thesaurus(jeton, "http")
+    # print(len(thesauri), thesauri)
     # print(len(thesauri))
     # print(thesauri[0].keys())
 
     # let's search for metadatas!
     # print(dir(isogeo))
-    # search = isogeo.search(jeton,
-    #                        # sub_resources='all',
-    #                        # sub_resources=["conditions", "contacts"],
-    #                        sub_resources=isogeo.sub_resources_available,
-    #                        # query="keyword:isogeo:2015",
-    #                        prot='http')
+    search = isogeo.search(jeton,
+                           # sub_resources='all',
+                           # sub_resources=["conditions", "contacts"],
+                           # sub_resources=isogeo.sub_resources_available,
+                           # query="keyword:isogeo:2015",
+                           prot='http',
+                           page_size=10,
+                           offset=50,
+                           whole_share=False,)
 
     # print(search.keys())
     # print(search.get('query'))
@@ -532,14 +535,17 @@ if __name__ == '__main__':
     # print("Count of resources got by request: {}\n".format(len(search.get("results"))))
     # # print(search.get("results")[0].get("contacts"))
 
-    # # get one random resource
+    # get one random resource
     # hatnumber = randrange(0, len(search.get("results")))
-    # my_resource = isogeo.resource(jeton,
-    #                               search.get("results")[hatnumber].get("_id"),
-    #                               sub_resources=isogeo.sub_resources_available,
-    #                               prot="http"
-    #                               )
-    # print(my_resource.keys())
+    hatnumber = 5
+    my_resource = isogeo.resource(jeton,
+                                  search.get("results")[hatnumber].get("_id"),
+                                  sub_resources=isogeo.sub_resources_available,
+                                  prot="http"
+                                  )
+    print(my_resource.keys())
+    # print(my_resource.get("keywords"))
+    print([k.get("text") for k in my_resource.get("keywords")])
 
     # # count and parse related resources
     # # actions number

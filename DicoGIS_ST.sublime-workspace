@@ -523,7 +523,7 @@
 			"file": "DicoGIS.py",
 			"settings":
 			{
-				"buffer_size": 128278,
+				"buffer_size": 140971,
 				"line_ending": "Windows"
 			}
 		},
@@ -531,7 +531,7 @@
 			"file": "data/locale/lang_FR.xml",
 			"settings":
 			{
-				"buffer_size": 4961,
+				"buffer_size": 5247,
 				"line_ending": "Windows"
 			}
 		},
@@ -539,7 +539,7 @@
 			"file": "data/locale/lang_EN.xml",
 			"settings":
 			{
-				"buffer_size": 4555,
+				"buffer_size": 4841,
 				"line_ending": "Windows"
 			}
 		},
@@ -547,7 +547,7 @@
 			"file": "data/locale/lang_ES.xml",
 			"settings":
 			{
-				"buffer_size": 4846,
+				"buffer_size": 5133,
 				"line_ending": "Windows"
 			}
 		}
@@ -1095,21 +1095,22 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 128278,
+						"buffer_size": 140971,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								20972,
-								20972
+								0,
+								0
 							]
 						],
 						"settings":
 						{
 							"WordCountShouldRun": false,
 							"WordCountSyntax": "python",
+							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai (SL).tmTheme",
 							"syntax": "Packages/Python/Python.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
@@ -1127,15 +1128,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4961,
+						"buffer_size": 5247,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								845,
-								850
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1157,15 +1158,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4555,
+						"buffer_size": 4841,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								458,
-								458
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1187,15 +1188,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4846,
+						"buffer_size": 5133,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								552,
-								552
+								0,
+								0
 							]
 						],
 						"settings":
