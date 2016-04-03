@@ -299,7 +299,21 @@ class files2xlsx(Workbook):
             # enable filters
             sheet.auto_filter.ref = str("A1:{}{}").format(get_column_letter(sheet.max_column),
                                                           sheet.max_row)
-        pass
+            # columns width
+            sheet.column_dimensions['A'].bestFit = True
+            # sheet.column_dimensions['A'].auto_size = True
+            # sheet.column_dimensions['B'].auto_size = True
+
+            dims = {}
+            for row in sheet.rows:
+                for cell in row:
+                    if cell.value:
+                        val = unicode(cell.value)
+                        dims[cell.column] = max((dims.get(cell.column, 0), len(val)))
+            for col, value in dims.items():
+                sheet.column_dimensions[col].width = value
+        # end of method
+        return
 
     # ------------ Writing metadata ---------------------
     def store_md_vector(self, layer, fields):
@@ -577,20 +591,11 @@ class files2xlsx(Workbook):
                 logging.warning('\tproblem detected: \
                                   {0} in {1}'.format(err_mess,
                                                      gdb_layer.get(u'title')))
-                sheet.write(line, 6, gdb_layer.get(u'title'), self.xls_erreur)
-                sheet.write(line, 7, err_mess, self.xls_erreur)
+                self.ws_fdb["G{}".format(self.idx_f)] = gdb_layer.get(u'title')
+                self.ws_fdb["G{}".format(self.idx_f)].style = self.s_error
+                self.ws_fdb["H{}".format(self.idx_f)] = err_mess
+                self.ws_fdb["H{}".format(self.idx_f)].style = self.s_error
                 # Interruption of function
-                continue
-            else:
-                pass
-            # in case of a source error
-            if gdb_layer.get('error'):
-                # sheet.row(line).set_style(self.xls_erreur)
-                err_mess = self.texts.get(gdb_layer.get('error'))
-                logging.warning('\tproblem detected')
-                self.ws_fdb["A{}".format(self.idx_f)] = gdb_layer.get('title')
-                self.ws_fdb["C{}".format(self.idx_f)] = err_mess
-                # keep looping
                 continue
             else:
                 pass
@@ -691,6 +696,86 @@ class files2xlsx(Workbook):
         self.ws_mdocs["D{}".format(self.idx_m)] = mapdoc.get('creator_prod')
         self.ws_mdocs["E{}".format(self.idx_m)] = mapdoc.get('keywords')
         self.ws_mdocs["F{}".format(self.idx_m)] = mapdoc.get('subject')
+        self.ws_mdocs["G{}".format(self.idx_m)] = mapdoc.get('dpi')
+        self.ws_mdocs["H{}".format(self.idx_m)] = mapdoc.get('total_size')
+        self.ws_mdocs["I{}".format(self.idx_m)] = mapdoc.get('date_crea')
+        self.ws_mdocs["J{}".format(self.idx_m)] = mapdoc.get('date_actu')
+        self.ws_mdocs["K{}".format(self.idx_m)] = mapdoc.get('xOrigin')
+        self.ws_mdocs["L{}".format(self.idx_m)] = mapdoc.get('yOrigin')
+        self.ws_mdocs["M{}".format(self.idx_m)] = mapdoc.get('srs')
+        self.ws_mdocs["N{}".format(self.idx_m)] = mapdoc.get('srs_type')
+        self.ws_mdocs["O{}".format(self.idx_m)] = mapdoc.get('EPSG')
+        self.ws_mdocs["P{}".format(self.idx_m)] = mapdoc.get('layers_count')
+        self.ws_mdocs["Q{}".format(self.idx_m)] = mapdoc.get('total_fields')
+        self.ws_mdocs["R{}".format(self.idx_m)] = mapdoc.get('total_objs')
+
+        for (layer_idx, layer_name) in zip(mapdoc.get(u'layers_idx'),
+                                           mapdoc.get(u'layers_names')):
+            # increment line
+            self.idx_m += 1
+            champs = ""
+
+            # get the layer informations
+            try:
+                mdoc_layer = filedb.get('{0}_{1}'.format(layer_idx,
+                                                           layer_name))
+            except UnicodeDecodeError:
+                mdoc_layer = filedb.get('{0}_{1}'.format(layer_idx,
+                                                            unicode(layer_name.decode('latin1'))))
+            # in case of a source error
+            if mdoc_layer.get('error'):
+                err_mess = self.texts.get(mdoc_layer.get('error'))
+                logging.warning('\tproblem detected: \
+                                  {0} in {1}'.format(err_mess,
+                                                     mdoc_layer.get(u'title')))
+                self.ws_mdocs["P{}".format(self.idx_f)] = mdoc_layer.get(u'title')
+                self.ws_mdocs["P{}".format(self.idx_f)].style = self.s_error
+                self.ws_mdocs["Q{}".format(self.idx_f)] = err_mess
+                self.ws_mdocs["Q{}".format(self.idx_f)].style = self.s_error
+                # loop must go on
+                continue
+            else:
+                pass
+            # layer info
+            self.ws_mdocs["P{}".format(self.idx_m)] = mapdoc.get('title')
+            self.ws_mdocs["Q{}".format(self.idx_m)] = mapdoc.get('num_fields')
+            self.ws_mdocs["R{}".format(self.idx_m)] = mapdoc.get('num_objs')
+
+            # Field informations
+            fields = mdoc_layer.get(u'fields')
+            for chp in fields.keys():
+                # field type
+                if 'Integer' in fields[chp][0]:
+                    tipo = self.texts.get(u'entier')
+                elif fields[chp][0] == 'Real':
+                    tipo = self.texts.get(u'reel')
+                elif fields[chp][0] == 'String':
+                    tipo = self.texts.get(u'string')
+                elif fields[chp][0] == 'Date':
+                    tipo = self.texts.get(u'date')
+                else:
+                    tipo = "unknown"
+                    logging.warning(chp, " unknown type")
+
+                # concatenation of field informations
+                try:
+                    champs = champs + chp +\
+                              u" (" + tipo + self.texts.get(u'longueur') +\
+                              unicode(fields[chp][1]) +\
+                              self.texts.get(u'precision') +\
+                              unicode(fields[chp][2]) + u") ; "
+                except UnicodeDecodeError:
+                    logging.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
+                    # decode the fucking field name
+                    champs = champs + chp.decode('latin1') \
+                    + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
+                                                            fields[chp][1],
+                                                            fields[chp][2])
+                    # then continue
+                    continue
+
+            # Once all fieds explored, write them
+            self.ws_fdb["S{}".format(self.idx_f)] = champs
 
         # end of method
         return
@@ -731,9 +816,9 @@ class files2xlsx(Workbook):
         self.ws_cad["B{}".format(self.idx_c)] = link
         self.ws_cad["B{}".format(self.idx_c)].style = self.s_link
 
-###############################################################################
-###### Stand alone program ########
-###################################
+# ############################################################################
+# ##### Stand alone program ########
+# ##################################
 
 if __name__ == '__main__':
     """ Standalone execution and tests
