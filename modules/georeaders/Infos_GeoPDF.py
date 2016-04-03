@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
-from __future__ import unicode_literals
+from __future__ import (absolute_import, print_function, unicode_literals)
 
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Name:         Infos Geospatial PDF
 # Purpose:      Use GDAL/OGR library to extract informations about
 #                   geographic data. It permits a more friendly use as
@@ -12,15 +12,16 @@ from __future__ import unicode_literals
 #
 # Python:       2.7.x
 # Created:      18/02/2014
-# Updated:      08/09/2014
+# Updated:      08/04/2016
 # Licence:      GPL 3
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 
-###############################################################################
-########### Libraries #############
-###################################
+# ############################################################################
+# ########## Libraries #############
+# ##################################
+
 # Standard library
-from os import chdir, listdir, path       # files and folder managing
+from os import chdir, listdir, path    # files and folder managing
 from time import localtime, strftime
 
 # Python 3 backported
@@ -38,9 +39,9 @@ except ImportError:
     import osr
     from gdalconst import *
 
-##############################################################
-############ Classes ##############
-###################################
+# ############################################################
+# ########### Classes ##############
+# ##################################
 
 
 class GdalErrorHandler(object):
@@ -56,16 +57,15 @@ class GdalErrorHandler(object):
     def handler(self, err_level, err_type, err_msg):
         """ Making errors messages more readable """
         # available types
-        err_class = {
-                    gdal.CE_None: 'None',
-                    gdal.CE_Debug: 'Debug',
-                    gdal.CE_Warning: 'Warning',
-                    gdal.CE_Failure: 'Failure',
-                    gdal.CE_Fatal: 'Fatal'
-                    }
+        err_class = {gdal.CE_None: 'None',
+                     gdal.CE_Debug: 'Debug',
+                     gdal.CE_Warning: 'Warning',
+                     gdal.CE_Failure: 'Failure',
+                     gdal.CE_Fatal: 'Fatal'
+                     }
         # getting type
         err_type = err_class.get(err_type, 'None')
-        
+
         # cleaning message
         err_msg = err_msg.replace('\n', ' ')
 
@@ -96,7 +96,7 @@ class Read_GeoPDF(object):
         # changing working directory to layer folder
         chdir(path.dirname(pdfpath))
         pdfpath = path.abspath(pdfpath)
-        
+
         # handling specific exceptions
         gdalerr = GdalErrorHandler()
         errhandler = gdalerr.handler
@@ -141,7 +141,7 @@ class Read_GeoPDF(object):
         # warnings messages
         dico_geopdf['err_gdal'] = gdalerr.err_type, gdalerr.err_msg
 
-        ###### READING INTO VECTORS LAYERS
+        # ##### READING INTO VECTORS LAYERS
         ogr.UseExceptions()
         try:
             geopdf_v = ogr.Open(pdfpath)
@@ -156,7 +156,6 @@ class Read_GeoPDF(object):
         li_layers_idx = []
         dico_geopdf['layers_names'] = li_layers_names
         dico_geopdf['layers_idx'] = li_layers_idx
-
 
         # total fields count
         total_fields = 0
@@ -249,15 +248,15 @@ class Read_GeoPDF(object):
 
     def vector_basics(self, layer_obj, dico_layer, txt):
         u""" get the global informations about the layer """
-        # title 
+        # title
         try:
             dico_layer[u'title'] = unicode(layer_obj.GetName()) 
         except UnicodeDecodeError:
             # just if you use chardet from Mozilla
             # encDet = chardet.detect(layer_obj.GetName()).get('encoding')
             # dico_layer[u'encoding_detected'] = encDet
-            layerName = layer_obj.GetName().decode('latin1', errors='ignore')
-            dico_layer[u'title'] = layerName
+            layer_name = layer_obj.GetName().decode('latin1', errors='ignore')
+            dico_layer[u'title'] = layer_name
 
         # features count
         dico_layer[u'num_obj'] = layer_obj.GetFeatureCount()
@@ -286,15 +285,14 @@ class Read_GeoPDF(object):
         dico_geopdf[u'pixelHeight'] = round(geotransform[5], 3)
         dico_geopdf[u'orientation'] = geotransform[2]
 
-            ## SRS
+            # # SRS
         # using osr to get the srs
         srs = osr.SpatialReference(self.geopdf.GetProjection())
         # srs.ImportFromWkt(self.geopdf.GetProjection())
         srs.AutoIdentifyEPSG()
 
         # srs types
-        srsmetod = [
-                    (srs.IsCompound(), txt.get('srs_comp')),
+        srsmetod = [(srs.IsCompound(), txt.get('srs_comp')),
                     (srs.IsGeocentric(), txt.get('srs_geoc')),
                     (srs.IsGeographic(), txt.get('srs_geog')),
                     (srs.IsLocal(), txt.get('srs_loca')),
@@ -337,7 +335,7 @@ class Read_GeoPDF(object):
                     dico_geopdf[u'srs'] = srs.GetAttrValue(str('GEOGCS')).decode('latin1').replace('_', ' ')
                 else:
                     dico_geopdf[u'srs'] = srs.GetAttrValue(str('PROJECTION')).decode('latin1').replace('_', ' ')
-        
+
         dico_geopdf[u'EPSG'] = unicode(srs.GetAttrValue(str("AUTHORITY"), 1))
 
         # end of function
@@ -359,7 +357,7 @@ class Read_GeoPDF(object):
                 dico_bands["band{}_Min".format(band)] = stats[0]
             else:
                 dico_bands["band{}_Min".format(band)] = band_info.GetMinimum()
-            
+
             # band maximum value
             if band_info.GetMinimum() is None:
                 dico_bands["band{}_Max".format(band)] = stats[1]
@@ -411,7 +409,7 @@ class Read_GeoPDF(object):
         for i in range(layer_def.GetFieldCount()):
             champomy = layer_def.GetFieldDefn(i)  # fields ordered
             dico_fields[champomy.GetName()] = champomy.GetTypeName()
-                                              
+
         # end of function
         return dico_fields
 
@@ -433,9 +431,9 @@ class Read_GeoPDF(object):
         # End of function
         return dico_geopdf
 
-###############################################################################
-###### Stand alone program ########
-###################################
+# #############################################################################
+# ##### Stand alone program ########
+# ##################################
 
 if __name__ == '__main__':
     u""" standalone execution for tests. Paths are relative considering a test
@@ -445,7 +443,7 @@ if __name__ == '__main__':
     chdir(path.abspath(dir_pdf))
     li_pdf = listdir(path.abspath(dir_pdf))
     li_pdf = [path.abspath(pdf) for pdf in li_pdf if path.splitext(pdf)[1].lower()=='.pdf']
-    
+
     # test txt dictionary
     textos = OD()
     textos['srs_comp'] = u'Compound'
@@ -470,9 +468,9 @@ if __name__ == '__main__':
         if not path.isfile(pdf):
             print("\n\t==> File doesn't exist: " + pdf)
             continue
-        print "\n======================\n\t", path.basename(pdf)
+        print("\n======================\n\t", path.basename(pdf))
         info_pdf = Read_GeoPDF(pdf,
                                dico_pdf,
                                path.splitext(pdf)[1],
                                textos)
-        print '\n', dico_pdf
+        print('\n', dico_pdf)
