@@ -11,6 +11,8 @@
 # python-setuptools, python-pip, python-dev, python-tk, python-gdal, python-software-properties
 
 # via pypi
+numpy
+gdal
 dxfgrabber
 openpyxl
 OWSLib

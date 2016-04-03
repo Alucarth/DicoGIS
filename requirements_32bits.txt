@@ -39,7 +39,7 @@ dxfgrabber==0.7.5
 .\lib\py2exe-0.6.10a1-cp27-none-win32.whl
 
 # -----------------------
-# All dependencies
+# Detailed dependencies
 # dxfgrabber==0.7.5
 # et-xmlfile==1.0.1
 # GDAL==1.11.3
