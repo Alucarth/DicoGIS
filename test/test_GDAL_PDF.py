@@ -2,7 +2,7 @@
 #!/usr/bin/env python
 # from __future__ import unicode_literals
 
-#-------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         InfosGDAL
 # Purpose:      Use GDAL/OGR library to extract informations about
 #                   geographic data. It permits a more friendly use as
@@ -14,13 +14,13 @@
 # Created:      18/02/2014
 # Updated:      12/09/2014
 # Licence:      GPL 3
-#-------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
-################################################################################
-########### Libraries #############
-###################################
+# #############################################################################
+# ########## Libraries #############
+# ##################################
 # Standard library
-from os import walk, path       # files and folder managing
+from os import chdir, listdir, walk, path       # files and folder managing
 from time import localtime, strptime, strftime
 
 # Python 3 backported
@@ -32,13 +32,18 @@ from osgeo import ogr
 from gdalconst import *
 gdal.AllRegister()
 
-################################################################################
-########### Classes #############
-#################################
+# #############################################################################
+# ########## Classes #############
+# ################################
 
 dico_geopdf = OD()
 
-li_pdf = [r'C:\Users\julien.moura\Documents\GIS Database\GeoPDF\US_Country_Populations.pdf']
+# sample files
+dir_pdf = path.abspath(r'datatest\maps_docs\pdf')
+chdir(path.abspath(dir_pdf))
+li_pdf = listdir(path.abspath(dir_pdf))
+li_pdf = [path.abspath(pdf) for pdf in li_pdf if path.splitext(pdf)[1].lower()=='.pdf']
+
 
 for in_pdf in li_pdf:
     geopdf = gdal.Open(in_pdf)
@@ -46,7 +51,7 @@ for in_pdf in li_pdf:
     # basics
     dico_geopdf[u'name'] = path.basename(in_pdf)
     dico_geopdf[u'folder'] = path.dirname(in_pdf)
-    
+
     # dependencies
     dependencies = [path.basename(filedepend) for filedepend in
                     geopdf.GetFileList() if filedepend != in_pdf]
@@ -75,7 +80,6 @@ for in_pdf in li_pdf:
     dico_geopdf[u'subdatasets_count'] = len(geopdf.GetSubDatasets())
 
     # read = geopdf.ReadRaster()
-    
     # readray = geopdf.ReadAsArray()
 
     # geopdf.GetLayers()
@@ -110,14 +114,13 @@ for index in range(geopdf_v.GetLayerCount()):
     srs = layer.GetSpatialRef()
     srs.AutoIdentifyEPSG()
     # srs type
-    srsmetod = [
-                (srs.IsCompound(), 'srs_comp'),
+    srsmetod = [(srs.IsCompound(), 'srs_comp'),
                 (srs.IsGeocentric(), 'srs_geoc'),
                 (srs.IsGeographic(), 'srs_geog'),
                 (srs.IsLocal(), 'srs_loca'),
                 (srs.IsProjected(), 'srs_proj'),
                 (srs.IsVertical(), 'srs_vert')
-               ]
+                ]
     # searching for a match with one of srs types
     for srsmet in srsmetod:
         if srsmet[0] == 1:
@@ -140,7 +143,7 @@ Ymin = {2} - Ymax = {3}".format(layer.GetExtent()[0],
     # print("Geometry name: {0}".format(layer.GetGeomName()))  # doesn't work
     print("Geometry column: {0}".format(layer.GetGeometryColumn()))
     print dir(layer.GetGeomType())
-    
+
     # fields information about each layer
     dico_fields = OD()
     layer_def = layer.GetLayerDefn()
