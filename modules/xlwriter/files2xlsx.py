@@ -27,7 +27,9 @@ from collections import OrderedDict     # ordered dictionary
 
 # 3rd party library
 from openpyxl import Workbook
+from openpyxl.cell import get_column_letter
 from openpyxl.worksheet.properties import WorksheetProperties
+from openpyxl.styles import Style, Font, Alignment
 
 # ##############################################################################
 # ########## Classes ###############
@@ -164,8 +166,20 @@ class files2xlsx(Workbook):
 
         """
         super(files2xlsx, self).__init__()
-        # super(Isogeo2xlsx, self).__init__(write_only=True)
+        # super(files2xlsx, self).__init__(write_only=True)
         self.texts = texts
+
+        # styles
+        self.s_error = Style(font=Font(color="FF0000"))
+        self.s_header = Style(alignment=Alignment(horizontal='center',
+                                                  vertical='center'
+                                                  ),
+                              font=Font(size=12,
+                                        bold=True,
+                                        )
+                              )
+        self.s_link = Style(font=Font(underline="single"))
+        self.s_wrap = Style(alignment=Alignment(wrap_text=True))
 
         # deleting the default worksheet
         ws = self.active
@@ -182,6 +196,11 @@ class files2xlsx(Workbook):
             self.ws_v = self.create_sheet(title=self.texts.get("sheet_vectors"))
             # headers
             self.ws_v.append([self.texts.get(i) for i in self.li_cols_vector])
+            # styling
+            for i in self.li_cols_vector:
+                self.ws_v.cell(row=1,
+                               column=self.li_cols_vector.index(i) + 1).style = self.s_header
+
             # initialize line counter
             self.idx_v = 1
         else:
@@ -191,6 +210,11 @@ class files2xlsx(Workbook):
             self.ws_r = self.create_sheet(title=self.texts.get("sheet_rasters"))
             # headers
             self.ws_r.append([self.texts.get(i) for i in self.li_cols_raster])
+            # styling
+            for i in self.li_cols_raster:
+                self.ws_r.cell(row=1,
+                               column=self.li_cols_raster.index(i) + 1).style = self.s_header
+
             # initialize line counter
             self.idx_r = 1
         else:
@@ -200,6 +224,11 @@ class files2xlsx(Workbook):
             self.ws_fdb = self.create_sheet(title=self.texts.get("sheet_filedb"))
             # headers
             self.ws_fdb.append([self.texts.get(i) for i in self.li_cols_filedb])
+            # styling
+            for i in self.li_cols_filedb:
+                self.ws_fdb.cell(row=1,
+                                 column=self.li_cols_filedb.index(i) + 1).style = self.s_header
+
             # initialize line counter
             self.idx_f = 1
         else:
@@ -209,6 +238,11 @@ class files2xlsx(Workbook):
             self.ws_mdocs = self.create_sheet(title=self.texts.get("sheet_maplans"))
             # headers
             self.ws_mdocs.append([self.texts.get(i) for i in self.li_cols_mapdocs])
+            # styling
+            for i in self.li_cols_mapdocs:
+                self.ws_mdocs.cell(row=1,
+                                   column=self.li_cols_mapdocs.index(i) + 1).style = self.s_header
+
             # initialize line counter
             self.idx_m = 1
         else:
@@ -218,6 +252,11 @@ class files2xlsx(Workbook):
             self.ws_cad = self.create_sheet(title=self.texts.get("sheet_cdao"))
             # headers
             self.ws_cad.append([self.texts.get(i) for i in self.li_cols_caodao])
+            # styling
+            for i in self.li_cols_caodao:
+                self.ws_cad.cell(row=1,
+                                 column=self.li_cols_caodao.index(i) + 1).style = self.s_header
+
             # initialize line counter
             self.idx_c = 1
         else:
@@ -227,16 +266,25 @@ class files2xlsx(Workbook):
             self.ws_sgbd = self.create_sheet(title="PostGIS")
             # headers
             self.ws_sgbd.append([self.texts.get(i) for i in self.li_cols_sgbd])
+            # styling
+            for i in self.li_cols_sgbd:
+                self.ws_sgbd.cell(row=1,
+                                  column=self.li_cols_sgbd.index(i) + 1).style = self.s_header
             # initialize line counter
             self.idx_s = 1
         else:
             pass
 
-        # CLEAN UP & TUNNING
+        # end of method
+        return
+
+    def tunning_worksheets(self):
+        """ CLEAN UP & TUNNING
+        """
         for sheet in self.worksheets:
             # Freezing panes
-            c = sheet['B2']
-            sheet.freeze_panes = c
+            c_freezed = sheet['B2']
+            sheet.freeze_panes = c_freezed
 
             # Print properties
             sheet.print_options.horizontalCentered = True
@@ -248,38 +296,14 @@ class files2xlsx(Workbook):
             wsprops = sheet.sheet_properties
             wsprops.filterMode = True
 
-        # end of method
-        return
+            # enable filters
+            sheet.auto_filter.ref = str("A1:{}{}").format(get_column_letter(sheet.max_column),
+                                                          sheet.max_row)
+        pass
 
     # ------------ Writing metadata ---------------------
-
-    def store_metadatas(self, kind, metadata):
-        """ TO DOCUMENT
-        """
-        if kind == "vectorDataset":
-            self.idx_v += 1
-            self.store_md_vector(metadata)
-            return
-        elif metadata.get("type") == "rasterDataset":
-            self.idx_r += 1
-            self.store_md_raster(metadata)
-            return
-        elif metadata.get("type") == "service":
-            self.idx_f += 1
-            self.store_md_service(metadata)
-            return
-        elif metadata.get("type") == "resource":
-            self.idx_m += 1
-            self.store_md_resource(metadata)
-            return
-        else:
-            print("Type of metadata is not recognized/handled: " + metadata.get("type"))
-            pass
-        # end of method
-        return
-
     def store_md_vector(self, layer, fields):
-        """ TO DOCUMENT
+        """ Storing metadata about a vector dataset
         """
         # increment line
         self.idx_v += 1
@@ -293,10 +317,13 @@ class files2xlsx(Workbook):
             err_mess = self.texts.get(layer.get('error'))
             logging.warning('\tproblem detected')
             self.ws_v["A{}".format(self.idx_v)] = layer.get('name')
+            self.ws_v["A{}".format(self.idx_v)].style = self.s_error
             link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
                                                      self.texts.get('browse'))
             self.ws_v["B{}".format(self.idx_v)] = link
+            self.ws_v["B{}".format(self.idx_v)].style = self.s_error
             self.ws_v["C{}".format(self.idx_v)] = err_mess
+            self.ws_v["C{}".format(self.idx_v)].style = self.s_error
             # Interruption of function
             return False
         else:
@@ -309,6 +336,7 @@ class files2xlsx(Workbook):
         link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
                                                  self.texts.get('browse'))
         self.ws_v["B{}".format(self.idx_v)] = link
+        self.ws_v["B{}".format(self.idx_v)].style = self.s_link
 
         # Name of parent folder with an exception if this is the format name
         self.ws_v["C{}".format(self.idx_v)] = path.basename(layer.get(u'folder'))
@@ -326,14 +354,13 @@ class files2xlsx(Workbook):
         # EPSG code
         self.ws_v["I{}".format(self.idx_v)] = layer.get(u'EPSG')
         # Spatial extent
-        emprise = u"Xmin : {0} - Xmax : {1} | \nYmin : {2} - Ymax : {3}"\
+        emprise = "Xmin : {0} - Xmax : {1} | \nYmin : {2} - Ymax : {3}"\
                   .format(unicode(layer.get(u'Xmin')),
                           unicode(layer.get(u'Xmax')),
                           unicode(layer.get(u'Ymin')),
                           unicode(layer.get(u'Ymax')))
-        self.ws_v["J{}".format(self.idx_v)].style.alignment.wrap_text = True
+        self.ws_v["J{}".format(self.idx_v)].style = self.s_wrap
         self.ws_v["J{}".format(self.idx_v)] = emprise
-        # self.ws_v.cell("E{}".format(self.idx_v)).style.alignment.wrap_text = True
 
         # Creation date
         self.ws_v["K{}".format(self.idx_v)] = layer.get(u'date_crea')
@@ -387,6 +414,7 @@ class files2xlsx(Workbook):
             logging.warning('\tproblem detected')
             self.ws_v["Q{}".format(self.idx_v)] = "{0} : {1}".format(layer.get('err_gdal')[0],
                                                                      layer.get('err_gdal')[1])
+            self.ws_v["Q{}".format(self.idx_v)].style = self.s_error
         else:
             pass
 
@@ -394,7 +422,7 @@ class files2xlsx(Workbook):
         return
 
     def store_md_raster(self, layer, bands):
-        """ TO DOCUMENT
+        """ Storing metadata about a raster dataset
         """
         # increment line
         self.idx_r += 1
@@ -408,7 +436,9 @@ class files2xlsx(Workbook):
             link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
                                                      self.texts.get('browse'))
             self.ws_r["B{}".format(self.idx_r)] = link
+            self.ws_r["B{}".format(self.idx_r)].style = self.s_error
             self.ws_r["C{}".format(self.idx_r)] = err_mess
+            self.ws_r["C{}".format(self.idx_r)].style = self.s_error
             # Interruption of function
             return False
         else:
@@ -421,6 +451,7 @@ class files2xlsx(Workbook):
         link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
                                                  self.texts.get('browse'))
         self.ws_r["B{}".format(self.idx_r)] = link
+        self.ws_r["B{}".format(self.idx_r)].style = self.s_link
 
         # Name of parent folder with an exception if this is the format name
         self.ws_r["C{}".format(self.idx_r)] = path.basename(layer.get(u'folder'))
@@ -471,6 +502,7 @@ class files2xlsx(Workbook):
             logging.warning('\tproblem detected')
             self.ws_r["U{}".format(self.idx_r)] = "{0} : {1}".format(layer.get('err_gdal')[0],
                                                                      layer.get('err_gdal')[1])
+            self.ws_r["U{}".format(self.idx_r)].style = self.s_error
         else:
             pass
 
@@ -478,7 +510,7 @@ class files2xlsx(Workbook):
         return
 
     def store_md_fdb(self, filedb):
-        """ TO DOCUMENT
+        """ Storing metadata about a file database
         """
         # increment line
         self.idx_f += 1
@@ -492,7 +524,9 @@ class files2xlsx(Workbook):
             link = r'=HYPERLINK("{0}","{1}")'.format(filedb.get(u'folder'),
                                                      self.texts.get('browse'))
             self.ws_fdb["B{}".format(self.idx_f)] = link
+            self.ws_fdb["B{}".format(self.idx_f)].style = self.s_error
             self.ws_fdb["C{}".format(self.idx_f)] = err_mess
+            self.ws_fdb["C{}".format(self.idx_f)].style = self.s_error
             # Interruption of function
             return False
         else:
@@ -505,6 +539,7 @@ class files2xlsx(Workbook):
         link = r'=HYPERLINK("{0}","{1}")'.format(filedb.get(u'folder'),
                                                  self.texts.get('browse'))
         self.ws_fdb["B{}".format(self.idx_f)] = link
+        self.ws_fdb["B{}".format(self.idx_f)].style = self.s_link
 
         self.ws_fdb["C{}".format(self.idx_f)] = path.basename(filedb.get(u'folder'))
         self.ws_fdb["D{}".format(self.idx_f)] = filedb.get(u'total_size')
@@ -519,6 +554,7 @@ class files2xlsx(Workbook):
             logging.warning('\tproblem detected')
             self.ws_fdb["P{}".format(self.idx_f)] = "{0} : {1}".format(filedb.get('err_gdal')[0],
                                                                        filedb.get('err_gdal')[1])
+            self.ws_fdb["P{}".format(self.idx_f)].style = self.s_error
         else:
             pass
 
@@ -615,42 +651,85 @@ class files2xlsx(Workbook):
         # end of method
         return
 
-    def store_md_mapdocs(self, md_resource):
+    def store_md_mapdoc(self, mapdoc):
         """ TO DOCUMENT
         """
         # increment line
-        self.idx_v += 1
+        self.idx_m += 1
 
         # local variables
         champs = ""
 
         # in case of a source error
-        if layer.get('error'):
+        if mapdoc.get('error'):
             # sheet.row(line).set_style(self.xls_erreur)
-            err_mess = self.texts.get(layer.get('error'))
+            err_mess = self.texts.get(mapdoc.get('error'))
             logging.warning('\tproblem detected')
-            self.ws_v["A{}".format(self.idx_v)] = layer.get('name')
-            link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
+            self.ws_mdocs["A{}".format(self.idx_m)] = mapdoc.get('name')
+            self.ws_mdocs["A{}".format(self.idx_m)].style = self.s_error
+            link = r'=HYPERLINK("{0}","{1}")'.format(mapdoc.get(u'folder'),
                                                      self.texts.get('browse'))
-            self.ws_v["B{}".format(self.idx_v)] = link
-            self.ws_v["C{}".format(self.idx_v)] = err_mess
+            self.ws_mdocs["B{}".format(self.idx_m)] = link
+            self.ws_mdocs["B{}".format(self.idx_m)].style = self.s_error
+            self.ws_mdocs["C{}".format(self.idx_m)] = err_mess
+            self.ws_mdocs["C{}".format(self.idx_m)].style = self.s_error
             # Interruption of function
             return False
         else:
             pass
 
         # Name
-        self.ws_v["A{}".format(self.idx_v)] = layer.get('name')
+        self.ws_mdocs["A{}".format(self.idx_m)] = mapdoc.get('name')
 
         # Path of parent folder formatted to be a hyperlink
-        link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
+        link = r'=HYPERLINK("{0}","{1}")'.format(mapdoc.get(u'folder'),
                                                  self.texts.get('browse'))
-        self.ws_v["B{}".format(self.idx_v)] = link
+        self.ws_mdocs["B{}".format(self.idx_m)] = link
+        self.ws_mdocs["B{}".format(self.idx_m)].style = self.s_link
 
-
+        self.ws_mdocs["C{}".format(self.idx_m)] = mapdoc.get('title')
+        self.ws_mdocs["D{}".format(self.idx_m)] = mapdoc.get('creator_prod')
+        self.ws_mdocs["E{}".format(self.idx_m)] = mapdoc.get('keywords')
+        self.ws_mdocs["F{}".format(self.idx_m)] = mapdoc.get('subject')
 
         # end of method
         return
+
+    def store_md_cad(self, cad):
+        """ TO DOCUMENT
+        """
+        # increment line
+        self.idx_c += 1
+
+        # local variables
+        champs = ""
+
+        # in case of a source error
+        if cad.get('error'):
+            # sheet.row(line).set_style(self.xls_erreur)
+            err_mess = self.texts.get(cad.get('error'))
+            logging.warning('\tproblem detected')
+            self.ws_cad["A{}".format(self.idx_c)] = cad.get('name')
+            self.ws_cad["A{}".format(self.idx_c)].style = self.s_error
+            link = r'=HYPERLINK("{0}","{1}")'.format(cad.get(u'folder'),
+                                                     self.texts.get('browse'))
+            self.ws_cad["B{}".format(self.idx_c)] = link
+            self.ws_cad["B{}".format(self.idx_c)].style = self.s_error
+            self.ws_cad["C{}".format(self.idx_c)] = err_mess
+            self.ws_cad["C{}".format(self.idx_c)].style = self.s_error
+            # Interruption of function
+            return False
+        else:
+            pass
+
+        # Name
+        self.ws_cad["A{}".format(self.idx_c)] = cad.get('name')
+
+        # Path of parent folder formatted to be a hyperlink
+        link = r'=HYPERLINK("{0}","{1}")'.format(cad.get(u'folder'),
+                                                 self.texts.get('browse'))
+        self.ws_cad["B{}".format(self.idx_c)] = link
+        self.ws_cad["B{}".format(self.idx_c)].style = self.s_link
 
 ###############################################################################
 ###### Stand alone program ########
