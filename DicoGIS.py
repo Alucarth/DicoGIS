@@ -95,16 +95,18 @@ class DicoGIS(Tk):
         Creates 1 frame and 2 labelled subframes"""
         # creation and configuration of log file
         # see: http://sametmax.com/ecrire-des-logs-en-python/
-        self.logger = logging.getLogger()
+        logger = logging.getLogger()
         logging.captureWarnings(True)
-        self.logger.setLevel(logging.DEBUG)  # all errors will be get
+        logger.setLevel(logging.DEBUG)  # all errors will be get
         log_form = logging.Formatter('%(asctime)s || %(levelname)s || %(module)s || %(message)s')
         logfile = RotatingFileHandler('DicoGIS.log', 'a', 5000000, 1)
         logfile.setLevel(logging.DEBUG)
         logfile.setFormatter(log_form)
-        self.logger.addHandler(logfile)
-        self.logger.info('\t\t ============== DicoGIS =============')  # start
-        self.logger.info('Version: {0}'.format(self.DGversion))
+        logger.addHandler(logfile)
+        # start
+        logging.info("")
+        logging.info('\t============== DicoGIS =============')
+        logging.info('Version: {0}'.format(self.DGversion))
 
         # manage settings outside the main class
         self.settings = OptionsManager(r"options.ini")
@@ -115,21 +117,21 @@ class DicoGIS(Tk):
         Tk.__init__(self)               # constructor of parent graphic class
         self.title(u'DicoGIS {0}'.format(self.DGversion))
         if opersys == 'win32':
-            self.logger.info('Operating system: {0}'.format(platform.platform()))
+            logging.info('Operating system: {0}'.format(platform.platform()))
             self.iconbitmap('DicoGIS.ico')    # windows icon
             self.uzer = env.get(u'USERNAME')
         elif opersys == 'linux2':
-            self.logger.info('Operating system: {0}'.format(platform.platform()))
+            logging.info('Operating system: {0}'.format(platform.platform()))
             self.uzer = env.get(u'USER')
             icon = Image("photo", file=r'data/img/DicoGIS_logo.gif')
             self.call('wm', 'iconphoto', self._w, icon)
             self.style = Style().theme_use('clam')
         elif opersys == 'darwin':
-            self.logger.info('Operating system: {0}'.format(platform.platform()))
+            logging.info('Operating system: {0}'.format(platform.platform()))
             self.uzer = env.get(u'USER')
         else:
-            self.logger.warning('Operating system unknown')
-            self.logger.info('Operating system: {0}'.format(platform.platform()))
+            logging.warning('Operating system unknown')
+            logging.info('Operating system: {0}'.format(platform.platform()))
         self.resizable(width=False, height=False)
         self.focus_force()
 
@@ -668,7 +670,7 @@ class DicoGIS(Tk):
             try:
                 self.settings.load_settings(parent=self)
             except:
-                self.logger.error("Load settings failed: option or section is missing.")
+                logging.error("Load settings failed: option or section is missing.")
         else:
             pass
         self.ddl_lang.set(self.def_lang)
@@ -847,7 +849,7 @@ class DicoGIS(Tk):
         # Looping in folders structure
         self.status.set(self.blabla.get('gui_prog1'))
         self.prog_layers.start()
-        self.logger.info('Begin of folders parsing')
+        logging.info('Begin of folders parsing')
         for root, dirs, files in walk(foldertarget):
             self.num_folders = self.num_folders + len(dirs)
             for d in dirs:
@@ -958,7 +960,7 @@ class DicoGIS(Tk):
         self.li_mapdocs.extend(self.li_mxd)
         # end of listing
         self.prog_layers.stop()
-        self.logger.info('End of folders parsing: {0} shapefiles - \
+        logging.info('End of folders parsing: {0} shapefiles - \
           {1} tables (MapInfo) - \
           {2} KML - \
           {3} GML - \
@@ -1081,19 +1083,19 @@ in {13}{14}'.format(len(self.li_shp),
         # process files or PostGIS database
         if self.typo == 0:
             self.nb.select(0)
-            self.logger.info('=> files process started')
+            logging.info('=> files process started')
             self.process_files()
         elif self.typo == 1:
             self.nb.select(1)
-            self.logger.info('=> DB process started')
+            logging.info('=> DB process started')
             self.check_fields()
         elif self.typo == 2:
             self.nb.select(2)
-            self.logger.info('=> web services process started')
+            logging.info('=> web services process started')
             # self.check_fields()
         elif self.typo == 3:
             self.nb.select(3)
-            self.logger.info('=> Isogeo started')
+            logging.info('=> Isogeo started')
             self.process_isogeo()
         else:
             pass
@@ -1125,7 +1127,7 @@ in {13}{14}'.format(len(self.li_shp),
             return
         # creating the Excel workbook
         self.configexcel()
-        self.logger.info('Excel file created')
+        logging.info('Excel file created')
         # configuring the progress bar
         total_files = 0
         if self.opt_shp.get() and len(self.li_shp) > 0:
@@ -1190,11 +1192,11 @@ in {13}{14}'.format(len(self.li_shp),
         line_maps = 1       # line rank of maps & plans dictionary
 
         if self.opt_shp.get() and len(self.li_shp) > 0:
-            self.logger.info('\n\tProcessing shapefiles: start')
+            logging.info('\n\tProcessing shapefiles: start')
             for shp in self.li_shp:
                 """ looping on shapefiles list """
                 self.status.set(path.basename(shp))
-                self.logger.info('\n' + shp)
+                logging.info('\n' + shp)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1208,10 +1210,10 @@ in {13}{14}'.format(len(self.li_shp),
                              self.dico_fields,
                              'Esri shapefiles',
                              self.blabla)
-                    self.logger.info('\t Infos OK')
+                    logging.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
-                    self.logger.error(e)
+                    logging.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
@@ -1224,21 +1226,21 @@ in {13}{14}'.format(len(self.li_shp),
                 self.wb.store_md_vector(self.dico_layer,
                                         self.dico_fields)
 
-                self.logger.info('\t Wrote into the dictionary')
+                logging.info('\t Wrote into the dictionary')
                 # getting for metrics analysis
-                self.logger.info('\t Added to global metrics')
+                logging.info('\t Added to global metrics')
                 # increment the line number
                 line_vectors = line_vectors + 1
         else:
-            self.logger.info('\tIgnoring {0} shapefiles'.format(len(self.li_shp)))
+            logging.info('\tIgnoring {0} shapefiles'.format(len(self.li_shp)))
             pass
 
         if self.opt_tab.get() and len(self.li_tab) > 0:
-            self.logger.info('\n\tProcessing MapInfo tables: start')
+            logging.info('\n\tProcessing MapInfo tables: start')
             for tab in self.li_tab:
                 """ looping on MapInfo tables list """
                 self.status.set(path.basename(tab))
-                self.logger.info('\n' + tab)
+                logging.info('\n' + tab)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1252,10 +1254,10 @@ in {13}{14}'.format(len(self.li_shp),
                              self.dico_fields,
                              'MapInfo tab',
                              self.blabla)
-                    self.logger.info('\t Infos OK')
+                    logging.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
-                    self.logger.error(e)
+                    logging.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
@@ -1267,19 +1269,19 @@ in {13}{14}'.format(len(self.li_shp),
                 self.wb.store_md_vector(self.dico_layer,
                                         self.dico_fields)
 
-                self.logger.info('\t Wrote into the dictionary')
+                logging.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_vectors = line_vectors + 1
         else:
-            self.logger.info('\tIgnoring {0} MapInfo tables'.format(len(self.li_tab)))
+            logging.info('\tIgnoring {0} MapInfo tables'.format(len(self.li_tab)))
             pass
 
         if self.opt_kml.get() and len(self.li_kml) > 0:
-            self.logger.info('\n\tProcessing KML-KMZ: start')
+            logging.info('\n\tProcessing KML-KMZ: start')
             for kml in self.li_kml:
                 """ looping on KML/KMZ list """
                 self.status.set(path.basename(kml))
-                self.logger.info('\n' + kml)
+                logging.info('\n' + kml)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1293,10 +1295,10 @@ in {13}{14}'.format(len(self.li_shp),
                              self.dico_fields,
                              'Google KML/KMZ',
                              self.blabla)
-                    self.logger.info('\t Infos OK')
+                    logging.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
-                    self.logger.error(e)
+                    logging.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
@@ -1309,19 +1311,19 @@ in {13}{14}'.format(len(self.li_shp),
                 self.wb.store_md_vector(self.dico_layer,
                                         self.dico_fields)
 
-                self.logger.info('\t Wrote into the dictionary')
+                logging.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_vectors = line_vectors + 1
         else:
-            self.logger.info('\tIgnoring {0} KML'.format(len(self.li_kml)))
+            logging.info('\tIgnoring {0} KML'.format(len(self.li_kml)))
             pass
 
         if self.opt_gml.get() and len(self.li_gml) > 0:
-            self.logger.info('\n\tProcessing GML: start')
+            logging.info('\n\tProcessing GML: start')
             for gml in self.li_gml:
                 """ looping on GML list """
                 self.status.set(path.basename(gml))
-                self.logger.info('\n' + gml)
+                logging.info('\n' + gml)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1335,10 +1337,10 @@ in {13}{14}'.format(len(self.li_shp),
                              self.dico_fields,
                              'GML',
                              self.blabla)
-                    self.logger.info('\t Infos OK')
+                    logging.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
-                    self.logger.error(e)
+                    logging.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
@@ -1350,19 +1352,19 @@ in {13}{14}'.format(len(self.li_shp),
                 self.wb.store_md_vector(self.dico_layer,
                                         self.dico_fields)
 
-                self.logger.info('\t Wrote into the dictionary')
+                logging.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_vectors = line_vectors + 1
         else:
-            self.logger.info('\tIgnoring {0} GML'.format(len(self.li_gml)))
+            logging.info('\tIgnoring {0} GML'.format(len(self.li_gml)))
             pass
 
         if self.opt_geoj.get() and len(self.li_geoj) > 0:
-            self.logger.info('\n\tProcessing GeoJSON: start')
+            logging.info('\n\tProcessing GeoJSON: start')
             for geojson in self.li_geoj:
                 """ looping on GeoJSON list """
                 self.status.set(path.basename(geojson))
-                self.logger.info('\n' + geojson)
+                logging.info('\n' + geojson)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1376,10 +1378,10 @@ in {13}{14}'.format(len(self.li_shp),
                                  self.dico_fields,
                                  'GeoJSON',
                                  self.blabla)
-                    self.logger.info('\t Infos OK')
+                    logging.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
-                    self.logger.error(e)
+                    logging.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
@@ -1392,19 +1394,19 @@ in {13}{14}'.format(len(self.li_shp),
                 self.wb.store_md_vector(self.dico_layer,
                                         self.dico_fields)
 
-                self.logger.info('\t Wrote into the dictionary')
+                logging.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_vectors = line_vectors + 1
         else:
-            self.logger.info('\tIgnoring {0} GeoJSON'.format(len(self.li_geoj)))
+            logging.info('\tIgnoring {0} GeoJSON'.format(len(self.li_geoj)))
             pass
 
         if self.opt_gxt.get() and len(self.li_gxt) > 0:
-            self.logger.info('\n\tProcessing GXT: start')
+            logging.info('\n\tProcessing GXT: start')
             for gxtpath in self.li_gxt:
                 """ looping on gxt list """
                 self.status.set(path.basename(gxtpath))
-                self.logger.info('\n' + gxtpath)
+                logging.info('\n' + gxtpath)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1418,10 +1420,10 @@ in {13}{14}'.format(len(self.li_shp),
                             self.dico_fields,
                             'Geoconcept eXport Text',
                             self.blabla)
-                    self.logger.info('\t Infos OK')
+                    logging.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
-                    self.logger.error(e)
+                    logging.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
@@ -1434,19 +1436,19 @@ in {13}{14}'.format(len(self.li_shp),
                 self.wb.store_md_vector(self.dico_layer,
                                         self.dico_fields)
 
-                self.logger.info('\t Wrote into the dictionary')
+                logging.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_vectors = line_vectors + 1
         else:
-            self.logger.info('\tIgnoring {0} Geoconcept eXport Text'.format(len(self.li_gxt)))
+            logging.info('\tIgnoring {0} Geoconcept eXport Text'.format(len(self.li_gxt)))
             pass
 
         if self.opt_rast.get() and len(self.li_raster) > 0:
-            self.logger.info('\n\tProcessing rasters: start')
+            logging.info('\n\tProcessing rasters: start')
             for raster in self.li_raster:
                 """ looping on rasters list """
                 self.status.set(path.basename(raster))
-                self.logger.info('\n' + raster)
+                logging.info('\n' + raster)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1460,10 +1462,10 @@ in {13}{14}'.format(len(self.li_shp),
                                  self.dico_bands,
                                  path.splitext(raster)[1],
                                  self.blabla)
-                    self.logger.info('\t Infos OK')
+                    logging.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
-                    self.logger.error(e)
+                    logging.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
@@ -1476,19 +1478,19 @@ in {13}{14}'.format(len(self.li_shp),
                 self.wb.store_md_raster(self.dico_raster,
                                         self.dico_bands)
 
-                self.logger.info('\t Wrote into the dictionary')
+                logging.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_rasters = line_rasters + 1
         else:
-            self.logger.info('\tIgnoring {0} rasters'.format(len(self.li_raster)))
+            logging.info('\tIgnoring {0} rasters'.format(len(self.li_raster)))
             pass
 
         if self.opt_egdb.get() and len(self.li_egdb) > 0:
-            self.logger.info('\n\tProcessing Esri FileGDB: start')
+            logging.info('\n\tProcessing Esri FileGDB: start')
             for gdb in self.li_egdb:
                 """ looping on FileGDB list """
                 self.status.set(path.basename(gdb))
-                self.logger.info('\n' + gdb)
+                logging.info('\n' + gdb)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1501,10 +1503,10 @@ in {13}{14}'.format(len(self.li_shp),
                              self.dico_fdb,
                              'Esri FileGeoDataBase',
                              self.blabla)
-                    self.logger.info('\t Infos OK')
+                    logging.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
-                    self.logger.error(e)
+                    logging.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
@@ -1514,19 +1516,19 @@ in {13}{14}'.format(len(self.li_shp),
                 # ## TESTING
                 self.wb.store_md_fdb(self.dico_fdb)
 
-                self.logger.info('\t Wrote into the dictionary')
+                logging.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_fdb += self.dico_fdb.get('layers_count') + 1
         else:
-            self.logger.info('\tIgnoring {0} Esri FileGDB'.format(len(self.li_egdb)))
+            logging.info('\tIgnoring {0} Esri FileGDB'.format(len(self.li_egdb)))
             pass
 
         if self.opt_spadb.get() and len(self.li_spadb) > 0:
-            self.logger.info('\n\tProcessing Spatialite DB: start')
+            logging.info('\n\tProcessing Spatialite DB: start')
             for spadb in self.li_spadb:
                 """ looping on Spatialite DBs list """
                 self.status.set(path.basename(spadb))
-                self.logger.info('\n' + spadb)
+                logging.info('\n' + spadb)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1539,29 +1541,33 @@ in {13}{14}'.format(len(self.li_shp),
                                self.dico_fdb,
                                'Spatialite',
                                self.blabla)
-                    self.logger.info('\t Infos OK')
+                    logging.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
-                    self.logger.error(e)
+                    logging.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
                 self.dictionarize_fdb(self.dico_fdb,
                                       self.feuyFGDB,
                                       line_fdb)
-                self.logger.info('\t Wrote into the dictionary')
+
+                ### TESTING
+                self.wb.store_md_fdb(self.dico_fdb)
+
+                logging.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_fdb += self.dico_fdb.get('layers_count') + 1
         else:
-            self.logger.info('\tIgnoring {0} Spatialite DB'.format(len(self.li_spadb)))
+            logging.info('\tIgnoring {0} Spatialite DB'.format(len(self.li_spadb)))
             pass
 
         if self.opt_cdao.get() and len(self.li_cdao) > 0:
-            self.logger.info('\n\tProcessing CAO/DAO: start')
+            logging.info('\n\tProcessing CAO/DAO: start')
             for dxf in self.li_dxf:
                 """ looping on DXF list """
                 self.status.set(path.basename(dxf))
-                self.logger.info('\n' + dxf)
+                logging.info('\n' + dxf)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1573,24 +1579,28 @@ in {13}{14}'.format(len(self.li_shp),
                              self.dico_cdao,
                              'AutoCAD DXF',
                              self.blabla)
-                    self.logger.info('\t Infos OK')
+                    logging.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
-                    self.logger.error(e)
+                    logging.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
                 self.dictionarize_cdao(self.dico_cdao,
                                        self.feuyCDAO,
                                        line_cdao)
-                self.logger.info('\t Wrote into the dictionary')
+
+                ### TESTING
+                self.wb.store_md_cad(self.dico_cdao)
+
+                logging.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_cdao += self.dico_cdao.get('layers_count') + 1
 
             for dwg in self.li_dwg:
                 """ looping on DWG list """
                 self.status.set(path.basename(dwg))
-                self.logger.info('\n' + dwg)
+                logging.info('\n' + dwg)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1603,7 +1613,7 @@ in {13}{14}'.format(len(self.li_shp),
                                                             self.blabla.get('browse'))
                 except UnicodeDecodeError:
                     # write a notification into the log file
-                    self.logger.warning('Path name with special letters: {}'.format(path.dirname(dwg).decode('utf8')))
+                    logging.warning('Path name with special letters: {}'.format(path.dirname(dwg).decode('utf8')))
                     # decode the fucking path name
                     link = 'HYPERLINK("{0}"; "{1}")'.format(path.dirname(dwg).decode('utf8'),
                                                             self.blabla.get('browse'))
@@ -1614,19 +1624,19 @@ in {13}{14}'.format(len(self.li_shp),
                 self.feuyCDAO.write(line_cdao, 2, path.basename(path.dirname(dwg)))
 
                 # logging
-                self.logger.info('\t Wrote into the dictionary')
+                logging.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_cdao += 1
         else:
-            self.logger.info('\tIgnoring {0} CAO/DAO files'.format(len(self.li_cdao)))
+            logging.info('\tIgnoring {0} CAO/DAO files'.format(len(self.li_cdao)))
             pass
 
         if self.opt_pdf.get() and len(self.li_pdf) > 0:
-            self.logger.info('\n\tProcessing Geospatial PDF: start')
+            logging.info('\n\tProcessing Geospatial PDF: start')
             for pdf in self.li_pdf:
                 """ looping on PDF list """
                 self.status.set(path.basename(pdf))
-                self.logger.info('\n' + pdf)
+                logging.info('\n' + pdf)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1638,29 +1648,33 @@ in {13}{14}'.format(len(self.li_shp),
                                 self.dico_pdf,
                                 'Geospatial PDF',
                                 self.blabla)
-                    self.logger.info('\t Infos OK')
+                    logging.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
-                    self.logger.error(e)
+                    logging.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
                 self.dictionarize_mapdocs(self.dico_pdf,
                                           self.feuyMAPS,
                                           line_maps)
-                self.logger.info('\t Wrote into the dictionary')
+
+                ### TESTING
+                self.wb.store_md_mapdoc(self.dico_pdf)
+
+                logging.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_maps += self.dico_pdf.get('layers_count') + 1
         else:
-            self.logger.info('\tIgnoring {0} Geospatial PDF'.format(len(self.li_pdf)))
+            logging.info('\tIgnoring {0} Geospatial PDF'.format(len(self.li_pdf)))
             pass
 
         if self.opt_lyr.get() and len(self.li_lyr) > 0:
-            self.logger.info('\n\tProcessing Esri LYR : start')
+            logging.info('\n\tProcessing Esri LYR : start')
             for lyr in self.li_lyr:
                 """ looping on lyr list """
                 self.status.set(path.basename(lyr))
-                self.logger.info('\n' + lyr)
+                logging.info('\n' + lyr)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1673,21 +1687,21 @@ in {13}{14}'.format(len(self.li_shp),
                              self.dico_layer,
                              'Esri LYR',
                              self.blabla)
-                    self.logger.info('\t Infos OK')
+                    logging.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
-                    self.logger.error(e)
+                    logging.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
                 self.dictionarize_lyr(self.dico_layer,
-                                          self.feuyMAPS,
-                                          line_maps)
-                self.logger.info('\t Wrote into the dictionary')
+                                      self.feuyMAPS,
+                                      line_maps)
+                logging.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_maps += self.dico_layer.get('layers_count')
         else:
-            self.logger.info('\tIgnoring {0} Esri LYR'.format(len(self.li_lyr)))
+            logging.info('\tIgnoring {0} Esri LYR'.format(len(self.li_lyr)))
             pass
 
         # writing global metrics about the dictionary
@@ -1696,7 +1710,7 @@ in {13}{14}'.format(len(self.li_shp),
         # saving dictionary
         self.val.config(state=ACTIVE)
         self.savedico()
-        self.logger.info('\n\tWorkbook saved: %s', self.output.get())
+        logging.info('\n\tWorkbook saved: %s', self.output.get())
         self.bell()
 
         # quit and exit
@@ -1713,10 +1727,10 @@ in {13}{14}'.format(len(self.li_shp),
         """
         # creating the Excel workbook
         self.configexcel()
-        self.logger.info('Excel file created')
+        logging.info('Excel file created')
         # getting the info from shapefiles and compile it in the excel
         line = 1    # line of dictionary
-        self.logger.info('\tPostGIS table processing...')
+        logging.info('\tPostGIS table processing...')
         # setting progress bar
         self.prog_layers["maximum"] = conn.GetLayerCount()
         # parsing the layers
@@ -1729,13 +1743,13 @@ in {13}{14}'.format(len(self.li_shp),
                          self.dico_fields,
                          'PostGIS table',
                          self.blabla)
-            self.logger.info('Table examined: %s' % layer.GetName())
+            logging.info('Table examined: %s' % layer.GetName())
             # writing to the Excel dictionary
             self.dictionarize_pg(self.dico_layer,
                                  self.dico_fields,
                                  self.feuyPG,
                                  line)
-            self.logger.info('\t Wrote into the dictionary')
+            logging.info('\t Wrote into the dictionary')
             # increment the line number
             line = line + 1
             # increment the progress bar
@@ -1743,7 +1757,7 @@ in {13}{14}'.format(len(self.li_shp),
             self.update()
         # saving dictionary
         self.savedico()
-        self.logger.info('\n\tWorkbook saved: %s', self.output.get())
+        logging.info('\n\tWorkbook saved: %s', self.output.get())
 
         # quit and exit
         self.open_dir_file(self.output.get())
@@ -1797,7 +1811,7 @@ in {13}{14}'.format(len(self.li_shp),
         else:
             pass
         # no error detected: let's test connection
-        self.logger.info("Required fields are OK.")
+        logging.info("Required fields are OK.")
         self.test_connection()
         # End of function
         return
@@ -1811,7 +1825,7 @@ in {13}{14}'.format(len(self.li_shp),
         # more information about the GDAL HTTP proxy options here:
         # http://trac.osgeo.org/gdal/wiki/ConfigOptions#GDALOGRHTTPoptions
         if self.opt_proxy.get():
-            self.logger.info("Proxy configured.")
+            logging.info("Proxy configured.")
             gdal.SetConfigOption('GDAL_HTTP_PROXY', '{0}:{1}'.format(self.prox_server.get(),
                                                                      self.prox_port.get()))
             if self.opt_ntlm.get():
@@ -1822,15 +1836,15 @@ in {13}{14}'.format(len(self.li_shp),
             else:
                 pass
         else:
-            self.logger.info("No proxy configured.")
+            logging.info("No proxy configured.")
 
         # checking if user chose to list PostGIS views
         if self.opt_pgvw.get():
             gdal.SetConfigOption(str("PG_LIST_ALL_TABLES"), str("YES"))
-            self.logger.info("PostgreSQL views enabled.")
+            logging.info("PostgreSQL views enabled.")
         else:
             gdal.SetConfigOption(str("PG_LIST_ALL_TABLES"), str("NO"))
-            self.logger.info("PostgreSQL views disabled.")
+            logging.info("PostgreSQL views disabled.")
 
         # testing connection settings
         try:
@@ -1841,14 +1855,14 @@ in {13}{14}'.format(len(self.li_shp),
             # sql_version = "SELECT PostGIS_full_version();"
             # version = conn.ExecuteSQL(sql_version)
         except Exception, e:
-            self.logger.warning("Connection failed: {0}.".format(e))
+            logging.warning("Connection failed: {0}.".format(e))
             self.status.set("Connection failed: {0}.".format(e))
             avert(title=self.blabla.get("err_pg_conn_fail"), message=unicode(e))
             return
 
         # if connection successed
         self.status.set("{} tables".format(conn.GetLayerCount()))
-        self.logger.info('Connection to database {0} successed.\
+        logging.info('Connection to database {0} successed.\
                           {1} tables found.'.format(self.dbnb.get(),
                                                     conn.GetLayerCount()))
         # set the default output file
@@ -1912,7 +1926,7 @@ in {13}{14}'.format(len(self.li_shp),
 
         # saving dictionary
         self.savedico()
-        self.logger.info('\n\tWorkbook saved: %s', self.output.get())
+        logging.info('\n\tWorkbook saved: %s', self.output.get())
 
         # quit and exit
         self.open_dir_file(self.output.get())
@@ -1927,7 +1941,7 @@ in {13}{14}'.format(len(self.li_shp),
         # Basic configuration
         self.book = Workbook(encoding='utf8')
         self.book.set_owner(str('DicoGIS_') + str(self.DGversion))
-        self.logger.info('Workbook created')
+        logging.info('Workbook created')
         # Some customization: fonts and styles
         # headers style
         self.entete = easyxf('pattern: pattern solid, fore_colour black;'
@@ -1957,7 +1971,7 @@ in {13}{14}'.format(len(self.li_shp),
             self.feuySTATS.write(3, 0, self.blabla.get('num_objets'), self.entete)
             self.feuySTATS.write(4, 0, self.blabla.get('gdal_warn'), self.entete)
             self.feuySTATS.write(6, 0, self.blabla.get('geometrie'), self.entete)
-            self.logger.info('Sheet for global statistics adedd')
+            logging.info('Sheet for global statistics adedd')
             # tunning headers
             # lg_shp_names = [len(lg) for lg in self.li_shp]
             # lg_tab_names = [len(lg) for lg in self.li_tab]
@@ -1993,7 +2007,7 @@ in {13}{14}'.format(len(self.li_shp),
             self.feuyVC.write(0, 14, self.blabla.get('tot_size'), self.entete)
             self.feuyVC.write(0, 15, self.blabla.get('li_chps'), self.entete)
             self.feuyVC.write(0, 16, self.blabla.get('gdal_warn'), self.entete)
-            self.logger.info('Sheet vectors adedd')
+            logging.info('Sheet vectors adedd')
             # tunning headers
             lg_shp_names = [len(lg) for lg in self.li_shp]
             lg_tab_names = [len(lg) for lg in self.li_tab]
@@ -2036,7 +2050,7 @@ in {13}{14}'.format(len(self.li_shp),
             self.feuyRS.write(0, 18, self.blabla.get('li_depends'), self.entete)
             self.feuyRS.write(0, 19, self.blabla.get('tot_size'), self.entete)
             self.feuyRS.write(0, 20, self.blabla.get('gdal_warn'), self.entete)
-            self.logger.info('Sheet rasters created')
+            logging.info('Sheet rasters created')
             # tunning headers
             lg_rast_names = [len(lg) for lg in self.li_raster]
             self.feuyRS.col(0).width = max(lg_rast_names) * 100
@@ -2071,7 +2085,7 @@ in {13}{14}'.format(len(self.li_shp),
             self.feuyFGDB.write(0, 12, self.blabla.get('codepsg'), self.entete)
             self.feuyFGDB.write(0, 13, self.blabla.get('emprise'), self.entete)
             self.feuyFGDB.write(0, 14, self.blabla.get('li_chps'), self.entete)
-            self.logger.info('Sheet FileGDB created')
+            logging.info('Sheet FileGDB created')
             # tunning headers
             lg_gdb_names = [len(lg) for lg in self.li_egdb]
             self.feuyFGDB.col(0).width = max(lg_gdb_names) * 100
@@ -2116,7 +2130,7 @@ in {13}{14}'.format(len(self.li_shp),
             self.feuyMAPS.write(0, 17, self.blabla.get('num_attrib'), self.entete)
             self.feuyMAPS.write(0, 18, self.blabla.get('num_objets'), self.entete)
             self.feuyMAPS.write(0, 19, self.blabla.get('li_chps'), self.entete)
-            self.logger.info('Sheet Maps & Documents created')
+            logging.info('Sheet Maps & Documents created')
             # tunning headers
             lg_maps_names = [len(lg) for lg in self.li_mapdocs]
             self.feuyMAPS.col(0).width = max(lg_maps_names) * 100
@@ -2154,7 +2168,7 @@ in {13}{14}'.format(len(self.li_shp),
             self.feuyCDAO.write(0, 12, self.blabla.get('codepsg'), self.entete)
             self.feuyCDAO.write(0, 13, self.blabla.get('emprise'), self.entete)
             self.feuyCDAO.write(0, 14, self.blabla.get('li_chps'), self.entete)
-            self.logger.info('Sheet CAO - DAO created')
+            logging.info('Sheet CAO - DAO created')
             # tunning headers
             lg_gdb_names = [len(lg) for lg in self.li_cdao]
             self.feuyCDAO.col(0).width = max(lg_gdb_names) * 100
@@ -2190,7 +2204,7 @@ in {13}{14}'.format(len(self.li_shp),
             self.feuyPG.write(0, 11, self.blabla.get('date_actu'), self.entete)
             self.feuyPG.write(0, 12, self.blabla.get('format'), self.entete)
             self.feuyPG.write(0, 13, self.blabla.get('li_chps'), self.entete)
-            self.logger.info('Sheet PostGIS created')
+            logging.info('Sheet PostGIS created')
             # tunning headers
             self.feuyPG.col(1).width = len(self.blabla.get('browse')) * 256
             # freezing headers line and first column
@@ -2216,7 +2230,7 @@ in {13}{14}'.format(len(self.li_shp),
         if layer_infos.get('error'):
             sheet.row(line).set_style(self.xls_erreur)
             err_mess = self.blabla.get(layer_infos.get('error'))
-            self.logger.warning('\tproblem detected')
+            logging.warning('\tproblem detected')
             sheet.write(line, 0, layer_infos.get('name'), self.xls_erreur)
             sheet.write(line, 2, err_mess, self.xls_erreur)
             link = 'HYPERLINK("{0}"; "{1}")'.format(layer_infos.get(u'folder'),
@@ -2237,7 +2251,7 @@ in {13}{14}'.format(len(self.li_shp),
                                                     self.blabla.get('browse'))
         except UnicodeDecodeError:
             # write a notification into the log file
-            self.logger.warning('Path name with special letters: {}'.format(layer_infos.get(u'folder').decode('utf8')))
+            logging.warning('Path name with special letters: {}'.format(layer_infos.get(u'folder').decode('utf8')))
             # decode the fucking path name
             link = 'HYPERLINK("{0}"; "{1}")'.format(layer_infos.get(u'folder').decode('utf8'),
                                                     self.blabla.get('browse'))
@@ -2309,7 +2323,7 @@ in {13}{14}'.format(len(self.li_shp),
                 self.dico_err[layer_infos.get('name')] = self.blabla.get(u'err_encod')\
                                                     + chp.decode('latin1') \
                                                     + u"\n\n"
-                self.logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
+                logging.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
                 # decode the fucking field name
                 champs = champs + chp.decode('latin1') \
                 + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
@@ -2323,7 +2337,7 @@ in {13}{14}'.format(len(self.li_shp),
 
         # in case of a source error
         if layer_infos.get('err_gdal')[0] != 0:
-            self.logger.warning('\tproblem detected')
+            logging.warning('\tproblem detected')
             sheet.write(line, 16, "{0} : {1}".format(layer_infos.get('err_gdal')[0],
                                                      layer_infos.get('err_gdal')[1]), self.xls_erreur)
         else:
@@ -2336,7 +2350,7 @@ in {13}{14}'.format(len(self.li_shp),
         u""" write the infos of the layer into the Excel workbook """
         # in case of a source error
         if dico_raster.get('error'):
-            self.logger.warning('\tproblem detected')
+            logging.warning('\tproblem detected')
             sheet.write(line, 0, dico_raster.get('name'))
             link = 'HYPERLINK("{0}"; "{1}")'.format(dico_raster.get(u'folder'),
                                                     self.blabla.get('browse'))
@@ -2357,7 +2371,7 @@ in {13}{14}'.format(len(self.li_shp),
                                                     self.blabla.get('browse'))
         except UnicodeDecodeError:
             # write a notification into the log file
-            self.logger.warning('Path name with special letters: {}'.format(dico_raster.get(u'folder').decode('utf8')))
+            logging.warning('Path name with special letters: {}'.format(dico_raster.get(u'folder').decode('utf8')))
             # decode the fucking path name
             link = 'HYPERLINK("{0}"; "{1}")'.format(dico_raster.get(u'folder').decode('utf8'),
                                                     self.blabla.get('browse'))
@@ -2423,7 +2437,7 @@ in {13}{14}'.format(len(self.li_shp),
 
         # in case of a source error
         if dico_raster.get('err_gdal')[0] != 0:
-            self.logger.warning('\tproblem detected')
+            logging.warning('\tproblem detected')
             sheet.write(line, 20, "{0} : {1}".format(dico_raster.get('err_gdal')[0],
                                                      dico_raster.get('err_gdal')[1]), self.xls_erreur)
         else:
@@ -2436,7 +2450,7 @@ in {13}{14}'.format(len(self.li_shp),
         u""" write the infos of the FileGDB into the Excel workbook """
         # in case of a source error
         if gdb_infos.get('error'):
-            self.logger.warning('\tproblem detected')
+            logging.warning('\tproblem detected')
             sheet.write(line, 0, gdb_infos.get('name'))
             link = 'HYPERLINK("{0}"; "{1}")'.format(gdb_infos.get(u'folder'),
                                                     self.blabla.get('browse'))
@@ -2459,7 +2473,7 @@ in {13}{14}'.format(len(self.li_shp),
                                                     self.blabla.get('browse'))
         except UnicodeDecodeError:
             # write a notification into the log file
-            self.logger.warning('Path name with special letters: {}'.format(gdb_infos.get(u'folder').decode('utf8')))
+            logging.warning('Path name with special letters: {}'.format(gdb_infos.get(u'folder').decode('utf8')))
             # decode the fucking path name
             link = 'HYPERLINK("{0}"; "{1}")'.format(gdb_infos.get(u'folder').decode('utf8'),
                                                     self.blabla.get('browse'))
@@ -2488,7 +2502,7 @@ in {13}{14}'.format(len(self.li_shp),
 
         # in case of a source error
         if gdb_infos.get('err_gdal')[0] != 0:
-            self.logger.warning('\tproblem detected')
+            logging.warning('\tproblem detected')
             sheet.write(line, 15, "{0} : {1}".format(gdb_infos.get('err_gdal')[0],
                                                      gdb_infos.get('err_gdal')[1]), self.xls_erreur)
         else:
@@ -2510,7 +2524,7 @@ in {13}{14}'.format(len(self.li_shp),
             # in case of a source error
             if gdb_layer.get('error'):
                 err_mess = self.blabla.get(gdb_layer.get('error'))
-                self.logger.warning('\tproblem detected: \
+                logging.warning('\tproblem detected: \
                                     {0} in {1}'.format(err_mess,
                                                        gdb_layer.get(u'title')))
                 sheet.write(line, 6, gdb_layer.get(u'title'), self.xls_erreur)
@@ -2568,7 +2582,7 @@ in {13}{14}'.format(len(self.li_shp),
                     self.dico_err[gdb_layer.get('name')] = self.blabla.get(u'err_encod') + \
                                                               chp.decode('latin1') + \
                                                               u"\n\n"
-                    self.logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
+                    logging.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
                     # decode the fucking field name
                     champs = champs + chp.decode('latin1') \
                                     + u" ({0}) ;".format(tipo)
@@ -2579,7 +2593,7 @@ in {13}{14}'.format(len(self.li_shp),
             sheet.write(line, 14, champs)
 
             # write layer's name into the log
-            self.logger.info('\t -- {0} = OK'.format(gdb_layer.get(u'title')))
+            logging.info('\t -- {0} = OK'.format(gdb_layer.get(u'title')))
 
         # End of function
         return self.feuyFGDB, line
@@ -2591,7 +2605,7 @@ in {13}{14}'.format(len(self.li_shp),
 
         # in case of a source error
         if dico_cdao.get('error'):
-            self.logger.warning('\tproblem detected')
+            logging.warning('\tproblem detected')
             sheet.write(line, 0, dico_cdao.get('name'))
             link = 'HYPERLINK("{0}"; "{1}")'.format(dico_cdao.get(u'folder'),
                                                     self.blabla.get('browse'))
@@ -2614,7 +2628,7 @@ in {13}{14}'.format(len(self.li_shp),
                                                     self.blabla.get('browse'))
         except UnicodeDecodeError:
             # write a notification into the log file
-            self.logger.warning('Path name with special letters: {}'.format(dico_cdao.get(u'folder').decode('utf8')))
+            logging.warning('Path name with special letters: {}'.format(dico_cdao.get(u'folder').decode('utf8')))
             # decode the fucking path name
             link = 'HYPERLINK("{0}"; "{1}")'.format(dico_cdao.get(u'folder').decode('utf8'),
                                                     self.blabla.get('browse'))
@@ -2698,7 +2712,7 @@ in {13}{14}'.format(len(self.li_shp),
                     self.dico_err[dico_cdao.get('name')] = self.blabla.get(u'err_encod') + \
                                                            chp.decode('latin1') + \
                                                            u"\n\n"
-                    self.logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
+                    logging.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
                     # decode the fucking field name
                     champs = champs + chp.decode('latin1') + u" ({}) ;".format(tipo)
                     # then continue
@@ -2708,7 +2722,7 @@ in {13}{14}'.format(len(self.li_shp),
             sheet.write(line, 14, champs)
 
             # write layer's name into the log
-            self.logger.info('\t -- {0} = OK'.format(cdao_layer.get(u'title')))
+            logging.info('\t -- {0} = OK'.format(cdao_layer.get(u'title')))
 
         # End of function
         return self.feuyCDAO, line
@@ -2717,7 +2731,7 @@ in {13}{14}'.format(len(self.li_shp),
         u""" write the infos of the map document into the Excel workbook """
         # in case of a source error
         if mapdoc_infos.get('error'):
-            self.logger.warning('\tproblem detected')
+            logging.warning('\tproblem detected')
             # source name
             sheet.write(line, 0, mapdoc_infos.get('name'))
             # link to parent folder
@@ -2742,7 +2756,7 @@ in {13}{14}'.format(len(self.li_shp),
                                                     self.blabla.get('browse'))
         except UnicodeDecodeError:
             # write a notification into the log file
-            self.logger.warning('Path name with special letters: {}'.format(mapdoc_infos.get(u'folder').decode('utf8')))
+            logging.warning('Path name with special letters: {}'.format(mapdoc_infos.get(u'folder').decode('utf8')))
             # decode the fucking path name
             link = 'HYPERLINK("{0}"; "{1}")'.format(mapdoc_infos.get(u'folder').decode('utf8'),
                                                     self.blabla.get('browse'))
@@ -2843,7 +2857,7 @@ in {13}{14}'.format(len(self.li_shp),
                     self.dico_err[mapdoc_infos.get('name')] = self.blabla.get(u'err_encod') + \
                                                               chp.decode('latin1') + \
                                                               u"\n\n"
-                    self.logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
+                    logging.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
                     # decode the fucking field name
                     champs = champs + chp.decode('latin1') \
                                     + u" ({0}) ;".format(tipo)
@@ -2854,7 +2868,7 @@ in {13}{14}'.format(len(self.li_shp),
             sheet.write(line, 19, champs)
 
             # write layer's name into the log
-            self.logger.info('\t -- {0} = OK'.format(mapdoc_layer.get(u'title')))
+            logging.info('\t -- {0} = OK'.format(mapdoc_layer.get(u'title')))
 
         # End of function
         return self.feuyMAPS, line
@@ -2863,7 +2877,7 @@ in {13}{14}'.format(len(self.li_shp),
         u""" write the infos of the map document into the Excel workbook """
         # in case of a source error
         if mapdoc_infos.get('error'):
-            self.logger.warning('\tproblem detected')
+            logging.warning('\tproblem detected')
             # source name
             sheet.write(line, 0, mapdoc_infos.get('name'))
             # link to parent folder
@@ -2888,7 +2902,7 @@ in {13}{14}'.format(len(self.li_shp),
                                                     self.blabla.get('browse'))
         except UnicodeDecodeError:
             # write a notification into the log file
-            self.logger.warning('Path name with special letters: {}'.format(mapdoc_infos.get(u'folder').decode('utf8')))
+            logging.warning('Path name with special letters: {}'.format(mapdoc_infos.get(u'folder').decode('utf8')))
             # decode the fucking path name
             link = 'HYPERLINK("{0}"; "{1}")'.format(mapdoc_infos.get(u'folder').decode('utf8'),
                                                     self.blabla.get('browse'))
@@ -2973,7 +2987,7 @@ in {13}{14}'.format(len(self.li_shp),
                     self.dico_err[layer_infos.get('name')] = self.blabla.get(u'err_encod')\
                                                         + chp.decode('latin1') \
                                                         + u"\n\n"
-                    self.logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
+                    logging.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
                     # decode the fucking field name
                     champs = champs + chp.decode('latin1') \
                     + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
@@ -2986,7 +3000,7 @@ in {13}{14}'.format(len(self.li_shp),
             sheet.write(line, 19, champs)
 
             # write layer's name into the log
-            # self.logger.info('\t -- {0} = OK'.format(mapdoc_layer.get(u'title')))
+            # logging.info('\t -- {0} = OK'.format(mapdoc_layer.get(u'title')))
 
         else:
             pass
@@ -2994,14 +3008,13 @@ in {13}{14}'.format(len(self.li_shp),
         # End of function
         return self.feuyMAPS, line
 
-
     def dictionarize_pg(self, layer_infos, fields_info, sheet, line):
         u""" write the infos of the layer into the Excel workbook """
         # local variables
         champs = ""
         # in case of a source error
         if layer_infos.get('error'):
-            self.logger.warning('\tproblem detected')
+            logging.warning('\tproblem detected')
             sheet.write(line, 0, layer_infos.get('name'))
             sheet.write(line, 1, "{0}:{1}-{2}".format(self.host.get(),
                                                       self.port.get(),
@@ -3066,7 +3079,7 @@ in {13}{14}'.format(len(self.li_shp),
                 self.dico_err[layer_infos.get('name')] = self.blabla.get(u'err_encod') + \
                                                          chp.decode('latin1') + \
                                                          u"\n\n"
-                self.logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
+                logging.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
                 # decode the fucking field name
                 champs = champs + chp.decode('latin1') \
                         + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
@@ -3115,11 +3128,12 @@ in {13}{14}'.format(len(self.li_shp),
             except IOError:
                 avert(title=u'Concurrent access',
                       message=u'Please close Microsoft Excel before saving.')
+                return
         else:
             avert(title=u'Not saved', message="You cancelled saving operation")
             exit()
 
-
+        self.wb.tunning_worksheets()
         self.wb.save(path.join(self.target.get(), r"DicoGIS_test.xlsx"))
         # End of function
         return self.book, saved
