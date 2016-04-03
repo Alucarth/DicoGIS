@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#from __future__ import unicode_literals
+from __future__ import (absolute_import, print_function, unicode_literals)
 #------------------------------------------------------------------------------
 # Name:         InfosOGR_PG
 # Purpose:      Use GDAL/OGR library to extract informations about
@@ -19,11 +19,11 @@
 ########### Libraries #############
 ###################################
 # Standard library
+import logging
 
 # Python 3 backported
 from collections import OrderedDict as OD
 
-# 3rd party libraries
 # 3rd party libraries
 try:
     from osgeo import gdal
@@ -35,8 +35,6 @@ except ImportError:
     import osr
 
 from gdalconst import *
-
-# gdal.SetConfigOption("PG_LIST_ALL_TABLES", "YES")
 
 ###############################################################################
 ########### Classes #############
@@ -82,6 +80,8 @@ class Read_PostGIS():
                 return None
             else:
                 pass
+        except Exception,e:
+            print(e)
 
         try:
             self.geom = obj.GetGeometryRef()        # get the geometry
@@ -93,6 +93,9 @@ class Read_PostGIS():
             self.alert = self.alert + 1
             self.erratum(dico_layer, layer, mess)
             return None
+        except UnboundLocalError:
+
+            return None
 
         # basic information
         dico_layer[u'type'] = tipo
@@ -100,7 +103,7 @@ class Read_PostGIS():
         # geometry information
         self.infos_geom(layer, dico_layer, text)
         # fields information
-        self.infos_fields(layer, dico_fields)
+        self.infos_fields(dico_fields)
 
     def infos_basics(self, layer, dico_layer, txt):
         u""" get the global informations about the layer """
@@ -120,12 +123,12 @@ class Read_PostGIS():
         ## SRS
         # srs type
         srsmetod = [
-                    (self.srs.IsCompound(), txt.get('srs_comp')),
-                    (self.srs.IsGeocentric(), txt.get('srs_geoc')),
-                    (self.srs.IsGeographic(), txt.get('srs_geog')),
-                    (self.srs.IsLocal(), txt.get('srs_loca')),
-                    (self.srs.IsProjected(), txt.get('srs_proj')),
-                    (self.srs.IsVertical(), txt.get('srs_vert'))
+                    (self.srs.IsCompound(), txt.get("srs_comp")),
+                    (self.srs.IsGeocentric(), txt.get("srs_geoc")),
+                    (self.srs.IsGeographic(), txt.get("srs_geog")),
+                    (self.srs.IsLocal(), txt.get("srs_loca")),
+                    (self.srs.IsProjected(), txt.get("srs_proj")),
+                    (self.srs.IsVertical(), txt.get("srs_vert"))
                    ]
         # searching for a match with one of srs types
         for srsmet in srsmetod:
@@ -143,21 +146,21 @@ class Read_PostGIS():
 
         # Handling exception in srs names'encoding
         try:
-            if self.srs.GetAttrValue('PROJCS') != 'unnamed':
-                dico_layer[u'srs'] = unicode(self.srs.GetAttrValue('PROJCS')).replace('_', ' ')
+            if self.srs.GetAttrValue(str("PROJCS")) != str("unnamed"):
+                dico_layer[u'srs'] = unicode(self.srs.GetAttrValue(str("PROJCS"))).replace('_', ' ')
             else:
-                dico_layer[u'srs'] = unicode(self.srs.GetAttrValue('PROJECTION')).replace('_', ' ')
+                dico_layer[u'srs'] = unicode(self.srs.GetAttrValue(str("PROJECTION"))).replace('_', ' ')
         except UnicodeDecodeError:
-            if self.srs.GetAttrValue('PROJCS') != 'unnamed':
-                dico_layer[u'srs'] = self.srs.GetAttrValue('PROJCS').decode('latin1').replace('_', ' ')
+            if self.srs.GetAttrValue(str("PROJCS")) != str("unnamed"):
+                dico_layer[u'srs'] = self.srs.GetAttrValue(str("PROJCS")).decode('latin1').replace('_', ' ')
             else:
-                dico_layer[u'srs'] = self.srs.GetAttrValue('PROJECTION').decode('latin1').replace('_', ' ')
-        dico_layer[u'EPSG'] = unicode(self.srs.GetAttrValue("AUTHORITY", 1))
+                dico_layer[u'srs'] = self.srs.GetAttrValue(str("PROJECTION")).decode('latin1').replace('_', ' ')
+        dico_layer[u'EPSG'] = unicode(self.srs.GetAttrValue(str("AUTHORITY"), 1))
         # EPSG code
         if dico_layer[u'EPSG'] == u'4326' and dico_layer[u'srs'] == u'None':
-            print dico_layer[u'srs']
             dico_layer[u'srs'] = u'WGS 84'
-            print dico_layer[u'srs']
+        else:
+            pass
 
         # end of function
         return dico_layer, layer, txt
@@ -174,17 +177,17 @@ class Read_PostGIS():
         else:
             dico_layer[u'type_geom'] = self.geom.GetGeometryName()
         # Spatial extent (bounding box)
-        dico_layer[u'Xmin'] = round(layer.GetExtent()[0],2)
-        dico_layer[u'Xmax'] = round(layer.GetExtent()[1],2)
-        dico_layer[u'Ymin'] = round(layer.GetExtent()[2],2)
-        dico_layer[u'Ymax'] = round(layer.GetExtent()[3],2)
+        dico_layer[u'Xmin'] = round(layer.GetExtent()[0], 2)
+        dico_layer[u'Xmax'] = round(layer.GetExtent()[1], 2)
+        dico_layer[u'Ymin'] = round(layer.GetExtent()[2], 2)
+        dico_layer[u'Ymax'] = round(layer.GetExtent()[3], 2)
         # end of function
         return dico_layer
 
-    def infos_fields(self, layer, dico_fields):
+    def infos_fields(self, dico_fields):
         u""" get the informations about fields definitions """
         for i in range(self.def_couche.GetFieldCount()):
-            champomy = self.def_couche.GetFieldDefn(i) # ordered list of fields
+            champomy = self.def_couche.GetFieldDefn(i)  # ordered list of fields
             dico_fields[champomy.GetName()] = champomy.GetTypeName(),\
                                               champomy.GetWidth(),\
                                               champomy.GetPrecision()
@@ -236,27 +239,27 @@ if __name__ == '__main__':
     test_db = 'guts_gis'
     test_user = 'guts_player'
     test_pwd = 'letsplay'
+    test_conn = "PG: host={} dbname={} user={} password={}".format(test_host,
+                                                                   test_db,
+                                                                   test_user,
+                                                                   test_pwd)
 
     # include views
     gdal.SetConfigOption(str("PG_LIST_ALL_TABLES"), str("YES"))
     try:
-        conn = ogr.Open("PG: host=%s dbname=%s user=%s password=%s" %(test_host,
-                                                                      test_db,
-                                                                      test_user,
-                                                                      test_pwd))
+        conn = ogr.Open(str(test_conn))
         print("Access granted : connecting people!")
         print("Layer count: {0}".format(conn.GetLayerCount()))
-        # sql_version = "SELECT PostGIS_full_version();"
-        # version = conn.ExecuteSQL(sql_version)
-        # print("Version: {0}".format(version))
-        # print(version)
+
+        sql_version = str("SELECT PostGIS_full_version();")
+        version = conn.ExecuteSQL(sql_version)
 
         # schemas list
-        sql_schemas = "select nspname from pg_catalog.pg_namespace;"
+        sql_schemas = str("select nspname from pg_catalog.pg_namespace;")
         schemas = conn.ExecuteSQL(sql_schemas)
         print("Driver name: {0}".format(conn.GetDriver().GetName()))
     except Exception, e:
-        print 'Connection to database failed. Check your connection settings: {0}'.format(str(e))
+        print('Connection failed. Check settings: {0}'.format(str(e)))
         exit()
 
     # parsing layers
@@ -264,7 +267,7 @@ if __name__ == '__main__':
         dico_layer.clear()
         dico_fields.clear()
         print("\n")
-        print layer.GetName()
+        print(layer.GetName())
         # if "_current"
         Read_PostGIS(layer, dico_layer, dico_fields, 'pg', textos)
-        print(dico_layer)
+        print(dico_layer, dico_fields)
