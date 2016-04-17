@@ -49,14 +49,15 @@ python setup2exe_DicoGIS.py py2exe
 
 You can [download this repository](https://github.com/Guts/DicoGIS/archive/master.zip) or run these commands:
 ```bash
-sudo apt-get install -y git python-software-properties
+sudo apt-get install -y git python-software-properties python-virtualenv
 sudo add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
 sudo apt-get update && sudo apt-get dist-upgrade
 sudo apt-get install -y python-setuptools python-pip python-dev python-tk python-gdal
 git clone --recursive https://github.com/Guts/DicoGIS.git
 cd DicoGIS/
+virtualenv virtenv --no-site-packages
+source virtenv/bin/activate
 sudo pip install -r requirements.txt
-
 ```
 
 ## Localization
