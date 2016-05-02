@@ -33,22 +33,48 @@ from geoserver.catalog import Catalog
 # ################################
 
 class ReadGeoServer():
-    def __init__(self, gs_url, dico_gs, tipo, txt=''):
+    def __init__(self, gs_axx, dico_gs, tipo, txt=''):
         u""" Uses OGR functions to extract basic informations about
         geographic Web Features Services.
 
-        gs_url = url of a WFS service
-        dico_wfs = dictionary for global informations
-        dico_fields = dictionary for the fields' informations
-        li_fieds = ordered list of fields
+        gs_axx = tuple like {url of a geoserver, user, password)
+        dico_gs = dictionary to store
         tipo = format
         text = dictionary of text in the selected language
-
         """
-        cat = Catalog(gs_url, "####", "####")
+        # connection
+        cat = Catalog(gs_axx[0], gs_axx[1], gs_axx[2])
+        # print(dir(cat))
+
+        # workspaces
+        workspaces = cat.get_workspaces()
+        for wk in workspaces:
+            # print(wk.name, wk.enabled, , wk.resource_type, wk.wmsstore_url)
+            dico_gs[wk.name] = wk.href
+        # print(dir(wk))
+
+        # stores
+        stores = cat.get_stores()
+        for st in stores:
+            # print(st.name, st.enabled, st.href, st.resource_type)
+            dico_gs[st.name] = st.href
+
+        print(dir(st))
+
+        dico_stores = OD()
+
+        # layers
         layers = cat.get_layers()
+        dico_layers = OD()
         for layer in layers:
-            print(layer.name)
+            # print(layer.name, layer.enabled, layer.resource._store.name, layer.resource._workspace.name)
+            title = layer.resource.title
+            print(layer.resource._workspace.name + "/wms?layers={}:{};".format(layer.resource._workspace.name, layer.name), title.encode("utf8"))
+            # print(title.encode("utf8"))
+            # dico_layers[layer.name] = layer.enabled, layer.resource.title, layer.resource.abstract, layer.resource.keywords
+            # dico_stores[layer.resource._store.name] = dico_layers
+            # dico_gs[layer.resource._workspace] = dico_stores
+        print(dir(layer.resource))
 
 # ############################################################################
 # ##### Stand alone program ########
@@ -63,19 +89,19 @@ if __name__ == '__main__':
 
     # listing WFS
     li_geoservers = [
-              r"http://noisy.hq.isogeo.fr:6090/geoserver/rest",
-              ]
+
+                     ]
 
     # recipient datas
     dico_gs = OD()
 
     # read WFS
-    for gs_url in li_geoservers:
+    for gs in li_geoservers:
         dico_gs.clear()
-        print("\n{0}: ".format(gs_url))
-        ReadGeoServer(gs_url,
+        print("\n{0}: ".format(gs))
+        ReadGeoServer(gs,
                       dico_gs,
                       'GeoServer',
-                       textos)
+                      textos)
         # print results
-        print(dico_gs)
+        # print(dico_gs.keys())
