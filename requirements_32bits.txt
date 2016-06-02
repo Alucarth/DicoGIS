@@ -30,7 +30,8 @@ xlwt==1.0.0
 # numpy
 .\lib\numpy-1.10.4+mkl-cp27-none-win32.whl
 #.\lib\GDAL-1.11.3-cp27-none-win32.whl
-.\lib\GDAL-2.0.2-cp27-none-win32.whl
+#.\lib\GDAL-2.0.2-cp27-none-win32.whl
+http://www.lfd.uci.edu/~gohlke/pythonlibs/6kbpejrn/GDAL-2.0.2-cp27-none-win_amd64.whl
 OWSLib==0.10.3
 dxfgrabber==0.7.5
 
