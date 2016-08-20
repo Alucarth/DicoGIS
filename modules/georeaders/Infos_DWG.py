@@ -39,7 +39,7 @@ import dxfgrabber   # module dedicated to DXF
 #################################
 
 
-class Read_DWG():
+class ReadDWG():
     def __init__(self, dxfpath, dico_dxf, tipo, txt=''):
         u""" Uses OGR functions to extract basic informations about
         geographic vector file (handles shapefile or MapInfo tables)
@@ -310,7 +310,7 @@ if __name__ == '__main__':
         dxfpath = path.abspath(dxfpath)
         if path.isfile(dxfpath):
             print("\n{0}: ".format(dxfpath))
-            Read_DXF(dxfpath,
+            Read_DWG(dxfpath,
                      dico_dxf,
                      'AutoCAD DXF',
                      textos)

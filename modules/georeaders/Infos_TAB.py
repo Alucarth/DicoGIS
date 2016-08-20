@@ -1,7 +1,7 @@
 ﻿# -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 ##from __future__ import unicode_literals
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Name:         InfosOGR
 # Purpose:      Use GDAL/OGR library to extract informations about
 #                   geographic data. It permits a more friendly use as
@@ -13,17 +13,16 @@
 # Created:      18/02/2013
 # Updated:      13/08/2014
 # Licence:      GPL 3
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 
-###############################################################################
-########### Libraries #############
-###################################
+# ############################################################################
+# ######### Libraries #############
+# #################################
 # Standard library
-from os import path, chdir, listdir  # files and folder managing
+from collections import OrderedDict  # Python 3 backported
+import logging
+from os import chdir, listdir, path  # files and folder managing
 from time import localtime, strftime
-
-# Python 3 backported
-from collections import OrderedDict as OD
 
 # 3rd party libraries
 try:
@@ -35,14 +34,15 @@ except ImportError:
     import ogr  # handler for vector spatial files
     import osr
 
-###############################################################################
-########### Classes #############
-#################################
+# ############################################################################
+# ######### Classes #############
+# ###############################
 
 
 class OGRErrorHandler(object):
     def __init__(self):
-        """ Callable error handler
+        """Callable error handler.
+
         see: http://trac.osgeo.org/gdal/wiki/PythonGotchas#Exceptionsraisedincustomerrorhandlersdonotgetcaught
         and http://pcjericks.github.io/py-gdalogr-cookbook/gdal_general.html#install-gdal-ogr-error-handler
         """
@@ -51,18 +51,17 @@ class OGRErrorHandler(object):
         self.err_msg = ''
 
     def handler(self, err_level, err_type, err_msg):
-        """ Making errors messages more readable """
+        """Makes errors messages more readable."""
         # available types
-        err_class = {
-                    gdal.CE_None: 'None',
-                    gdal.CE_Debug: 'Debug',
-                    gdal.CE_Warning: 'Warning',
-                    gdal.CE_Failure: 'Failure',
-                    gdal.CE_Fatal: 'Fatal'
-                    }
+        err_class = {gdal.CE_None: 'None',
+                     gdal.CE_Debug: 'Debug',
+                     gdal.CE_Warning: 'Warning',
+                     gdal.CE_Failure: 'Failure',
+                     gdal.CE_Fatal: 'Fatal'
+                     }
         # getting type
         err_type = err_class.get(err_type, 'None')
-        
+
         # cleaning message
         err_msg = err_msg.replace('\n', ' ')
 
@@ -78,9 +77,9 @@ class OGRErrorHandler(object):
         return self.err_level, self.err_type, self.err_msg
 
 
-class Read_TAB():
+class ReadTAB():
     def __init__(self, layerpath, dico_layer, dico_fields, tipo, text=''):
-        u""" Uses OGR functions to extract basic informations about
+        u"""Use OGR functions to extract basic informations about
         geographic vector file (handles shapefile or MapInfo tables)
         and store into dictionaries.
 
@@ -90,7 +89,6 @@ class Read_TAB():
         li_fieds = ordered list of fields
         tipo = shp or tab
         text = dictionary of text in the selected language
-
         """
         # handling ogr specific exceptions
         ogrerr = OGRErrorHandler()
@@ -276,7 +274,7 @@ if __name__ == '__main__':
               path.join(getcwd(),
                         r'..\..\test\datatest\vectors\tab\tab\Hydrobiologie.TAB')] # MapInfo table
     # test text dictionary
-    textos = OD()
+    textos = OrderedDict()
     textos['srs_comp'] = u'Compound'
     textos['srs_geoc'] = u'Geocentric'
     textos['srs_geog'] = u'Geographic'
@@ -287,8 +285,8 @@ if __name__ == '__main__':
     textos['geom_ligne'] = u'Line'
     textos['geom_polyg'] = u'Polygon'
     # recipient datas
-    dico_layer = OD()     # dictionary where will be stored informations
-    dico_fields = OD()     # dictionary for fields information
+    dico_layer = OrderedDict()     # dictionary where will be stored informations
+    dico_fields = OrderedDict()     # dictionary for fields information
     # execution
     for tab in li_tab:
         """ looping on MapInfo tables list """
@@ -296,10 +294,9 @@ if __name__ == '__main__':
         dico_layer.clear()
         dico_fields.clear()
         # getting the informations
-        info_tab = Read_TAB(path.abspath(tab),
-                            dico_layer,
-                            dico_fields,
-                            'MI table',
+        info_tab = ReadTAB(path.abspath(tab),
+                           dico_layer,
+                           dico_fields,
+                           'MI table',
                             textos)
-        print '\n', dico_layer, dico_fields
-
+        print('\n', dico_layer, dico_fields)

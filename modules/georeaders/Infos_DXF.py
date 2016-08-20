@@ -2,7 +2,7 @@
 #!/usr/bin/env python
 # from __future__ import unicode_literals
 
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Name:         Infos DXF
 # Purpose:      Use GDAL/OGR and dxfgrabber to read AutoCAD exchanges file format.
 #
@@ -12,17 +12,15 @@
 # Created:      24/07/2014
 # Updated:      13/08/2014
 # Licence:      GPL 3
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 
-###############################################################################
-########### Libraries #############
-###################################
+# ############################################################################
+# ######### Libraries #############
+# #################################
 # Standard library
-from os import path, chdir, listdir   # files and folder managing
+from collections import OrderedDict  # Python 3 backported
+from os import chdir, listdir, path  # files and folder managing
 from time import localtime, strftime
-
-# Python 3 backported
-from collections import OrderedDict as OD
 
 # 3rd party libraries
 try:
@@ -36,13 +34,15 @@ except ImportError:
 
 import dxfgrabber   # module dedicated to DXF
 
-###############################################################################
-########### Classes #############
-#################################
+# ##############################################################################
+# ########## Classes #############
+# ################################
+
 
 class OGRErrorHandler(object):
     def __init__(self):
-        """ Callable error handler
+        """Callable error handler.
+
         see: http://trac.osgeo.org/gdal/wiki/PythonGotchas#Exceptionsraisedincustomerrorhandlersdonotgetcaught
         and http://pcjericks.github.io/py-gdalogr-cookbook/gdal_general.html#install-gdal-ogr-error-handler
         """
@@ -53,16 +53,15 @@ class OGRErrorHandler(object):
     def handler(self, err_level, err_type, err_msg):
         """ Making errors messages more readable """
         # available types
-        err_class = {
-                    gdal.CE_None: 'None',
-                    gdal.CE_Debug: 'Debug',
-                    gdal.CE_Warning: 'Warning',
-                    gdal.CE_Failure: 'Failure',
-                    gdal.CE_Fatal: 'Fatal'
-                    }
+        err_class = {gdal.CE_None: 'None',
+                     gdal.CE_Debug: 'Debug',
+                     gdal.CE_Warning: 'Warning',
+                     gdal.CE_Failure: 'Failure',
+                     gdal.CE_Fatal: 'Fatal'
+                     }
         # getting type
         err_type = err_class.get(err_type, 'None')
-        
+
         # cleaning message
         err_msg = err_msg.replace('\n', ' ')
 
@@ -78,9 +77,7 @@ class OGRErrorHandler(object):
         return self.err_level, self.err_type, self.err_msg
 
 
-
-
-class Read_DXF():
+class ReadDXF():
     def __init__(self, dxfpath, dico_dxf, tipo, txt=''):
         u""" Uses OGR functions to extract basic informations about
         geographic vector file (handles shapefile or MapInfo tables)
@@ -99,7 +96,7 @@ class Read_DXF():
         self.alert = 0
 
         # changing working directory to layer folder
-        chdir(path.dirname(dxfpath))        
+        chdir(path.dirname(dxfpath))
 
         # opening DXF
         dr_dxf = ogr.GetDriverByName("DXF")
@@ -175,7 +172,7 @@ class Read_DXF():
         # parsing layers
         for layer_idx in range(dxf.GetLayerCount()):
             # dictionary where will be stored informations
-            dico_layer = OD()
+            dico_layer = OrderedDict()
             # parent DXF
             dico_layer['dxf_name'] = path.basename(dxf.GetName())
             # getting layer object
@@ -216,7 +213,7 @@ class Read_DXF():
         self.infos_geos(layer_obj, srs, dico_layer, txt)
 
         # getting fields informations
-        dico_fields = OD()
+        dico_fields = OrderedDict()
         layer_def = layer_obj.GetLayerDefn()
         dico_layer['num_fields'] = layer_def.GetFieldCount()
         self.infos_fields(layer_def, dico_fields)
@@ -328,15 +325,15 @@ class Read_DXF():
         # End of function
         return dico_dxf
 
-###############################################################################
-###### Stand alone program ########
-###################################
+# ############################################################################
+# ##### Stand alone program ######
+# ################################
 
 if __name__ == '__main__':
     u""" standalone execution for tests. Paths are relative considering a test
     within the official repository (https://github.com/Guts/DicoGIS/)"""
     # test text dictionary
-    textos = OD()
+    textos = OrderedDict()
     textos['srs_comp'] = u'Compound'
     textos['srs_geoc'] = u'Geocentric'
     textos['srs_geog'] = u'Geographic'
@@ -350,20 +347,20 @@ if __name__ == '__main__':
     # searching for DX Files
     num_folders = 0
     li_dxf = [r'..\..\test\datatest\cao\dxf\paris_transports_ed.dxf']
-    
+
     # recipient datas
-    dico_dxf = OD()
-    
+    dico_dxf = OrderedDict()
+
     # read DXF
     for dxfpath in li_dxf:
         dico_dxf.clear()
         dxfpath = path.abspath(dxfpath)
         if path.isfile(dxfpath):
             print("\n{0}: ".format(dxfpath))
-            Read_DXF(dxfpath,
-                     dico_dxf,
-                     'AutoCAD DXF',
-                     textos)
+            ReadDXF(dxfpath,
+                    dico_dxf,
+                    'AutoCAD DXF',
+                    textos)
             # print results
             print(dico_dxf)
         else:

@@ -18,12 +18,10 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 # ########## Libraries #############
 # ##################################
 # Standard library
+from collections import OrderedDict  # Python 3 backported
 import logging
 from os import path, chdir, listdir   # files and folder managing
 from time import localtime, strftime
-
-# Python 3 backported
-from collections import OrderedDict as OD
 
 # 3rd party libraries
 try:
@@ -41,7 +39,7 @@ except RuntimeError:
 # ################################
 
 
-class Read_LYR():
+class ReadLYR():
     def __init__(self, lyr_path, dico_lyr, tipo, txt=''):
         u""" Uses OGR functions to extract basic informations about
         geographic vector file (handles shapefile or MapInfo tables)
@@ -83,7 +81,7 @@ class Read_LYR():
             # features
             # dico_lyr[u'num_obj'] = int(obj_count(lyr_path).getOutput(0))
             # fields
-            dico_fields = OD()
+            dico_fields = OrderedDict()
             if layer_obj.isBroken:
                 self.erratum(dico_lyr, lyr_path, u'err_corrupt')
                 self.alert = self.alert + 1
@@ -341,7 +339,7 @@ if __name__ == '__main__' and __package__ is None:
         from sys import exit
         exit('ArcPy not found. Check your installation.')
     else:
-        print("ArcPy: ", checker.check_arcpy())
+        logging.info("ArcPy: ", checker.check_arcpy())
         pass
 
     # ------------ import arcpy ----------------
@@ -352,7 +350,7 @@ if __name__ == '__main__' and __package__ is None:
         from arcpy.mapping import Layer, ListLayers
         from arcpy.da import SearchCursor
     except ImportError:
-        print("mmm")
+        logging.error("arcpy isn't well installed.")
 
     # ------------ Real start ----------------
     # searching for lyr Files
@@ -363,10 +361,10 @@ if __name__ == '__main__' and __package__ is None:
     li_lyr = [path.abspath(lyr) for lyr in li_lyr if path.splitext(lyr)[1].lower()=='.lyr']
 
     # recipient datas
-    dico_lyr = OD()
+    dico_lyr = OrderedDict()
 
     # test text dictionary
-    textos = OD()
+    textos = OrderedDict()
     textos['srs_comp'] = u'Compound'
     textos['srs_geoc'] = u'Geocentric'
     textos['srs_geog'] = u'Geographic'
@@ -389,12 +387,12 @@ if __name__ == '__main__' and __package__ is None:
         dico_lyr.clear()
         if path.isfile(lyrpath):
             print("\n{0}: ".format(lyrpath))
-            Read_LYR(lyrpath,
-                     dico_lyr,
-                     'Esri LYR',
-                     txt=textos)
+            ReadLYR(lyrpath,
+                    dico_lyr,
+                    'Esri LYR',
+                    txt=textos)
             # print results
             print(dico_lyr)
         else:
-            print("{0} is not a recognized file".format(lyrpath))
+            loggin.error("{0} is not a recognized file".format(lyrpath))
             continue

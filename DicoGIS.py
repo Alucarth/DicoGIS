@@ -39,40 +39,40 @@ import threading    # handling various subprocesses
 
 import platform  # about operating systems
 
-import logging      # log files
+import logging  # log files
 from logging.handlers import RotatingFileHandler
 
 import subprocess
 
 # Python 3 backported
-from collections import OrderedDict as OD   # ordered dictionary
+from collections import OrderedDict  # ordered dictionary
 
 # 3rd party libraries
 from isogeo_pysdk import Isogeo
-from xlwt import Workbook, easyxf, Formula  # excel writer
+from xlwt import easyxf, Formula, Workbook  # excel writer
 
 # Custom modules
-from modules import Read_Rasters    # extractor for rasters files
-from modules import Read_SHP        # extractor for shapefiles
-from modules import Read_TAB        # extractor for MapInfo Tables
-from modules import Read_KML        # extractor for KML
-from modules import Read_GML        # extractor for GML
-from modules import Read_GeoJSON    # extractor for GeoJSON
-from modules import ReadGXT    # extractor for Geoconcept eXport Text
-from modules import Read_PostGIS    # extractor for PostGIS databases
-from modules import Read_GDB        # extractor for Esri FileGeoDataBase
-from modules import Read_SpaDB      # extractor for Spatialite DB
-from modules import Read_DXF        # extractor for AutoCAD DXF
-from modules import Read_GeoPDF     # extractor for Geospatial PDF
-from modules import Read_IsogeoOpenCatalog  # Isogeo catalogs
-from modules import Read_LYR  # Esri LYR files
+from modules import ReadRasters    # for rasters files
+from modules import ReadSHP        # for shapefiles
+from modules import ReadTAB        # for MapInfo Tables
+from modules import ReadKML        # for KML
+from modules import ReadGML        # for GML
+from modules import ReadGeoJSON    # for GeoJSON
+from modules import ReadGXT    # for Geoconcept eXport Text
+from modules import ReadPostGIS    # for PostGIS databases
+from modules import ReadGDB        # for Esri FileGeoDataBase
+from modules import ReadSpaDB      # for Spatialite DB
+from modules import ReadDXF        # for AutoCAD DXF
+from modules import ReadGeoPDF     # for Geospatial PDF
+from modules import ReadIsogeoOpenCatalog  # Isogeo catalogs
+from modules import ReadLYR  # Esri LYR files
 
-from modules import TextsManager
-from modules import MetricsManager
-from modules import ConfigExcel
 from modules import CheckNorris
+from modules import ConfigExcel
 from modules import files2xlsx
+from modules import MetricsManager
 from modules import OptionsManager
+from modules import TextsManager
 
 # Imports depending on operating system
 if opersys == 'win32':
@@ -148,7 +148,7 @@ class DicoGIS(Tk):
         self.def_lang = 'EN'    # default language to start
         self.today = strftime("%Y-%m-%d")   # date of the day
         li_lang = [lg[5:-4] for lg in listdir(r'data/locale')]  # languages
-        self.blabla = OD()      # texts dictionary
+        self.blabla = OrderedDict()      # texts dictionary
 
         # formats / type: vectors
         self.li_vectors_formats = (".shp", ".tab", ".kml",
@@ -180,17 +180,17 @@ class DicoGIS(Tk):
         self.li_qgs = []      # list for QGS path
 
         # dictionaries to store informations
-        self.dico_layer = OD()      # dict for vectors informations
-        self.dico_fields = OD()     # dict for fields informations
-        self.dico_raster = OD()     # dict for rasters global informations
-        self.dico_bands = OD()      # dict for bands informations
-        self.dico_fdb = OD()        # dict for Esri FileGDB
-        self.dico_cdao = OD()       # dict for CAO/DAO
-        self.dico_pdf = OD()        # dict for Geospatial PDF
-        self.dico_err = OD()        # errors list
+        self.dico_layer = OrderedDict()      # dict for vectors informations
+        self.dico_fields = OrderedDict()     # dict for fields informations
+        self.dico_raster = OrderedDict()     # dict for rasters global informations
+        self.dico_bands = OrderedDict()      # dict for bands informations
+        self.dico_fdb = OrderedDict()        # dict for Esri FileGDB
+        self.dico_cdao = OrderedDict()       # dict for CAO/DAO
+        self.dico_pdf = OrderedDict()        # dict for Geospatial PDF
+        self.dico_err = OrderedDict()        # errors list
 
         # metrics
-        self.dico_metrics = OD()
+        self.dico_metrics = OrderedDict()
         self.global_total_layers = 0
         self.global_total_fields = 0
         self.global_total_features = 0
@@ -200,7 +200,7 @@ class DicoGIS(Tk):
         self.global_total_srs_geog = 0
         self.global_total_srs_none = 0
         self.global_ignored = 0    # files ignored by an user filter
-        self.global_dico_fields = OD()
+        self.global_dico_fields = OrderedDict()
 
         # GUI fonts
         ft_tit = tkFont.Font(family="Times", size=10, weight=tkFont.BOLD)
@@ -1208,7 +1208,7 @@ in {13}{14}'.format(len(self.li_shp),
                 self.dico_fields.clear()
                 # getting the informations
                 try:
-                    Read_SHP(path.abspath(shp),
+                    ReadSHP(path.abspath(shp),
                              self.dico_layer,
                              self.dico_fields,
                              'Esri shapefiles',
@@ -1252,7 +1252,7 @@ in {13}{14}'.format(len(self.li_shp),
                 self.dico_fields.clear()
                 # getting the informations
                 try:
-                    Read_TAB(path.abspath(tab),
+                    ReadTAB(path.abspath(tab),
                              self.dico_layer,
                              self.dico_fields,
                              'MapInfo tab',
@@ -1293,7 +1293,7 @@ in {13}{14}'.format(len(self.li_shp),
                 self.dico_fields.clear()
                 # getting the informations
                 try:
-                    Read_KML(path.abspath(kml),
+                    ReadKML(path.abspath(kml),
                              self.dico_layer,
                              self.dico_fields,
                              'Google KML/KMZ',
@@ -1335,7 +1335,7 @@ in {13}{14}'.format(len(self.li_shp),
                 self.dico_fields.clear()
                 # getting the informations
                 try:
-                    Read_GML(path.abspath(gml),
+                    ReadGML(path.abspath(gml),
                              self.dico_layer,
                              self.dico_fields,
                              'GML',
@@ -1376,7 +1376,7 @@ in {13}{14}'.format(len(self.li_shp),
                 self.dico_fields.clear()
                 # getting the informations
                 try:
-                    Read_GeoJSON(path.abspath(geojson),
+                    ReadGeoJSON(path.abspath(geojson),
                                  self.dico_layer,
                                  self.dico_fields,
                                  'GeoJSON',
@@ -1460,7 +1460,7 @@ in {13}{14}'.format(len(self.li_shp),
                 self.dico_bands.clear()
                 # getting the informations
                 try:
-                    Read_Rasters(path.abspath(raster),
+                    ReadRasters(path.abspath(raster),
                                  self.dico_raster,
                                  self.dico_bands,
                                  path.splitext(raster)[1],
@@ -1502,7 +1502,7 @@ in {13}{14}'.format(len(self.li_shp),
                 self.dico_fields.clear()
                 # getting the informations
                 try:
-                    Read_GDB(path.abspath(gdb),
+                    ReadGDB(path.abspath(gdb),
                              self.dico_fdb,
                              'Esri FileGeoDataBase',
                              self.blabla)
@@ -1540,7 +1540,7 @@ in {13}{14}'.format(len(self.li_shp),
                 self.dico_fields.clear()
                 # getting the informations
                 try:
-                    Read_SpaDB(path.abspath(spadb),
+                    ReadSpaDB(path.abspath(spadb),
                                self.dico_fdb,
                                'Spatialite',
                                self.blabla)
@@ -1578,7 +1578,7 @@ in {13}{14}'.format(len(self.li_shp),
                 self.dico_cdao.clear()
                 # getting the informations
                 try:
-                    Read_DXF(path.abspath(dxf),
+                    ReadDXF(path.abspath(dxf),
                              self.dico_cdao,
                              'AutoCAD DXF',
                              self.blabla)
@@ -1647,7 +1647,7 @@ in {13}{14}'.format(len(self.li_shp),
                 self.dico_pdf.clear()
                 # getting the informations
                 try:
-                    Read_GeoPDF(path.abspath(pdf),
+                    ReadGeoPDF(path.abspath(pdf),
                                 self.dico_pdf,
                                 'Geospatial PDF',
                                 self.blabla)
@@ -1686,7 +1686,7 @@ in {13}{14}'.format(len(self.li_shp),
                 self.dico_fields.clear()
                 # getting the informations
                 try:
-                    Read_LYR(path.abspath(lyr),
+                    ReadLYR(path.abspath(lyr),
                              self.dico_layer,
                              'Esri LYR',
                              self.blabla)
@@ -1741,7 +1741,7 @@ in {13}{14}'.format(len(self.li_shp),
             # reset recipient data
             self.dico_layer.clear()
             self.dico_fields.clear()
-            Read_PostGIS(layer,
+            ReadPostGIS(layer,
                          self.dico_layer,
                          self.dico_fields,
                          'PostGIS table',
@@ -1890,9 +1890,9 @@ in {13}{14}'.format(len(self.li_shp),
             pass
 
         # extracting metadata with the API
-        dico_md = OD()
+        dico_md = OrderedDict()
         lang = self.ddl_lang.get()
-        Read_IsogeoOpenCatalog(url_oc, lang, dico_md)
+        ReadIsogeoOpenCatalog(url_oc, lang, dico_md)
 
         # creating the Excel file
         self.configexcel()

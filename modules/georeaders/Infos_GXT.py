@@ -15,15 +15,13 @@
 # Licence:      GPL 3
 # -----------------------------------------------------------------------------
 
-###############################################################################
-########### Libraries #############
-###################################
+# ############################################################################
+# ######### Libraries #############
+# #################################
 # Standard library
-from os import chdir, listdir, path       # files and folder managing
+from collections import OrderedDict  # Python 3 backported
+from os import chdir, listdir, path  # files and folder managing
 from time import localtime, strftime
-
-# Python 3 backported
-from collections import OrderedDict as OD
 
 # 3rd party libraries
 try:
@@ -35,9 +33,9 @@ except ImportError:
     import ogr  # handler for vector spatial files
     import osr
 
-###############################################################################
-########### Classes #############
-#################################
+# ############################################################################
+# ######### Classes #############
+# ###############################
 
 
 class OGRErrorHandler(object):
@@ -260,7 +258,7 @@ class ReadGXT():
     def infos_fields(self, dico_fields):
         u""" get the informations about fields definitions """
         for i in range(self.def_couche.GetFieldCount()):
-            champomy = self.def_couche.GetFieldDefn(i) # fields ordered
+            champomy = self.def_couche.GetFieldDefn(i)  # fields ordered
             dico_fields[champomy.GetName()] = champomy.GetTypeName(),\
                                               champomy.GetWidth(),\
                                               champomy.GetPrecision()
@@ -292,9 +290,9 @@ class ReadGXT():
         # End of function
         return dicolayer
 
-###############################################################################
-###### Stand alone program ########
-###################################
+# ############################################################################
+# #### Stand alone program ########
+# #################################
 
 if __name__ == '__main__':
     u""" standalone execution for tests. Paths are relative considering a test
@@ -304,7 +302,7 @@ if __name__ == '__main__':
     chdir(r'..\..\test')
     li_gxt = []
     # test text dictionary
-    textos = OD()
+    textos = OrderedDict()
     textos['srs_comp'] = u'Compound'
     textos['srs_geoc'] = u'Geocentric'
     textos['srs_geog'] = u'Geographic'
@@ -331,8 +329,8 @@ if __name__ == '__main__':
                 pass
 
     # recipient datas
-    dico_gxt = OD()
-    dico_fields = OD()    # dictionary for fields information
+    dico_gxt = OrderedDict()
+    dico_fields = OrderedDict()    # dictionary for fields information
     # read GXT
     for gxtpath in li_gxt:
         dico_gxt.clear()

@@ -2,7 +2,7 @@
 #!/usr/bin/env python
 from __future__ import unicode_literals
 
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Name:         InfosSpatialite
 # Purpose:      Use OGR to read into Spatialite databases (ie SQLite with
 #               geospatial extension)
@@ -13,32 +13,31 @@ from __future__ import unicode_literals
 # Created:      16/11/2014
 # Updated:      17/11/2014
 # Licence:      GPL 3
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 
-###############################################################################
-########### Libraries #############
-###################################
+# ############################################################################
+# ######### Libraries #############
+# #################################
 # Standard library
-from os import path, walk   # files and folder managing
+from collections import OrderedDict  # Python 3 backported
+import logging
+from os import path   # files and folder managing
 from time import localtime, strftime
-import sys
-
-# Python 3 backported
-from collections import OrderedDict as OD
 
 # 3rd party libraries
 from osgeo import ogr
 from osgeo import gdal
 from gdalconst import *
 
-###############################################################################
-########### Classes #############
-#################################
+# ############################################################################
+# ######## Classes #############
+# ###############################
 
 
 class OGRErrorHandler(object):
     def __init__(self):
-        """ Callable error handler
+        """Callable error handler.
+
         see: http://trac.osgeo.org/gdal/wiki/PythonGotchas#Exceptionsraisedincustomerrorhandlersdonotgetcaught
         and http://pcjericks.github.io/py-gdalogr-cookbook/gdal_general.html#install-gdal-ogr-error-handler
         """
@@ -47,18 +46,17 @@ class OGRErrorHandler(object):
         self.err_msg = ''
 
     def handler(self, err_level, err_type, err_msg):
-        """ Making errors messages more readable """
+        """Makes errors messages more readable."""
         # available types
-        err_class = {
-                    gdal.CE_None: 'None',
-                    gdal.CE_Debug: 'Debug',
-                    gdal.CE_Warning: 'Warning',
-                    gdal.CE_Failure: 'Failure',
-                    gdal.CE_Fatal: 'Fatal'
-                    }
+        err_class = {gdal.CE_None: 'None',
+                     gdal.CE_Debug: 'Debug',
+                     gdal.CE_Warning: 'Warning',
+                     gdal.CE_Failure: 'Failure',
+                     gdal.CE_Fatal: 'Fatal'
+                     }
         # getting type
         err_type = err_class.get(err_type, 'None')
-        
+
         # cleaning message
         err_msg = err_msg.replace('\n', ' ')
 
@@ -74,10 +72,9 @@ class OGRErrorHandler(object):
         return self.err_level, self.err_type, self.err_msg
 
 
-class Read_SpaDB():
+class ReadSpaDB():
     def __init__(self, spadbpath, dico_spadb, tipo, txt=''):
-        u"""
-        Uses OGR functions to extract basic informations about
+        """Use OGR functions to extract basic informations about
         geographic vector file
         and store into dictionaries.
 
@@ -115,7 +112,7 @@ class Read_SpaDB():
         li_layers_idx = []
         dico_spadb['layers_names'] = li_layers_names
         dico_spadb['layers_idx'] = li_layers_idx
-        
+
         # cumulated size
         total_size = path.getsize(spadbpath)
         dico_spadb[u"total_size"] = self.sizeof(total_size)
@@ -134,7 +131,7 @@ class Read_SpaDB():
         # parsing layers
         for layer_idx in range(spadb.GetLayerCount()):
             # dictionary where will be stored informations
-            dico_layer = OD()
+            dico_layer = OrderedDict()
             # parent GDB
             dico_layer['gdb_name'] = path.basename(spadb.GetName())
             # getting layer object
@@ -162,7 +159,7 @@ class Read_SpaDB():
         dico_spadb['err_gdal'] = ogrerr.err_type, ogrerr.err_msg
 
     def infos_basics(self, layer_obj, dico_layer, txt):
-        u""" get the global informations about the layer """
+        u"""Get the global informations about the layer."""
         # title
         try:
             dico_layer[u'title'] = unicode(layer_obj.GetName())
@@ -183,7 +180,7 @@ class Read_SpaDB():
             self.infos_geos(layer_obj, srs, dico_layer, txt)
 
         # getting fields informations
-        dico_fields = OD()
+        dico_fields = OrderedDict()
         layer_def = layer_obj.GetLayerDefn()
         dico_layer['num_fields'] = layer_def.GetFieldCount()
         self.infos_fields(layer_def, dico_fields)
@@ -193,7 +190,7 @@ class Read_SpaDB():
         return dico_layer
 
     def infos_geos(self, layer_obj, srs, dico_layer, txt):
-        u""" get the informations about geography and geometry """
+        u"""Get the informations about geography and geometry."""
         # SRS
         srs.AutoIdentifyEPSG()
         # srs type
@@ -265,7 +262,7 @@ class Read_SpaDB():
         return dico_layer
 
     def infos_fields(self, layer_def, dico_fields):
-        u""" get the informations about fields definitions """
+        u"""Get the informations about fields definitions."""
         for i in range(layer_def.GetFieldCount()):
             champomy = layer_def.GetFieldDefn(i)  # fields ordered
             dico_fields[champomy.GetName()] = champomy.GetTypeName(),\
@@ -275,8 +272,10 @@ class Read_SpaDB():
         return dico_fields
 
     def sizeof(self, os_size):
-        u""" return size in different units depending on size
-        see http://stackoverflow.com/a/1094933 """
+        u"""Return size in different units depending on size.
+
+        see http://stackoverflow.com/a/1094933
+        """
         for size_cat in ['octets', 'Ko', 'Mo', 'Go']:
             if os_size < 1024.0:
                 return "%3.1f %s" % (os_size, size_cat)
@@ -284,7 +283,7 @@ class Read_SpaDB():
         return "%3.1f %s" % (os_size, " To")
 
     def erratum(self, dico_spadb, spadbpath, mess):
-        u""" errors handling """
+        """Errors handler."""
         # local variables
         dico_spadb[u'name'] = path.basename(spadbpath)
         dico_spadb[u'folder'] = path.dirname(spadbpath)
@@ -299,9 +298,9 @@ class Read_SpaDB():
         # End of function
         return dico_spadb
 
-###############################################################################
-###### Stand alone program ########
-###################################
+# ###########################################################################
+# #### Stand alone program ########
+# #################################
 
 if __name__ == '__main__':
     u"""
@@ -312,7 +311,7 @@ if __name__ == '__main__':
     # sample files
     chdir(r'..\..\test\datatest\FileGDB')
     # test text dictionary
-    textos = OD()
+    textos = OrderedDict()
     textos['srs_comp'] = u'Compound'
     textos['srs_geoc'] = u'Geocentric'
     textos['srs_geog'] = u'Geographic'
@@ -327,19 +326,19 @@ if __name__ == '__main__':
     li_spadb = [
                 r'Spatialite_Test.sqlite'
                ]
-    
+
     # recipient datas
-    dico_spadb = OD()
-    
+    dico_spadb = OrderedDict()
+
     # read GDB
     for spadbpath in li_spadb:
         dico_spadb.clear()
         if path.isfile(spadbpath):
             print("\n{0}: ".format(spadbpath))
-            Read_SpaDB(spadbpath,
-                     dico_spadb,
-                     'Spatialite DB',
-                     textos)
+            ReadSpaDB(spadbpath,
+                      dico_spadb,
+                      'Spatialite DB',
+                      textos)
             # print results
             print(dico_spadb)
         else:

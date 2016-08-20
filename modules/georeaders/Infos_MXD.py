@@ -18,17 +18,15 @@ from __future__ import unicode_literals
 # ########## Libraries #############
 # ##################################
 # Standard library
+from collections import OrderedDict  # Python 3 backported
 import logging
-from os import path, chdir, listdir   # files and folder managing
+from os import chdir, listdir, path  # files and folder managing
 from time import localtime, strftime
-
-# Python 3 backported
-from collections import OrderedDict as OD
 
 # 3rd party libraries
 try:
-    from arcpy import env as enviro, Describe
-    from arcpy.mapping import MapDocument, ListLayers, ListBrokenDataSources, ListDataFrames
+    from arcpy import env as enviro
+    from arcpy.mapping import ListDataFrames, ListLayers, MapDocument
 except ImportError:
     logging.error("ArcPy is not installed.")
 except RuntimeError:
@@ -87,7 +85,7 @@ class ReadMXD():
         for dframe in dframes:
             x += 1
             # dictionary where will be stored informations
-            dico_dframe = OD()
+            dico_dframe = OrderedDict()
             # parent GDB
             dico_dframe[u'name'] = dframe.name
 
@@ -100,8 +98,6 @@ class ReadMXD():
 
             # reset
             del dico_dframe
-
-
 
         # dico_mxd[u'layers_count'] = total_layers
 
@@ -224,10 +220,10 @@ if __name__ == '__main__' and __package__ is None:
     li_mxd = [path.abspath(mxd) for mxd in li_mxd if path.splitext(mxd)[1].lower()=='.mxd']
 
     # recipient datas
-    dico_mxd = OD()
+    dico_mxd = OrderedDict()
 
     # test text dictionary
-    textos = OD()
+    textos = OrderedDict()
     textos['srs_comp'] = u'Compound'
     textos['srs_geoc'] = u'Geocentric'
     textos['srs_geog'] = u'Geographic'
@@ -244,9 +240,9 @@ if __name__ == '__main__' and __package__ is None:
         if path.isfile(mxdpath):
             print("\n{0}: ".format(mxdpath))
             ReadMXD(mxdpath,
-                     dico_mxd,
-                     'Esri MXD',
-                     txt=textos)
+                    dico_mxd,
+                    'Esri MXD',
+                    txt=textos)
             # print results
             print(dico_mxd)
         else:

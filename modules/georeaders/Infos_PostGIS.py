@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import (absolute_import, print_function, unicode_literals)
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Name:         InfosOGR_PG
 # Purpose:      Use GDAL/OGR library to extract informations about
 #                   geographic data contained in a PostGIS database.
@@ -13,16 +13,14 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 # Created:      18/06/2013
 # Updated:      13/08/2014
 # Licence:      GPL 3
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 
-###############################################################################
-########### Libraries #############
-###################################
+# ############################################################################
+# ######### Libraries #############
+# #################################
 # Standard library
+from collections import OrderedDict  # Python 3 backported
 import logging
-
-# Python 3 backported
-from collections import OrderedDict as OD
 
 # 3rd party libraries
 try:
@@ -36,11 +34,11 @@ except ImportError:
 
 from gdalconst import *
 
-###############################################################################
-########### Classes #############
-###################################
+# ############################################################################
+# ######### Classes #############
+# #################################
 
-class Read_PostGIS():
+class ReadPostGIS():
     def __init__(self, layer, dico_layer, dico_fields, tipo, text=''):
         u""" Uses gdal/ogr functions to extract basic informations about
         geographic file (handles shapefile or MapInfo tables)
@@ -211,9 +209,9 @@ class Read_PostGIS():
         # End of function
         return dicolayer, layer
 
-###############################################################################
-###### Stand alone program ########
-###################################
+# ############################################################################
+# #### Stand alone program ########
+# #################################
 
 if __name__ == '__main__':
     u""" standalone execution for tests. Paths are relative considering a test
@@ -221,7 +219,7 @@ if __name__ == '__main__':
     # libraries import
     from sys import exit
     # test text dictionary
-    textos = OD()
+    textos = OrderedDict()
     textos['srs_comp'] = u'Compound'
     textos['srs_geoc'] = u'Geocentric'
     textos['srs_geog'] = u'Geographic'
@@ -232,8 +230,8 @@ if __name__ == '__main__':
     textos['geom_ligne'] = u'Line'
     textos['geom_polyg'] = u'Polygon'
     # recipient datas
-    dico_layer = OD()     # dictionary where will be stored informations
-    dico_fields = OD()     # dictionary for fields information
+    dico_layer = OrderedDict()     # dictionary where will be stored informations
+    dico_fields = OrderedDict()     # dictionary for fields information
     # PostGIS database settings
     test_host = 'postgresql-guts.alwaysdata.net'
     test_db = 'guts_gis'
@@ -269,5 +267,5 @@ if __name__ == '__main__':
         print("\n")
         print(layer.GetName())
         # if "_current"
-        Read_PostGIS(layer, dico_layer, dico_fields, 'pg', textos)
+        ReadPostGIS(layer, dico_layer, dico_fields, 'pg', textos)
         print(dico_layer, dico_fields)

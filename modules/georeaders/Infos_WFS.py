@@ -2,7 +2,7 @@
 #!/usr/bin/env python
 from __future__ import unicode_literals
 
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Name:         InfosWFS
 # Purpose:      Uses OGR to read OGC Web Features Service.
 #
@@ -12,18 +12,16 @@ from __future__ import unicode_literals
 # Created:      24/04/2015
 # Updated:      11/05/2015
 # Licence:      GPL 3
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 
-###############################################################################
-########### Libraries #############
-###################################
+# ############################################################################
+# ######### Libraries #############
+# #################################
 # Standard library
-from os import path, walk   # files and folder managing
+from collections import OrderedDict  # Python 3 backported
+import logging
+from os import path   # files and folder managing
 from time import localtime, strftime
-import sys
-
-# Python 3 backported
-from collections import OrderedDict as OD
 
 # 3rd party libraries
 try:
@@ -37,14 +35,15 @@ except ImportError:
 
 from owslib.wfs import WebFeatureService
 
-###############################################################################
-########### Classes #############
-#################################
+# ############################################################################
+# ######### Classes #############
+# ###############################
 
 
 class OGRErrorHandler(object):
     def __init__(self):
-        """ Callable error handler
+        """Callable error handler.
+
         see: http://trac.osgeo.org/gdal/wiki/PythonGotchas#Exceptionsraisedincustomerrorhandlersdonotgetcaught
         and http://pcjericks.github.io/py-gdalogr-cookbook/gdal_general.html#install-gdal-ogr-error-handler
         """
@@ -53,18 +52,17 @@ class OGRErrorHandler(object):
         self.err_msg = ''
 
     def handler(self, err_level, err_type, err_msg):
-        """ Making errors messages more readable """
+        """Makes errors messages more readable."""
         # available types
-        err_class = {
-                    gdal.CE_None: 'None',
-                    gdal.CE_Debug: 'Debug',
-                    gdal.CE_Warning: 'Warning',
-                    gdal.CE_Failure: 'Failure',
-                    gdal.CE_Fatal: 'Fatal'
-                    }
+        err_class = {gdal.CE_None: 'None',
+                     gdal.CE_Debug: 'Debug',
+                     gdal.CE_Warning: 'Warning',
+                     gdal.CE_Failure: 'Failure',
+                     gdal.CE_Fatal: 'Fatal'
+                     }
         # getting type
         err_type = err_class.get(err_type, 'None')
-        
+
         # cleaning message
         err_msg = err_msg.replace('\n', ' ')
 
@@ -138,7 +136,7 @@ class ReadWFS_OGR():
         # parsing layers
         for layer_idx in range(wfs.GetLayerCount()):
             # dictionary where will be stored informations
-            dico_layer = OD()
+            dico_layer = OrderedDict()
             # parent GDB
             dico_layer['wfs_name'] = path.basename(wfs.GetName())
             # getting layer object
@@ -189,7 +187,7 @@ class ReadWFS_OGR():
             self.infos_geos(layer_obj, srs, dico_layer, txt)
 
         # getting fields informations
-        dico_fields = OD()
+        dico_fields = OrderedDict()
         layer_def = layer_obj.GetLayerDefn()
         dico_layer['num_fields'] = layer_def.GetFieldCount()
         self.infos_fields(layer_def, dico_fields)
@@ -345,7 +343,7 @@ class ReadWFS_OWS():
         # parsing layers
         for layer_idx in range(wfs.GetLayerCount()):
             # dictionary where will be stored informations
-            dico_layer = OD()
+            dico_layer = OrderedDict()
             # parent GDB
             dico_layer['wfs_name'] = path.basename(wfs.GetName())
             # getting layer object
@@ -396,7 +394,7 @@ class ReadWFS_OWS():
             self.infos_geos(layer_obj, srs, dico_layer, txt)
 
         # getting fields informations
-        dico_fields = OD()
+        dico_fields = OrderedDict()
         layer_def = layer_obj.GetLayerDefn()
         dico_layer['num_fields'] = layer_def.GetFieldCount()
         self.infos_fields(layer_def, dico_fields)
@@ -501,16 +499,16 @@ class ReadWFS_OWS():
             dico_wfs[u'layers_count'] = 0
         # End of function
         return dico_wfs
-###############################################################################
-###### Stand alone program ########
-###################################
+# ############################################################################
+# #### Stand alone program ########
+# #################################
 
 if __name__ == '__main__':
     u""" standalone execution for tests. Paths are relative considering a test
     within the official repository (https://github.com/Guts/DicoGIS/)"""
     from urllib2 import urlopen
     # test text dictionary
-    textos = OD()
+    textos = OrderedDict()
     textos['srs_comp'] = u'Compound'
     textos['srs_geoc'] = u'Geocentric'
     textos['srs_geog'] = u'Geographic'
@@ -527,19 +525,19 @@ if __name__ == '__main__':
               r"http://ws.carmencarto.fr/WFS/119/fxx_inpn?service=wfs",
               r"http://demo.mapserver.org/cgi-bin/wfs?request=getCapabilities&service=WFS"
               ]
-    
+
     # recipient datas
-    dico_wfs = OD()
+    dico_wfs = OrderedDict()
 
     # read WFS
     for wfsUrl in li_wfs:
         dico_wfs.clear()
         if urlopen(wfsUrl):
             print("\n{0}: ".format(wfsUrl))
-            ReadWFS(wfsUrl,
-                    dico_wfs,
-                    'OGC WFS',
-                    textos)
+            ReadWFS_OGR(wfsUrl,
+                        dico_wfs,
+                        'OGC WFS',
+                        textos)
             # print results
             print(dico_wfs)
         else:

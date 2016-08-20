@@ -21,11 +21,9 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 # ##################################
 
 # Standard library
+from collections import OrderedDict  # Python 3 backported
 from os import chdir, listdir, path    # files and folder managing
 from time import localtime, strftime
-
-# Python 3 backported
-from collections import OrderedDict as OD
 
 # 3rd party libraries
 try:
@@ -81,7 +79,45 @@ class GdalErrorHandler(object):
         return self.err_level, self.err_type, self.err_msg
 
 
-class Read_GeoPDF(object):
+class OGRErrorHandler(object):
+    def __init__(self):
+        """Callable error handler.
+
+        see: http://trac.osgeo.org/gdal/wiki/PythonGotchas#Exceptionsraisedincustomerrorhandlersdonotgetcaught
+        and http://pcjericks.github.io/py-gdalogr-cookbook/gdal_general.html#install-gdal-ogr-error-handler
+        """
+        self.err_level = gdal.CE_None
+        self.err_type = 0
+        self.err_msg = ''
+
+    def handler(self, err_level, err_type, err_msg):
+        """Makes errors messages more readable."""
+        # available types
+        err_class = {gdal.CE_None: 'None',
+                     gdal.CE_Debug: 'Debug',
+                     gdal.CE_Warning: 'Warning',
+                     gdal.CE_Failure: 'Failure',
+                     gdal.CE_Fatal: 'Fatal'
+                     }
+        # getting type
+        err_type = err_class.get(err_type, 'None')
+
+        # cleaning message
+        err_msg = err_msg.replace('\n', ' ')
+
+        # disabling OGR exceptions raising to avoid future troubles
+        ogr.DontUseExceptions()
+
+        # propagating
+        self.err_level = err_level
+        self.err_type = err_type
+        self.err_msg = err_msg
+
+        # end of function
+        return self.err_level, self.err_type, self.err_msg
+
+
+class ReadGeoPDF(object):
     def __init__(self, pdfpath, dico_geopdf, tipo='pdf', txt=''):
         u""" Uses GDAL & OGR functions to extract basic
         informations about geographic PDF file and store into dictionaries.
@@ -128,7 +164,7 @@ class Read_GeoPDF(object):
         # bands information
         for band_idx in range(1, self.geopdf.RasterCount):
             # new dict to store band informations
-            dico_band = OD()
+            dico_band = OrderedDict()
             # getting band infos
             self.infos_bands(band_idx, dico_band)
             # storing band into the PDF dictionary
@@ -166,7 +202,7 @@ class Read_GeoPDF(object):
         # parsing layers
         for layer_idx in range(geopdf_v.GetLayerCount()):
             # dictionary where will be stored informations
-            dico_layer = OD()
+            dico_layer = OrderedDict()
             # parent GDB
             dico_layer['parent_name'] = path.basename(geopdf_v.GetName())
             # getting layer object
@@ -266,7 +302,7 @@ class Read_GeoPDF(object):
         # self.infos_geos(layer_obj, srs, dico_layer, txt)
 
         # getting fields informations
-        dico_fields = OD()
+        dico_fields = OrderedDict()
         layer_def = layer_obj.GetLayerDefn()
         dico_layer['num_fields'] = layer_def.GetFieldCount()
         self.infos_fields(layer_def, dico_fields)
@@ -445,7 +481,7 @@ if __name__ == '__main__':
     li_pdf = [path.abspath(pdf) for pdf in li_pdf if path.splitext(pdf)[1].lower()=='.pdf']
 
     # test txt dictionary
-    textos = OD()
+    textos = OrderedDict()
     textos['srs_comp'] = u'Compound'
     textos['srs_geoc'] = u'Geocentric'
     textos['srs_geog'] = u'Geographic'
@@ -456,7 +492,7 @@ if __name__ == '__main__':
     textos['geom_ligne'] = u'Line'
     textos['geom_polyg'] = u'Polygon'
     # recipient datas
-    dico_pdf = OD()     # dictionary where will be stored informations
+    dico_pdf = OrderedDict()     # dictionary where will be stored informations
     # execution
     for pdf in li_pdf:
         """ looping on pdf files """
@@ -469,8 +505,8 @@ if __name__ == '__main__':
             print("\n\t==> File doesn't exist: " + pdf)
             continue
         print("\n======================\n\t", path.basename(pdf))
-        info_pdf = Read_GeoPDF(pdf,
-                               dico_pdf,
-                               path.splitext(pdf)[1],
-                               textos)
+        info_pdf = ReadGeoPDF(pdf,
+                              dico_pdf,
+                              path.splitext(pdf)[1],
+                              textos)
         print('\n', dico_pdf)
