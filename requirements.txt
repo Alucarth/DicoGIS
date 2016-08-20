@@ -23,6 +23,4 @@ requests
 six
 xlwt
 arrow
-
-# Isogeo
-git+https://github.com/Guts/isogeo-api-py-minsdk.git
+isogeo-pysdk
