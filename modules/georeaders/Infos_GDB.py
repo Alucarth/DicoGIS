@@ -2,7 +2,7 @@
 #!/usr/bin/env python
 from __future__ import unicode_literals
 
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Name:         InfosGDB
 # Purpose:      Uses OGR to read into Esri File GeoDataBase.
 #
@@ -12,33 +12,31 @@ from __future__ import unicode_literals
 # Created:      24/05/2014
 # Updated:      11/11/2014
 # Licence:      GPL 3
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 
-###############################################################################
-########### Libraries #############
-###################################
+# ############################################################################
+# ######### Libraries #############
+# #################################
 # Standard library
+from collections import OrderedDict  # Python 3 backported
+import logging
 from os import path, walk   # files and folder managing
 from time import localtime, strftime
-import sys
-
-# Python 3 backported
-from collections import OrderedDict as OD
 
 # 3rd party libraries
 from osgeo import ogr
 from osgeo import gdal
 from gdalconst import *
 
-
-###############################################################################
-########### Classes #############
-#################################
+# ############################################################################
+# ######### Classes #############
+# ##############################
 
 
 class OGRErrorHandler(object):
     def __init__(self):
-        """ Callable error handler
+        """Callable error handler.
+
         see: http://trac.osgeo.org/gdal/wiki/PythonGotchas#Exceptionsraisedincustomerrorhandlersdonotgetcaught
         and http://pcjericks.github.io/py-gdalogr-cookbook/gdal_general.html#install-gdal-ogr-error-handler
         """
@@ -47,18 +45,17 @@ class OGRErrorHandler(object):
         self.err_msg = ''
 
     def handler(self, err_level, err_type, err_msg):
-        """ Making errors messages more readable """
+        """Makes errors messages more readable."""
         # available types
-        err_class = {
-                    gdal.CE_None: 'None',
-                    gdal.CE_Debug: 'Debug',
-                    gdal.CE_Warning: 'Warning',
-                    gdal.CE_Failure: 'Failure',
-                    gdal.CE_Fatal: 'Fatal'
-                    }
+        err_class = {gdal.CE_None: 'None',
+                     gdal.CE_Debug: 'Debug',
+                     gdal.CE_Warning: 'Warning',
+                     gdal.CE_Failure: 'Failure',
+                     gdal.CE_Fatal: 'Fatal'
+                     }
         # getting type
         err_type = err_class.get(err_type, 'None')
-        
+
         # cleaning message
         err_msg = err_msg.replace('\n', ' ')
 
@@ -74,7 +71,7 @@ class OGRErrorHandler(object):
         return self.err_level, self.err_type, self.err_msg
 
 
-class Read_GDB():
+class ReadGDB():
     def __init__(self, gdbpath, dico_gdb, tipo, txt=''):
         u""" Uses OGR functions to extract basic informations about
         geographic vector file (handles shapefile or MapInfo tables)
@@ -115,7 +112,7 @@ class Read_GDB():
         li_layers_idx = []
         dico_gdb['layers_names'] = li_layers_names
         dico_gdb['layers_idx'] = li_layers_idx
-        
+
         # cumulated size
         total_size = 0
         for chemins in walk(gdbpath):
@@ -141,7 +138,7 @@ class Read_GDB():
         # parsing layers
         for layer_idx in range(gdb.GetLayerCount()):
             # dictionary where will be stored informations
-            dico_layer = OD()
+            dico_layer = OrderedDict()
             # parent GDB
             dico_layer['gdb_name'] = path.basename(gdb.GetName())
             # getting layer object
@@ -190,7 +187,7 @@ class Read_GDB():
             self.infos_geos(layer_obj, srs, dico_layer, txt)
 
         # getting fields informations
-        dico_fields = OD()
+        dico_fields = OrderedDict()
         layer_def = layer_obj.GetLayerDefn()
         dico_layer['num_fields'] = layer_def.GetFieldCount()
         self.infos_fields(layer_def, dico_fields)
@@ -306,9 +303,9 @@ class Read_GDB():
         # End of function
         return dico_gdb
 
-###############################################################################
-###### Stand alone program ########
-###################################
+# ############################################################################
+# #### Stand alone program #######
+# ################################
 
 if __name__ == '__main__':
     u""" standalone execution for tests. Paths are relative considering a test
@@ -317,7 +314,7 @@ if __name__ == '__main__':
     # sample files
     chdir(r'..\..\test\datatest\FileGDB\Esri_FileGDB')
     # test text dictionary
-    textos = OD()
+    textos = OrderedDict()
     textos['srs_comp'] = u'Compound'
     textos['srs_geoc'] = u'Geocentric'
     textos['srs_geog'] = u'Geographic'
@@ -349,19 +346,19 @@ if __name__ == '__main__':
                     li_gdb.append(path.abspath(full_path))
                 else:
                     pass
-    
+
     # recipient datas
-    dico_gdb = OD()
-    
+    dico_gdb = OrderedDict()
+
     # read GDB
     for gdbpath in li_gdb:
         dico_gdb.clear()
         if path.isdir(gdbpath):
             print("\n{0}: ".format(gdbpath))
-            Read_GDB(gdbpath,
-                     dico_gdb,
-                     'Esri FileGDB',
-                     textos)
+            ReadGDB(gdbpath,
+                    dico_gdb,
+                    'Esri FileGDB',
+                    textos)
             # print results
             print(dico_gdb)
         else:

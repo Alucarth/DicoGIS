@@ -13,27 +13,26 @@ from __future__ import unicode_literals
 # Updated:      27/10/2015
 # -----------------------------------------------------------------------------
 
-###############################################################################
-########### Libraries #############
-###################################
+# ############################################################################
+# ######### Libraries #############
+# #################################
 
 # Standard library
+from collections import OrderedDict  # Python 3 backported
 import json
+import logging
 from math import ceil
 import os
-from urllib2 import Request, urlopen, URLError
+from urllib2 import Request, URLError, urlopen
 
-# Python 3 backported
-from collections import OrderedDict as OD   # ordered dictionary
-
-###############################################################################
-########### Classes ###############
-###################################
+# ############################################################################
+# ######### Classes ###############
+# #################################
 
 
-class Read_IsogeoOpenCatalog():
-    """
-    Read an Isogeo OpenCatalog and store metadata into an ordered dictionary
+class ReadIsogeoOpenCatalog():
+    """Read an Isogeo OpenCatalog and store metadata into an ordered dictionary.
+
     see: http://www.isogeo.com
     """
     def __init__(self, url_catalog, lang, dico_mds):
@@ -113,17 +112,17 @@ class Read_IsogeoOpenCatalog():
         dico_mds['resources'] = metadatas
 
 
-###############################################################################
-###### Stand alone program ########
-###################################
+# ############################################################################
+# #### Stand alone program ########
+# #################################
 
 if __name__ == '__main__':
     """ standalone execution """
     # test variables
     url_catalog = "http://open.isogeo.com/s/ad6451f1f9ca405ca6f78fabf46aeb10/Bue0ySfhmGOPw33jHMyaJtcOM4MY0"
     lang = "fr"
-    dico_md = OD()
+    dico_md = OrderedDict()
 
     # testing class
-    Read_IsogeoOpenCatalog(url_catalog, lang, dico_md)
+    ReadIsogeoOpenCatalog(url_catalog, lang, dico_md)
     print("Worksgroups represented: " + unicode(dico_md.get('owners')))

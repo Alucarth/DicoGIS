@@ -1,7 +1,7 @@
 ﻿# -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 # from __future__ import unicode_literals
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Name:         InfosSHP
 # Purpose:      Use GDAL/OGR library to extract informations about
 #                   geographic data. It permits a more friendly use as
@@ -13,17 +13,17 @@
 # Created:      18/02/2013
 # Updated:      28/09/2014
 # Licence:      GPL 3
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
-###############################################################################
-########### Libraries #############
-###################################
+# ############################################################################
+# ######### Libraries #############
+# #################################
 # Standard library
+from collections import OrderedDict  # Python 3 backported
+import logging
+from os import path
 from os import chdir, listdir, path       # files and folder managing
 from time import localtime, strftime
-
-# Python 3 backported
-from collections import OrderedDict as OD
 
 # 3rd party libraries
 try:
@@ -35,14 +35,15 @@ except ImportError:
     import ogr  # handler for vector spatial files
     import osr
 
-###############################################################################
-########### Classes #############
-#################################
+# ############################################################################
+# ######### Classes #############
+# ###############################
 
 
 class OGRErrorHandler(object):
     def __init__(self):
-        """ Callable error handler
+        """Callable error handler.
+
         see: http://trac.osgeo.org/gdal/wiki/PythonGotchas#Exceptionsraisedincustomerrorhandlersdonotgetcaught
         and http://pcjericks.github.io/py-gdalogr-cookbook/gdal_general.html#install-gdal-ogr-error-handler
         """
@@ -51,18 +52,17 @@ class OGRErrorHandler(object):
         self.err_msg = ''
 
     def handler(self, err_level, err_type, err_msg):
-        """ Making errors messages more readable """
+        """Makes errors messages more readable."""
         # available types
-        err_class = {
-                    gdal.CE_None: 'None',
-                    gdal.CE_Debug: 'Debug',
-                    gdal.CE_Warning: 'Warning',
-                    gdal.CE_Failure: 'Failure',
-                    gdal.CE_Fatal: 'Fatal'
-                    }
+        err_class = {gdal.CE_None: 'None',
+                     gdal.CE_Debug: 'Debug',
+                     gdal.CE_Warning: 'Warning',
+                     gdal.CE_Failure: 'Failure',
+                     gdal.CE_Fatal: 'Fatal'
+                     }
         # getting type
         err_type = err_class.get(err_type, 'None')
-        
+
         # cleaning message
         err_msg = err_msg.replace('\n', ' ')
 
@@ -78,9 +78,9 @@ class OGRErrorHandler(object):
         return self.err_level, self.err_type, self.err_msg
 
 
-class Read_SHP():
+class ReadSHP():
     def __init__(self, layerpath, dico_layer, dico_fields, tipo, text=''):
-        u""" Uses OGR functions to extract basic informations about
+        u"""Use OGR functions to extract basic informations about
         geographic vector file (handles shapefile or MapInfo tables)
         and store into dictionaries.
 
@@ -98,10 +98,10 @@ class Read_SHP():
         gdal.PushErrorHandler(errhandler)
         ogr.UseExceptions()
         self.alert = 0
-        
+
         # changing working directory to layer folder
         chdir(path.dirname(layerpath))
-        
+
         # raising corrupt files
         try:
             source = ogr.Open(layerpath, 0)  # OGR driver
@@ -168,7 +168,7 @@ class Read_SHP():
         del source
 
     def infos_basics(self, layerpath, dico_layer, txt):
-        u""" get the global informations about the layer """
+        u"""Get the global informations about the layer."""
         # Storing into the dictionary
         dico_layer[u'name'] = path.basename(layerpath)
         dico_layer[u'folder'] = path.dirname(layerpath)
@@ -239,7 +239,7 @@ class Read_SHP():
         return dico_layer
 
     def infos_geom(self, dico_layer, txt):
-        u""" get the informations about geometry """
+        u"""Get the informations about geometry."""
         # type géométrie
         if self.geom.GetGeometryName() == u'POINT':
             dico_layer[u'type_geom'] = txt.get('geom_point')
@@ -258,9 +258,9 @@ class Read_SHP():
         return dico_layer
 
     def infos_fields(self, dico_fields):
-        u""" get the informations about fields definitions """
+        u"""Get the informations about fields definitions?"""
         for i in range(self.def_couche.GetFieldCount()):
-            champomy = self.def_couche.GetFieldDefn(i) # fields ordered
+            champomy = self.def_couche.GetFieldDefn(i)  # fields ordered
             dico_fields[champomy.GetName()] = champomy.GetTypeName(),\
                                            champomy.GetWidth(),\
                                            champomy.GetPrecision()
@@ -269,8 +269,10 @@ class Read_SHP():
         return dico_fields
 
     def sizeof(self, os_size):
-        u""" return size in different units depending on size
-        see http://stackoverflow.com/a/1094933 """
+        u"""Return size in different units depending on size.
+
+        see http://stackoverflow.com/a/1094933
+        """
         for size_cat in ['octets', 'Ko', 'Mo', 'Go']:
             if os_size < 1024.0:
                 return "%3.1f %s" % (os_size, size_cat)
@@ -278,7 +280,7 @@ class Read_SHP():
         return "%3.1f %s" % (os_size, " To")
 
     def erratum(self, dicolayer, layerpath, mess):
-        u""" errors handling """
+        u"""Error handler."""
         # local variables
         dicolayer[u'name'] = path.basename(layerpath)
         dicolayer[u'folder'] = path.dirname(layerpath)
@@ -292,9 +294,9 @@ class Read_SHP():
         # End of function
         return dicolayer
 
-###############################################################################
-###### Stand alone program ########
-###################################
+# ############################################################################
+# #### Stand alone program ########
+# ################################
 
 if __name__ == '__main__':
     u""" standalone execution for tests. Paths are relative considering a test
@@ -302,15 +304,11 @@ if __name__ == '__main__':
     # libraries import
     from os import getcwd
     # test files
-    li_shp = [
-              path.join(getcwd(),
-                        r'..\..\test\datatest\vectors\shp\airports.shp'),
-              path.join(getcwd(),
-                        r'..\..\test\datatest\vectors\shp\itineraires_rando.shp'),
-              r'C:\Users\julien.moura\Documents\GIS Database\Montserrado\Layers_County_Boundary.shp',
-              r'C:\Users\julien.moura\Documents\GIS Database\Montserrado\Layers_Ocean.shp']
+    li_shp = [path.realpath(r'..\..\test\datatest\vectors\shp\airports.shp'),
+              path.realpath(r'..\..\test\datatest\vectors\shp\itineraires_rando.shp')
+              ]
     # test text dictionary
-    textos = OD()
+    textos = OrderedDict()
     textos['srs_comp'] = u'Compound'
     textos['srs_geoc'] = u'Geocentric'
     textos['srs_geog'] = u'Geographic'
@@ -321,8 +319,8 @@ if __name__ == '__main__':
     textos['geom_ligne'] = u'Line'
     textos['geom_polyg'] = u'Polygon'
     # recipient datas
-    dico_layer = OD()     # dictionary where will be stored informations
-    dico_fields = OD()    # dictionary for fields information
+    dico_layer = OrderedDict()     # dictionary where will be stored informations
+    dico_fields = OrderedDict()    # dictionary for fields information
     # execution
     for shp in li_shp:
         """ looping on shapefiles list """
@@ -331,9 +329,9 @@ if __name__ == '__main__':
         dico_fields.clear()
         # getting the informations
         print('\n{0}'.format(shp))
-        info_shp = Read_SHP(path.abspath(shp),
-                            dico_layer,
-                            dico_fields,
-                            'shape',
-                            textos)
-        print '\n', dico_layer, dico_fields
+        info_shp = ReadSHP(path.abspath(shp),
+                           dico_layer,
+                           dico_fields,
+                           'shape',
+                           textos)
+        print('\n', dico_layer, dico_fields)

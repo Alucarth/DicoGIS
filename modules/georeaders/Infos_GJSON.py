@@ -1,7 +1,7 @@
 ﻿# -*- coding: UTF-8 -*-
 #!/usr/bin/env python
-##from __future__ import unicode_literals
-#------------------------------------------------------------------------------
+#from __future__ import unicode_literals
+# ----------------------------------------------------------------------------
 # Name:         InfosGeoJSON
 # Purpose:      Use GDAL/OGR library to extract informations about
 #                   GeoJSON, JavaScript standard format. 
@@ -13,17 +13,15 @@
 # Created:      18/06/2013
 # Updated:      14/07/2014
 # Licence:      GPL 3
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 
-###############################################################################
-########### Libraries #############
-###################################
+# ############################################################################
+# ######### Libraries #############
+# #################################
 # Standard library
+from collections import OrderedDict  # Python 3 backported
 from os import chdir, listdir, path       # files and folder managing
 from time import localtime, strftime
-
-# Python 3 backported
-from collections import OrderedDict as OD
 
 # 3rd party libraries
 try:
@@ -35,14 +33,15 @@ except ImportError:
     import ogr  # handler for vector spatial files
     import osr
 
-###############################################################################
-########### Classes #############
-#################################
+# ############################################################################
+# ######### Classes #############
+# ###############################
 
 
 class OGRErrorHandler(object):
     def __init__(self):
-        """ Callable error handler
+        """Callable error handler.
+
         see: http://trac.osgeo.org/gdal/wiki/PythonGotchas#Exceptionsraisedincustomerrorhandlersdonotgetcaught
         and http://pcjericks.github.io/py-gdalogr-cookbook/gdal_general.html#install-gdal-ogr-error-handler
         """
@@ -51,15 +50,14 @@ class OGRErrorHandler(object):
         self.err_msg = ''
 
     def handler(self, err_level, err_type, err_msg):
-        """ Making errors messages more readable """
+        """Makes errors messages more readable."""
         # available types
-        err_class = {
-                    gdal.CE_None: 'None',
-                    gdal.CE_Debug: 'Debug',
-                    gdal.CE_Warning: 'Warning',
-                    gdal.CE_Failure: 'Failure',
-                    gdal.CE_Fatal: 'Fatal'
-                    }
+        err_class = {gdal.CE_None: 'None',
+                     gdal.CE_Debug: 'Debug',
+                     gdal.CE_Warning: 'Warning',
+                     gdal.CE_Failure: 'Failure',
+                     gdal.CE_Fatal: 'Fatal'
+                     }
         # getting type
         err_type = err_class.get(err_type, 'None')
 
@@ -78,7 +76,7 @@ class OGRErrorHandler(object):
         return self.err_level, self.err_type, self.err_msg
 
 
-class Read_GeoJSON():
+class ReadGeoJSON():
     def __init__(self, layerpath, dico_layer, dico_fields, tipo, text=''):
         u""" Uses OGR functions to extract basic informations about
         geographic vector file (handles shapefile or MapInfo tables)
@@ -263,9 +261,9 @@ class Read_GeoJSON():
         # End of function
         return dicolayer
 
-###############################################################################
-###### Stand alone program ########
-###################################
+# ############################################################################
+# #### Stand alone program ########
+# #################################
 
 if __name__ == '__main__':
     u""" standalone execution for tests. Paths are relative considering a test
@@ -276,7 +274,7 @@ if __name__ == '__main__':
     li_geoj = [path.join(getcwd(),
                          r'..\..\test\datatest\vectors\geojson\wc2014_MapTour.geojson')]
     # test text dictionary
-    textos = OD()
+    textos = OrderedDict()
     textos['srs_comp'] = u'Compound'
     textos['srs_geoc'] = u'Geocentric'
     textos['srs_geog'] = u'Geographic'
@@ -287,8 +285,8 @@ if __name__ == '__main__':
     textos['geom_ligne'] = u'Line'
     textos['geom_polyg'] = u'Polygon'
     # recipient datas
-    dico_layer = OD()     # dictionary where will be stored informations
-    dico_fields = OD()     # dictionary for fields information
+    dico_layer = OrderedDict()     # dictionary where will be stored informations
+    dico_fields = OrderedDict()     # dictionary for fields information
     # execution
     for geoj in li_geoj:
         """ looping on geojson list """
@@ -297,9 +295,9 @@ if __name__ == '__main__':
         dico_fields.clear()
         # getting the informations
         print(geoj)
-        info_geoj = Read_GeoJSON(path.abspath(geoj),
-                                 dico_layer,
-                                 dico_fields,
-                                 'GeoJSON',
-                                 textos)
+        info_geoj = ReadGeoJSON(path.abspath(geoj),
+                                dico_layer,
+                                dico_fields,
+                                'GeoJSON',
+                                textos)
         print '\n', dico_layer, dico_fields

@@ -18,12 +18,9 @@ from __future__ import unicode_literals
 # ########## Libraries #############
 # ##################################
 # Standard library
+from collections import OrderedDict  # Python 3 backported
 from os import path, walk   # files and folder managing
 from time import localtime, strftime
-import sys
-
-# Python 3 backported
-from collections import OrderedDict as OD
 
 # 3rd party libraries
 from geoserver.catalog import Catalog
@@ -31,6 +28,7 @@ from geoserver.catalog import Catalog
 # ############################################################################
 # ########## Classes #############
 # ################################
+
 
 class ReadGeoServer():
     def __init__(self, gs_axx, dico_gs, tipo, txt=''):
@@ -61,11 +59,11 @@ class ReadGeoServer():
 
         print(dir(st))
 
-        dico_stores = OD()
+        dico_stores = OrderedDict()
 
         # layers
         layers = cat.get_layers()
-        dico_layers = OD()
+        dico_layers = OrderedDict()
         for layer in layers:
             # print(layer.name, layer.enabled, layer.resource._store.name, layer.resource._workspace.name)
             title = layer.resource.title
@@ -85,7 +83,7 @@ if __name__ == '__main__':
     within the official repository (https://github.com/Guts/DicoGIS/)"""
     from urllib2 import urlopen
     # test text dictionary
-    textos = OD()
+    textos = OrderedDict()
 
     # listing WFS
     li_geoservers = [
@@ -93,7 +91,7 @@ if __name__ == '__main__':
                      ]
 
     # recipient datas
-    dico_gs = OD()
+    dico_gs = OrderedDict()
 
     # read WFS
     for gs in li_geoservers:

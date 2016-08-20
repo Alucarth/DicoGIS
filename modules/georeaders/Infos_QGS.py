@@ -2,7 +2,7 @@
 #!/usr/bin/env python
 from __future__ import (absolute_import, print_function, unicode_literals)
 
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Name:         Infos qgs
 # Purpose:      Get some metadata abour qgs files (Esri symbology layer))
 #
@@ -12,22 +12,20 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 # Created:      28/09/2015
 # Updated:      12/12/2015
 # Licence:      GPL 3
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 
-###############################################################################
+# ############################################################################
 ########### Libraries #############
 ###################################
 # Standard library
-from xml.etree import ElementTree
+from collections import OrderedDict  # Python 3 backported
 from os import path, chdir, listdir   # files and folder managing
 from time import localtime, strftime
+from xml.etree import ElementTree
 
-# Python 3 backported
-from collections import OrderedDict as OD
-
-###############################################################################
-########### Classes #############
-#################################
+# ############################################################################
+# ######### Classes #############
+# ###############################
 
 class ReadQGS():
     def __init__(self, qgs_path, dico_qgs, tipo, txt=''):
@@ -75,7 +73,7 @@ class ReadQGS():
     #     for dframe in dframes:
     #         x += 1
     #         # dictionary where will be stored informations
-    #         dico_dframe = OD()
+    #         dico_dframe = OrderedDict()
     #         # parent GDB
     #         dico_dframe[u'name'] = dframe.name
 
@@ -186,9 +184,9 @@ class ReadQGS():
         # End of function
         return dico_qgs
 
-###############################################################################
-###### Stand alone program ########
-###################################
+# ############################################################################
+# #### Stand alone program ########
+# #################################
 
 if __name__ == '__main__':
     u"""
@@ -203,10 +201,10 @@ if __name__ == '__main__':
     li_qgs = [path.abspath(qgs) for qgs in li_qgs if path.splitext(qgs)[1].lower()=='.qgs']
 
     # recipient datas
-    dico_qgs = OD()
+    dico_qgs = OrderedDict()
 
     # test text dictionary
-    textos = OD()
+    textos = OrderedDict()
     textos['srs_comp'] = u'Compound'
     textos['srs_geoc'] = u'Geocentric'
     textos['srs_geog'] = u'Geographic'
