@@ -48,6 +48,7 @@ import subprocess
 from collections import OrderedDict as OD   # ordered dictionary
 
 # 3rd party libraries
+from isogeo_pysdk import Isogeo
 from xlwt import Workbook, easyxf, Formula  # excel writer
 
 # Custom modules
@@ -71,7 +72,6 @@ from modules import MetricsManager
 from modules import ConfigExcel
 from modules import CheckNorris
 from modules import files2xlsx
-from modules import Isogeo
 from modules import OptionsManager
 
 # Imports depending on operating system
