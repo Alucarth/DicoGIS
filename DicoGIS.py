@@ -82,6 +82,19 @@ else:
     pass
 
 # ##############################################################################
+# ############ Log file ############
+# ##################################
+# see: http://sametmax.com/ecrire-des-logs-en-python/
+logger = logging.getLogger()
+logging.captureWarnings(True)
+logger.setLevel(logging.INFO)  # all errors will be get
+log_form = logging.Formatter('%(asctime)s || %(levelname)s || %(module)s || %(message)s')
+logfile = RotatingFileHandler('LOG_DicoGIS.log', 'a', 5000000, 1)
+logfile.setLevel(logging.INFO)
+logfile.setFormatter(log_form)
+logger.addHandler(logfile)
+
+# ##############################################################################
 # ############ Classes #############
 # ##################################
 
@@ -93,16 +106,6 @@ class DicoGIS(Tk):
     def __init__(self):
         u""" Main window constructor
         Creates 1 frame and 2 labelled subframes"""
-        # creation and configuration of log file
-        # see: http://sametmax.com/ecrire-des-logs-en-python/
-        logger = logging.getLogger()
-        logging.captureWarnings(True)
-        logger.setLevel(logging.DEBUG)  # all errors will be get
-        log_form = logging.Formatter('%(asctime)s || %(levelname)s || %(module)s || %(message)s')
-        logfile = RotatingFileHandler('DicoGIS.log', 'a', 5000000, 1)
-        logfile.setLevel(logging.DEBUG)
-        logfile.setFormatter(log_form)
-        logger.addHandler(logfile)
         # start
         logging.info("")
         logging.info('\t============== DicoGIS =============')
