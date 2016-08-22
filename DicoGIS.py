@@ -715,19 +715,10 @@ class DicoGIS(Tk):
                 else:
                     pass
 
-        # TESTING
-        self.wb = files2xlsx(texts=self.blabla)
-        self.wb.set_worksheets(has_vector=1,
-                               has_raster=1,
-                               has_filedb=1,
-                               has_mapdocs=1,
-                               has_cad=1,
-                               has_sgbd=1)
-
 # =================================================================================
 
     def ui_switch(self, cb_value, parent):
-        """ Easy change state of  all children widgets
+        """Change state of  all children widgets
         within a parent class
 
         cb_value=boolean
@@ -743,7 +734,7 @@ class DicoGIS(Tk):
         return
 
     def change_lang(self, event):
-        u""" update the texts dictionary with the language selected """
+        u"""Update the texts dictionary with the language selected."""
         new_lang = self.ddl_lang.get()
         # change to the new language selected
         TextsManager().load_texts(dico_texts=self.blabla,
@@ -782,10 +773,10 @@ class DicoGIS(Tk):
                 elif new_lang.lower() == "es":
                     locale.setlocale(locale.LC_ALL, str("es_ES.utf8"))
                 else:
-                    locale.setlocale(locale.LC_ALL, str("en_GB.utf8"))            
+                    locale.setlocale(locale.LC_ALL, str("en_GB.utf8"))
 
-            logging.info('Language switched to: {0}'\
-                             .format(self.ddl_lang.get()))
+            logging.info("Language switched to: {0}"\
+                         .format(self.ddl_lang.get()))
         except locale.Error:
             logging.error('Selected locale is not installed')
 
@@ -793,7 +784,7 @@ class DicoGIS(Tk):
         return self.blabla
 
     def setpathtarg(self):
-        """ ...browse and insert the path of target folder """
+        """Browse and insert the path of target folder."""
         foldername = askdirectory(parent=self,
                                   initialdir=self.def_rep,
                                   mustexist=True,
@@ -825,8 +816,7 @@ class DicoGIS(Tk):
         return foldername
 
     def ligeofiles(self, foldertarget):
-        u""" List compatible geo-files stored into
-        the folders structure """
+        u"""List compatible geo-files stored into a folder structure."""
         # reseting global variables
         self.li_shp = []
         self.li_tab = []
@@ -963,25 +953,25 @@ class DicoGIS(Tk):
         self.li_mapdocs.extend(self.li_mxd)
         # end of listing
         self.prog_layers.stop()
-        logging.info('End of folders parsing: {0} shapefiles - \
-          {1} tables (MapInfo) - \
-          {2} KML - \
-          {3} GML - \
-          {4} GeoJSON\
-          {5} rasters - \
-          {6} Esri FileGDB - \
-          {7} Spatialite - \
-          {8} CAO/DAO - \
-          {9} PDF - \
-          {10} GXT - \
-          in {11}{12}'.format(len(self.li_shp), len(self.li_tab),
-                              len(self.li_kml), len(self.li_gml),
-                              len(self.li_geoj), len(self.li_raster),
-                              len(self.li_egdb), len(self.li_spadb),
-                              len(self.li_cdao), len(self.li_pdf),
-                              len(self.li_gxt),
-                              self.num_folders,
-                              self.blabla.get('log_numfold')))
+        logging.info("End of folders parsing: {0} shapefiles - "
+                     "{1} tables (MapInfo) - "
+                     "{2} KML - "
+                     "{3} GML - "
+                     "{4} GeoJSON"
+                     "{5} rasters - "
+                     "{6} Esri FileGDB - "
+                     "{7} Spatialite - "
+                     "{8} CAO/DAO - "
+                     "{9} PDF - "
+                     "{10} GXT - in {11}{12}"
+                     .format(len(self.li_shp), len(self.li_tab),
+                             len(self.li_kml), len(self.li_gml),
+                             len(self.li_geoj), len(self.li_raster),
+                             len(self.li_egdb), len(self.li_spadb),
+                             len(self.li_cdao), len(self.li_pdf),
+                             len(self.li_gxt),
+                             self.num_folders,
+                             self.blabla.get('log_numfold')))
         # grouping vectors lists
         self.li_vectors.extend(self.li_shp)
         self.li_vectors.extend(self.li_tab)
@@ -1030,34 +1020,35 @@ class DicoGIS(Tk):
         self.li_mapdocs.sort()
         self.li_mapdocs = tuple(self.li_mapdocs)
         # status message
-        self.status.set(u'{0} shapefiles - \
-{1} tables (MapInfo) - \
-{2} KML - \
-{3} GML - \
-{4} GeoJSON - \
-{5} GXT\
-\n{6} rasters - \
-{7} file databases - \
-{8} CAO/DAO - \
-{9} PDF - \
-{10} LYR - \
-{11} QGS - \
-{12} MXD - \
-in {13}{14}'.format(len(self.li_shp),
-                    len(self.li_tab),
-                    len(self.li_kml),
-                    len(self.li_gml),
-                    len(self.li_geoj),
-                    len(self.li_gxt),
-                    len(self.li_raster),
-                    len(self.li_fdb),
-                    len(self.li_cdao),
-                    len(self.li_pdf),
-                    len(self.li_lyr),
-                    len(self.li_qgs),
-                    len(self.li_mxd),
-                    self.num_folders,
-                    self.blabla.get('log_numfold')))
+        self.status.set("{0} shapefiles - "
+                        "{1} tables (MapInfo) - "
+                        "{2} KML - "
+                        "{3} GML - "
+                        "{4} GeoJSON - "
+                        "{5} GXT"
+                        "\n{6} rasters - "
+                        "{7} file databases - "
+                        "{8} CAO/DAO - "
+                        "{9} PDF - "
+                        "{10} LYR - "
+                        "{11} QGS - "
+                        "{12} MXD - "
+                        "in {13}{14}"
+                        .format(len(self.li_shp),
+                                len(self.li_tab),
+                                len(self.li_kml),
+                                len(self.li_gml),
+                                len(self.li_geoj),
+                                len(self.li_gxt),
+                                len(self.li_raster),
+                                len(self.li_fdb),
+                                len(self.li_cdao),
+                                len(self.li_pdf),
+                                len(self.li_lyr),
+                                len(self.li_qgs),
+                                len(self.li_mxd),
+                                self.num_folders,
+                                self.blabla.get('log_numfold')))
 
         # reactivating the buttons
         self.browsetarg.config(state=ACTIVE)
@@ -1069,7 +1060,7 @@ in {13}{14}'.format(len(self.li_shp),
             self.li_cdao, self.li_fdb, self.li_spadb
 
     def process(self):
-        """ check needed info and launch different processes """
+        """Check needed info and launch different processes."""
         # saving settings
         self.settings.save_settings(self)
 
@@ -1107,7 +1098,7 @@ in {13}{14}'.format(len(self.li_shp),
         return self.typo
 
     def process_files(self):
-        u""" launch the different processes """
+        u"""Launch the different processes."""
         # check if at least a format has been choosen
         if (self.opt_shp.get() + self.opt_tab.get() + self.opt_kml.get() +
            self.opt_gml.get() + self.opt_geoj.get() + self.opt_rast.get() +
@@ -1118,17 +1109,18 @@ in {13}{14}'.format(len(self.li_shp),
             avert('DicoGIS - User error', self.blabla.get('noformat'))
             return
         # check if there are some layers into the folder structure
-        if (len(self.li_vectors)
-          + len(self.li_raster)
-          + len(self.li_fdb)
-          + len(self.li_cdao)
-          + len(self.li_pdf)
-          + len(self.li_mapdocs)):
+        if (len(self.li_vectors) +
+            len(self.li_raster) +
+            len(self.li_fdb) +
+            len(self.li_cdao) +
+            len(self.li_pdf) +
+            len(self.li_mapdocs)):
             pass
         else:
             avert('DicoGIS - User error', self.blabla.get('nodata'))
             return
         # creating the Excel workbook
+        self.wb = files2xlsx(texts=self.blabla)  # TESTING
         self.configexcel()
         logging.info('Excel file created')
         # configuring the progress bar
@@ -1820,8 +1812,7 @@ in {13}{14}'.format(len(self.li_shp),
         return
 
     def test_connection(self):
-        u"""
-        Testing database connection and handling specific
+        """Test database connection and handling specific
         settings : proxy, DB views, etc.
         """
         # check if a proxy is needed
@@ -1865,9 +1856,9 @@ in {13}{14}'.format(len(self.li_shp),
 
         # if connection successed
         self.status.set("{} tables".format(conn.GetLayerCount()))
-        logging.info('Connection to database {0} successed.\
-                          {1} tables found.'.format(self.dbnb.get(),
-                                                    conn.GetLayerCount()))
+        logging.info("Connection to database {0} successed."
+                     "{1} tables found.".format(self.dbnb.get(),
+                                                conn.GetLayerCount()))
         # set the default output file
         self.output.delete(0, END)
         self.output.insert(0, "DicoGIS_{0}-{1}_{2}.xls".format(self.dbnb.get(),
@@ -1879,9 +1870,7 @@ in {13}{14}'.format(len(self.li_shp),
         return conn
 
     def process_isogeo(self):
-        u"""
-        Read and extract Isogeo metadata catalog into an Excel worksheet
-        """
+        """Extract Isogeo metadata catalog into an Excel worksheet."""
         # getting and checking the OpenCatalog given
         url_oc = self.url_OpenCatalog.get()
         if url_oc[:4] != "http":
@@ -1940,7 +1929,7 @@ in {13}{14}'.format(len(self.li_shp),
         return
 
     def configexcel(self):
-        u""" create and configure the Excel workbook """
+        u"""Create and configure the Excel workbook."""
         # Basic configuration
         self.book = Workbook(encoding='utf8')
         self.book.set_owner(str('DicoGIS_') + str(self.DGversion))
@@ -1989,6 +1978,7 @@ in {13}{14}'.format(len(self.li_shp),
                  + self.opt_gml.get() + self.opt_geoj.get()) > 0\
             and len(self.li_vectors) > 0:
             """ adding a new sheet for vectors informations """
+            self.wb.set_worksheets(has_vector=1)
             # sheet
             self.feuyVC = self.book.add_sheet(self.blabla.get('sheet_vectors'),
                                               cell_overwrite_ok=True)
@@ -2028,6 +2018,7 @@ in {13}{14}'.format(len(self.li_shp),
            and self.opt_rast.get() == 1\
            and len(self.li_raster) > 0:
             """ adding a new sheet for rasters informations """
+            self.wb.set_worksheets(has_raster=1)
             # sheet
             self.feuyRS = self.book.add_sheet(self.blabla.get('sheet_rasters'),
                                               cell_overwrite_ok=True)
@@ -2069,6 +2060,7 @@ in {13}{14}'.format(len(self.li_shp),
            and (self.opt_spadb.get() + self.opt_egdb.get())\
            and len(self.li_fdb) > 0:
             """ adding a new sheet for flat geodatabases informations """
+            self.wb.set_worksheets(has_filedb=1)
             # sheet
             self.feuyFGDB = self.book.add_sheet(self.blabla.get('sheet_filedb'),
                                                 cell_overwrite_ok=True)
@@ -2109,6 +2101,7 @@ in {13}{14}'.format(len(self.li_shp),
                  + self.opt_mxd.get()) > 0\
             and len(self.li_mapdocs) > 0:
             """ adding a new sheet for maps documents informations """
+            self.wb.set_worksheets(has_mapdocs=1)
             # sheet
             self.feuyMAPS = self.book.add_sheet(self.blabla.get('sheet_maplans'),
                                                 cell_overwrite_ok=True)
@@ -2153,6 +2146,7 @@ in {13}{14}'.format(len(self.li_shp),
            and self.opt_cdao.get() == 1\
            and len(self.li_cdao) > 0:
             """ adding a new sheet for CAO informations """
+            self.wb.set_worksheets(has_cad=1)
             # sheet
             self.feuyCDAO = self.book.add_sheet(self.blabla.get('sheet_cdao'), cell_overwrite_ok=True)
             # headers
@@ -2189,6 +2183,7 @@ in {13}{14}'.format(len(self.li_shp),
 
         if self.typo == 1:
             """ adding a new sheet for PostGIS informations """
+            self.wb.set_worksheets(has_sgbd=1)
             # sheet
             self.feuyPG = self.book.add_sheet(u'PostGIS',
                                               cell_overwrite_ok=True)
