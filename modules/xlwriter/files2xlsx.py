@@ -37,8 +37,7 @@ from openpyxl.styles import Style, Font, Alignment
 
 
 class files2xlsx(Workbook):
-    """ files2xlsx
-    """
+    """Export into a XLSX worksheet."""
     li_cols_vector = [
                       "nomfic",
                       "path",
@@ -160,10 +159,9 @@ class files2xlsx(Workbook):
                       ]
 
     def __init__(self, lang="EN", texts=OrderedDict()):
-        """ TO DOC
+        """TO DOC.
 
         Keyword arguments:
-
         """
         super(files2xlsx, self).__init__()
         # super(files2xlsx, self).__init__(write_only=True)
@@ -189,8 +187,7 @@ class files2xlsx(Workbook):
 
     def set_worksheets(self, has_vector=0, has_raster=0, has_filedb=0,
                        has_mapdocs=0, has_cad=0, has_sgbd=0):
-        """ adds news sheets depending on present metadata types
-        """
+        """Add news sheets depending on present metadata types."""
         # SHEETS & HEADERS
         if has_vector:
             self.ws_v = self.create_sheet(title=self.texts.get("sheet_vectors"))
@@ -279,8 +276,7 @@ class files2xlsx(Workbook):
         return
 
     def tunning_worksheets(self):
-        """ CLEAN UP & TUNNING
-        """
+        """Clean up and tunning worksheet."""
         for sheet in self.worksheets:
             # Freezing panes
             c_freezed = sheet['B2']
@@ -316,9 +312,9 @@ class files2xlsx(Workbook):
         return
 
     # ------------ Writing metadata ---------------------
+
     def store_md_vector(self, layer, fields):
-        """ Storing metadata about a vector dataset
-        """
+        """Store metadata about a vector dataset."""
         # increment line
         self.idx_v += 1
 
@@ -401,7 +397,7 @@ class files2xlsx(Workbook):
                 tipo = self.texts.get(u'date')
             else:
                 tipo = "unknown"
-                logging.warning(chp, " unknown type")
+                logging.warning(chp + " unknown type")
 
             # concatenation of field informations
             try:
@@ -631,7 +627,7 @@ class files2xlsx(Workbook):
                     tipo = self.texts.get(u'date')
                 else:
                     tipo = "unknown"
-                    logging.warning(chp, " unknown type")
+                    logging.warning(chp + " unknown type")
 
                 # concatenation of field informations
                 try:
@@ -755,7 +751,7 @@ class files2xlsx(Workbook):
                     tipo = self.texts.get(u'date')
                 else:
                     tipo = "unknown"
-                    logging.warning(chp, " unknown type")
+                    logging.warning(chp + " unknown type")
 
                 # concatenation of field informations
                 try:
@@ -781,7 +777,7 @@ class files2xlsx(Workbook):
         return
 
     def store_md_cad(self, cad):
-        """ TO DOCUMENT
+        """Store metadata about CAD dataset
         """
         # increment line
         self.idx_c += 1
@@ -815,6 +811,105 @@ class files2xlsx(Workbook):
                                                  self.texts.get('browse'))
         self.ws_cad["B{}".format(self.idx_c)] = link
         self.ws_cad["B{}".format(self.idx_c)].style = self.s_link
+
+        # Name of parent folder with an exception if this is the format name
+        self.ws_cad["C{}".format(self.idx_c)] = path.basename(cad.get(u'folder'))
+        # total size
+        self.ws_cad["D{}".format(self.idx_c)] = cad.get(u'total_size')
+        # Creation date
+        self.ws_cad["E{}".format(self.idx_c)] = cad.get(u'date_crea')
+        # Last update date
+        self.ws_cad["F{}".format(self.idx_c)] = cad.get(u'date_actu')
+        self.ws_cad["G{}".format(self.idx_c)] = cad.get(u'layers_count')
+        self.ws_cad["H{}".format(self.idx_c)] = cad.get(u'total_fields')
+        self.ws_cad["I{}".format(self.idx_c)] = cad.get(u'total_objs')
+
+        # parsing layers
+        for (layer_idx, layer_name) in zip(cad.get(u'layers_idx'),
+                                           cad.get(u'layers_names')):
+            # increment line
+            self.idx_c += 1
+            champs = ""
+            # get the layer informations
+            try:
+                layer = cad.get('{0}_{1}'.format(layer_idx,
+                                                 layer_name))
+            except UnicodeDecodeError:
+                layer = cad.get('{0}_{1}'.format(layer_idx,
+                                                 unicode(layer_name.decode('latin1'))))
+            # in case of a source error
+            if layer.get('error'):
+                err_mess = self.texts.get(layer.get('error'))
+                logging.warning("\tproblem detected: "
+                                "{0} in {1}".format(err_mess,
+                                                    layer.get(u'title')))
+                self.ws_cad["G{}".format(self.idx_c)] = layer.get(u'title')
+                self.ws_cad["G{}".format(self.idx_c)].style = self.s_error
+                self.ws_cad["H{}".format(self.idx_c)] = err_mess
+                self.ws_cad["H{}".format(self.idx_c)].style = self.s_error
+                # Interruption of function
+                continue
+            else:
+                pass
+
+            self.ws_cad["G{}".format(self.idx_c)] = layer.get('title')
+            self.ws_cad["H{}".format(self.idx_c)] = layer.get(u'num_fields')
+            self.ws_cad["I{}".format(self.idx_c)] = layer.get(u'num_obj')
+            self.ws_cad["J{}".format(self.idx_c)] = layer.get(u'type_geom')
+            self.ws_cad["K{}".format(self.idx_c)] = layer.get(u'srs')
+            self.ws_cad["L{}".format(self.idx_c)] = layer.get(u'srs_type')
+            self.ws_cad["M{}".format(self.idx_c)] = layer.get(u'EPSG')
+
+            # Spatial extent
+            emprise = u"Xmin : {0} - Xmax : {1} | \nYmin : {2} - Ymax : {3}"\
+                      .format(unicode(layer.get(u'Xmin')),
+                              unicode(layer.get(u'Xmax')),
+                              unicode(layer.get(u'Ymin')),
+                              unicode(layer.get(u'Ymax')))
+            self.ws_cad["N{}".format(self.idx_c)].style.alignment.wrap_text = True
+            self.ws_cad["N{}".format(self.idx_c)] = emprise
+
+            # Field informations
+            fields = layer.get(u'fields')
+            for chp in fields.keys():
+                # field type
+                if 'Integer' in fields[chp][0]:
+                    tipo = self.texts.get(u'entier')
+                elif fields[chp][0] == 'Real':
+                    tipo = self.texts.get(u'reel')
+                elif fields[chp][0] == 'String':
+                    tipo = self.texts.get(u'string')
+                elif fields[chp][0] == 'Date':
+                    tipo = self.texts.get(u'date')
+                else:
+                    tipo = "unknown"
+                    logging.warning(chp + " unknown type")
+
+                # concatenation of field informations
+                try:
+                    champs = champs + chp \
+                                    + u" (" + tipo + self.texts.get(u'longueur')\
+                                    + unicode(fields[chp][1])\
+                                    + self.texts.get(u'precision')\
+                                    + unicode(fields[chp][2]) + u") ; "
+                except UnicodeDecodeError:
+                    logging.warning("Field name with special letters: {}"
+                                    .format(chp.decode('latin1')))
+                    # decode the fucking field name
+                    champs = champs + chp.decode('latin1') \
+                                    + u" ({}, Lg. = {}, Pr. = {}) ;"\
+                                        .format(tipo,
+                                                fields[chp][1],
+                                                fields[chp][2])
+                    # then continue
+                    continue
+
+            # Once all fieds explored, write them
+            self.ws_cad["O{}".format(self.idx_c)] = champs
+
+        # End of method
+        return
+
 
 # ############################################################################
 # ##### Stand alone program ########
