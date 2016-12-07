@@ -11,7 +11,7 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 #
 # Python:       2.7.x
 # Created:      14/08/2014
-# Updated:      30/01/2016
+# Updated:      28/10/2016
 # ------------------------------------------------------------------------------
 
 # ##############################################################################
@@ -27,9 +27,9 @@ from collections import OrderedDict     # ordered dictionary
 
 # 3rd party library
 from openpyxl import Workbook
-from openpyxl.cell import get_column_letter
+from openpyxl.styles import NamedStyle, Font, Alignment
+from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.properties import WorksheetProperties
-from openpyxl.styles import Style, Font, Alignment
 
 # ##############################################################################
 # ########## Classes ###############
@@ -37,8 +37,7 @@ from openpyxl.styles import Style, Font, Alignment
 
 
 class files2xlsx(Workbook):
-    """ files2xlsx
-    """
+    """Export into a XLSX worksheet."""
     li_cols_vector = [
                       "nomfic",
                       "path",
@@ -160,26 +159,21 @@ class files2xlsx(Workbook):
                       ]
 
     def __init__(self, lang="EN", texts=OrderedDict()):
-        """ TO DOC
+        """TO DOC.
 
         Keyword arguments:
-
         """
         super(files2xlsx, self).__init__()
         # super(files2xlsx, self).__init__(write_only=True)
         self.texts = texts
 
         # styles
-        self.s_error = Style(font=Font(color="FF0000"))
-        self.s_header = Style(alignment=Alignment(horizontal='center',
-                                                  vertical='center'
-                                                  ),
-                              font=Font(size=12,
-                                        bold=True,
-                                        )
-                              )
-        self.s_link = Style(font=Font(underline="single"))
-        self.s_wrap = Style(alignment=Alignment(wrap_text=True))
+        s_date = NamedStyle(name="date")
+        s_date.number_format = "dd/mm/yyyy"
+        s_wrap = NamedStyle(name="wrap")
+        s_wrap.alignment = Alignment(wrap_text=True)
+        self.add_named_style(s_date)
+        self.add_named_style(s_wrap)
 
         # deleting the default worksheet
         ws = self.active
@@ -189,8 +183,7 @@ class files2xlsx(Workbook):
 
     def set_worksheets(self, has_vector=0, has_raster=0, has_filedb=0,
                        has_mapdocs=0, has_cad=0, has_sgbd=0):
-        """ adds news sheets depending on present metadata types
-        """
+        """Add news sheets depending on present metadata types."""
         # SHEETS & HEADERS
         if has_vector:
             self.ws_v = self.create_sheet(title=self.texts.get("sheet_vectors"))
@@ -199,7 +192,7 @@ class files2xlsx(Workbook):
             # styling
             for i in self.li_cols_vector:
                 self.ws_v.cell(row=1,
-                               column=self.li_cols_vector.index(i) + 1).style = self.s_header
+                               column=self.li_cols_vector.index(i) + 1).style = "Headline 2"
 
             # initialize line counter
             self.idx_v = 1
@@ -213,7 +206,7 @@ class files2xlsx(Workbook):
             # styling
             for i in self.li_cols_raster:
                 self.ws_r.cell(row=1,
-                               column=self.li_cols_raster.index(i) + 1).style = self.s_header
+                               column=self.li_cols_raster.index(i) + 1).style = "Headline 2"
 
             # initialize line counter
             self.idx_r = 1
@@ -227,7 +220,7 @@ class files2xlsx(Workbook):
             # styling
             for i in self.li_cols_filedb:
                 self.ws_fdb.cell(row=1,
-                                 column=self.li_cols_filedb.index(i) + 1).style = self.s_header
+                                 column=self.li_cols_filedb.index(i) + 1).style = "Headline 2"
 
             # initialize line counter
             self.idx_f = 1
@@ -241,7 +234,7 @@ class files2xlsx(Workbook):
             # styling
             for i in self.li_cols_mapdocs:
                 self.ws_mdocs.cell(row=1,
-                                   column=self.li_cols_mapdocs.index(i) + 1).style = self.s_header
+                                   column=self.li_cols_mapdocs.index(i) + 1).style = "Headline 2"
 
             # initialize line counter
             self.idx_m = 1
@@ -255,7 +248,7 @@ class files2xlsx(Workbook):
             # styling
             for i in self.li_cols_caodao:
                 self.ws_cad.cell(row=1,
-                                 column=self.li_cols_caodao.index(i) + 1).style = self.s_header
+                                 column=self.li_cols_caodao.index(i) + 1).style = "Headline 2"
 
             # initialize line counter
             self.idx_c = 1
@@ -269,7 +262,7 @@ class files2xlsx(Workbook):
             # styling
             for i in self.li_cols_sgbd:
                 self.ws_sgbd.cell(row=1,
-                                  column=self.li_cols_sgbd.index(i) + 1).style = self.s_header
+                                  column=self.li_cols_sgbd.index(i) + 1).style = "Headline 2"
             # initialize line counter
             self.idx_s = 1
         else:
@@ -279,8 +272,7 @@ class files2xlsx(Workbook):
         return
 
     def tunning_worksheets(self):
-        """ CLEAN UP & TUNNING
-        """
+        """Clean up and tunning worksheet."""
         for sheet in self.worksheets:
             # Freezing panes
             c_freezed = sheet['B2']
@@ -316,9 +308,9 @@ class files2xlsx(Workbook):
         return
 
     # ------------ Writing metadata ---------------------
+
     def store_md_vector(self, layer, fields):
-        """ Storing metadata about a vector dataset
-        """
+        """Store metadata about a vector dataset."""
         # increment line
         self.idx_v += 1
 
@@ -331,13 +323,13 @@ class files2xlsx(Workbook):
             err_mess = self.texts.get(layer.get('error'))
             logging.warning('\tproblem detected')
             self.ws_v["A{}".format(self.idx_v)] = layer.get('name')
-            self.ws_v["A{}".format(self.idx_v)].style = self.s_error
+            self.ws_v["A{}".format(self.idx_v)].style = "Warning Text"
             link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
                                                      self.texts.get('browse'))
             self.ws_v["B{}".format(self.idx_v)] = link
-            self.ws_v["B{}".format(self.idx_v)].style = self.s_error
+            self.ws_v["B{}".format(self.idx_v)].style = "Warning Text"
             self.ws_v["C{}".format(self.idx_v)] = err_mess
-            self.ws_v["C{}".format(self.idx_v)].style = self.s_error
+            self.ws_v["C{}".format(self.idx_v)].style = "Warning Text"
             # Interruption of function
             return False
         else:
@@ -350,7 +342,7 @@ class files2xlsx(Workbook):
         link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
                                                  self.texts.get('browse'))
         self.ws_v["B{}".format(self.idx_v)] = link
-        self.ws_v["B{}".format(self.idx_v)].style = self.s_link
+        self.ws_v["B{}".format(self.idx_v)].style = "Hyperlink"
 
         # Name of parent folder with an exception if this is the format name
         self.ws_v["C{}".format(self.idx_v)] = path.basename(layer.get(u'folder'))
@@ -373,7 +365,7 @@ class files2xlsx(Workbook):
                           unicode(layer.get(u'Xmax')),
                           unicode(layer.get(u'Ymin')),
                           unicode(layer.get(u'Ymax')))
-        self.ws_v["J{}".format(self.idx_v)].style = self.s_wrap
+        self.ws_v["J{}".format(self.idx_v)].style = "wrap"
         self.ws_v["J{}".format(self.idx_v)] = emprise
 
         # Creation date
@@ -383,7 +375,7 @@ class files2xlsx(Workbook):
         # Format of data
         self.ws_v["M{}".format(self.idx_v)] = layer.get(u'type')
         # dependencies
-        self.ws_v["N{}".format(self.idx_v)].style.alignment.wrap_text = True
+        self.ws_v["N{}".format(self.idx_v)].style = "wrap"
         self.ws_v.cell("N{}".format(self.idx_v)).value = u' |\n '.join(layer.get(u'dependencies'))
         # total size
         self.ws_v["O{}".format(self.idx_v)] = layer.get(u'total_size')
@@ -401,7 +393,7 @@ class files2xlsx(Workbook):
                 tipo = self.texts.get(u'date')
             else:
                 tipo = "unknown"
-                logging.warning(chp, " unknown type")
+                logging.warning(chp + " unknown type")
 
             # concatenation of field informations
             try:
@@ -428,7 +420,7 @@ class files2xlsx(Workbook):
             logging.warning('\tproblem detected')
             self.ws_v["Q{}".format(self.idx_v)] = "{0} : {1}".format(layer.get('err_gdal')[0],
                                                                      layer.get('err_gdal')[1])
-            self.ws_v["Q{}".format(self.idx_v)].style = self.s_error
+            self.ws_v["Q{}".format(self.idx_v)].style = "Warning Text"
         else:
             pass
 
@@ -450,9 +442,9 @@ class files2xlsx(Workbook):
             link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
                                                      self.texts.get('browse'))
             self.ws_r["B{}".format(self.idx_r)] = link
-            self.ws_r["B{}".format(self.idx_r)].style = self.s_error
+            self.ws_r["B{}".format(self.idx_r)].style = "Warning Text"
             self.ws_r["C{}".format(self.idx_r)] = err_mess
-            self.ws_r["C{}".format(self.idx_r)].style = self.s_error
+            self.ws_r["C{}".format(self.idx_r)].style = "Warning Text"
             # Interruption of function
             return False
         else:
@@ -465,7 +457,7 @@ class files2xlsx(Workbook):
         link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
                                                  self.texts.get('browse'))
         self.ws_r["B{}".format(self.idx_r)] = link
-        self.ws_r["B{}".format(self.idx_r)].style = self.s_link
+        self.ws_r["B{}".format(self.idx_r)].style = "Hyperlink"
 
         # Name of parent folder with an exception if this is the format name
         self.ws_r["C{}".format(self.idx_r)] = path.basename(layer.get(u'folder'))
@@ -505,7 +497,7 @@ class files2xlsx(Workbook):
         self.ws_r["R{}".format(self.idx_r)] = layer.get(u'color_ref')
 
         # Dependencies
-        self.ws_r["S{}".format(self.idx_v)].style.alignment.wrap_text = True
+        self.ws_r["S{}".format(self.idx_v)].style = "wrap"
         self.ws_r.cell("S{}".format(self.idx_v)).value = u' |\n '.join(layer.get(u'dependencies'))
 
         # total size of file and its dependencies
@@ -516,7 +508,7 @@ class files2xlsx(Workbook):
             logging.warning('\tproblem detected')
             self.ws_r["U{}".format(self.idx_r)] = "{0} : {1}".format(layer.get('err_gdal')[0],
                                                                      layer.get('err_gdal')[1])
-            self.ws_r["U{}".format(self.idx_r)].style = self.s_error
+            self.ws_r["U{}".format(self.idx_r)].style = "Warning Text"
         else:
             pass
 
@@ -538,9 +530,9 @@ class files2xlsx(Workbook):
             link = r'=HYPERLINK("{0}","{1}")'.format(filedb.get(u'folder'),
                                                      self.texts.get('browse'))
             self.ws_fdb["B{}".format(self.idx_f)] = link
-            self.ws_fdb["B{}".format(self.idx_f)].style = self.s_error
+            self.ws_fdb["B{}".format(self.idx_f)].style = "Warning Text"
             self.ws_fdb["C{}".format(self.idx_f)] = err_mess
-            self.ws_fdb["C{}".format(self.idx_f)].style = self.s_error
+            self.ws_fdb["C{}".format(self.idx_f)].style = "Warning Text"
             # Interruption of function
             return False
         else:
@@ -553,7 +545,7 @@ class files2xlsx(Workbook):
         link = r'=HYPERLINK("{0}","{1}")'.format(filedb.get(u'folder'),
                                                  self.texts.get('browse'))
         self.ws_fdb["B{}".format(self.idx_f)] = link
-        self.ws_fdb["B{}".format(self.idx_f)].style = self.s_link
+        self.ws_fdb["B{}".format(self.idx_f)].style = "Hyperlink"
 
         self.ws_fdb["C{}".format(self.idx_f)] = path.basename(filedb.get(u'folder'))
         self.ws_fdb["D{}".format(self.idx_f)] = filedb.get(u'total_size')
@@ -568,7 +560,7 @@ class files2xlsx(Workbook):
             logging.warning('\tproblem detected')
             self.ws_fdb["P{}".format(self.idx_f)] = "{0} : {1}".format(filedb.get('err_gdal')[0],
                                                                        filedb.get('err_gdal')[1])
-            self.ws_fdb["P{}".format(self.idx_f)].style = self.s_error
+            self.ws_fdb["P{}".format(self.idx_f)].style = "Warning Text"
         else:
             pass
 
@@ -592,9 +584,9 @@ class files2xlsx(Workbook):
                                   {0} in {1}'.format(err_mess,
                                                      gdb_layer.get(u'title')))
                 self.ws_fdb["G{}".format(self.idx_f)] = gdb_layer.get(u'title')
-                self.ws_fdb["G{}".format(self.idx_f)].style = self.s_error
+                self.ws_fdb["G{}".format(self.idx_f)].style = "Warning Text"
                 self.ws_fdb["H{}".format(self.idx_f)] = err_mess
-                self.ws_fdb["H{}".format(self.idx_f)].style = self.s_error
+                self.ws_fdb["H{}".format(self.idx_f)].style = "Warning Text"
                 # Interruption of function
                 continue
             else:
@@ -614,7 +606,7 @@ class files2xlsx(Workbook):
                               unicode(gdb_layer.get(u'Xmax')),
                               unicode(gdb_layer.get(u'Ymin')),
                               unicode(gdb_layer.get(u'Ymax')))
-            self.ws_fdb["N{}".format(self.idx_f)].style.alignment.wrap_text = True
+            self.ws_fdb["N{}".format(self.idx_f)].style = "wrap"
             self.ws_fdb["N{}".format(self.idx_f)] = emprise
 
             # Field informations
@@ -631,7 +623,7 @@ class files2xlsx(Workbook):
                     tipo = self.texts.get(u'date')
                 else:
                     tipo = "unknown"
-                    logging.warning(chp, " unknown type")
+                    logging.warning(chp + " unknown type")
 
                 # concatenation of field informations
                 try:
@@ -671,13 +663,13 @@ class files2xlsx(Workbook):
             err_mess = self.texts.get(mapdoc.get('error'))
             logging.warning('\tproblem detected')
             self.ws_mdocs["A{}".format(self.idx_m)] = mapdoc.get('name')
-            self.ws_mdocs["A{}".format(self.idx_m)].style = self.s_error
+            self.ws_mdocs["A{}".format(self.idx_m)].style = "Warning Text"
             link = r'=HYPERLINK("{0}","{1}")'.format(mapdoc.get(u'folder'),
                                                      self.texts.get('browse'))
             self.ws_mdocs["B{}".format(self.idx_m)] = link
-            self.ws_mdocs["B{}".format(self.idx_m)].style = self.s_error
+            self.ws_mdocs["B{}".format(self.idx_m)].style = "Warning Text"
             self.ws_mdocs["C{}".format(self.idx_m)] = err_mess
-            self.ws_mdocs["C{}".format(self.idx_m)].style = self.s_error
+            self.ws_mdocs["C{}".format(self.idx_m)].style = "Warning Text"
             # Interruption of function
             return False
         else:
@@ -690,24 +682,25 @@ class files2xlsx(Workbook):
         link = r'=HYPERLINK("{0}","{1}")'.format(mapdoc.get(u'folder'),
                                                  self.texts.get('browse'))
         self.ws_mdocs["B{}".format(self.idx_m)] = link
-        self.ws_mdocs["B{}".format(self.idx_m)].style = self.s_link
+        self.ws_mdocs["B{}".format(self.idx_m)].style = "Hyperlink"
 
-        self.ws_mdocs["C{}".format(self.idx_m)] = mapdoc.get('title')
-        self.ws_mdocs["D{}".format(self.idx_m)] = mapdoc.get('creator_prod')
-        self.ws_mdocs["E{}".format(self.idx_m)] = mapdoc.get('keywords')
-        self.ws_mdocs["F{}".format(self.idx_m)] = mapdoc.get('subject')
-        self.ws_mdocs["G{}".format(self.idx_m)] = mapdoc.get('dpi')
-        self.ws_mdocs["H{}".format(self.idx_m)] = mapdoc.get('total_size')
-        self.ws_mdocs["I{}".format(self.idx_m)] = mapdoc.get('date_crea')
-        self.ws_mdocs["J{}".format(self.idx_m)] = mapdoc.get('date_actu')
-        self.ws_mdocs["K{}".format(self.idx_m)] = mapdoc.get('xOrigin')
-        self.ws_mdocs["L{}".format(self.idx_m)] = mapdoc.get('yOrigin')
-        self.ws_mdocs["M{}".format(self.idx_m)] = mapdoc.get('srs')
-        self.ws_mdocs["N{}".format(self.idx_m)] = mapdoc.get('srs_type')
-        self.ws_mdocs["O{}".format(self.idx_m)] = mapdoc.get('EPSG')
-        self.ws_mdocs["P{}".format(self.idx_m)] = mapdoc.get('layers_count')
-        self.ws_mdocs["Q{}".format(self.idx_m)] = mapdoc.get('total_fields')
-        self.ws_mdocs["R{}".format(self.idx_m)] = mapdoc.get('total_objs')
+        self.ws_mdocs["C{}".format(self.idx_m)] = path.dirname(mapdoc.get('folder'))
+        self.ws_mdocs["D{}".format(self.idx_m)] = mapdoc.get('title')
+        self.ws_mdocs["E{}".format(self.idx_m)] = mapdoc.get('creator_prod')
+        self.ws_mdocs["F{}".format(self.idx_m)] = mapdoc.get('keywords')
+        self.ws_mdocs["G{}".format(self.idx_m)] = mapdoc.get('subject')
+        self.ws_mdocs["H{}".format(self.idx_m)] = mapdoc.get('dpi')
+        self.ws_mdocs["I{}".format(self.idx_m)] = mapdoc.get('total_size')
+        self.ws_mdocs["J{}".format(self.idx_m)] = mapdoc.get('date_crea')
+        self.ws_mdocs["K{}".format(self.idx_m)] = mapdoc.get('date_actu')
+        self.ws_mdocs["L{}".format(self.idx_m)] = mapdoc.get('xOrigin')
+        self.ws_mdocs["M{}".format(self.idx_m)] = mapdoc.get('yOrigin')
+        self.ws_mdocs["N{}".format(self.idx_m)] = mapdoc.get('srs')
+        self.ws_mdocs["O{}".format(self.idx_m)] = mapdoc.get('srs_type')
+        self.ws_mdocs["P{}".format(self.idx_m)] = mapdoc.get('EPSG')
+        self.ws_mdocs["Q{}".format(self.idx_m)] = mapdoc.get('layers_count')
+        self.ws_mdocs["R{}".format(self.idx_m)] = mapdoc.get('total_fields')
+        self.ws_mdocs["S{}".format(self.idx_m)] = mapdoc.get('total_objs')
 
         for (layer_idx, layer_name) in zip(mapdoc.get(u'layers_idx'),
                                            mapdoc.get(u'layers_names')):
@@ -717,29 +710,29 @@ class files2xlsx(Workbook):
 
             # get the layer informations
             try:
-                mdoc_layer = filedb.get('{0}_{1}'.format(layer_idx,
-                                                           layer_name))
+                mdoc_layer = mapdoc.get('{0}_{1}'.format(layer_idx,
+                                                         layer_name))
             except UnicodeDecodeError:
-                mdoc_layer = filedb.get('{0}_{1}'.format(layer_idx,
-                                                            unicode(layer_name.decode('latin1'))))
+                mdoc_layer = mapdoc.get('{0}_{1}'.format(layer_idx,
+                                                         unicode(layer_name.decode('latin1'))))
             # in case of a source error
             if mdoc_layer.get('error'):
                 err_mess = self.texts.get(mdoc_layer.get('error'))
                 logging.warning('\tproblem detected: \
                                   {0} in {1}'.format(err_mess,
                                                      mdoc_layer.get(u'title')))
-                self.ws_mdocs["P{}".format(self.idx_f)] = mdoc_layer.get(u'title')
-                self.ws_mdocs["P{}".format(self.idx_f)].style = self.s_error
-                self.ws_mdocs["Q{}".format(self.idx_f)] = err_mess
-                self.ws_mdocs["Q{}".format(self.idx_f)].style = self.s_error
+                self.ws_mdocs["Q{}".format(self.idx_f)] = mdoc_layer.get(u'title')
+                self.ws_mdocs["Q{}".format(self.idx_f)].style = "Warning Text"
+                self.ws_mdocs["R{}".format(self.idx_f)] = err_mess
+                self.ws_mdocs["R{}".format(self.idx_f)].style = "Warning Text"
                 # loop must go on
                 continue
             else:
                 pass
             # layer info
-            self.ws_mdocs["P{}".format(self.idx_m)] = mapdoc.get('title')
-            self.ws_mdocs["Q{}".format(self.idx_m)] = mapdoc.get('num_fields')
-            self.ws_mdocs["R{}".format(self.idx_m)] = mapdoc.get('num_objs')
+            self.ws_mdocs["Q{}".format(self.idx_m)] = mdoc_layer.get('title')
+            self.ws_mdocs["R{}".format(self.idx_m)] = mdoc_layer.get('num_fields')
+            self.ws_mdocs["S{}".format(self.idx_m)] = mdoc_layer.get('num_objs')
 
             # Field informations
             fields = mdoc_layer.get(u'fields')
@@ -755,7 +748,7 @@ class files2xlsx(Workbook):
                     tipo = self.texts.get(u'date')
                 else:
                     tipo = "unknown"
-                    logging.warning(chp, " unknown type")
+                    logging.warning(chp + " unknown type")
 
                 # concatenation of field informations
                 try:
@@ -775,13 +768,13 @@ class files2xlsx(Workbook):
                     continue
 
             # Once all fieds explored, write them
-            self.ws_fdb["S{}".format(self.idx_f)] = champs
+            self.ws_fdb["T{}".format(self.idx_f)] = champs
 
         # end of method
         return
 
     def store_md_cad(self, cad):
-        """ TO DOCUMENT
+        """Store metadata about CAD dataset
         """
         # increment line
         self.idx_c += 1
@@ -795,13 +788,13 @@ class files2xlsx(Workbook):
             err_mess = self.texts.get(cad.get('error'))
             logging.warning('\tproblem detected')
             self.ws_cad["A{}".format(self.idx_c)] = cad.get('name')
-            self.ws_cad["A{}".format(self.idx_c)].style = self.s_error
+            self.ws_cad["A{}".format(self.idx_c)].style = "Warning Text"
             link = r'=HYPERLINK("{0}","{1}")'.format(cad.get(u'folder'),
                                                      self.texts.get('browse'))
             self.ws_cad["B{}".format(self.idx_c)] = link
-            self.ws_cad["B{}".format(self.idx_c)].style = self.s_error
+            self.ws_cad["B{}".format(self.idx_c)].style = "Warning Text"
             self.ws_cad["C{}".format(self.idx_c)] = err_mess
-            self.ws_cad["C{}".format(self.idx_c)].style = self.s_error
+            self.ws_cad["C{}".format(self.idx_c)].style = "Warning Text"
             # Interruption of function
             return False
         else:
@@ -814,7 +807,106 @@ class files2xlsx(Workbook):
         link = r'=HYPERLINK("{0}","{1}")'.format(cad.get(u'folder'),
                                                  self.texts.get('browse'))
         self.ws_cad["B{}".format(self.idx_c)] = link
-        self.ws_cad["B{}".format(self.idx_c)].style = self.s_link
+        self.ws_cad["B{}".format(self.idx_c)].style = "Hyperlink"
+
+        # Name of parent folder with an exception if this is the format name
+        self.ws_cad["C{}".format(self.idx_c)] = path.basename(cad.get(u'folder'))
+        # total size
+        self.ws_cad["D{}".format(self.idx_c)] = cad.get(u'total_size')
+        # Creation date
+        self.ws_cad["E{}".format(self.idx_c)] = cad.get(u'date_crea')
+        # Last update date
+        self.ws_cad["F{}".format(self.idx_c)] = cad.get(u'date_actu')
+        self.ws_cad["G{}".format(self.idx_c)] = cad.get(u'layers_count')
+        self.ws_cad["H{}".format(self.idx_c)] = cad.get(u'total_fields')
+        self.ws_cad["I{}".format(self.idx_c)] = cad.get(u'total_objs')
+
+        # parsing layers
+        for (layer_idx, layer_name) in zip(cad.get(u'layers_idx'),
+                                           cad.get(u'layers_names')):
+            # increment line
+            self.idx_c += 1
+            champs = ""
+            # get the layer informations
+            try:
+                layer = cad.get('{0}_{1}'.format(layer_idx,
+                                                 layer_name))
+            except UnicodeDecodeError:
+                layer = cad.get('{0}_{1}'.format(layer_idx,
+                                                 unicode(layer_name.decode('latin1'))))
+            # in case of a source error
+            if layer.get('error'):
+                err_mess = self.texts.get(layer.get('error'))
+                logging.warning("\tproblem detected: "
+                                "{0} in {1}".format(err_mess,
+                                                    layer.get(u'title')))
+                self.ws_cad["G{}".format(self.idx_c)] = layer.get(u'title')
+                self.ws_cad["G{}".format(self.idx_c)].style = "Warning Text"
+                self.ws_cad["H{}".format(self.idx_c)] = err_mess
+                self.ws_cad["H{}".format(self.idx_c)].style = "Warning Text"
+                # Interruption of function
+                continue
+            else:
+                pass
+
+            self.ws_cad["G{}".format(self.idx_c)] = layer.get('title')
+            self.ws_cad["H{}".format(self.idx_c)] = layer.get(u'num_fields')
+            self.ws_cad["I{}".format(self.idx_c)] = layer.get(u'num_obj')
+            self.ws_cad["J{}".format(self.idx_c)] = layer.get(u'type_geom')
+            self.ws_cad["K{}".format(self.idx_c)] = layer.get(u'srs')
+            self.ws_cad["L{}".format(self.idx_c)] = layer.get(u'srs_type')
+            self.ws_cad["M{}".format(self.idx_c)] = layer.get(u'EPSG')
+
+            # Spatial extent
+            emprise = u"Xmin : {0} - Xmax : {1} | \nYmin : {2} - Ymax : {3}"\
+                      .format(unicode(layer.get(u'Xmin')),
+                              unicode(layer.get(u'Xmax')),
+                              unicode(layer.get(u'Ymin')),
+                              unicode(layer.get(u'Ymax')))
+            self.ws_cad["N{}".format(self.idx_c)].style = "wrap"
+            self.ws_cad["N{}".format(self.idx_c)] = emprise
+
+            # Field informations
+            fields = layer.get(u'fields')
+            for chp in fields.keys():
+                # field type
+                if 'Integer' in fields[chp][0]:
+                    tipo = self.texts.get(u'entier')
+                elif fields[chp][0] == 'Real':
+                    tipo = self.texts.get(u'reel')
+                elif fields[chp][0] == 'String':
+                    tipo = self.texts.get(u'string')
+                elif fields[chp][0] == 'Date':
+                    tipo = self.texts.get(u'date')
+                else:
+                    tipo = "unknown"
+                    logging.warning(chp + " unknown type")
+
+                # concatenation of field informations
+                try:
+                    champs = champs + chp \
+                                    + u" (" + tipo + self.texts.get(u'longueur')\
+                                    + unicode(fields[chp][1])\
+                                    + self.texts.get(u'precision')\
+                                    + unicode(fields[chp][2]) + u") ; "
+                except UnicodeDecodeError:
+                    logging.warning("Field name with special letters: {}"
+                                    .format(chp.decode('latin1')))
+                    # decode the fucking field name
+                    champs = champs + chp.decode('latin1') \
+                                    + u" ({}, Lg. = {}, Pr. = {}) ;"\
+                                        .format(tipo,
+                                                fields[chp][1],
+                                                fields[chp][2])
+                    # then continue
+                    continue
+
+            # Once all fieds explored, write them
+            self.ws_cad["O{}".format(self.idx_c)] = champs
+
+        # End of method
+        return
+
 
 # ############################################################################
 # ##### Stand alone program ########

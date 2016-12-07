@@ -52,7 +52,9 @@ You can [download this repository](https://github.com/Guts/DicoGIS/archive/maste
 sudo apt-get install -y git python-software-properties python-virtualenv
 sudo add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
 sudo apt-get update && sudo apt-get dist-upgrade
-sudo apt-get install -y python-setuptools python-pip python-dev python-tk python-gdal
+sudo apt-get install -y libgdal-dev python-setuptools python-pip python-dev python-tk python-gdal
+export CPLUS_INCLUDE_PATH=/usr/include/gdal
+export C_INCLUDE_PATH=/usr/include/gdal
 git clone --recursive https://github.com/Guts/DicoGIS.git
 cd DicoGIS/
 virtualenv virtenv --no-site-packages
