@@ -86,6 +86,7 @@ class ReadPostGIS():
             self.geom = obj.GetGeometryRef()        # get the geometry
             if not self.geom:
                 obj = layer.GetNextFeature()
+                self.geom = obj.GetGeometryRef()
                 logging.warning("GetGeometryRef failed on: {}".format(layer.GetName()))
             else:
                 pass
@@ -183,8 +184,8 @@ class ReadPostGIS():
                 dico_layer[u'type_geom'] = self.geom.GetGeometryName()
         except AttributeError, e:
             mess = str(e).split('\n')[0]
-            self.alert = self.alert + 1
-            self.erratum(dico_layer, layer, mess)
+            # self.alert = self.alert + 1
+            # self.erratum(dico_layer, layer, mess)
             logging.warning("GDAL: {} - {}".format(layer.GetName(), mess))
             dico_layer[u'type_geom'] = "ERROR: not recognized"
 
