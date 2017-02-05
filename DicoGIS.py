@@ -707,7 +707,7 @@ class DicoGIS(Tk):
                                 client_secret=self.isog_app_tk.get(),
                                 lang=self.def_lang)
                 self.isogeo_token = isogeo.connect()
-            except ValueError, e:
+            except ValueError as e:
                 if e[0] == 1:
                     self.nb.tab(3, state=DISABLED)
                 elif e[0] == 2:
@@ -1848,7 +1848,7 @@ class DicoGIS(Tk):
             conn.GetLayerCount()
             # sql_version = "SELECT PostGIS_full_version();"
             # version = conn.ExecuteSQL(sql_version)
-        except Exception, e:
+        except Exception as e:
             logging.warning("Connection failed: {0}.".format(e))
             self.status.set("Connection failed: {0}.".format(e))
             avert(title=self.blabla.get("err_pg_conn_fail"), message=unicode(e))

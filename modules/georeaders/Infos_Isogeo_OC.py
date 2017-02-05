@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 from __future__ import unicode_literals
+from __future__ import print_function
 # -----------------------------------------------------------------------------
 # Name:         OpenCatalog to Excel
 # Purpose:      Get metadatas from an Isogeo OpenCatlog and store it into
@@ -71,7 +72,7 @@ class ReadIsogeoOpenCatalog():
         try:
             search_resp = urlopen(search_req)
             search_rez = json.load(search_resp)
-        except URLError, e:
+        except URLError as e:
             print(e)
 
         if not search_rez:
@@ -104,7 +105,7 @@ class ReadIsogeoOpenCatalog():
                 try:
                     search_resp = urlopen(search_req)
                     search_rez = json.load(search_resp)
-                except URLError, e:
+                except URLError as e:
                     print(e)
                 metadatas.extend(search_rez.get('results'))
         else:

@@ -20,6 +20,7 @@
 ########### Libraries #############
 ###################################
 # Standard library
+from __future__ import print_function
 from os import walk, path       # files and folder managing
 from time import localtime, strptime, strftime
 
@@ -43,7 +44,7 @@ gdal.UseExceptions()
 class Read_GDB_f():
     def __init__(self, gdb):
         """ """
-        print "\tLet's play with OGR FileGDB driver\n\n".upper()
+        print("\tLet's play with OGR FileGDB driver\n\n".upper())
         print(dir(gdb))
         print(gdb.GetName())
         print(gdb.LayerCount())
@@ -63,12 +64,12 @@ class Read_GDB_o():
         textos['geom_ligne'] = u'Line'
         textos['geom_polyg'] = u'Polygon'
         # playing with driver
-        print "\nLet's play with OGR OpenGDB driver".upper()
+        print("\nLet's play with OGR OpenGDB driver".upper())
         print("GDB available methods: {0}".format(dir(gdb)))
 
 
 
-        print gdb.__sizeof__()
+        print(gdb.__sizeof__())
         # print(gdb.GetStyleTable())
         print("{0} layers found into.".format(gdb.GetLayerCount()))
         for index in range(gdb.GetLayerCount()):
@@ -77,7 +78,7 @@ class Read_GDB_o():
             # first feature and geometry type
             obj = layer.GetFeature(1)
             geom = obj.GetGeometryRef()
-            print geom.GetGeometryName()
+            print(geom.GetGeometryName())
             # SRS
             srs = layer.GetSpatialRef()
             srs.AutoIdentifyEPSG()
@@ -97,7 +98,7 @@ class Read_GDB_o():
                 else:
                     continue
 
-            print typsrs
+            print(typsrs)
 
             print("\n==============================================\n\t\tLayer available methods: {0}\n".format(dir(layer)))
             print("\nLayer: {0}".format(layer.GetName()))
@@ -111,7 +112,7 @@ Ymin = {2} - Ymax = {3}".format(layer.GetExtent()[0],
             print("Geometry type: {0}".format(layer.GetGeomType()))
             # print("Geometry name: {0}".format(layer.GetGeomName()))  # doesn't work
             print("Geometry column: {0}".format(layer.GetGeometryColumn()))
-            print dir(layer.GetGeomType())
+            print(dir(layer.GetGeomType()))
             
             # fields information about each layer
             layer_def = layer.GetLayerDefn()
@@ -170,8 +171,8 @@ if __name__ == '__main__':
         gdb = dr_gdb_o.Open(gdb, 0)
         print("OGR driver OpenFileGDB: OK!")
         Read_GDB_o(gdb)
-    except Exception, e:
-        print e
+    except Exception as e:
+        print(e)
         print("FileGeodatabases can't be read by this driver: {0}.\nYou need GDAL/OGR >= 1.11".format("OpenFileGDB"))
 
 

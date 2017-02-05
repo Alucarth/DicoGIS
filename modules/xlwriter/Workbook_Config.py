@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 from __future__ import unicode_literals
+from __future__ import print_function
 #------------------------------------------------------------------------------
 # Name:         Workbook configuration wizard
 # Purpose:      set an Excel (2003 ie .xls) sheets and headers according

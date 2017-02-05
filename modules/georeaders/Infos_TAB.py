@@ -19,6 +19,7 @@
 # ######### Libraries #############
 # #################################
 # Standard library
+from __future__ import print_function
 from collections import OrderedDict  # Python 3 backported
 import logging
 from os import chdir, listdir, path  # files and folder managing
@@ -299,4 +300,4 @@ if __name__ == '__main__':
                            dico_fields,
                            'MI table',
                             textos)
-        print('\n', dico_layer, dico_fields)
+        print(('\n', dico_layer, dico_fields))

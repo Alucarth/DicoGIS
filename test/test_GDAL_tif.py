@@ -20,6 +20,7 @@
 ########### Libraries #############
 ###################################
 # Standard library
+from __future__ import print_function
 from os import chdir, path       # files and folder managing
 from time import localtime, strftime
 
@@ -63,35 +64,35 @@ if __name__ == '__main__':
     gdal.AllRegister()
     # execution
     for rasterpath in li_rasters:
-        print '\n' + rasterpath
+        print('\n' + rasterpath)
         rast = gdal.Open(rasterpath, GA_ReadOnly)
-        print 'name: ' + path.basename(rasterpath)
-        print 'folder: ' + path.dirname(rasterpath)
+        print('name: ' + path.basename(rasterpath))
+        print('folder: ' + path.dirname(rasterpath))
 
         rastMD = rast.GetMetadata()
-        print rastMD.get('COMPRESSION_RATE_TARGET')
-        print rastMD.get('COLORSPACE')
-        print rastMD.get('VERSION')
+        print(rastMD.get('COMPRESSION_RATE_TARGET'))
+        print(rastMD.get('COLORSPACE'))
+        print(rastMD.get('VERSION'))
 
-        print rast.RasterXSize
-        print rast.RasterYSize
-        print rast.RasterCount
+        print(rast.RasterXSize)
+        print(rast.RasterYSize)
+        print(rast.RasterCount)
 
-        print gdal.GetDataTypeName(rast.GetRasterBand(1).DataType)
+        print(gdal.GetDataTypeName(rast.GetRasterBand(1).DataType))
 
         geotransform = rast.GetGeoTransform()
-        print 'xOrigin: {}'.format(geotransform[0])
-        print 'yOrigin: {}'.format(geotransform[3])
-        print 'pixelWidth: {}'.format(round(geotransform[1], 3))
-        print 'pixelHeight: {}'.format(round(geotransform[5], 3))
-        print 'orientation: {}'.format(geotransform[2])
+        print('xOrigin: {}'.format(geotransform[0]))
+        print('yOrigin: {}'.format(geotransform[3]))
+        print('pixelWidth: {}'.format(round(geotransform[1], 3)))
+        print('pixelHeight: {}'.format(round(geotransform[5], 3)))
+        print('orientation: {}'.format(geotransform[2]))
 
 
         srs = osr.SpatialReference(rast.GetProjection())
         srs.AutoIdentifyEPSG()
-        print srs.GetAttrValue('PROJCS')
-        print srs.GetAttrValue('GEOGCS')
-        print srs.GetAttrValue("AUTHORITY", 1)
+        print(srs.GetAttrValue('PROJCS'))
+        print(srs.GetAttrValue('GEOGCS'))
+        print(srs.GetAttrValue("AUTHORITY", 1))
 
         for band in range(rast.RasterCount):
             band += 1

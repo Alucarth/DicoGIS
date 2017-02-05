@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 from __future__ import unicode_literals
+from __future__ import print_function
 #------------------------------------------------------------------------------
 # Name:         Geodata Explorer
 # Purpose:      Explore directory structure and list files and folders
@@ -73,7 +74,7 @@ class GeodataExplorer:
                 try:
                     unicode(path.join(root, d))
                     full_path = path.join(root, d)
-                except UnicodeDecodeError, e:
+                except UnicodeDecodeError as e:
                     full_path = path.join(root, d.decode('latin1'))
                 if full_path[-4:].lower() == '.gdb':
                     # add complete path of Esri FileGeoDatabase
@@ -85,9 +86,9 @@ class GeodataExplorer:
                 try:
                     unicode(path.join(root, f))
                     full_path = path.join(root, f)
-                except UnicodeDecodeError, e:
+                except UnicodeDecodeError as e:
                     full_path = path.join(root, f.decode('latin1'))
-                    print unicode(full_path), e
+                    print(unicode(full_path), e)
                 # Looping on files contained
                 if path.splitext(full_path.lower())[1].lower() == '.shp'\
                    and (path.isfile('{0}.dbf'.format(full_path[:-4]))

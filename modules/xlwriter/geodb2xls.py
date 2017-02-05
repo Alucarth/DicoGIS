@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 from __future__ import unicode_literals
+from __future__ import print_function
 #------------------------------------------------------------------------------
 # Name:         GeoDataBase to Excel
 # Purpose:      Automatize the creation of a dictionnary of geographic data
@@ -41,7 +42,7 @@ class XLWriter_GeoDB(Workbook):
         Main window constructor
         Creates 1 frame and 2 labelled subframes
         """
-        print help(self)
+        print(help(self))
 
     def dictionarize_gdb(self, gdb_infos, sheet, line):
         u""" write the infos of the FileGDB into the Excel workbook """

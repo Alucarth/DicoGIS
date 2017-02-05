@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 from __future__ import unicode_literals
+from __future__ import print_function
 
 # ----------------------------------------------------------------------------
 # Name:         InfosGDB
@@ -244,8 +245,8 @@ class ReadGDB():
         try:
             first_obj = layer_obj.GetNextFeature()
             geom = first_obj.GetGeometryRef()
-        except AttributeError, e:
-            print e, layer_obj.GetName(), layer_obj.GetFeatureCount()
+        except AttributeError as e:
+            print(e, layer_obj.GetName(), layer_obj.GetFeatureCount())
             first_obj = layer_obj.GetNextFeature()
             geom = first_obj.GetGeometryRef()
 
@@ -338,9 +339,9 @@ if __name__ == '__main__':
                 try:
                     unicode(path.join(root, d))
                     full_path = path.join(root, d)
-                except UnicodeDecodeError, e:
+                except UnicodeDecodeError as e:
                     full_path = path.join(root, d.decode('latin1'))
-                    print unicode(full_path), e
+                    print(unicode(full_path), e)
                 if full_path[-4:].lower() == '.gdb':
                     # add complete path of shapefile
                     li_gdb.append(path.abspath(full_path))

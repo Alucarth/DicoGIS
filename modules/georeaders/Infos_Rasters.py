@@ -20,6 +20,7 @@
 # ######### Libraries #############
 # #################################
 # Standard library
+from __future__ import print_function
 from collections import OrderedDict  # Python 3 backported
 import logging
 from os import chdir, path       # files and folder managing
@@ -107,8 +108,8 @@ class ReadRasters(object):
         # opening file
         try:
             self.rast = gdal.Open(rasterpath, GA_ReadOnly)
-        except Exception, e:
-            print e
+        except Exception as e:
+            print(e)
             self.alert += 1
             self.erratum(dico_raster, rasterpath, u'err_incomp')
             return
@@ -374,7 +375,7 @@ if __name__ == '__main__':
             continue
         else:
             pass
-        print("\n======================\n\t", path.basename(raster))
+        print(("\n======================\n\t", path.basename(raster)))
         # handling odd warnings
         info_raster = ReadRasters(path.abspath(raster),
                                   dico_raster,

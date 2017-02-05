@@ -18,6 +18,7 @@
 ########### Libraries #############
 ###################################
 # Standard library
+from __future__ import print_function
 from os import path
 import re
 import multiprocessing
@@ -61,7 +62,7 @@ def read_mxd(mxd_path):
     print(mxd.credits)
     print(mxd.tags)
     print(mxd.summary)
-    print('relative paths ?', mxd.relativePaths)
+    print(('relative paths ?', mxd.relativePaths))
     print(mxd.hyperlinkBase)
     print(mxd.dateExported)
     print(mxd.datePrinted)

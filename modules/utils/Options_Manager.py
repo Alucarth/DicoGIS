@@ -160,7 +160,7 @@ class OptionsManager(object):
                 self.config.write(configfile)
                 logging.info('Options saved.')
                 return True
-            except (UnicodeEncodeError, UnicodeDecodeError), e:
+            except (UnicodeEncodeError, UnicodeDecodeError) as e:
                 logging.error("Options couldn't be saved because of: {0}".format(e))
                 return False
 

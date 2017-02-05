@@ -19,6 +19,7 @@
 # ######### Libraries #############
 # #################################
 # Standard library
+from __future__ import print_function
 from collections import OrderedDict  # Python 3 backported
 from os import chdir, listdir, path       # files and folder managing
 from time import localtime, strftime
@@ -103,7 +104,7 @@ class ReadGeoJSON():
         source = ogr.Open(layerpath, 0)     # OGR driver
         if not source:
             u""" if layer doesn't have any object, return an error """
-            print 'no compatible source'
+            print('no compatible source')
             self.erratum(dico_layer, layerpath, u'err_nobjet')
             self.alert = self.alert + 1
         self.layer = source.GetLayer()          # get the layer
@@ -300,4 +301,4 @@ if __name__ == '__main__':
                                 dico_fields,
                                 'GeoJSON',
                                 textos)
-        print '\n', dico_layer, dico_fields
+        print('\n', dico_layer, dico_fields)

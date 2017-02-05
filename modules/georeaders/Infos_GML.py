@@ -20,6 +20,7 @@
 # ######### Libraries #############
 # #################################
 # Standard library
+from __future__ import print_function
 from collections import OrderedDict  # Python 3 backported
 import logging
 from os import chdir, listdir, path  # files and folder managing
@@ -108,7 +109,7 @@ class ReadGML():
         source = ogr.Open(layerpath, 0)     # OGR driver
         if not source:
             u""" if layer doesn't have any object, return an error """
-            print 'no compatible source'
+            print('no compatible source')
             self.erratum(dico_layer, layerpath, u'err_nobjet')
             self.alert = self.alert + 1
             return None
@@ -185,7 +186,7 @@ class ReadGML():
                 dico_layer[u'srs'] = unicode(self.srs.GetAttrValue('PROJCS')).replace('_', ' ')
             else:
                 dico_layer[u'srs'] = unicode(self.srs.GetAttrValue('PROJECTION')).replace('_', ' ')
-        except UnicodeDecodeError, e:
+        except UnicodeDecodeError as e:
             if self.srs.GetAttrValue('PROJCS') != 'unnamed':
                 dico_layer[u'srs'] = self.srs.GetAttrValue('PROJCS').decode('latin1').replace('_', ' ')
             else:
@@ -198,9 +199,9 @@ class ReadGML():
                                             localtime(path.getctime(layerpath)))
         # SRS exception handling
         if dico_layer[u'EPSG'] == u'4326' and dico_layer[u'srs'] == u'None':
-            print dico_layer[u'srs']
+            print(dico_layer[u'srs'])
             dico_layer[u'srs'] = u'WGS 84'
-            print dico_layer[u'srs']
+            print(dico_layer[u'srs'])
 
         # end of function
         return dico_layer
@@ -297,4 +298,4 @@ if __name__ == '__main__':
                            dico_fields,
                            'GML',
                            textos)
-        print('\n', dico_layer, dico_fields)
+        print(('\n', dico_layer, dico_fields))
