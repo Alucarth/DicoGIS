@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 from __future__ import unicode_literals
+from __future__ import print_function
 
 
 
@@ -11,8 +12,8 @@ import multiprocessing
 
 def read_featureClass(featureclass):
     """  """
-    print featureclass
-    print len(featureclass)
+    print(featureclass)
+    print(len(featureclass))
 
     # end of function
     return

@@ -1,3 +1,4 @@
+from __future__ import print_function
 from osgeo import gdal
 
 class GdalErrorHandler(object):
@@ -24,12 +25,12 @@ if __name__=='__main__':
     try:
         gdal.Error(gdal.CE_Warning,1,'gdal.CE_Warning warning')
     except Exception as e:
-        print 'Operation raised an exception'
-        print e
+        print('Operation raised an exception')
+        print(e)
     else:
-        print 'No exception'
+        print('No exception')
         if err.err_level >= gdal.CE_Warning:
             raise RuntimeError(err.err_level, err.err_no, err.err_msg)
     finally:
-        print err.err_level, err.err_no, err.err_msg
+        print(err.err_level, err.err_no, err.err_msg)
         gdal.PopErrorHandler()

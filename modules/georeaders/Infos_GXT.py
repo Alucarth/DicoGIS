@@ -19,6 +19,7 @@
 # ######### Libraries #############
 # #################################
 # Standard library
+from __future__ import print_function
 from collections import OrderedDict  # Python 3 backported
 from os import chdir, listdir, path  # files and folder managing
 from time import localtime, strftime
@@ -107,7 +108,7 @@ class ReadGXT():
             self.erratum(dico_layer, layerpath, u'err_corrupt')
             self.alert = self.alert + 1
             return None
-        except Exception, e:
+        except Exception as e:
             self.erratum(dico_layer, layerpath, u'err_corrupt')
             self.alert = self.alert + 1
             return None
@@ -140,7 +141,7 @@ class ReadGXT():
         try:
             self.srs = self.layer.GetSpatialRef()   # spatial system reference
             self.srs.AutoIdentifyEPSG()     # try to determine the EPSG code
-        except AttributeError, e:
+        except AttributeError as e:
             if not (path.isfile('%s.prj' % layerpath[:-4])
                or path.isfile('%s.PRJ' % layerpath[:-4])
                or path.isfile('%s.qpj' % layerpath[:-4])
@@ -319,9 +320,9 @@ if __name__ == '__main__':
             try:
                 unicode(path.join(root, f))
                 full_path = path.join(root, f)
-            except UnicodeDecodeError, e:
+            except UnicodeDecodeError as e:
                 full_path = path.join(root, f.decode('latin1'))
-                print unicode(full_path), e
+                print(unicode(full_path), e)
             if full_path[-4:].lower() == '.gxt':
                 # add complete path of shapefile
                 li_gxt.append(path.abspath(full_path))

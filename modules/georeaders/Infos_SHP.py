@@ -19,6 +19,7 @@
 # ######### Libraries #############
 # #################################
 # Standard library
+from __future__ import print_function
 from collections import OrderedDict  # Python 3 backported
 import logging
 from os import path
@@ -109,7 +110,7 @@ class ReadSHP():
             self.erratum(dico_layer, layerpath, u'err_corrupt')
             self.alert = self.alert + 1
             return None
-        except Exception, e:
+        except Exception as e:
             self.erratum(dico_layer, layerpath, u'err_corrupt')
             self.alert = self.alert + 1
             return None
@@ -142,7 +143,7 @@ class ReadSHP():
         try:
             self.srs = self.layer.GetSpatialRef()   # spatial system reference
             self.srs.AutoIdentifyEPSG()     # try to determine the EPSG code
-        except AttributeError, e:
+        except AttributeError as e:
             if not (path.isfile('%s.prj' % layerpath[:-4])
                or path.isfile('%s.PRJ' % layerpath[:-4])
                or path.isfile('%s.qpj' % layerpath[:-4])
@@ -334,4 +335,4 @@ if __name__ == '__main__':
                            dico_fields,
                            'shape',
                            textos)
-        print('\n', dico_layer, dico_fields)
+        print(('\n', dico_layer, dico_fields))

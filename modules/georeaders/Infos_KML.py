@@ -20,6 +20,7 @@
 # ######### Libraries #############
 # #################################
 # Standard library
+from __future__ import print_function
 from collections import OrderedDict  # Python 3 backported
 import logging
 from os import chdir, listdir,path       # files and folder managing
@@ -180,7 +181,7 @@ class ReadKML():
                 dico_layer[u'srs'] = unicode(self.srs.GetAttrValue('PROJCS')).replace('_', ' ')
             else:
                 dico_layer[u'srs'] = unicode(self.srs.GetAttrValue('PROJECTION')).replace('_', ' ')
-        except UnicodeDecodeError, e:
+        except UnicodeDecodeError as e:
             if self.srs.GetAttrValue('PROJCS') != 'unnamed':
                 dico_layer[u'srs'] = self.srs.GetAttrValue('PROJCS').decode('latin1').replace('_', ' ')
             else:
@@ -294,4 +295,4 @@ if __name__ == '__main__':
                            dico_fields,
                            'KML',
                            textos)
-        print('\n', dico_layer, dico_fields)
+        print(('\n', dico_layer, dico_fields))
