@@ -40,7 +40,7 @@ from gdalconst import *
 
 class ReadPostGIS():
     def __init__(self, layer, dico_layer, dico_fields, tipo, text=''):
-        u""" Uses gdal/ogr functions to extract basic informations about
+        u"""Uses gdal/ogr functions to extract basic informations about
         geographic file (handles shapefile or MapInfo tables)
         and store into the dictionaries.
 
@@ -75,14 +75,25 @@ class ReadPostGIS():
                 mess = str(e).split('\n')[0]
                 self.alert = self.alert + 1
                 self.erratum(dico_layer, layer, mess)
+                logging.error("GDAL: {} - {}".format(layer.GetName(), mess))
                 return None
             else:
                 pass
+<<<<<<< HEAD
         except Exception as e:
+=======
+        except Exception, e:
+>>>>>>> origin/master
             print(e)
 
         try:
             self.geom = obj.GetGeometryRef()        # get the geometry
+            if not self.geom:
+                obj = layer.GetNextFeature()
+                logging.warning("GetGeometryRef failed on: {}".format(layer.GetName()))
+            else:
+                pass
+
             self.def_couche = layer.GetLayerDefn()  # get layer definitions
             self.srs = layer.GetSpatialRef()   # get spatial system reference
             self.srs.AutoIdentifyEPSG()  # try to determine the EPSG code
@@ -92,7 +103,6 @@ class ReadPostGIS():
             self.erratum(dico_layer, layer, mess)
             return None
         except UnboundLocalError:
-
             return None
 
         # basic information
@@ -164,16 +174,24 @@ class ReadPostGIS():
         return dico_layer, layer, txt
 
     def infos_geom(self, layer, dico_layer, txt):
-        u""" get the informations about geometry """
-        # type géométrie
-        if self.geom.GetGeometryName() == u'POINT':
-            dico_layer[u'type_geom'] = txt.get('geom_point')
-        elif u'LINESTRING' in self.geom.GetGeometryName():
-            dico_layer[u'type_geom'] = txt.get('geom_ligne')
-        elif u'POLYGON' in self.geom.GetGeometryName():
-            dico_layer[u'type_geom'] = txt.get('geom_polyg')
-        else:
-            dico_layer[u'type_geom'] = self.geom.GetGeometryName()
+        u"""Get the informations about geometry."""
+        try:
+            # geometry type
+            if self.geom.GetGeometryName() == u'POINT':
+                dico_layer[u'type_geom'] = txt.get('geom_point')
+            elif u'LINESTRING' in self.geom.GetGeometryName():
+                dico_layer[u'type_geom'] = txt.get('geom_ligne')
+            elif u'POLYGON' in self.geom.GetGeometryName():
+                dico_layer[u'type_geom'] = txt.get('geom_polyg')
+            else:
+                dico_layer[u'type_geom'] = self.geom.GetGeometryName()
+        except AttributeError, e:
+            mess = str(e).split('\n')[0]
+            self.alert = self.alert + 1
+            self.erratum(dico_layer, layer, mess)
+            logging.warning("GDAL: {} - {}".format(layer.GetName(), mess))
+            dico_layer[u'type_geom'] = "ERROR: not recognized"
+
         # Spatial extent (bounding box)
         dico_layer[u'Xmin'] = round(layer.GetExtent()[0], 2)
         dico_layer[u'Xmax'] = round(layer.GetExtent()[1], 2)

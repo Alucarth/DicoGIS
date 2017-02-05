@@ -684,22 +684,23 @@ class files2xlsx(Workbook):
         self.ws_mdocs["B{}".format(self.idx_m)] = link
         self.ws_mdocs["B{}".format(self.idx_m)].style = "Hyperlink"
 
-        self.ws_mdocs["C{}".format(self.idx_m)] = mapdoc.get('title')
-        self.ws_mdocs["D{}".format(self.idx_m)] = mapdoc.get('creator_prod')
-        self.ws_mdocs["E{}".format(self.idx_m)] = mapdoc.get('keywords')
-        self.ws_mdocs["F{}".format(self.idx_m)] = mapdoc.get('subject')
-        self.ws_mdocs["G{}".format(self.idx_m)] = mapdoc.get('dpi')
-        self.ws_mdocs["H{}".format(self.idx_m)] = mapdoc.get('total_size')
-        self.ws_mdocs["I{}".format(self.idx_m)] = mapdoc.get('date_crea')
-        self.ws_mdocs["J{}".format(self.idx_m)] = mapdoc.get('date_actu')
-        self.ws_mdocs["K{}".format(self.idx_m)] = mapdoc.get('xOrigin')
-        self.ws_mdocs["L{}".format(self.idx_m)] = mapdoc.get('yOrigin')
-        self.ws_mdocs["M{}".format(self.idx_m)] = mapdoc.get('srs')
-        self.ws_mdocs["N{}".format(self.idx_m)] = mapdoc.get('srs_type')
-        self.ws_mdocs["O{}".format(self.idx_m)] = mapdoc.get('EPSG')
-        self.ws_mdocs["P{}".format(self.idx_m)] = mapdoc.get('layers_count')
-        self.ws_mdocs["Q{}".format(self.idx_m)] = mapdoc.get('total_fields')
-        self.ws_mdocs["R{}".format(self.idx_m)] = mapdoc.get('total_objs')
+        self.ws_mdocs["C{}".format(self.idx_m)] = path.dirname(mapdoc.get('folder'))
+        self.ws_mdocs["D{}".format(self.idx_m)] = mapdoc.get('title')
+        self.ws_mdocs["E{}".format(self.idx_m)] = mapdoc.get('creator_prod')
+        self.ws_mdocs["F{}".format(self.idx_m)] = mapdoc.get('keywords')
+        self.ws_mdocs["G{}".format(self.idx_m)] = mapdoc.get('subject')
+        self.ws_mdocs["H{}".format(self.idx_m)] = mapdoc.get('dpi')
+        self.ws_mdocs["I{}".format(self.idx_m)] = mapdoc.get('total_size')
+        self.ws_mdocs["J{}".format(self.idx_m)] = mapdoc.get('date_crea')
+        self.ws_mdocs["K{}".format(self.idx_m)] = mapdoc.get('date_actu')
+        self.ws_mdocs["L{}".format(self.idx_m)] = mapdoc.get('xOrigin')
+        self.ws_mdocs["M{}".format(self.idx_m)] = mapdoc.get('yOrigin')
+        self.ws_mdocs["N{}".format(self.idx_m)] = mapdoc.get('srs')
+        self.ws_mdocs["O{}".format(self.idx_m)] = mapdoc.get('srs_type')
+        self.ws_mdocs["P{}".format(self.idx_m)] = mapdoc.get('EPSG')
+        self.ws_mdocs["Q{}".format(self.idx_m)] = mapdoc.get('layers_count')
+        self.ws_mdocs["R{}".format(self.idx_m)] = mapdoc.get('total_fields')
+        self.ws_mdocs["S{}".format(self.idx_m)] = mapdoc.get('total_objs')
 
         for (layer_idx, layer_name) in zip(mapdoc.get(u'layers_idx'),
                                            mapdoc.get(u'layers_names')):
@@ -709,29 +710,29 @@ class files2xlsx(Workbook):
 
             # get the layer informations
             try:
-                mdoc_layer = filedb.get('{0}_{1}'.format(layer_idx,
-                                                           layer_name))
+                mdoc_layer = mapdoc.get('{0}_{1}'.format(layer_idx,
+                                                         layer_name))
             except UnicodeDecodeError:
-                mdoc_layer = filedb.get('{0}_{1}'.format(layer_idx,
-                                                            unicode(layer_name.decode('latin1'))))
+                mdoc_layer = mapdoc.get('{0}_{1}'.format(layer_idx,
+                                                         unicode(layer_name.decode('latin1'))))
             # in case of a source error
             if mdoc_layer.get('error'):
                 err_mess = self.texts.get(mdoc_layer.get('error'))
                 logging.warning('\tproblem detected: \
                                   {0} in {1}'.format(err_mess,
                                                      mdoc_layer.get(u'title')))
-                self.ws_mdocs["P{}".format(self.idx_f)] = mdoc_layer.get(u'title')
-                self.ws_mdocs["P{}".format(self.idx_f)].style = "Warning Text"
-                self.ws_mdocs["Q{}".format(self.idx_f)] = err_mess
+                self.ws_mdocs["Q{}".format(self.idx_f)] = mdoc_layer.get(u'title')
                 self.ws_mdocs["Q{}".format(self.idx_f)].style = "Warning Text"
+                self.ws_mdocs["R{}".format(self.idx_f)] = err_mess
+                self.ws_mdocs["R{}".format(self.idx_f)].style = "Warning Text"
                 # loop must go on
                 continue
             else:
                 pass
             # layer info
-            self.ws_mdocs["P{}".format(self.idx_m)] = mapdoc.get('title')
-            self.ws_mdocs["Q{}".format(self.idx_m)] = mapdoc.get('num_fields')
-            self.ws_mdocs["R{}".format(self.idx_m)] = mapdoc.get('num_objs')
+            self.ws_mdocs["Q{}".format(self.idx_m)] = mdoc_layer.get('title')
+            self.ws_mdocs["R{}".format(self.idx_m)] = mdoc_layer.get('num_fields')
+            self.ws_mdocs["S{}".format(self.idx_m)] = mdoc_layer.get('num_objs')
 
             # Field informations
             fields = mdoc_layer.get(u'fields')
@@ -767,7 +768,7 @@ class files2xlsx(Workbook):
                     continue
 
             # Once all fieds explored, write them
-            self.ws_fdb["S{}".format(self.idx_f)] = champs
+            self.ws_fdb["T{}".format(self.idx_f)] = champs
 
         # end of method
         return

@@ -48,6 +48,15 @@ import subprocess
 from collections import OrderedDict  # ordered dictionary
 
 # 3rd party libraries
+try:
+    from osgeo import gdal
+    from osgeo import ogr  # handler for vector spatial files
+    from osgeo import osr
+except ImportError:
+    import gdal
+    import ogr  # handler for vector spatial files
+    import osr
+
 from isogeo_pysdk import Isogeo
 from xlwt import easyxf, Formula, Workbook  # excel writer
 
