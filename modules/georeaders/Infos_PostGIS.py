@@ -79,11 +79,7 @@ class ReadPostGIS():
                 return None
             else:
                 pass
-<<<<<<< HEAD
         except Exception as e:
-=======
-        except Exception, e:
->>>>>>> origin/master
             print(e)
 
         try:
