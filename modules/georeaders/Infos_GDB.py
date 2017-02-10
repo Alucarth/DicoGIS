@@ -98,15 +98,21 @@ class ReadGDB():
 
         # opening GDB
         try:
-            gdb = ogr.Open(gdbpath, 0)
-        except Exception:
-            self.erratum(dico_gdb, gdbpath, u'err_corrupt')
+            driver = ogr.GetDriverByName(str("OpenFileGDB"))
+            gdb = driver.Open(gdbpath, 0)
+        except Exception as e:
+            logging.error(e)
+            youtils.erratum(dico_gdb, gdbpath, u'err_corrupt')
             self.alert = self.alert + 1
             return None
 
         # GDB name and parent folder
-        dico_gdb['name'] = path.basename(gdb.GetName())
-        dico_gdb['folder'] = path.dirname(gdb.GetName())
+        try:
+            dico_gdb['name'] = path.basename(gdb.GetName())
+            dico_gdb['folder'] = path.dirname(gdb.GetName())
+        except AttributeError as e:
+            dico_gdb['name'] = path.basename(gdbpath)
+            dico_gdb['folder'] = path.dirname(gdbpath)
         # layers count and names
         dico_gdb['layers_count'] = gdb.GetLayerCount()
         li_layers_names = []
@@ -331,7 +337,8 @@ if __name__ == '__main__':
     li_gdb = [
               r'Points.gdb',
               r'Polygons.gdb',
-              r'AAHH.gdb'
+              r'GDB_Test.gdb',
+              r'MulitNet_2015_12.gdb',
               ]
     for root, dirs, files in walk(r'..\test\datatest'):
             num_folders = num_folders + len(dirs)
@@ -341,7 +348,7 @@ if __name__ == '__main__':
                     full_path = path.join(root, d)
                 except UnicodeDecodeError as e:
                     full_path = path.join(root, d.decode('latin1'))
-                    print(unicode(full_path), e)
+                    logging.error(unicode(full_path), e)
                 if full_path[-4:].lower() == '.gdb':
                     # add complete path of shapefile
                     li_gdb.append(path.abspath(full_path))
@@ -354,8 +361,10 @@ if __name__ == '__main__':
     # read GDB
     for gdbpath in li_gdb:
         dico_gdb.clear()
+        gdbpath = path.abspath(gdbpath)
+        print(path.isdir(gdbpath), gdbpath)
         if path.isdir(gdbpath):
-            print("\n{0}: ".format(gdbpath))
+            print("\n{0}: ".format(path.realpath(gdbpath)))
             ReadGDB(gdbpath,
                     dico_gdb,
                     'Esri FileGDB',
@@ -363,4 +372,5 @@ if __name__ == '__main__':
             # print results
             print(dico_gdb)
         else:
+            print(path.isfile(gdbpath), gdbpath)
             pass
