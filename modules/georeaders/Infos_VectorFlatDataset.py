@@ -90,7 +90,7 @@ class ReadVectorFlatDataset():
             # driver = ogr.GetDriverByName(str("ESRI Shapefile"))
             # print(help(driver.Open))
             # source_ogr = driver.Open(layerpath, 0)
-            # source_ogr = ogr.Open(layerpath, 0)
+            # source = ogr.Open(layerpath)
             source = gdal.OpenEx(layerpath, 0)  # GDAL driver
             # print(type(source_ogr))
             # print(type(source_gdal))
@@ -193,6 +193,8 @@ if __name__ == '__main__':
               path.realpath(r'..\..\test\datatest\vectors\tab\tab\Hydrobiologie.TAB'),
               path.realpath(r'..\..\test\datatest\vectors\geojson\wc2014_MapTour.geojson'),
               path.realpath(r'..\..\test\datatest\vectors\gml\airports.gml'),
+              path.realpath(r'..\..\test\datatest\vectors\kml\wc2014_MapTour.kml'),
+              path.realpath(r'..\..\test\datatest\vectors\kml\PPRI_Loire_sept2014.kmz'),
               ]
     # test text dictionary
     textos = OrderedDict()
