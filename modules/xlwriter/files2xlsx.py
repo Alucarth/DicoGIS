@@ -330,6 +330,14 @@ class files2xlsx(Workbook):
             self.ws_v["B{}".format(self.idx_v)].style = "Warning Text"
             self.ws_v["C{}".format(self.idx_v)] = err_mess
             self.ws_v["C{}".format(self.idx_v)].style = "Warning Text"
+            # gdal info
+            if "err_gdal" in layer.keys():
+                logging.warning('\tproblem detected')
+                self.ws_v["Q{}".format(self.idx_v)] = "{0} : {1}".format(layer.get('err_gdal')[0],
+                                                                         layer.get('err_gdal')[1])
+                self.ws_v["Q{}".format(self.idx_v)].style = "Warning Text"
+            else:
+                pass
             # Interruption of function
             return False
         else:
@@ -416,14 +424,7 @@ class files2xlsx(Workbook):
         # Once all fieds explored, write them
         self.ws_v["P{}".format(self.idx_v)] = champs
 
-        # in case of a source error
-        if layer.get('err_gdal')[0] != 0:
-            logging.warning('\tproblem detected')
-            self.ws_v["Q{}".format(self.idx_v)] = "{0} : {1}".format(layer.get('err_gdal')[0],
-                                                                     layer.get('err_gdal')[1])
-            self.ws_v["Q{}".format(self.idx_v)].style = "Warning Text"
-        else:
-            pass
+
 
         # end of method
         return
