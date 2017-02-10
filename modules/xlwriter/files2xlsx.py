@@ -535,6 +535,14 @@ class files2xlsx(Workbook):
             self.ws_fdb["B{}".format(self.idx_f)].style = "Warning Text"
             self.ws_fdb["C{}".format(self.idx_f)] = err_mess
             self.ws_fdb["C{}".format(self.idx_f)].style = "Warning Text"
+            # gdal info
+            if "err_gdal" in layer.keys():
+                logging.warning('\tproblem detected')
+                self.ws_v["Q{}".format(self.idx_v)] = "{0} : {1}".format(layer.get('err_gdal')[0],
+                                                                         layer.get('err_gdal')[1])
+                self.ws_v["Q{}".format(self.idx_v)].style = "Warning Text"
+            else:
+                pass
             # Interruption of function
             return False
         else:
@@ -556,15 +564,6 @@ class files2xlsx(Workbook):
         self.ws_fdb["G{}".format(self.idx_f)] = filedb.get(u'layers_count')
         self.ws_fdb["H{}".format(self.idx_f)] = filedb.get(u'total_fields')
         self.ws_fdb["I{}".format(self.idx_f)] = filedb.get(u'total_objs')
-
-        # in case of a source error
-        if filedb.get('err_gdal')[0] != 0:
-            logging.warning('\tproblem detected')
-            self.ws_fdb["P{}".format(self.idx_f)] = "{0} : {1}".format(filedb.get('err_gdal')[0],
-                                                                       filedb.get('err_gdal')[1])
-            self.ws_fdb["P{}".format(self.idx_f)].style = "Warning Text"
-        else:
-            pass
 
         # parsing layers
         for (layer_idx, layer_name) in zip(filedb.get(u'layers_idx'),
