@@ -62,7 +62,7 @@ youtils = Utils()
 # ###############################
 
 
-class ReadSHP():
+class ReadVectorFlatDataset():
     def __init__(self, layerpath, dico_layer, tipo, txt=''):
         """Use OGR functions to extract basic informations about
         geographic vector file (handles shapefile or MapInfo tables)
@@ -98,14 +98,16 @@ class ReadSHP():
             # print(dir(source), source.GetDriver())
         except Exception as e:
             logging.error(e)
-            youtils.erratum(dico_layer, layerpath, u'err_corrupt')
             self.alert = self.alert + 1
+            youtils.erratum(dico_layer, layerpath, u'err_corrupt')
+            dico_layer['err_gdal'] = gdal_err.err_type, gdal_err.err_msg
             return None
 
         # raising incompatible files
         if not source:
             u""" if file is not compatible """
             self.alert += 1
+            dico_layer['err_gdal'] = gdal_err.err_type, gdal_err.err_msg
             youtils.erratum(dico_layer, layerpath, u'err_nobjet')
             return None
         else:
@@ -167,7 +169,10 @@ class ReadSHP():
         dico_layer[u'Ymax'] = extent[3]
 
         # warnings messages
-        dico_layer['err_gdal'] = gdal_err.err_type, gdal_err.err_msg
+        if self.alert:
+            dico_layer['err_gdal'] = gdal_err.err_type, gdal_err.err_msg
+        else:
+            pass
 
         # safe exit
         del source
@@ -182,8 +187,10 @@ if __name__ == '__main__':
     # libraries import
     # from os import getcwd
     # test files
-    li_shp = [path.realpath(r'..\..\test\datatest\vectors\shp\airports.shp'),
-              path.realpath(r'..\..\test\datatest\vectors\shp\itineraires_rando.shp')
+    li_shp = [path.realpath(r'..\..\test\datatest\vectors\shp\itineraires_rando.shp'),
+              path.realpath(r'..\..\test\datatest\vectors\shp\airports.shp'),
+              path.realpath(r'..\..\test\datatest\vectors\tab\tab\airports_MI.tab'),
+              path.realpath(r'..\..\test\datatest\vectors\tab\tab\Hydrobiologie.TAB')
               ]
     # test text dictionary
     textos = OrderedDict()
@@ -207,9 +214,8 @@ if __name__ == '__main__':
         dico_fields.clear()
         # getting the informations
         print('\n{0}'.format(shp))
-        info_shp = ReadSHP(path.abspath(shp),
-                           dico_layer,
-                           dico_fields,
-                           'shape',
-                           textos)
-        print(('\n', dico_layer, dico_fields))
+        info_shp = ReadVectorFlatDataset(path.abspath(shp),
+                                         dico_layer,
+                                         'shape',
+                                         textos)
+        print(('\n', dico_layer))

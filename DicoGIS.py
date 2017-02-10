@@ -62,8 +62,7 @@ from xlwt import easyxf, Formula, Workbook  # excel writer
 
 # Custom modules
 from modules import ReadRasters    # for rasters files
-from modules import ReadSHP        # for shapefiles
-from modules import ReadTAB        # for MapInfo Tables
+from modules import ReadVectorFlatDataset  # for shapefiles and TAB
 from modules import ReadKML        # for KML
 from modules import ReadGML        # for GML
 from modules import ReadGeoJSON    # for GeoJSON
@@ -1206,13 +1205,12 @@ class DicoGIS(Tk):
                 self.update()
                 # reset recipient data
                 self.dico_layer.clear()
-                self.dico_fields.clear()
                 # getting the informations
                 try:
-                    ReadSHP(path.abspath(shp),
-                            self.dico_layer,
-                            'Esri shapefiles',
-                            self.blabla)
+                    ReadVectorFlatDataset(path.abspath(shp),
+                                          self.dico_layer,
+                                          'Esri shapefiles',
+                                          self.blabla)
                     logging.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
@@ -1247,14 +1245,13 @@ class DicoGIS(Tk):
                 self.update()
                 # reset recipient data
                 self.dico_layer.clear()
-                self.dico_fields.clear()
+                print(self.dico_layer.get("err_gdal"))
                 # getting the informations
                 try:
-                    ReadTAB(path.abspath(tab),
-                             self.dico_layer,
-                             self.dico_fields,
-                             'MapInfo tab',
-                             self.blabla)
+                    ReadVectorFlatDataset(path.abspath(tab),
+                                          self.dico_layer,
+                                          'MapInfo tab',
+                                          self.blabla)
                     logging.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
@@ -1263,12 +1260,13 @@ class DicoGIS(Tk):
                     continue
                 # writing to the Excel dictionary
                 self.dictionarize_vectors(self.dico_layer,
-                                          self.dico_fields,
+                                          # self.dico_fields,
                                           self.feuyVC, line_vectors)
 
-                ### TESTING
+                # TESTING ##
                 self.wb.store_md_vector(self.dico_layer,
-                                        self.dico_fields)
+                                        # self.dico_fields
+                                        )
 
                 logging.info('\t Wrote into the dictionary')
                 # increment the line number
@@ -1292,10 +1290,10 @@ class DicoGIS(Tk):
                 # getting the informations
                 try:
                     ReadKML(path.abspath(kml),
-                             self.dico_layer,
-                             self.dico_fields,
-                             'Google KML/KMZ',
-                             self.blabla)
+                            self.dico_layer,
+                            self.dico_fields,
+                            'Google KML/KMZ',
+                            self.blabla)
                     logging.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
@@ -1308,7 +1306,7 @@ class DicoGIS(Tk):
                                           self.feuyVC,
                                           line_vectors)
 
-                ### TESTING
+                # TESTING ##
                 self.wb.store_md_vector(self.dico_layer,
                                         self.dico_fields)
 
@@ -2240,7 +2238,15 @@ class DicoGIS(Tk):
             link = 'HYPERLINK("{0}"; "{1}")'.format(layer_infos.get(u'folder'),
                                                     self.blabla.get('browse'))
             sheet.write(line, 1, Formula(link), self.url)
-
+            # GDAL report
+            if layer_infos.get('err_gdal', [0,])[0] != 0:
+                logging.warning('\tproblem detected')
+                sheet.write(line, 16, "{0} : {1}"
+                            .format(layer_infos.get('err_gdal')[0],
+                                    layer_infos.get('err_gdal')[1]),
+                            self.xls_erreur)
+            else:
+                pass
             # Interruption of function
             return self.book, self.feuyVC
         else:
@@ -2339,14 +2345,6 @@ class DicoGIS(Tk):
 
         # Once all fieds explored, write them
         sheet.write(line, 15, champs)
-
-        # in case of a source error
-        if layer_infos.get('err_gdal')[0] != 0:
-            logging.warning('\tproblem detected')
-            sheet.write(line, 16, "{0} : {1}".format(layer_infos.get('err_gdal')[0],
-                                                     layer_infos.get('err_gdal')[1]), self.xls_erreur)
-        else:
-            pass
 
         # End of function
         return self.book, self.feuyVC
