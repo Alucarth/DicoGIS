@@ -309,7 +309,7 @@ class files2xlsx(Workbook):
 
     # ------------ Writing metadata ---------------------
 
-    def store_md_vector(self, layer, fields):
+    def store_md_vector(self, layer):
         """Store metadata about a vector dataset."""
         # increment line
         self.idx_v += 1
@@ -381,6 +381,7 @@ class files2xlsx(Workbook):
         self.ws_v["O{}".format(self.idx_v)] = layer.get(u'total_size')
 
         # Field informations
+        fields = layer.get("fields")
         for chp in fields.keys():
             # field type
             if 'Integer' in fields[chp][0]:

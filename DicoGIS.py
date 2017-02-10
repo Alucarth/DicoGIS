@@ -1210,10 +1210,9 @@ class DicoGIS(Tk):
                 # getting the informations
                 try:
                     ReadSHP(path.abspath(shp),
-                             self.dico_layer,
-                             self.dico_fields,
-                             'Esri shapefiles',
-                             self.blabla)
+                            self.dico_layer,
+                            'Esri shapefiles',
+                            self.blabla)
                     logging.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
@@ -1222,13 +1221,11 @@ class DicoGIS(Tk):
                     continue
                 # writing to the Excel dictionary
                 self.dictionarize_vectors(self.dico_layer,
-                                          self.dico_fields,
                                           self.feuyVC,
                                           line_vectors)
 
-                ### TESTING
-                self.wb.store_md_vector(self.dico_layer,
-                                        self.dico_fields)
+                # TESTING ##
+                self.wb.store_md_vector(self.dico_layer)
 
                 logging.info('\t Wrote into the dictionary')
                 # getting for metrics analysis
@@ -2229,7 +2226,7 @@ class DicoGIS(Tk):
         # end of function
         return self.book, self.entete, self.url, self.xls_erreur
 
-    def dictionarize_vectors(self, layer_infos, fields_info, sheet, line):
+    def dictionarize_vectors(self, layer_infos, sheet, line):
         u""" write the infos of the layer into the Excel workbook """
         # local variables
         champs = ""
@@ -2254,7 +2251,7 @@ class DicoGIS(Tk):
 
         # Path of parent folder formatted to be a hyperlink
         try:
-            link = 'HYPERLINK("{0}"; "{1}")'.format(layer_infos.get(u'folder'),
+            link = 'HYPERLINK("{0}"; "{1}")'.format(layer_infos.get(u'folder', "No"),
                                                     self.blabla.get('browse'))
         except UnicodeDecodeError:
             # write a notification into the log file
@@ -2266,7 +2263,7 @@ class DicoGIS(Tk):
 
         # Name of parent folder
         # with an exception if this is the format name
-        if not path.basename(layer_infos.get(u'folder')).lower() in self.li_vectors_formats:
+        if not path.basename(layer_infos.get('folder')).lower() in self.li_vectors_formats:
             sheet.write(line, 2, path.basename(layer_infos.get(u'folder')))
         else:
             sheet.write(line, 2, path.basename(path.dirname(layer_infos.get(u'folder'))))
@@ -2304,15 +2301,16 @@ class DicoGIS(Tk):
         # total size
         self.feuyVC.write(line, 14, layer_infos.get(u'total_size'))
         # Field informations
-        for chp in fields_info.keys():
+        fields = layer_infos.get("fields")
+        for chp in fields.keys():
             # field type
-            if 'Integer' in fields_info[chp][0]:
+            if 'Integer' in fields[chp][0]:
                 tipo = self.blabla.get(u'entier')
-            elif fields_info[chp][0] == 'Real':
+            elif fields[chp][0] == 'Real':
                 tipo = self.blabla.get(u'reel')
-            elif fields_info[chp][0] == 'String':
+            elif fields[chp][0] == 'String':
                 tipo = self.blabla.get(u'string')
-            elif fields_info[chp][0] == 'Date':
+            elif fields[chp][0] == 'Date':
                 tipo = self.blabla.get(u'date')
             else:
                 tipo = "unknown"
@@ -2322,9 +2320,9 @@ class DicoGIS(Tk):
             try:
                 champs = champs + chp +\
                           u" (" + tipo + self.blabla.get(u'longueur') +\
-                          unicode(fields_info[chp][1]) +\
+                          unicode(fields[chp][1]) +\
                           self.blabla.get(u'precision') +\
-                          unicode(fields_info[chp][2]) + u") ; "
+                          unicode(fields[chp][2]) + u") ; "
             except UnicodeDecodeError:
                 # write a notification into the log file
                 self.dico_err[layer_infos.get('name')] = self.blabla.get(u'err_encod')\
@@ -2334,8 +2332,8 @@ class DicoGIS(Tk):
                 # decode the fucking field name
                 champs = champs + chp.decode('latin1') \
                 + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
-                                                        fields_info[chp][1],
-                                                        fields_info[chp][2])
+                                                        fields[chp][1],
+                                                        fields[chp][2])
                 # then continue
                 continue
 
@@ -2570,16 +2568,16 @@ class DicoGIS(Tk):
             sheet.write(line, 13, emprise, self.xls_wrap)
 
             # Field informations
-            fields_info = gdb_layer.get(u'fields')
-            for chp in fields_info.keys():
+            fields = gdb_layer.get(u'fields')
+            for chp in fields.keys():
                 # field type
-                if 'Integer' in fields_info[chp][0]:
+                if 'Integer' in fields[chp][0]:
                     tipo = self.blabla.get(u'entier')
-                elif fields_info[chp][0] == 'Real':
+                elif fields[chp][0] == 'Real':
                     tipo = self.blabla.get(u'reel')
-                elif fields_info[chp][0] == 'String':
+                elif fields[chp][0] == 'String':
                     tipo = self.blabla.get(u'string')
-                elif fields_info[chp][0] == 'Date':
+                elif fields[chp][0] == 'Date':
                     tipo = self.blabla.get(u'date')
                 # concatenation of field informations
                 try:
@@ -3015,7 +3013,7 @@ class DicoGIS(Tk):
         # End of function
         return self.feuyMAPS, line
 
-    def dictionarize_pg(self, layer_infos, fields_info, sheet, line):
+    def dictionarize_pg(self, layer_infos, sheet, line):
         u""" write the infos of the layer into the Excel workbook """
         # local variables
         champs = ""
@@ -3064,23 +3062,24 @@ class DicoGIS(Tk):
         # Format of data
         sheet.write(line, 12, layer_infos.get(u'type'))
         # Field informations
-        for chp in fields_info.keys():
+        fields = layer_infos.get("fields")
+        for chp in fields.keys():
             # field type
-            if 'Integer' in fields_info[chp][0]:
+            if 'Integer' in fields[chp][0]:
                 tipo = self.blabla.get(u'entier')
-            elif fields_info[chp][0] == 'Real':
+            elif fields[chp][0] == 'Real':
                 tipo = self.blabla.get(u'reel')
-            elif fields_info[chp][0] == 'String':
+            elif fields[chp][0] == 'String':
                 tipo = self.blabla.get(u'string')
-            elif fields_info[chp][0] == 'Date':
+            elif fields[chp][0] == 'Date':
                 tipo = self.blabla.get(u'date')
             # concatenation of field informations
             try:
                 champs = champs + chp +\
                          u" (" + tipo + self.blabla.get(u'longueur') +\
-                         unicode(fields_info[chp][1]) +\
+                         unicode(fields[chp][1]) +\
                          self.blabla.get(u'precision') +\
-                         unicode(fields_info[chp][2]) + u") ; "
+                         unicode(fields[chp][2]) + u") ; "
             except UnicodeDecodeError:
                 # write a notification into the log file
                 self.dico_err[layer_infos.get('name')] = self.blabla.get(u'err_encod') + \
@@ -3090,8 +3089,8 @@ class DicoGIS(Tk):
                 # decode the fucking field name
                 champs = champs + chp.decode('latin1') \
                         + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
-                                                                fields_info[chp][1],
-                                                                fields_info[chp][2])
+                                                                fields[chp][1],
+                                                                fields[chp][2])
                 # then continue
                 continue
 
