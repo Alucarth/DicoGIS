@@ -26,7 +26,6 @@ install_aliases()
 import logging
 
 # 3rd party libraries
-from osgeo import ogr, osr
 from osgeo import gdal
 from gdalconst import *
 
