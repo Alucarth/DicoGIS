@@ -190,7 +190,8 @@ if __name__ == '__main__':
     li_shp = [path.realpath(r'..\..\test\datatest\vectors\shp\itineraires_rando.shp'),
               path.realpath(r'..\..\test\datatest\vectors\shp\airports.shp'),
               path.realpath(r'..\..\test\datatest\vectors\tab\tab\airports_MI.tab'),
-              path.realpath(r'..\..\test\datatest\vectors\tab\tab\Hydrobiologie.TAB')
+              path.realpath(r'..\..\test\datatest\vectors\tab\tab\Hydrobiologie.TAB'),
+              path.realpath(r'..\..\test\datatest\vectors\geojson\wc2014_MapTour.geojson'),
               ]
     # test text dictionary
     textos = OrderedDict()

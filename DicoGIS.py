@@ -62,10 +62,9 @@ from xlwt import easyxf, Formula, Workbook  # excel writer
 
 # Custom modules
 from modules import ReadRasters    # for rasters files
-from modules import ReadVectorFlatDataset  # for shapefiles and TAB
+from modules import ReadVectorFlatDataset  # for various vectors flat dataset
 from modules import ReadKML        # for KML
 from modules import ReadGML        # for GML
-from modules import ReadGeoJSON    # for GeoJSON
 from modules import ReadGXT    # for Geoconcept eXport Text
 from modules import ReadPostGIS    # for PostGIS databases
 from modules import ReadGDB        # for Esri FileGeoDataBase
@@ -1264,9 +1263,7 @@ class DicoGIS(Tk):
                                           self.feuyVC, line_vectors)
 
                 # TESTING ##
-                self.wb.store_md_vector(self.dico_layer,
-                                        # self.dico_fields
-                                        )
+                self.wb.store_md_vector(self.dico_layer)
 
                 logging.info('\t Wrote into the dictionary')
                 # increment the line number
@@ -1307,8 +1304,7 @@ class DicoGIS(Tk):
                                           line_vectors)
 
                 # TESTING ##
-                self.wb.store_md_vector(self.dico_layer,
-                                        self.dico_fields)
+                self.wb.store_md_vector(self.dico_layer)
 
                 logging.info('\t Wrote into the dictionary')
                 # increment the line number
@@ -1348,8 +1344,7 @@ class DicoGIS(Tk):
                                           self.feuyVC, line_vectors)
 
                 ### TESTING
-                self.wb.store_md_vector(self.dico_layer,
-                                        self.dico_fields)
+                self.wb.store_md_vector(self.dico_layer)
 
                 logging.info('\t Wrote into the dictionary')
                 # increment the line number
@@ -1372,11 +1367,10 @@ class DicoGIS(Tk):
                 self.dico_fields.clear()
                 # getting the informations
                 try:
-                    ReadGeoJSON(path.abspath(geojson),
-                                 self.dico_layer,
-                                 self.dico_fields,
-                                 'GeoJSON',
-                                 self.blabla)
+                    ReadVectorFlatDataset(path.abspath(geojson),
+                                          self.dico_layer,
+                                          'GeoJSON',
+                                          self.blabla)
                     logging.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
@@ -1385,13 +1379,11 @@ class DicoGIS(Tk):
                     continue
                 # writing to the Excel dictionary
                 self.dictionarize_vectors(self.dico_layer,
-                                          self.dico_fields,
                                           self.feuyVC,
                                           line_vectors)
 
-                ### TESTING
-                self.wb.store_md_vector(self.dico_layer,
-                                        self.dico_fields)
+                # TESTING ##
+                self.wb.store_md_vector(self.dico_layer)
 
                 logging.info('\t Wrote into the dictionary')
                 # increment the line number
@@ -1432,8 +1424,7 @@ class DicoGIS(Tk):
                                           line_vectors)
 
                 ### TESTING
-                self.wb.store_md_vector(self.dico_layer,
-                                        self.dico_fields)
+                self.wb.store_md_vector(self.dico_layer)
 
                 logging.info('\t Wrote into the dictionary')
                 # increment the line number
