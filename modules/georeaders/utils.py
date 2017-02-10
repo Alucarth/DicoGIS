@@ -48,12 +48,6 @@ class Utils(object):
                         if path.splitext(path.abspath(f))[0] == path.splitext(main_file_path)[0]
                         and not path.splitext(path.abspath(f).lower())[1] == exclude]
 
-        # # total file and dependencies size
-        # dependencies.append(layerpath)
-        # total_size = sum([path.getsize(f) for f in dependencies])
-        # dico_layer[u"total_size"] = self.sizeof(total_size)
-        # dependencies.pop(-1)
-
         return dependencies
 
     def sizeof(self, source_path, dependencies=[]):
@@ -62,7 +56,9 @@ class Utils(object):
         see: http://stackoverflow.com/a/1094933
         """
         if path.isfile(source_path):
+            dependencies.append(source_path)
             total_size = sum([path.getsize(f) for f in dependencies])
+            dependencies.pop(-1)
         elif path.isdir(source_path):
             # sum files size
             total_size = 0

@@ -126,7 +126,7 @@ class ReadVectorFlatDataset():
                                         .capitalize()
 
         # dependencies and total size
-        dependencies = youtils.list_dependencies(layerpath, ".shp")
+        dependencies = youtils.list_dependencies(layerpath, "auto")
         dico_layer[u'dependencies'] = dependencies
         dico_layer[u"total_size"] = youtils.sizeof(layerpath,
                                                    dependencies)
@@ -192,6 +192,7 @@ if __name__ == '__main__':
               path.realpath(r'..\..\test\datatest\vectors\tab\tab\airports_MI.tab'),
               path.realpath(r'..\..\test\datatest\vectors\tab\tab\Hydrobiologie.TAB'),
               path.realpath(r'..\..\test\datatest\vectors\geojson\wc2014_MapTour.geojson'),
+              path.realpath(r'..\..\test\datatest\vectors\gml\airports.gml'),
               ]
     # test text dictionary
     textos = OrderedDict()
