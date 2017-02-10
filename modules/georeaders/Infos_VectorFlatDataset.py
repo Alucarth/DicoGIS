@@ -63,13 +63,13 @@ youtils = Utils()
 
 
 class ReadVectorFlatDataset():
-    def __init__(self, layerpath, dico_layer, tipo, txt=''):
+    def __init__(self, source_path, dico_dataset, tipo, txt=''):
         """Use OGR functions to extract basic informations about
         geographic vector file (handles shapefile or MapInfo tables)
         and store into dictionaries.
 
-        layerpath = path to the geographic file
-        dico_layer = dictionary for global informations
+        source_path = path to the geographic file
+        dico_dataset = dictionary for global informations
         dico_fields = dictionary for the fields' informations
         li_fieds = ordered list of fields
         tipo = shp or tab
@@ -79,19 +79,20 @@ class ReadVectorFlatDataset():
         errhandler = gdal_err.handler
         gdal.PushErrorHandler(errhandler)
         gdal.UseExceptions()
+        ogr.UseExceptions()
         self.alert = 0
 
         # changing working directory to layer folder
-        chdir(path.dirname(layerpath))
-        dico_layer['type'] = tipo
+        chdir(path.dirname(source_path))
+        dico_dataset['type'] = tipo
 
         # raising corrupt files
         try:
             # driver = ogr.GetDriverByName(str("ESRI Shapefile"))
             # print(help(driver.Open))
-            # source_ogr = driver.Open(layerpath, 0)
-            # source = ogr.Open(layerpath)
-            source = gdal.OpenEx(layerpath, 0)  # GDAL driver
+            # source_ogr = driver.Open(source_path, 0)
+            # source = ogr.Open(source_path)
+            src = gdal.OpenEx(source_path, 0)  # GDAL driver
             # print(type(source_ogr))
             # print(type(source_gdal))
             # print(source_ogr == source_gdal)
@@ -99,83 +100,84 @@ class ReadVectorFlatDataset():
         except Exception as e:
             logging.error(e)
             self.alert = self.alert + 1
-            youtils.erratum(dico_layer, layerpath, u'err_corrupt')
-            dico_layer['err_gdal'] = gdal_err.err_type, gdal_err.err_msg
+            youtils.erratum(dico_dataset, source_path, u'err_corrupt')
+            dico_dataset['err_gdal'] = gdal_err.err_type, gdal_err.err_msg
             return None
 
         # raising incompatible files
-        if not source:
+        if not src:
             u""" if file is not compatible """
             self.alert += 1
-            dico_layer['err_gdal'] = gdal_err.err_type, gdal_err.err_msg
-            youtils.erratum(dico_layer, layerpath, u'err_nobjet')
+            dico_dataset['err_gdal'] = gdal_err.err_type, gdal_err.err_msg
+            youtils.erratum(dico_dataset, source_path, u'err_nobjet')
             return None
         else:
-            layer = source.GetLayer()   # get the layer
+            layer = src.GetLayer()   # get the layer
             pass
 
         # dataset name, title and parent folder
         try:
-            dico_layer['name'] = path.basename(layerpath)
-            dico_layer['folder'] = path.dirname(layerpath)
+            dico_dataset['name'] = path.basename(source_path)
+            dico_dataset['folder'] = path.dirname(source_path)
         except AttributeError as e:
-            dico_layer['name'] = path.basename(layer.GetName())
-            dico_layer['folder'] = path.dirname(layer.GetName())
-        dico_layer['title'] = dico_layer.get('name')[:-4]\
-                                        .replace('_', ' ')\
-                                        .capitalize()
+            dico_dataset['name'] = path.basename(layer.GetName())
+            dico_dataset['folder'] = path.dirname(layer.GetName())
+        dico_dataset['title'] = dico_dataset.get('name')[:-4]\
+                                            .replace('_', ' ')\
+                                            .capitalize()
 
         # dependencies and total size
-        dependencies = youtils.list_dependencies(layerpath, "auto")
-        dico_layer[u'dependencies'] = dependencies
-        dico_layer[u"total_size"] = youtils.sizeof(layerpath,
-                                                   dependencies)
+        dependencies = youtils.list_dependencies(source_path, "auto")
+        dico_dataset[u'dependencies'] = dependencies
+        dico_dataset[u"total_size"] = youtils.sizeof(source_path,
+                                                     dependencies)
         # Getting basic dates
-        dico_layer[u'date_actu'] = strftime('%Y-%m-%d',
-                                            localtime(path.getmtime(layerpath)))
-        dico_layer[u'date_crea'] = strftime('%Y-%m-%d',
-                                            localtime(path.getctime(layerpath)))
+        crea, up = path.getctime(source_path), path.getmtime(source_path)
+        dico_dataset[u'date_crea'] = strftime('%Y/%m/%d',
+                                              localtime(crea))
+        dico_dataset[u'date_actu'] = strftime('%Y/%m/%d',
+                                              localtime(up))
 
         # features
         layer_feat_count = layer.GetFeatureCount()
-        dico_layer['num_obj'] = layer_feat_count
+        dico_dataset['num_obj'] = layer_feat_count
         if layer_feat_count == 0:
             u""" if layer doesn't have any object, return an error """
             self.alert += 1
-            youtils.erratum(dico_layer, layerpath, u'err_nobjet')
+            youtils.erratum(dico_dataset, source_path, u'err_nobjet')
             return None
         else:
             pass
 
         # fields
         layer_def = layer.GetLayerDefn()
-        dico_layer['num_fields'] = layer_def.GetFieldCount()
-        dico_layer['fields'] = georeader.get_fields_details(layer_def)
+        dico_dataset['num_fields'] = layer_def.GetFieldCount()
+        dico_dataset['fields'] = georeader.get_fields_details(layer_def)
 
         # geometry type
-        dico_layer[u'type_geom'] = georeader.get_geometry_type(layer)
+        dico_dataset[u'type_geom'] = georeader.get_geometry_type(layer)
 
         # SRS
         srs_details = georeader.get_srs_details(layer, txt)
-        dico_layer[u'srs'] = srs_details[0]
-        dico_layer[u'EPSG'] = srs_details[1]
-        dico_layer[u'srs_type'] = srs_details[2]
+        dico_dataset[u'srs'] = srs_details[0]
+        dico_dataset[u'EPSG'] = srs_details[1]
+        dico_dataset[u'srs_type'] = srs_details[2]
 
         # spatial extent
         extent = georeader.get_extent_as_tuple(layer)
-        dico_layer[u'Xmin'] = extent[0]
-        dico_layer[u'Xmax'] = extent[1]
-        dico_layer[u'Ymin'] = extent[2]
-        dico_layer[u'Ymax'] = extent[3]
+        dico_dataset[u'Xmin'] = extent[0]
+        dico_dataset[u'Xmax'] = extent[1]
+        dico_dataset[u'Ymin'] = extent[2]
+        dico_dataset[u'Ymax'] = extent[3]
 
         # warnings messages
         if self.alert:
-            dico_layer['err_gdal'] = gdal_err.err_type, gdal_err.err_msg
+            dico_dataset['err_gdal'] = gdal_err.err_type, gdal_err.err_msg
         else:
             pass
 
-        # safe exit
-        del source
+        # clean exit
+        del src
 
 # ############################################################################
 # #### Stand alone program ########
@@ -208,18 +210,18 @@ if __name__ == '__main__':
     textos['geom_ligne'] = u'Line'
     textos['geom_polyg'] = u'Polygon'
     # recipient datas
-    dico_layer = OrderedDict()     # dictionary where will be stored informations
+    dico_dataset = OrderedDict()     # dictionary where will be stored informations
     dico_fields = OrderedDict()    # dictionary for fields information
     # execution
     for shp in li_shp:
         """ looping on shapefiles list """
         # reset recipient data
-        dico_layer.clear()
+        dico_dataset.clear()
         dico_fields.clear()
         # getting the informations
         print('\n{0}'.format(shp))
         info_shp = ReadVectorFlatDataset(path.abspath(shp),
-                                         dico_layer,
+                                         dico_dataset,
                                          'shape',
                                          textos)
-        print(('\n', dico_layer))
+        print(('\n', dico_dataset))
