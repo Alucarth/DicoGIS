@@ -2,7 +2,6 @@
 from .Infos_Rasters import ReadRasters
 from .Infos_GDB import ReadGDB
 from .Infos_VectorFlatDataset import ReadVectorFlatDataset
-from .Infos_KML import ReadKML
 from .Infos_GXT import ReadGXT
 from .Infos_PostGIS import ReadPostGIS
 from .Infos_DXF import ReadDXF
