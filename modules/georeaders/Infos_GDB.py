@@ -52,13 +52,13 @@ youtils = Utils()
 
 
 class ReadGDB():
-    def __init__(self, gdbpath, dico_gdb, tipo, txt=''):
+    def __init__(self, source_path, dico_dataset, tipo, txt=''):
         u"""Use OGR functions to extract basic informations about
         geographic vector file (handles shapefile or MapInfo tables)
         and store into dictionaries.
 
-        gdbpath = path to the File Geodatabase Esri
-        dico_gdb = dictionary for global informations
+        source_path = path to the File Geodatabase Esri
+        dico_dataset = dictionary for global informations
         dico_fields = dictionary for the fields' informations
         li_fieds = ordered list of fields
         tipo = format
@@ -71,56 +71,53 @@ class ReadGDB():
         gdal.UseExceptions()
         self.alert = 0
 
-        # counting alerts
-        self.alert = 0
-
         # opening GDB
         try:
             driver = ogr.GetDriverByName(str("OpenFileGDB"))
-            gdb = driver.Open(gdbpath, 0)
+            src = driver.Open(source_path, 0)
         except Exception as e:
             logging.error(e)
-            youtils.erratum(dico_gdb, gdbpath, u'err_corrupt')
+            youtils.erratum(dico_dataset, source_path, u'err_corrupt')
             self.alert = self.alert + 1
             return None
 
         # GDB name and parent folder
         try:
-            dico_gdb['name'] = path.basename(gdb.GetName())
-            dico_gdb['folder'] = path.dirname(gdb.GetName())
+            dico_dataset['name'] = path.basename(src.GetName())
+            dico_dataset['folder'] = path.dirname(src.GetName())
         except AttributeError as e:
-            dico_gdb['name'] = path.basename(gdbpath)
-            dico_gdb['folder'] = path.dirname(gdbpath)
+            dico_dataset['name'] = path.basename(source_path)
+            dico_dataset['folder'] = path.dirname(source_path)
         # layers count and names
-        dico_gdb['layers_count'] = gdb.GetLayerCount()
+        dico_dataset['layers_count'] = src.GetLayerCount()
         li_layers_names = []
         li_layers_idx = []
-        dico_gdb['layers_names'] = li_layers_names
-        dico_gdb['layers_idx'] = li_layers_idx
+        dico_dataset['layers_names'] = li_layers_names
+        dico_dataset['layers_idx'] = li_layers_idx
 
         # cumulated size
-        dico_gdb[u"total_size"] = youtils.sizeof(gdbpath)
+        dico_dataset[u"total_size"] = youtils.sizeof(source_path)
 
         # global dates
-        dico_gdb[u'date_actu'] = strftime('%d/%m/%Y',
-                                          localtime(path.getmtime(gdbpath)))
-        dico_gdb[u'date_crea'] = strftime('%d/%m/%Y',
-                                          localtime(path.getctime(gdbpath)))
+        crea, up = path.getctime(source_path), path.getmtime(source_path)
+        dico_dataset[u'date_crea'] = strftime('%Y/%m/%d',
+                                              localtime(crea))
+        dico_dataset[u'date_actu'] = strftime('%Y/%m/%d',
+                                              localtime(up))
         # total fields count
         total_fields = 0
-        dico_gdb['total_fields'] = total_fields
+        dico_dataset['total_fields'] = total_fields
         # total objects count
         total_objs = 0
-        dico_gdb['total_objs'] = total_objs
+        dico_dataset['total_objs'] = total_objs
         # parsing layers
-        for layer_idx in range(gdb.GetLayerCount()):
+        for layer_idx in range(src.GetLayerCount()):
             # dictionary where will be stored informations
             dico_layer = OrderedDict()
             # parent GDB
-            dico_layer['gdb_name'] = path.basename(gdb.GetName())
+            dico_layer['src_name'] = path.basename(src.GetName())
             # getting layer object
-            layer = gdb.GetLayerByIndex(layer_idx)
-            self.layer_obj = layer
+            layer = src.GetLayerByIndex(layer_idx)
             # layer globals
             li_layers_names.append(layer.GetName())
             dico_layer[u'title'] = georeader.get_title(layer)
@@ -158,8 +155,9 @@ class ReadGDB():
             dico_layer[u'Ymax'] = extent[3]
 
             # storing layer into the GDB dictionary
-            dico_gdb['{0}_{1}'.format(layer_idx,
-                                      dico_layer.get('title'))] = dico_layer
+            dico_dataset['{0}_{1}'
+                         .format(layer_idx,
+                                 dico_layer.get('title'))] = dico_layer
             # summing fields number
             total_fields += dico_layer.get('num_fields', 0)
             # summing objects number
@@ -167,11 +165,16 @@ class ReadGDB():
             # deleting dictionary to ensure having cleared space
             del dico_layer
         # storing fileds and objects sum
-        dico_gdb['total_fields'] = total_fields
-        dico_gdb['total_objs'] = total_objs
+        dico_dataset['total_fields'] = total_fields
+        dico_dataset['total_objs'] = total_objs
 
         # warnings messages
-        dico_gdb['err_gdal'] = gdal_err.err_type, gdal_err.err_msg
+        if self.alert:
+            dico_dataset['err_gdal'] = gdal_err.err_type, gdal_err.err_msg
+        else:
+            pass
+        # clean exit
+        del src
 
 # ############################################################################
 # #### Stand alone program #######
@@ -219,21 +222,21 @@ if __name__ == '__main__':
                     pass
 
     # recipient datas
-    dico_gdb = OrderedDict()
+    dico_dataset = OrderedDict()
 
     # read GDB
-    for gdbpath in li_gdb:
-        dico_gdb.clear()
-        gdbpath = path.abspath(gdbpath)
-        print(path.isdir(gdbpath), gdbpath)
-        if path.isdir(gdbpath):
-            print("\n{0}: ".format(path.realpath(gdbpath)))
-            ReadGDB(gdbpath,
-                    dico_gdb,
+    for source_path in li_gdb:
+        dico_dataset.clear()
+        source_path = path.abspath(source_path)
+        print(path.isdir(source_path), source_path)
+        if path.isdir(source_path):
+            print("\n{0}: ".format(path.realpath(source_path)))
+            ReadGDB(source_path,
+                    dico_dataset,
                     'Esri FileGDB',
                     textos)
             # print results
-            print(dico_gdb)
+            print(dico_dataset)
         else:
-            print(path.isfile(gdbpath), gdbpath)
+            print(path.isfile(source_path), source_path)
             pass

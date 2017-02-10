@@ -75,7 +75,7 @@ from modules import ReadLYR  # Esri LYR files
 from modules import CheckNorris
 from modules import ConfigExcel
 from modules import files2xlsx
-from modules import MetricsManager
+# from modules import MetricsManager
 from modules import OptionsManager
 from modules import TextsManager
 
@@ -106,7 +106,7 @@ logger.addHandler(logfile)
 
 class DicoGIS(Tk):
     # attributes
-    DGversion = "2.5.0-beta3"
+    DGversion = "2.5.0-beta4"
 
     def __init__(self):
         u""" Main window constructor
@@ -1402,7 +1402,6 @@ class DicoGIS(Tk):
                 try:
                     ReadGXT(path.abspath(gxtpath),
                             self.dico_layer,
-                            self.dico_fields,
                             'Geoconcept eXport Text',
                             self.blabla)
                     logging.info('\t Infos OK')
@@ -1413,11 +1412,10 @@ class DicoGIS(Tk):
                     continue
                 # writing to the Excel dictionary
                 self.dictionarize_vectors(self.dico_layer,
-                                          self.dico_fields,
                                           self.feuyVC,
                                           line_vectors)
 
-                ### TESTING
+                # TESTING ##
                 self.wb.store_md_vector(self.dico_layer)
 
                 logging.info('\t Wrote into the dictionary')
@@ -1536,7 +1534,7 @@ class DicoGIS(Tk):
                                       self.feuyFGDB,
                                       line_fdb)
 
-                ### TESTING
+                # TESTING ##
                 self.wb.store_md_fdb(self.dico_fdb)
 
                 logging.info('\t Wrote into the dictionary')
@@ -1560,9 +1558,9 @@ class DicoGIS(Tk):
                 # getting the informations
                 try:
                     ReadDXF(path.abspath(dxf),
-                             self.dico_cdao,
-                             'AutoCAD DXF',
-                             self.blabla)
+                            self.dico_cdao,
+                            'AutoCAD DXF',
+                            self.blabla)
                     logging.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
@@ -1574,7 +1572,7 @@ class DicoGIS(Tk):
                                        self.feuyCDAO,
                                        line_cdao)
 
-                ### TESTING
+                # TESTING ##
                 self.wb.store_md_cad(self.dico_cdao)
 
                 logging.info('\t Wrote into the dictionary')
@@ -2444,9 +2442,16 @@ class DicoGIS(Tk):
                                                     self.blabla.get('browse'))
             sheet.write(line, 1, Formula(link), self.url)
             sheet.write(line, 2, self.blabla.get(gdb_infos.get('error')),
-                                 self.xls_erreur)
-            # incrementing line
-            # gdb_infos['layers_count'] = 0
+                        self.xls_erreur)
+            # GDAL report
+            if gdb_infos.get('err_gdal', [0, ])[0] != 0:
+                logging.warning('\tproblem detected')
+                sheet.write(line, 16, "{0} : {1}"
+                            .format(gdb_infos.get('err_gdal')[0],
+                                    gdb_infos.get('err_gdal')[1]),
+                            self.xls_erreur)
+            else:
+                pass
             # Interruption of function
             return self.feuyFGDB, line
         else:
@@ -2487,14 +2492,6 @@ class DicoGIS(Tk):
 
         # total number of objects
         sheet.write(line, 8, gdb_infos.get(u'total_objs'))
-
-        # in case of a source error
-        if gdb_infos.get('err_gdal')[0] != 0:
-            logging.warning('\tproblem detected')
-            sheet.write(line, 15, "{0} : {1}".format(gdb_infos.get('err_gdal')[0],
-                                                     gdb_infos.get('err_gdal')[1]), self.xls_erreur)
-        else:
-            pass
 
         # parsing layers
         for (layer_idx, layer_name) in zip(gdb_infos.get(u'layers_idx'),
@@ -2599,9 +2596,18 @@ class DicoGIS(Tk):
                                                     self.blabla.get('browse'))
             sheet.write(line, 1, Formula(link), self.url)
             sheet.write(line, 2, self.blabla.get(dico_cdao.get('error')),
-                                 self.xls_erreur)
+                        self.xls_erreur)
             # incrementing line
             dico_cdao['layers_count'] = 0
+            # GDAL report
+            if dico_cdao.get('err_gdal', [0, ])[0] != 0:
+                logging.warning('\tproblem detected')
+                sheet.write(line, 16, "{0} : {1}"
+                            .format(dico_cdao.get('err_gdal')[0],
+                                    dico_cdao.get('err_gdal')[1]),
+                            self.xls_erreur)
+            else:
+                pass
             # Interruption of function
             return self.feuyCDAO, line
         else:
@@ -2692,15 +2698,19 @@ class DicoGIS(Tk):
                     tipo = self.blabla.get(u'string')
                 elif fields_info[chp] == 'Date':
                     tipo = self.blabla.get(u'date')
+                else:
+                    tipo = fields_info[chp]
                 # concatenation of field informations
                 try:
-                    champs = champs + chp + u" (" + tipo + u") \n; "
+                    # champs = champs + chp + u" (" + tipo + u") \n; "
+                    champs = champs + chp + u" ({0}) ; ".format(tipo)
                 except UnicodeDecodeError:
                     # write a notification into the log file
                     self.dico_err[dico_cdao.get('name')] = self.blabla.get(u'err_encod') + \
                                                            chp.decode('latin1') + \
                                                            u"\n\n"
-                    logging.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
+                    logging.warning('Field name with special letters: {}'
+                                    .format(chp.decode('latin1')))
                     # decode the fucking field name
                     champs = champs + chp.decode('latin1') + u" ({}) ;".format(tipo)
                     # then continue
