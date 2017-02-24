@@ -32,7 +32,7 @@ import tkFont   # font library
 import locale
 from sys import exit, platform as opersys
 from os import listdir, walk, path         # files and folder managing
-from os import environ as env, access, R_OK
+from os import environ as env
 from time import strftime
 from webbrowser import open_new
 import threading    # handling various subprocesses
@@ -41,8 +41,6 @@ import platform  # about operating systems
 
 import logging  # log files
 from logging.handlers import RotatingFileHandler
-
-import subprocess
 
 # Python 3 backported
 from collections import OrderedDict  # ordered dictionary
@@ -75,21 +73,18 @@ from modules import ReadLYR  # Esri LYR files
 from modules import CheckNorris
 from modules import ConfigExcel
 from modules import files2xlsx
+from modules import Utilities
 # from modules import MetricsManager
 from modules import OptionsManager
 from modules import TextsManager
 
-# Imports depending on operating system
-if opersys == 'win32':
-    u""" windows """
-    from os import startfile        # to open a folder/file
-else:
-    pass
-
 # ##############################################################################
-# ############ Log file ############
-# ##################################
-# see: http://sametmax.com/ecrire-des-logs-en-python/
+# ############ Globals ############
+# #################################
+
+utils_global = Utilities()
+
+# LOG
 logger = logging.getLogger()
 logging.captureWarnings(True)
 logger.setLevel(logging.INFO)  # all errors will be get
@@ -599,7 +594,7 @@ class DicoGIS(Tk):
         self.welcome = Label(self,
                              text=self.blabla.get('hi') + self.uzer,
                              font=ft_tit,
-                             foreground="red2")
+                             foreground="blue")
 
         # Frame: Output
         self.FrOutp = Labelframe(self,
@@ -1215,11 +1210,6 @@ class DicoGIS(Tk):
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
-                self.dictionarize_vectors(self.dico_layer,
-                                          self.feuyVC,
-                                          line_vectors)
-
-                # TESTING ##
                 self.wb.store_md_vector(self.dico_layer)
 
                 logging.info('\t Wrote into the dictionary')
@@ -1255,12 +1245,7 @@ class DicoGIS(Tk):
                     logging.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
-                # writing to the Excel dictionary
-                self.dictionarize_vectors(self.dico_layer,
-                                          # self.dico_fields,
-                                          self.feuyVC, line_vectors)
-
-                # TESTING ##
+                # writing to the Excel file
                 self.wb.store_md_vector(self.dico_layer)
 
                 logging.info('\t Wrote into the dictionary')
@@ -1295,11 +1280,6 @@ class DicoGIS(Tk):
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
-                self.dictionarize_vectors(self.dico_layer,
-                                          self.feuyVC,
-                                          line_vectors)
-
-                # TESTING ##
                 self.wb.store_md_vector(self.dico_layer)
 
                 logging.info('\t Wrote into the dictionary')
@@ -1334,10 +1314,6 @@ class DicoGIS(Tk):
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
-                self.dictionarize_vectors(self.dico_layer,
-                                          self.feuyVC, line_vectors)
-
-                ### TESTING
                 self.wb.store_md_vector(self.dico_layer)
 
                 logging.info('\t Wrote into the dictionary')
@@ -1372,11 +1348,6 @@ class DicoGIS(Tk):
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
-                self.dictionarize_vectors(self.dico_layer,
-                                          self.feuyVC,
-                                          line_vectors)
-
-                # TESTING ##
                 self.wb.store_md_vector(self.dico_layer)
 
                 logging.info('\t Wrote into the dictionary')
@@ -1411,11 +1382,6 @@ class DicoGIS(Tk):
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
-                self.dictionarize_vectors(self.dico_layer,
-                                          self.feuyVC,
-                                          line_vectors)
-
-                # TESTING ##
                 self.wb.store_md_vector(self.dico_layer)
 
                 logging.info('\t Wrote into the dictionary')
@@ -1696,7 +1662,7 @@ class DicoGIS(Tk):
         self.bell()
 
         # quit and exit
-        self.open_dir_file(self.output.get())
+        utils_global.open_dir_file(self.output.get())
         self.destroy()
         exit()
 
@@ -1742,7 +1708,7 @@ class DicoGIS(Tk):
         logging.info('\n\tWorkbook saved: %s', self.output.get())
 
         # quit and exit
-        self.open_dir_file(self.output.get())
+        utils_global.open_dir_file(self.output.get())
         self.destroy()
         exit()
 
@@ -1908,7 +1874,7 @@ class DicoGIS(Tk):
         logging.info('\n\tWorkbook saved: %s', self.output.get())
 
         # quit and exit
-        self.open_dir_file(self.output.get())
+        utils_global.open_dir_file(self.output.get())
         self.destroy()
         exit()
 
@@ -2206,131 +2172,6 @@ class DicoGIS(Tk):
 
         # end of function
         return self.book, self.entete, self.url, self.xls_erreur
-
-    def dictionarize_vectors(self, layer_infos, sheet, line):
-        u""" write the infos of the layer into the Excel workbook """
-        # local variables
-        champs = ""
-        # in case of a source error
-        if layer_infos.get('error'):
-            sheet.row(line).set_style(self.xls_erreur)
-            err_mess = self.blabla.get(layer_infos.get('error'))
-            logging.warning('\tproblem detected')
-            sheet.write(line, 0, layer_infos.get('name'), self.xls_erreur)
-            sheet.write(line, 2, err_mess, self.xls_erreur)
-            link = 'HYPERLINK("{0}"; "{1}")'.format(layer_infos.get(u'folder'),
-                                                    self.blabla.get('browse'))
-            sheet.write(line, 1, Formula(link), self.url)
-            # GDAL report
-            if layer_infos.get('err_gdal', [0,])[0] != 0:
-                logging.warning('\tproblem detected')
-                sheet.write(line, 16, "{0} : {1}"
-                            .format(layer_infos.get('err_gdal')[0],
-                                    layer_infos.get('err_gdal')[1]),
-                            self.xls_erreur)
-            else:
-                pass
-            # Interruption of function
-            return self.book, self.feuyVC
-        else:
-            pass
-
-        # Name
-        sheet.write(line, 0, layer_infos.get('name'))
-
-        # Path of parent folder formatted to be a hyperlink
-        try:
-            link = 'HYPERLINK("{0}"; "{1}")'.format(layer_infos.get(u'folder', "No"),
-                                                    self.blabla.get('browse'))
-        except UnicodeDecodeError:
-            # write a notification into the log file
-            logging.warning('Path name with special letters: {}'.format(layer_infos.get(u'folder').decode('utf8')))
-            # decode the fucking path name
-            link = 'HYPERLINK("{0}"; "{1}")'.format(layer_infos.get(u'folder').decode('utf8'),
-                                                    self.blabla.get('browse'))
-        sheet.write(line, 1, Formula(link), self.url)
-
-        # Name of parent folder
-        # with an exception if this is the format name
-        if not path.basename(layer_infos.get('folder')).lower() in self.li_vectors_formats:
-            sheet.write(line, 2, path.basename(layer_infos.get(u'folder')))
-        else:
-            sheet.write(line, 2, path.basename(path.dirname(layer_infos.get(u'folder'))))
-
-        # Geometry type
-        sheet.write(line, 5, layer_infos.get(u'type_geom'))
-        # Spatial extent
-        emprise = u"Xmin : {0} - Xmax : {1} \
-                   \nYmin : {2} - Ymax : {3}".format(unicode(layer_infos.get(u'Xmin')),
-                                                     unicode(layer_infos.get(u'Xmax')),
-                                                     unicode(layer_infos.get(u'Ymin')),
-                                                     unicode(layer_infos.get(u'Ymax'))
-                                                     )
-        sheet.write(line, 9, emprise, self.xls_wrap)
-        # Name of srs
-        sheet.write(line, 6, layer_infos.get(u'srs'))
-        # Type of SRS
-        sheet.write(line, 7, layer_infos.get(u'srs_type'))
-        # EPSG code
-        sheet.write(line, 8, layer_infos.get(u'EPSG'))
-        # Number of fields
-        sheet.write(line, 3, layer_infos.get(u'num_fields'))
-        self.global_total_fields += layer_infos.get(u'num_fields')
-        # Name of objects
-        sheet.write(line, 4, layer_infos.get(u'num_obj'))
-        self.global_total_features += layer_infos.get(u'num_obj')
-        # Creation date
-        sheet.write(line, 10, layer_infos.get(u'date_crea'))
-        # Last update date
-        sheet.write(line, 11, layer_infos.get(u'date_actu'))
-        # Format of data
-        sheet.write(line, 12, layer_infos.get(u'type'))
-        # dependencies
-        self.feuyVC.write(line, 13, ' | '.join(layer_infos.get(u'dependencies')))
-        # total size
-        self.feuyVC.write(line, 14, layer_infos.get(u'total_size'))
-        # Field informations
-        fields = layer_infos.get("fields")
-        for chp in fields.keys():
-            # field type
-            if 'Integer' in fields[chp][0]:
-                tipo = self.blabla.get(u'entier')
-            elif fields[chp][0] == 'Real':
-                tipo = self.blabla.get(u'reel')
-            elif fields[chp][0] == 'String':
-                tipo = self.blabla.get(u'string')
-            elif fields[chp][0] == 'Date':
-                tipo = self.blabla.get(u'date')
-            else:
-                tipo = "unknown"
-                print(chp, " unknown type")
-
-            # concatenation of field informations
-            try:
-                champs = champs + chp +\
-                          u" (" + tipo + self.blabla.get(u'longueur') +\
-                          unicode(fields[chp][1]) +\
-                          self.blabla.get(u'precision') +\
-                          unicode(fields[chp][2]) + u") ; "
-            except UnicodeDecodeError:
-                # write a notification into the log file
-                self.dico_err[layer_infos.get('name')] = self.blabla.get(u'err_encod')\
-                                                    + chp.decode('latin1') \
-                                                    + u"\n\n"
-                logging.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
-                # decode the fucking field name
-                champs = champs + chp.decode('latin1') \
-                + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
-                                                        fields[chp][1],
-                                                        fields[chp][2])
-                # then continue
-                continue
-
-        # Once all fieds explored, write them
-        sheet.write(line, 15, champs)
-
-        # End of function
-        return self.book, self.feuyVC
 
     def dictionarize_rasters(self, dico_raster, dico_bands, sheet, line):
         u""" write the infos of the layer into the Excel workbook """
@@ -3105,7 +2946,7 @@ class DicoGIS(Tk):
         return
 
     def savedico(self):
-        u""" Save the Excel file """
+        u"""Save the Excel file."""
         # Prompt of folder where save the file
         saved = asksaveasfilename(initialdir=self.target.get(),
                                   defaultextension='.xls',
@@ -3118,6 +2959,12 @@ class DicoGIS(Tk):
         # check if the extension is correctly indicated
         if path.splitext(saved)[1] != ".xls":
             saved = saved + ".xls"
+        else:
+            pass
+        if path.splitext(saved)[1] != ".xlsx":
+            saved_xlsx = saved + ".xlsx"
+        else:
+            pass
         # save
         if saved != ".xls":
             try:
@@ -3133,47 +2980,13 @@ class DicoGIS(Tk):
             exit()
 
         self.wb.tunning_worksheets()
-        self.wb.save(path.join(self.target.get(), r"DicoGIS_test.xlsx"))
+        self.wb.save(path.join(self.target.get(), saved_xlsx))
         # End of function
         return self.book, saved
 
-    def open_dir_file(self, target):
-        """
-        Open a file or a directory in the explorer of the operating system
-        http://sametmax.com/ouvrir-un-fichier-avec-le-bon-programme-en-python
-        """
-        # check if the file or the directory exists
-        if not path.exists(target):
-            raise IOError('No such file: {0}'.format(target))
-
-        # check the read permission
-        if not access(target, R_OK):
-            raise IOError('Cannot access file: {0}'.format(target))
-
-        # open the directory or the file according to the os
-        if opersys == 'win32':  # Windows
-            proc = startfile(path.realpath(target))
-
-        elif opersys.startswith('linux'):  # Linux:
-            proc = subprocess.Popen(['xdg-open', target],
-                                    stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE)
-
-        elif opersys == 'darwin':  # Mac:
-            proc = subprocess.Popen(['open', '--', target],
-                                    stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE)
-
-        else:
-            raise NotImplementedError(
-                "Your `%s` isn't a supported operating system`." % opersys)
-
-        # end of function
-        return proc
-
-###############################################################################
-###### Stand alone program ########
-###################################
+# ############################################################################
+# #### Stand alone program ########
+# #################################
 
 if __name__ == '__main__':
     """ standalone execution """
