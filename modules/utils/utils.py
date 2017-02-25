@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
-from __future__ import unicode_literals
-from __future__ import print_function
+from __future__ import (absolute_import, print_function, unicode_literals)
 # ----------------------------------------------------------------------------
 # Name:         Geodata Explorer
 # Purpose:      Explore directory structure and list files and folders
@@ -21,9 +20,12 @@ from __future__ import print_function
 # ################################
 
 # Standard library
-from os import path, access, R_OK, walk  # files and folder managing
-from sys import platform as opersys
+from os import path, access, R_OK  # files and folder managing
+from sys import exit, platform as opersys
 import subprocess
+
+from tkFileDialog import asksaveasfilename    # dialogs
+from tkMessageBox import showerror as avert
 
 # Imports depending on operating system
 if opersys == 'win32':
@@ -72,6 +74,39 @@ class Utilities(object):
 
         # end of function
         return proc
+
+    def safe_save(self, wb, dest_dir=r".", dest_filename="DicoGIS.xlsx",
+                  ftype="Excel Workbook",
+                  dlg_title="DicoGIS - Save output Excel Workbook"):
+        u"""Safe save output file."""
+        # Prompt of folder where save the file
+        out_name = asksaveasfilename(initialdir=dest_dir,
+                                     initialfile=dest_filename,
+                                     defaultextension='.xlsx',
+                                     filetypes=[(ftype, "*.xlsx")],
+                                     title=dlg_title)
+
+        # check if the extension is correctly indicated
+        if path.splitext(out_name)[1] != ".xlsx":
+            out_name = out_name + ".xlsx"
+        else:
+            pass
+
+        out_path = path.join(dest_dir, out_name)
+        # save
+        if out_name != ".xlsx":
+            try:
+                wb.save(out_path)
+            except IOError:
+                avert(title=u'Concurrent access',
+                      message=u'Please close Microsoft Excel before saving.')
+                return out_name
+        else:
+            avert(title=u'Not saved', message="You cancelled saving operation")
+            exit()
+
+        # End of function
+        return out_name, out_path
 
 # ############################################################################
 # #### Stand alone program ########
