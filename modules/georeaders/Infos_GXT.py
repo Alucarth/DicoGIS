@@ -38,11 +38,11 @@ except ImportError:
 try:
     from .gdal_exceptions_handler import GdalErrorHandler
     from .geo_infos_generic import GeoInfosGenericReader
-    from .utils import Utils
+    from .geoutils import Utils
 except ValueError:
     from gdal_exceptions_handler import GdalErrorHandler
     from geo_infos_generic import GeoInfosGenericReader
-    from utils import Utils
+    from geoutils import Utils
 
 # ############################################################################
 # ######### Globals ############

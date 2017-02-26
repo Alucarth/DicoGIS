@@ -11,4 +11,4 @@ from .Infos_Isogeo_OC import ReadIsogeoOpenCatalog
 from .Infos_LYR import ReadLYR
 from .Infos_MXD import ReadMXD
 from .geo_infos_generic import GeoInfosGenericReader
-from .utils import Utils
+from .geoutils import Utils
