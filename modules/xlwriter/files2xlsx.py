@@ -38,8 +38,7 @@ from openpyxl.worksheet.properties import WorksheetProperties
 
 class files2xlsx(Workbook):
     """Export into a XLSX worksheet."""
-    li_cols_vector = [
-                      "nomfic",
+    li_cols_vector = ["nomfic",
                       "path",
                       "theme",
                       "num_attrib",
@@ -56,31 +55,30 @@ class files2xlsx(Workbook):
                       "tot_size",
                       "li_chps",
                       "gdal_warn"
-                     ]
+                      ]
 
-    li_cols_raster = [
-                     "nomfic",
-                     "path",
-                     "theme",
-                     "size_Y",
-                     "size_X",
-                     "pixel_w",
-                     "pixel_h",
-                     "origin_x",
-                     "origin_y",
-                     "srs_type",
-                     "codepsg",
-                     "emprise",
-                     "date_crea",
-                     "date_actu",
-                     "num_bands",
-                     "format",
-                     "compression",
-                     "coloref",
-                     "li_depends",
-                     "tot_size",
-                     "gdal_warn",
-                     ]
+    li_cols_raster = ["nomfic",
+                      "path",
+                      "theme",
+                      "size_Y",
+                      "size_X",
+                      "pixel_w",
+                      "pixel_h",
+                      "origin_x",
+                      "origin_y",
+                      "srs_type",
+                      "codepsg",
+                      "emprise",
+                      "date_crea",
+                      "date_actu",
+                      "num_bands",
+                      "format",
+                      "compression",
+                      "coloref",
+                      "li_depends",
+                      "tot_size",
+                      "gdal_warn",
+                      ]
 
     li_cols_filedb = [
                       "nomfic",
@@ -122,6 +120,28 @@ class files2xlsx(Workbook):
                       "num_objets",
                       "li_chps",
                       ]
+
+    li_cols_lyr = ["nomfic",
+                   "path",
+                   "theme",
+                   "custom_title",
+                   "lyr_type",
+                   "description",
+                   "keywords",
+                   "subject",
+                   "license",
+                   "tot_size",
+                   "date_crea",
+                   "date_actu",
+                   "emprise",
+                   "srs",
+                   "srs_type",
+                   "codepsg",
+                   "sub_layers",
+                   "num_attrib",
+                   "num_objets",
+                   "li_chps",
+                   ]
 
     li_cols_caodao = [
                       "nomfic",
@@ -165,7 +185,7 @@ class files2xlsx(Workbook):
         """
         super(files2xlsx, self).__init__()
         # super(files2xlsx, self).__init__(write_only=True)
-        self.texts = texts
+        self.txt = texts
 
         # styles
         s_date = NamedStyle(name="date")
@@ -182,13 +202,13 @@ class files2xlsx(Workbook):
     # ------------ Setting workbook ---------------------
 
     def set_worksheets(self, has_vector=0, has_raster=0, has_filedb=0,
-                       has_mapdocs=0, has_cad=0, has_sgbd=0):
+                       has_mapdocs=0, has_cad=0, has_lyr=0, has_sgbd=0):
         """Add news sheets depending on present metadata types."""
         # SHEETS & HEADERS
         if has_vector:
-            self.ws_v = self.create_sheet(title=self.texts.get("sheet_vectors"))
+            self.ws_v = self.create_sheet(title=self.txt.get("sheet_vectors"))
             # headers
-            self.ws_v.append([self.texts.get(i) for i in self.li_cols_vector])
+            self.ws_v.append([self.txt.get(i) for i in self.li_cols_vector])
             # styling
             for i in self.li_cols_vector:
                 self.ws_v.cell(row=1,
@@ -200,9 +220,9 @@ class files2xlsx(Workbook):
             pass
 
         if has_raster:
-            self.ws_r = self.create_sheet(title=self.texts.get("sheet_rasters"))
+            self.ws_r = self.create_sheet(title=self.txt.get("sheet_rasters"))
             # headers
-            self.ws_r.append([self.texts.get(i) for i in self.li_cols_raster])
+            self.ws_r.append([self.txt.get(i) for i in self.li_cols_raster])
             # styling
             for i in self.li_cols_raster:
                 self.ws_r.cell(row=1,
@@ -214,9 +234,9 @@ class files2xlsx(Workbook):
             pass
 
         if has_filedb:
-            self.ws_fdb = self.create_sheet(title=self.texts.get("sheet_filedb"))
+            self.ws_fdb = self.create_sheet(title=self.txt.get("sheet_filedb"))
             # headers
-            self.ws_fdb.append([self.texts.get(i) for i in self.li_cols_filedb])
+            self.ws_fdb.append([self.txt.get(i) for i in self.li_cols_filedb])
             # styling
             for i in self.li_cols_filedb:
                 self.ws_fdb.cell(row=1,
@@ -228,9 +248,9 @@ class files2xlsx(Workbook):
             pass
 
         if has_mapdocs:
-            self.ws_mdocs = self.create_sheet(title=self.texts.get("sheet_maplans"))
+            self.ws_mdocs = self.create_sheet(title=self.txt.get("sheet_maplans"))
             # headers
-            self.ws_mdocs.append([self.texts.get(i) for i in self.li_cols_mapdocs])
+            self.ws_mdocs.append([self.txt.get(i) for i in self.li_cols_mapdocs])
             # styling
             for i in self.li_cols_mapdocs:
                 self.ws_mdocs.cell(row=1,
@@ -242,9 +262,9 @@ class files2xlsx(Workbook):
             pass
 
         if has_cad:
-            self.ws_cad = self.create_sheet(title=self.texts.get("sheet_cdao"))
+            self.ws_cad = self.create_sheet(title=self.txt.get("sheet_cdao"))
             # headers
-            self.ws_cad.append([self.texts.get(i) for i in self.li_cols_caodao])
+            self.ws_cad.append([self.txt.get(i) for i in self.li_cols_caodao])
             # styling
             for i in self.li_cols_caodao:
                 self.ws_cad.cell(row=1,
@@ -258,7 +278,7 @@ class files2xlsx(Workbook):
         if has_sgbd:
             self.ws_sgbd = self.create_sheet(title="PostGIS")
             # headers
-            self.ws_sgbd.append([self.texts.get(i) for i in self.li_cols_sgbd])
+            self.ws_sgbd.append([self.txt.get(i) for i in self.li_cols_sgbd])
             # styling
             for i in self.li_cols_sgbd:
                 self.ws_sgbd.cell(row=1,
@@ -320,12 +340,12 @@ class files2xlsx(Workbook):
         # in case of a source error
         if layer.get('error'):
             # sheet.row(line).set_style(self.xls_erreur)
-            err_mess = self.texts.get(layer.get('error'))
+            err_mess = self.txt.get(layer.get('error'))
             logging.warning('\tproblem detected')
             self.ws_v["A{}".format(self.idx_v)] = layer.get('name')
             self.ws_v["A{}".format(self.idx_v)].style = "Warning Text"
             link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
-                                                     self.texts.get('browse'))
+                                                     self.txt.get('browse'))
             self.ws_v["B{}".format(self.idx_v)] = link
             self.ws_v["B{}".format(self.idx_v)].style = "Warning Text"
             self.ws_v["C{}".format(self.idx_v)] = err_mess
@@ -348,7 +368,7 @@ class files2xlsx(Workbook):
 
         # Path of parent folder formatted to be a hyperlink
         link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
-                                                 self.texts.get('browse'))
+                                                 self.txt.get('browse'))
         self.ws_v["B{}".format(self.idx_v)] = link
         self.ws_v["B{}".format(self.idx_v)].style = "Hyperlink"
 
@@ -393,13 +413,13 @@ class files2xlsx(Workbook):
         for chp in fields.keys():
             # field type
             if 'Integer' in fields[chp][0]:
-                tipo = self.texts.get(u'entier')
+                tipo = self.txt.get(u'entier')
             elif fields[chp][0] == 'Real':
-                tipo = self.texts.get(u'reel')
+                tipo = self.txt.get(u'reel')
             elif fields[chp][0] == 'String':
-                tipo = self.texts.get(u'string')
+                tipo = self.txt.get(u'string')
             elif fields[chp][0] == 'Date':
-                tipo = self.texts.get(u'date')
+                tipo = self.txt.get(u'date')
             else:
                 tipo = "unknown"
                 logging.warning(chp + " unknown type")
@@ -407,9 +427,9 @@ class files2xlsx(Workbook):
             # concatenation of field informations
             try:
                 champs = champs + chp +\
-                          u" (" + tipo + self.texts.get(u'longueur') +\
+                          u" (" + tipo + self.txt.get(u'longueur') +\
                           unicode(fields[chp][1]) +\
-                          self.texts.get(u'precision') +\
+                          self.txt.get(u'precision') +\
                           unicode(fields[chp][2]) + u") ; "
             except UnicodeDecodeError:
                 logging.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
@@ -424,8 +444,6 @@ class files2xlsx(Workbook):
         # Once all fieds explored, write them
         self.ws_v["P{}".format(self.idx_v)] = champs
 
-
-
         # end of method
         return
 
@@ -438,11 +456,11 @@ class files2xlsx(Workbook):
         # in case of a source error
         if layer.get('error'):
             # sheet.row(line).set_style(self.xls_erreur)
-            err_mess = self.texts.get(layer.get('error'))
+            err_mess = self.txt.get(layer.get('error'))
             logging.warning('\tproblem detected')
             self.ws_r["A{}".format(self.idx_r)] = layer.get('name')
             link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
-                                                     self.texts.get('browse'))
+                                                     self.txt.get('browse'))
             self.ws_r["B{}".format(self.idx_r)] = link
             self.ws_r["B{}".format(self.idx_r)].style = "Warning Text"
             self.ws_r["C{}".format(self.idx_r)] = err_mess
@@ -457,7 +475,7 @@ class files2xlsx(Workbook):
 
         # Path of parent folder formatted to be a hyperlink
         link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
-                                                 self.texts.get('browse'))
+                                                 self.txt.get('browse'))
         self.ws_r["B{}".format(self.idx_r)] = link
         self.ws_r["B{}".format(self.idx_r)].style = "Hyperlink"
 
@@ -491,7 +509,7 @@ class files2xlsx(Workbook):
 
         # Format of data
         self.ws_r["P{}".format(self.idx_r)] = "{0} {1}".format(layer.get(u'format'),
-                                               layer.get('format_version'))
+                                                               layer.get('format_version'))
         # Compression rate
         self.ws_r["Q{}".format(self.idx_r)] = layer.get(u'compr_rate')
 
@@ -526,20 +544,21 @@ class files2xlsx(Workbook):
         # in case of a source error
         if filedb.get('error'):
             # sheet.row(line).set_style(self.xls_erreur)
-            err_mess = self.texts.get(filedb.get('error'))
+            err_mess = self.txt.get(filedb.get('error'))
             logging.warning('\tproblem detected')
             self.ws_fdb["A{}".format(self.idx_f)] = filedb.get('name')
             link = r'=HYPERLINK("{0}","{1}")'.format(filedb.get(u'folder'),
-                                                     self.texts.get('browse'))
+                                                     self.txt.get('browse'))
             self.ws_fdb["B{}".format(self.idx_f)] = link
             self.ws_fdb["B{}".format(self.idx_f)].style = "Warning Text"
             self.ws_fdb["C{}".format(self.idx_f)] = err_mess
             self.ws_fdb["C{}".format(self.idx_f)].style = "Warning Text"
             # gdal info
-            if "err_gdal" in layer.keys():
+            if "err_gdal" in filedb.keys():
                 logging.warning('\tproblem detected')
-                self.ws_v["Q{}".format(self.idx_v)] = "{0} : {1}".format(layer.get('err_gdal')[0],
-                                                                         layer.get('err_gdal')[1])
+                self.ws_v["Q{}".format(self.idx_v)] = "{0} : {1}"\
+                                                      .format(filedb.get('err_gdal')[0],
+                                                              filedb.get('err_gdal')[1])
                 self.ws_v["Q{}".format(self.idx_v)].style = "Warning Text"
             else:
                 pass
@@ -553,7 +572,7 @@ class files2xlsx(Workbook):
 
         # Path of parent folder formatted to be a hyperlink
         link = r'=HYPERLINK("{0}","{1}")'.format(filedb.get(u'folder'),
-                                                 self.texts.get('browse'))
+                                                 self.txt.get('browse'))
         self.ws_fdb["B{}".format(self.idx_f)] = link
         self.ws_fdb["B{}".format(self.idx_f)].style = "Hyperlink"
 
@@ -580,7 +599,7 @@ class files2xlsx(Workbook):
                                                         unicode(layer_name.decode('latin1'))))
             # in case of a source error
             if gdb_layer.get('error'):
-                err_mess = self.texts.get(gdb_layer.get('error'))
+                err_mess = self.txt.get(gdb_layer.get('error'))
                 logging.warning('\tproblem detected: \
                                   {0} in {1}'.format(err_mess,
                                                      gdb_layer.get(u'title')))
@@ -615,13 +634,13 @@ class files2xlsx(Workbook):
             for chp in fields.keys():
                 # field type
                 if 'Integer' in fields[chp][0]:
-                    tipo = self.texts.get(u'entier')
+                    tipo = self.txt.get(u'entier')
                 elif fields[chp][0] == 'Real':
-                    tipo = self.texts.get(u'reel')
+                    tipo = self.txt.get(u'reel')
                 elif fields[chp][0] == 'String':
-                    tipo = self.texts.get(u'string')
+                    tipo = self.txt.get(u'string')
                 elif fields[chp][0] == 'Date':
-                    tipo = self.texts.get(u'date')
+                    tipo = self.txt.get(u'date')
                 else:
                     tipo = "unknown"
                     logging.warning(chp + " unknown type")
@@ -629,12 +648,13 @@ class files2xlsx(Workbook):
                 # concatenation of field informations
                 try:
                     champs = champs + chp +\
-                              u" (" + tipo + self.texts.get(u'longueur') +\
-                              unicode(fields[chp][1]) +\
-                              self.texts.get(u'precision') +\
-                              unicode(fields[chp][2]) + u") ; "
+                             u" (" + tipo + self.txt.get(u'longueur') +\
+                             unicode(fields[chp][1]) +\
+                             self.txt.get(u'precision') +\
+                             unicode(fields[chp][2]) + u") ; "
                 except UnicodeDecodeError:
-                    logging.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
+                    logging.warning('Field name with special letters: {}'
+                                    .format(chp.decode('latin1')))
                     # decode the fucking field name
                     champs = champs + chp.decode('latin1') \
                     + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
@@ -650,8 +670,7 @@ class files2xlsx(Workbook):
         return
 
     def store_md_mapdoc(self, mapdoc):
-        """ TO DOCUMENT
-        """
+        """To store mapdocs information from DicoGIS."""
         # increment line
         self.idx_m += 1
 
@@ -661,12 +680,12 @@ class files2xlsx(Workbook):
         # in case of a source error
         if mapdoc.get('error'):
             # sheet.row(line).set_style(self.xls_erreur)
-            err_mess = self.texts.get(mapdoc.get('error'))
+            err_mess = self.txt.get(mapdoc.get('error'))
             logging.warning('\tproblem detected')
             self.ws_mdocs["A{}".format(self.idx_m)] = mapdoc.get('name')
             self.ws_mdocs["A{}".format(self.idx_m)].style = "Warning Text"
             link = r'=HYPERLINK("{0}","{1}")'.format(mapdoc.get(u'folder'),
-                                                     self.texts.get('browse'))
+                                                     self.txt.get('browse'))
             self.ws_mdocs["B{}".format(self.idx_m)] = link
             self.ws_mdocs["B{}".format(self.idx_m)].style = "Warning Text"
             self.ws_mdocs["C{}".format(self.idx_m)] = err_mess
@@ -681,10 +700,9 @@ class files2xlsx(Workbook):
 
         # Path of parent folder formatted to be a hyperlink
         link = r'=HYPERLINK("{0}","{1}")'.format(mapdoc.get(u'folder'),
-                                                 self.texts.get('browse'))
+                                                 self.txt.get('browse'))
         self.ws_mdocs["B{}".format(self.idx_m)] = link
         self.ws_mdocs["B{}".format(self.idx_m)].style = "Hyperlink"
-
         self.ws_mdocs["C{}".format(self.idx_m)] = path.dirname(mapdoc.get('folder'))
         self.ws_mdocs["D{}".format(self.idx_m)] = mapdoc.get('title')
         self.ws_mdocs["E{}".format(self.idx_m)] = mapdoc.get('creator_prod')
@@ -718,7 +736,7 @@ class files2xlsx(Workbook):
                                                          unicode(layer_name.decode('latin1'))))
             # in case of a source error
             if mdoc_layer.get('error'):
-                err_mess = self.texts.get(mdoc_layer.get('error'))
+                err_mess = self.txt.get(mdoc_layer.get('error'))
                 logging.warning('\tproblem detected: \
                                   {0} in {1}'.format(err_mess,
                                                      mdoc_layer.get(u'title')))
@@ -740,13 +758,13 @@ class files2xlsx(Workbook):
             for chp in fields.keys():
                 # field type
                 if 'Integer' in fields[chp][0]:
-                    tipo = self.texts.get(u'entier')
+                    tipo = self.txt.get(u'entier')
                 elif fields[chp][0] == 'Real':
-                    tipo = self.texts.get(u'reel')
+                    tipo = self.txt.get(u'reel')
                 elif fields[chp][0] == 'String':
-                    tipo = self.texts.get(u'string')
+                    tipo = self.txt.get(u'string')
                 elif fields[chp][0] == 'Date':
-                    tipo = self.texts.get(u'date')
+                    tipo = self.txt.get(u'date')
                 else:
                     tipo = "unknown"
                     logging.warning(chp + " unknown type")
@@ -754,9 +772,9 @@ class files2xlsx(Workbook):
                 # concatenation of field informations
                 try:
                     champs = champs + chp +\
-                              u" (" + tipo + self.texts.get(u'longueur') +\
+                              u" (" + tipo + self.txt.get(u'longueur') +\
                               unicode(fields[chp][1]) +\
-                              self.texts.get(u'precision') +\
+                              self.txt.get(u'precision') +\
                               unicode(fields[chp][2]) + u") ; "
                 except UnicodeDecodeError:
                     logging.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
@@ -786,12 +804,12 @@ class files2xlsx(Workbook):
         # in case of a source error
         if cad.get('error'):
             # sheet.row(line).set_style(self.xls_erreur)
-            err_mess = self.texts.get(cad.get('error'))
+            err_mess = self.txt.get(cad.get('error'))
             logging.warning('\tproblem detected')
             self.ws_cad["A{}".format(self.idx_c)] = cad.get('name')
             self.ws_cad["A{}".format(self.idx_c)].style = "Warning Text"
             link = r'=HYPERLINK("{0}","{1}")'.format(cad.get(u'folder'),
-                                                     self.texts.get('browse'))
+                                                     self.txt.get('browse'))
             self.ws_cad["B{}".format(self.idx_c)] = link
             self.ws_cad["B{}".format(self.idx_c)].style = "Warning Text"
             self.ws_cad["C{}".format(self.idx_c)] = err_mess
@@ -806,7 +824,7 @@ class files2xlsx(Workbook):
 
         # Path of parent folder formatted to be a hyperlink
         link = r'=HYPERLINK("{0}","{1}")'.format(cad.get(u'folder'),
-                                                 self.texts.get('browse'))
+                                                 self.txt.get('browse'))
         self.ws_cad["B{}".format(self.idx_c)] = link
         self.ws_cad["B{}".format(self.idx_c)].style = "Hyperlink"
 
@@ -837,7 +855,7 @@ class files2xlsx(Workbook):
                                                  unicode(layer_name.decode('latin1'))))
             # in case of a source error
             if layer.get('error'):
-                err_mess = self.texts.get(layer.get('error'))
+                err_mess = self.txt.get(layer.get('error'))
                 logging.warning("\tproblem detected: "
                                 "{0} in {1}".format(err_mess,
                                                     layer.get(u'title')))
@@ -872,13 +890,13 @@ class files2xlsx(Workbook):
             for chp in fields.keys():
                 # field type
                 if 'Integer' in fields[chp][0]:
-                    tipo = self.texts.get(u'entier')
+                    tipo = self.txt.get(u'entier')
                 elif fields[chp][0] == 'Real':
-                    tipo = self.texts.get(u'reel')
+                    tipo = self.txt.get(u'reel')
                 elif fields[chp][0] == 'String':
-                    tipo = self.texts.get(u'string')
+                    tipo = self.txt.get(u'string')
                 elif fields[chp][0] == 'Date':
-                    tipo = self.texts.get(u'date')
+                    tipo = self.txt.get(u'date')
                 else:
                     tipo = "unknown"
                     logging.warning(chp + " unknown type")
@@ -886,9 +904,9 @@ class files2xlsx(Workbook):
                 # concatenation of field informations
                 try:
                     champs = champs + chp \
-                                    + u" (" + tipo + self.texts.get(u'longueur')\
+                                    + u" (" + tipo + self.txt.get(u'longueur')\
                                     + unicode(fields[chp][1])\
-                                    + self.texts.get(u'precision')\
+                                    + self.txt.get(u'precision')\
                                     + unicode(fields[chp][2]) + u") ; "
                 except UnicodeDecodeError:
                     logging.warning("Field name with special letters: {}"

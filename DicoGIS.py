@@ -1620,6 +1620,7 @@ class DicoGIS(Tk):
                 self.dictionarize_lyr(self.dico_layer,
                                       self.feuyMAPS,
                                       line_maps)
+                self.wb.store_md_mapdoc(self.dico_layer)
                 logging.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_maps += self.dico_layer.get('layers_count')
@@ -2161,7 +2162,7 @@ class DicoGIS(Tk):
                                                     self.blabla.get('browse'))
             sheet.write(line, 1, Formula(link), self.url)
             sheet.write(line, 2, self.blabla.get(mapdoc_infos.get('error')),
-                                 self.xls_erreur)
+                        self.xls_erreur)
             # incrementing line
             mapdoc_infos['layers_count'] = 0
             # exiting function
@@ -2208,7 +2209,6 @@ class DicoGIS(Tk):
         # Last update date
         sheet.write(line, 10, mapdoc_infos.get(u'date_actu'), self.xls_date)
 
-
         if mapdoc_infos.get(u'type') in ['Feature', 'Raster']:
             # Spatial extent
             emprise = u"Xmin : {0} - Xmax : {1} \
@@ -2231,8 +2231,8 @@ class DicoGIS(Tk):
         if mapdoc_infos.get(u'type') == u'Group':
             # Layers count
             sheet.write(line, 16, mapdoc_infos.get(u'layers_count'))
-             # layer's name
-            sheet.write(line+1, 16, ' ; '.join(mapdoc_infos.get(u'layers_names')))
+            # layer's name
+            sheet.write(line + 1, 16, ' ; '.join(mapdoc_infos.get(u'layers_names')))
         else:
             pass
 
