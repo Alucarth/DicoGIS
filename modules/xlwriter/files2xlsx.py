@@ -32,6 +32,13 @@ from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.properties import WorksheetProperties
 
 # ##############################################################################
+# ############ Globals ############
+# #################################
+
+# LOG
+logger = logging.getLogger("DicoGIS")
+
+# ##############################################################################
 # ########## Classes ###############
 # ##################################
 
@@ -341,7 +348,7 @@ class files2xlsx(Workbook):
         if layer.get('error'):
             # sheet.row(line).set_style(self.xls_erreur)
             err_mess = self.txt.get(layer.get('error'))
-            logging.warning('\tproblem detected')
+            logger.warning('\tproblem detected')
             self.ws_v["A{}".format(self.idx_v)] = layer.get('name')
             self.ws_v["A{}".format(self.idx_v)].style = "Warning Text"
             link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
@@ -352,7 +359,7 @@ class files2xlsx(Workbook):
             self.ws_v["C{}".format(self.idx_v)].style = "Warning Text"
             # gdal info
             if "err_gdal" in layer.keys():
-                logging.warning('\tproblem detected')
+                logger.warning('\tproblem detected')
                 self.ws_v["Q{}".format(self.idx_v)] = "{0} : {1}".format(layer.get('err_gdal')[0],
                                                                          layer.get('err_gdal')[1])
                 self.ws_v["Q{}".format(self.idx_v)].style = "Warning Text"
@@ -376,17 +383,17 @@ class files2xlsx(Workbook):
         self.ws_v["C{}".format(self.idx_v)] = path.basename(layer.get(u'folder'))
 
         # Fields count
-        self.ws_v["D{}".format(self.idx_v)] = layer.get(u'num_fields')
+        self.ws_v["D{}".format(self.idx_v)] = layer.get(u'num_fields', "")
         # Objects count
-        self.ws_v["E{}".format(self.idx_v)] = layer.get(u'num_obj')
+        self.ws_v["E{}".format(self.idx_v)] = layer.get(u'num_obj', "")
         # Geometry type
-        self.ws_v["F{}".format(self.idx_v)] = layer.get(u'type_geom')
+        self.ws_v["F{}".format(self.idx_v)] = layer.get(u'type_geom', "")
         # Name of srs
-        self.ws_v["G{}".format(self.idx_v)] = layer.get(u'srs')
+        self.ws_v["G{}".format(self.idx_v)] = layer.get(u'srs', "")
         # Type of SRS
-        self.ws_v["H{}".format(self.idx_v)] = layer.get(u'srs_type')
+        self.ws_v["H{}".format(self.idx_v)] = layer.get(u'srs_type', "")
         # EPSG code
-        self.ws_v["I{}".format(self.idx_v)] = layer.get(u'EPSG')
+        self.ws_v["I{}".format(self.idx_v)] = layer.get(u'EPSG', "")
         # Spatial extent
         emprise = "Xmin : {0} - Xmax : {1} | \nYmin : {2} - Ymax : {3}"\
                   .format(unicode(layer.get(u'Xmin')),
@@ -422,7 +429,7 @@ class files2xlsx(Workbook):
                 tipo = self.txt.get(u'date')
             else:
                 tipo = "unknown"
-                logging.warning(chp + " unknown type")
+                logger.warning(chp + " unknown type")
 
             # concatenation of field informations
             try:
@@ -432,7 +439,7 @@ class files2xlsx(Workbook):
                           self.txt.get(u'precision') +\
                           unicode(fields[chp][2]) + u") ; "
             except UnicodeDecodeError:
-                logging.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
+                logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
                 # decode the fucking field name
                 champs = champs + chp.decode('latin1') \
                 + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
@@ -448,8 +455,7 @@ class files2xlsx(Workbook):
         return
 
     def store_md_raster(self, layer, bands):
-        """ Storing metadata about a raster dataset
-        """
+        """Store metadata about a raster dataset."""
         # increment line
         self.idx_r += 1
 
@@ -457,7 +463,7 @@ class files2xlsx(Workbook):
         if layer.get('error'):
             # sheet.row(line).set_style(self.xls_erreur)
             err_mess = self.txt.get(layer.get('error'))
-            logging.warning('\tproblem detected')
+            logger.warning('\tproblem detected')
             self.ws_r["A{}".format(self.idx_r)] = layer.get('name')
             link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
                                                      self.txt.get('browse'))
@@ -524,8 +530,8 @@ class files2xlsx(Workbook):
         self.ws_r["T{}".format(self.idx_r)] = layer.get(u'total_size')
 
         # in case of a source error
-        if layer.get('err_gdal')[0] != 0:
-            logging.warning('\tproblem detected')
+        if layer.get('err_gdal', [0,])[0] != 0:
+            logger.warning('\tproblem detected')
             self.ws_r["U{}".format(self.idx_r)] = "{0} : {1}".format(layer.get('err_gdal')[0],
                                                                      layer.get('err_gdal')[1])
             self.ws_r["U{}".format(self.idx_r)].style = "Warning Text"
@@ -536,8 +542,7 @@ class files2xlsx(Workbook):
         return
 
     def store_md_fdb(self, filedb):
-        """ Storing metadata about a file database
-        """
+        """Storing metadata about a file database."""
         # increment line
         self.idx_f += 1
 
@@ -545,7 +550,7 @@ class files2xlsx(Workbook):
         if filedb.get('error'):
             # sheet.row(line).set_style(self.xls_erreur)
             err_mess = self.txt.get(filedb.get('error'))
-            logging.warning('\tproblem detected')
+            logger.warning('\tproblem detected')
             self.ws_fdb["A{}".format(self.idx_f)] = filedb.get('name')
             link = r'=HYPERLINK("{0}","{1}")'.format(filedb.get(u'folder'),
                                                      self.txt.get('browse'))
@@ -555,11 +560,11 @@ class files2xlsx(Workbook):
             self.ws_fdb["C{}".format(self.idx_f)].style = "Warning Text"
             # gdal info
             if "err_gdal" in filedb.keys():
-                logging.warning('\tproblem detected')
-                self.ws_v["Q{}".format(self.idx_v)] = "{0} : {1}"\
-                                                      .format(filedb.get('err_gdal')[0],
-                                                              filedb.get('err_gdal')[1])
-                self.ws_v["Q{}".format(self.idx_v)].style = "Warning Text"
+                logger.warning('\tproblem detected')
+                self.ws_fdb["Q{}".format(self.idx_v)] = "{0} : {1}"\
+                                                        .format(filedb.get('err_gdal')[0],
+                                                                filedb.get('err_gdal')[1])
+                self.ws_fdb["Q{}".format(self.idx_v)].style = "Warning Text"
             else:
                 pass
             # Interruption of function
@@ -600,7 +605,7 @@ class files2xlsx(Workbook):
             # in case of a source error
             if gdb_layer.get('error'):
                 err_mess = self.txt.get(gdb_layer.get('error'))
-                logging.warning('\tproblem detected: \
+                logger.warning('\tproblem detected: \
                                   {0} in {1}'.format(err_mess,
                                                      gdb_layer.get(u'title')))
                 self.ws_fdb["G{}".format(self.idx_f)] = gdb_layer.get(u'title')
@@ -643,7 +648,7 @@ class files2xlsx(Workbook):
                     tipo = self.txt.get(u'date')
                 else:
                     tipo = "unknown"
-                    logging.warning(chp + " unknown type")
+                    logger.warning(chp + " unknown type")
 
                 # concatenation of field informations
                 try:
@@ -653,7 +658,7 @@ class files2xlsx(Workbook):
                              self.txt.get(u'precision') +\
                              unicode(fields[chp][2]) + u") ; "
                 except UnicodeDecodeError:
-                    logging.warning('Field name with special letters: {}'
+                    logger.warning('Field name with special letters: {}'
                                     .format(chp.decode('latin1')))
                     # decode the fucking field name
                     champs = champs + chp.decode('latin1') \
@@ -681,7 +686,7 @@ class files2xlsx(Workbook):
         if mapdoc.get('error'):
             # sheet.row(line).set_style(self.xls_erreur)
             err_mess = self.txt.get(mapdoc.get('error'))
-            logging.warning('\tproblem detected')
+            logger.warning('\tproblem detected')
             self.ws_mdocs["A{}".format(self.idx_m)] = mapdoc.get('name')
             self.ws_mdocs["A{}".format(self.idx_m)].style = "Warning Text"
             link = r'=HYPERLINK("{0}","{1}")'.format(mapdoc.get(u'folder'),
@@ -737,7 +742,7 @@ class files2xlsx(Workbook):
             # in case of a source error
             if mdoc_layer.get('error'):
                 err_mess = self.txt.get(mdoc_layer.get('error'))
-                logging.warning('\tproblem detected: \
+                logger.warning('\tproblem detected: \
                                   {0} in {1}'.format(err_mess,
                                                      mdoc_layer.get(u'title')))
                 self.ws_mdocs["Q{}".format(self.idx_f)] = mdoc_layer.get(u'title')
@@ -767,7 +772,7 @@ class files2xlsx(Workbook):
                     tipo = self.txt.get(u'date')
                 else:
                     tipo = "unknown"
-                    logging.warning(chp + " unknown type")
+                    logger.warning(chp + " unknown type")
 
                 # concatenation of field informations
                 try:
@@ -777,7 +782,7 @@ class files2xlsx(Workbook):
                               self.txt.get(u'precision') +\
                               unicode(fields[chp][2]) + u") ; "
                 except UnicodeDecodeError:
-                    logging.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
+                    logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
                     # decode the fucking field name
                     champs = champs + chp.decode('latin1') \
                     + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
@@ -793,8 +798,7 @@ class files2xlsx(Workbook):
         return
 
     def store_md_cad(self, cad):
-        """Store metadata about CAD dataset
-        """
+        """Store metadata about CAD dataset."""
         # increment line
         self.idx_c += 1
 
@@ -805,7 +809,7 @@ class files2xlsx(Workbook):
         if cad.get('error'):
             # sheet.row(line).set_style(self.xls_erreur)
             err_mess = self.txt.get(cad.get('error'))
-            logging.warning('\tproblem detected')
+            logger.warning('\tproblem detected')
             self.ws_cad["A{}".format(self.idx_c)] = cad.get('name')
             self.ws_cad["A{}".format(self.idx_c)].style = "Warning Text"
             link = r'=HYPERLINK("{0}","{1}")'.format(cad.get(u'folder'),
@@ -856,7 +860,7 @@ class files2xlsx(Workbook):
             # in case of a source error
             if layer.get('error'):
                 err_mess = self.txt.get(layer.get('error'))
-                logging.warning("\tproblem detected: "
+                logger.warning("\tproblem detected: "
                                 "{0} in {1}".format(err_mess,
                                                     layer.get(u'title')))
                 self.ws_cad["G{}".format(self.idx_c)] = layer.get(u'title')
@@ -899,7 +903,7 @@ class files2xlsx(Workbook):
                     tipo = self.txt.get(u'date')
                 else:
                     tipo = "unknown"
-                    logging.warning(chp + " unknown type")
+                    logger.warning(chp + " unknown type")
 
                 # concatenation of field informations
                 try:
@@ -909,7 +913,7 @@ class files2xlsx(Workbook):
                                     + self.txt.get(u'precision')\
                                     + unicode(fields[chp][2]) + u") ; "
                 except UnicodeDecodeError:
-                    logging.warning("Field name with special letters: {}"
+                    logger.warning("Field name with special letters: {}"
                                     .format(chp.decode('latin1')))
                     # decode the fucking field name
                     champs = champs + chp.decode('latin1') \
@@ -926,6 +930,138 @@ class files2xlsx(Workbook):
         # End of method
         return
 
+    def store_md_sgdb(self, layer):
+        """Storing metadata about a file database."""
+        # increment line
+        self.idx_s += 1
+
+        # in case of a source error
+        if layer.get('error'):
+            # sheet.row(line).set_style(self.xls_erreur)
+            err_mess = self.txt.get(layer.get('error'))
+            logger.warning('\tproblem detected: ' + err_mess)
+            self.ws_sgbd["A{}".format(self.idx_s)] = layer.get('name')
+            link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
+                                                     self.txt.get('browse'))
+            self.ws_sgbd["B{}".format(self.idx_s)] = link
+            self.ws_sgbd["B{}".format(self.idx_s)].style = "Warning Text"
+            self.ws_sgbd["C{}".format(self.idx_s)] = err_mess
+            self.ws_sgbd["C{}".format(self.idx_s)].style = "Warning Text"
+            # gdal info
+            if "err_gdal" in layer.keys():
+                logger.warning('\tproblem detected')
+                self.ws_v["Q{}".format(self.idx_v)] = "{0} : {1}"\
+                                                      .format(layer.get('err_gdal')[0],
+                                                              layer.get('err_gdal')[1])
+                self.ws_v["Q{}".format(self.idx_v)].style = "Warning Text"
+            else:
+                pass
+            # Interruption of function
+            return False
+        else:
+            pass
+
+        # Name
+        self.ws_sgbd["A{}".format(self.idx_s)] = layer.get('name')
+
+        # Path of parent folder formatted to be a hyperlink
+        link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
+                                                 self.txt.get('browse'))
+        self.ws_sgbd["B{}".format(self.idx_s)] = link
+        self.ws_sgbd["B{}".format(self.idx_s)].style = "Hyperlink"
+
+        self.ws_sgbd["C{}".format(self.idx_s)] = path.basename(layer.get(u'folder'))
+        self.ws_sgbd["D{}".format(self.idx_s)] = layer.get(u'total_size')
+        self.ws_sgbd["E{}".format(self.idx_s)] = layer.get(u'date_crea')
+        self.ws_sgbd["F{}".format(self.idx_s)] = layer.get(u'date_actu')
+        self.ws_sgbd["G{}".format(self.idx_s)] = layer.get(u'layers_count')
+        self.ws_sgbd["H{}".format(self.idx_s)] = layer.get(u'total_fields')
+        self.ws_sgbd["I{}".format(self.idx_s)] = layer.get(u'total_objs')
+
+        # parsing layers
+        for (layer_idx, layer_name) in zip(layer.get(u'layers_idx'),
+                                           layer.get(u'layers_names')):
+            # increment line
+            self.idx_s += 1
+            champs = ""
+            # get the layer informations
+            try:
+                gdb_layer = layer.get('{0}_{1}'.format(layer_idx,
+                                                        layer_name))
+            except UnicodeDecodeError:
+                gdb_layer = layer.get('{0}_{1}'.format(layer_idx,
+                                                        unicode(layer_name.decode('latin1'))))
+            # in case of a source error
+            if gdb_layer.get('error'):
+                err_mess = self.txt.get(gdb_layer.get('error'))
+                logger.warning('\tproblem detected: \
+                                  {0} in {1}'.format(err_mess,
+                                                     gdb_layer.get(u'title')))
+                self.ws_sgbd["G{}".format(self.idx_s)] = gdb_layer.get(u'title')
+                self.ws_sgbd["G{}".format(self.idx_s)].style = "Warning Text"
+                self.ws_sgbd["H{}".format(self.idx_s)] = err_mess
+                self.ws_sgbd["H{}".format(self.idx_s)].style = "Warning Text"
+                # Interruption of function
+                continue
+            else:
+                pass
+
+            self.ws_sgbd["G{}".format(self.idx_s)] = gdb_layer.get('title')
+            self.ws_sgbd["H{}".format(self.idx_s)] = gdb_layer.get(u'num_fields')
+            self.ws_sgbd["I{}".format(self.idx_s)] = gdb_layer.get(u'num_obj')
+            self.ws_sgbd["J{}".format(self.idx_s)] = gdb_layer.get(u'type_geom')
+            self.ws_sgbd["K{}".format(self.idx_s)] = gdb_layer.get(u'srs')
+            self.ws_sgbd["L{}".format(self.idx_s)] = gdb_layer.get(u'srs_type')
+            self.ws_sgbd["M{}".format(self.idx_s)] = gdb_layer.get(u'EPSG')
+
+            # Spatial extent
+            emprise = u"Xmin : {0} - Xmax : {1} | \nYmin : {2} - Ymax : {3}"\
+                      .format(unicode(gdb_layer.get(u'Xmin')),
+                              unicode(gdb_layer.get(u'Xmax')),
+                              unicode(gdb_layer.get(u'Ymin')),
+                              unicode(gdb_layer.get(u'Ymax')))
+            self.ws_sgbd["N{}".format(self.idx_s)].style = "wrap"
+            self.ws_sgbd["N{}".format(self.idx_s)] = emprise
+
+            # Field informations
+            fields = gdb_layer.get(u'fields')
+            for chp in fields.keys():
+                # field type
+                if 'Integer' in fields[chp][0]:
+                    tipo = self.txt.get(u'entier')
+                elif fields[chp][0] == 'Real':
+                    tipo = self.txt.get(u'reel')
+                elif fields[chp][0] == 'String':
+                    tipo = self.txt.get(u'string')
+                elif fields[chp][0] == 'Date':
+                    tipo = self.txt.get(u'date')
+                else:
+                    tipo = "unknown"
+                    logger.warning(chp + " unknown type")
+
+                # concatenation of field informations
+                try:
+                    champs = champs + chp +\
+                             u" (" + tipo + self.txt.get(u'longueur') +\
+                             unicode(fields[chp][1]) +\
+                             self.txt.get(u'precision') +\
+                             unicode(fields[chp][2]) + u") ; "
+                except UnicodeDecodeError:
+                    logger.warning('Field name with special letters: {}'
+                                    .format(chp.decode('latin1')))
+                    # decode the fucking field name
+                    champs = champs + chp.decode('latin1') \
+                    + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
+                                                            fields[chp][1],
+                                                            fields[chp][2])
+                    # then continue
+                    continue
+
+            # Once all fieds explored, write them
+            self.ws_sgbd["O{}".format(self.idx_s)] = champs
+
+        # end of method
+        return
 
 # ############################################################################
 # ##### Stand alone program ########
