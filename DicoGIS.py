@@ -1593,39 +1593,48 @@ class DicoGIS(Tk):
             pass
 
         if self.opt_lyr.get() and len(self.li_lyr) > 0:
-            logging.info('\n\tProcessing Esri LYR : start')
+            logger.info('\n\tProcessing Esri LYR : start')
             for lyr in self.li_lyr:
                 """ looping on lyr list """
                 self.status.set(path.basename(lyr))
-                logging.info('\n' + lyr)
+                logger.info('\n' + lyr)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
                 # reset recipient data
                 self.dico_layer.clear()
                 self.dico_fields.clear()
+                self.dico_bands.clear()
                 # getting the informations
                 try:
                     ReadLYR(path.abspath(lyr),
                             self.dico_layer,
                             'Esri LYR',
                             self.blabla)
-                    logging.info('\t Infos OK')
+                    logger.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
-                    logging.error(e)
+                    logger.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
                 self.dictionarize_lyr(self.dico_layer,
                                       self.feuyMAPS,
                                       line_maps)
-                self.wb.store_md_mapdoc(self.dico_layer)
-                logging.info('\t Wrote into the dictionary')
+                # self.wb.store_md_mapdoc(self.dico_layer)
+                if self.dico_layer.get(u'type') == 'Feature':
+                    self.wb.store_md_vector(self.dico_layer)
+                    line_vectors = line_vectors + 1
+                elif self.dico_layer.get(u'type') == 'Raster':
+                    self.wb.store_md_raster(self.dico_layer, self.dico_bands)
+                    line_rasters = line_rasters + 1
+
+
+                logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_maps += self.dico_layer.get('layers_count')
         else:
-            logging.info('\tIgnoring {0} Esri LYR'.format(len(self.li_lyr)))
+            logger.info('\tIgnoring {0} Esri LYR'.format(len(self.li_lyr)))
             pass
 
         # saving dictionary
