@@ -20,6 +20,7 @@
 # ########## Libraries #############
 # ##################################
 # Standard library
+from __future__ import print_function
 from os import chdir, listdir, walk, path       # files and folder managing
 from time import localtime, strptime, strftime
 
@@ -109,7 +110,7 @@ for index in range(geopdf_v.GetLayerCount()):
     # first feature and geometry type
     obj = layer.GetFeature(1)
     geom = obj.GetGeometryRef()
-    print geom.GetGeometryName()
+    print(geom.GetGeometryName())
     # SRS
     srs = layer.GetSpatialRef()
     srs.AutoIdentifyEPSG()
@@ -128,7 +129,7 @@ for index in range(geopdf_v.GetLayerCount()):
         else:
             continue
 
-    print typsrs
+    print(typsrs)
 
     print("\n\n\t\tLayer available methods: {0}\n".format(dir(layer)))
     print("\nLayer: {0}".format(layer.GetName()))
@@ -142,7 +143,7 @@ Ymin = {2} - Ymax = {3}".format(layer.GetExtent()[0],
     print("Geometry type: {0}".format(layer.GetGeomType()))
     # print("Geometry name: {0}".format(layer.GetGeomName()))  # doesn't work
     print("Geometry column: {0}".format(layer.GetGeometryColumn()))
-    print dir(layer.GetGeomType())
+    print(dir(layer.GetGeomType()))
 
     # fields information about each layer
     dico_fields = OD()

@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 from __future__ import unicode_literals
+from __future__ import print_function
 
 # ----------------------------------------------------------------------------
 # Name:         InfosWFS
@@ -175,7 +176,7 @@ class ReadWFS_OGR():
         # features count
         dico_layer[u'num_obj'] = layer_obj.GetFeatureCount()
 
-        print dico_layer
+        print(dico_layer)
 
         if layer_obj.GetFeatureCount() == 0:
             u""" if layer doesn't have any object, return an error """
@@ -244,8 +245,8 @@ class ReadWFS_OGR():
         try:
             first_obj = layer_obj.GetNextFeature()
             geom = first_obj.GetGeometryRef()
-        except AttributeError, e:
-            print e, layer_obj.GetName(), layer_obj.GetFeatureCount(), layer_obj.GetGeomType()
+        except AttributeError as e:
+            print(e, layer_obj.GetName(), layer_obj.GetFeatureCount(), layer_obj.GetGeomType())
             return
         else:
             pass
@@ -382,7 +383,7 @@ class ReadWFS_OWS():
         # features count
         dico_layer[u'num_obj'] = layer_obj.GetFeatureCount()
 
-        print dico_layer
+        print(dico_layer)
 
         if layer_obj.GetFeatureCount() == 0:
             u""" if layer doesn't have any object, return an error """
@@ -451,8 +452,8 @@ class ReadWFS_OWS():
         try:
             first_obj = layer_obj.GetNextFeature()
             geom = first_obj.GetGeometryRef()
-        except AttributeError, e:
-            print e, layer_obj.GetName(), layer_obj.GetFeatureCount(), layer_obj.GetGeomType()
+        except AttributeError as e:
+            print(e, layer_obj.GetName(), layer_obj.GetFeatureCount(), layer_obj.GetGeomType())
             return
         else:
             pass

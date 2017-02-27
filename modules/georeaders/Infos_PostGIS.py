@@ -70,7 +70,7 @@ class ReadPostGIS():
         # raising forbidden access
         try:
             obj = layer.GetNextFeature()  # get the first object
-        except RuntimeError, e:
+        except RuntimeError as e:
             if u'permission denied' in str(e):
                 mess = str(e).split('\n')[0]
                 self.alert = self.alert + 1
@@ -79,7 +79,7 @@ class ReadPostGIS():
                 return None
             else:
                 pass
-        except Exception, e:
+        except Exception as e:
             print(e)
 
         try:
@@ -271,7 +271,7 @@ if __name__ == '__main__':
         sql_schemas = str("select nspname from pg_catalog.pg_namespace;")
         schemas = conn.ExecuteSQL(sql_schemas)
         print("Driver name: {0}".format(conn.GetDriver().GetName()))
-    except Exception, e:
+    except Exception as e:
         print('Connection failed. Check settings: {0}'.format(str(e)))
         exit()
 

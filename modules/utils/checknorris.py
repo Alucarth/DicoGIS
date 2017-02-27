@@ -119,6 +119,7 @@ class CheckNorris(object):
                 import site
                 esri_info = arcpy.GetInstallInfo()
                 logging.info("ArcGIS configuration has been fixed.")
+                logging.info("ArcGIS installation: {}".format(arcpy.ProductInfo()))
                 if hasattr(sys, 'real_prefix'):
                     # inside a venv
                     logging.info("Executing inside a virtualenv. Nice!")

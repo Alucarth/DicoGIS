@@ -227,7 +227,7 @@ pip-log.txt
 
 # virtual environments
 venv/
-virtenv/
+virtenv*/
 virtualenv/
 
 # logs, config and thumbnails files

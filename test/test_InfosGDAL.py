@@ -7,6 +7,7 @@
 
 
 # Standard library
+from __future__ import print_function
 from os import walk, path       # files and folder managing
 from time import localtime, strptime, strftime
 
@@ -28,72 +29,72 @@ li_jpg2 = [r'C:\Users\julien.moura\Documents\GIS Database\JPEG2000\image_jpg2000
 li_rasters = (li_ecw[0], li_gtif[0], li_jpg2[0])
 
 # check if test files exist
-print path.isfile(li_ecw[0])
-print path.isfile(li_gtif[0])
-print path.isfile(li_jpg2[0])
+print(path.isfile(li_ecw[0]))
+print(path.isfile(li_gtif[0]))
+print(path.isfile(li_jpg2[0]))
 
 
 # read rasters data
 for raster in li_rasters:
     rast = gdal.Open(raster)
-    print "\n\n", dir(rast)
+    print("\n\n", dir(rast))
 
     # check if raster is GDAL friendly
     if rast is None:
-        print "\n\tUnable to open " + raster
+        print("\n\tUnable to open " + raster)
         continue
 
     # basic infos
-    print "\n======================\nfilename: ", path.basename(raster)
-    print "format: ", path.splitext(raster)[1]
-    print "dependencies: ", [path.basename(filedepend) for filedepend in rast.GetFileList() if filedepend != raster]
+    print("\n======================\nfilename: ", path.basename(raster))
+    print("format: ", path.splitext(raster)[1])
+    print("dependencies: ", [path.basename(filedepend) for filedepend in rast.GetFileList() if filedepend != raster])
 
     # tecnical specifications
-    print "\nPixel size: columns=%.3f, rows=%.3f" % (rast.RasterXSize, rast.RasterYSize)
-    print "Compression rate: " + str(rast.GetMetadata().get('COMPRESSION_RATE_TARGET'))
-    print "Color system: " + str(rast.GetMetadata().get('COLORSPACE'))
-    print "Version: ", rast.GetMetadata().get('VERSION')
+    print("\nPixel size: columns=%.3f, rows=%.3f" % (rast.RasterXSize, rast.RasterYSize))
+    print("Compression rate: " + str(rast.GetMetadata().get('COMPRESSION_RATE_TARGET')))
+    print("Color system: " + str(rast.GetMetadata().get('COLORSPACE')))
+    print("Version: ", rast.GetMetadata().get('VERSION'))
 
     # raster bands specifications
-    print "\nRaster bands count: ", rast.RasterCount
+    print("\nRaster bands count: ", rast.RasterCount)
     for band in range(rast.RasterCount):
         band += 1
-        print "\n\tBand: #",band
+        print("\n\tBand: #",band)
         inband = rast.GetRasterBand(band)
         #print dir(inband)
         if inband is not None:
-            print "\tBand got!"
+            print("\tBand got!")
             stats = inband.GetStatistics( True, True )
             if stats is not None:
-                print "\n\tStatistics got!"
-                print "\t\t\tStatistics: Minimum=%.3f, Maximum=%.3f, Mean=%.3f, StdDev=%.3f" % ( stats[0], stats[1], stats[2], stats[3] )
-                print "\t\t\tNoData=", inband.GetNoDataValue()
-                print "\t\t\tMinimum=", inband.GetMinimum()
-                print "\t\t\tMaximum=", inband.GetMaximum()
-                print "\t\t\tScale=", inband.GetScale()
-                print "\t\t\tUnit type=", inband.GetUnitType()
+                print("\n\tStatistics got!")
+                print("\t\t\tStatistics: Minimum=%.3f, Maximum=%.3f, Mean=%.3f, StdDev=%.3f" % ( stats[0], stats[1], stats[2], stats[3] ))
+                print("\t\t\tNoData=", inband.GetNoDataValue())
+                print("\t\t\tMinimum=", inband.GetMinimum())
+                print("\t\t\tMaximum=", inband.GetMaximum())
+                print("\t\t\tScale=", inband.GetScale())
+                print("\t\t\tUnit type=", inband.GetUnitType())
             else:
-                print "\n\t\tNo statistics available."
+                print("\n\t\tNo statistics available.")
 
             ctable = inband.GetColorTable()
             if ctable is not None:
-                print "\n\tColor table found"
-                print "\t\tColor table count: ", ctable.GetCount()
+                print("\n\tColor table found")
+                print("\t\tColor table count: ", ctable.GetCount())
                 for i in range( 0, ctable.GetCount() ):
                     entry = ctable.GetColorEntry( i )
                     if not entry:
                         continue
-                    print "\t\tColor entry RGB = ", ctable.GetColorEntryAsRGB( i, entry )
+                    print("\t\tColor entry RGB = ", ctable.GetColorEntryAsRGB( i, entry ))
             else:
-                print "\n\tColor table not found."
+                print("\n\tColor table not found.")
         else:
-            print "Band informations not available."
+            print("Band informations not available.")
 
 
     # SRS
     srs= osr.SpatialReference()
     srs = srs.ImportFromWkt(rast.GetProjectionRef())
-    print "\nProjection: ", type(srs)
+    print("\nProjection: ", type(srs))
 
     # file description
     #print rast.GetDescription()

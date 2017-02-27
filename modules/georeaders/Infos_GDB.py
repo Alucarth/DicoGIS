@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
-from __future__ import unicode_literals
+from __future__ import (absolute_import, print_function, unicode_literals)
 
 # ----------------------------------------------------------------------------
 # Name:         InfosGDB
@@ -24,61 +24,41 @@ from os import path, walk   # files and folder managing
 from time import localtime, strftime
 
 # 3rd party libraries
-from osgeo import ogr
+from osgeo import ogr, osr
 from osgeo import gdal
 from gdalconst import *
 
+# custom submodules
+try:
+    from .gdal_exceptions_handler import GdalErrorHandler
+    from .geo_infos_generic import GeoInfosGenericReader
+    from .geoutils import Utils
+except ValueError:
+    from gdal_exceptions_handler import GdalErrorHandler
+    from geo_infos_generic import GeoInfosGenericReader
+    from geoutils import Utils
+
 # ############################################################################
-# ######### Classes #############
+# ######### Globals ############
+# ##############################
+
+gdal_err = GdalErrorHandler()
+georeader = GeoInfosGenericReader()
+youtils = Utils()
+
+# ############################################################################
+# ######### Classes ############
 # ##############################
 
 
-class OGRErrorHandler(object):
-    def __init__(self):
-        """Callable error handler.
-
-        see: http://trac.osgeo.org/gdal/wiki/PythonGotchas#Exceptionsraisedincustomerrorhandlersdonotgetcaught
-        and http://pcjericks.github.io/py-gdalogr-cookbook/gdal_general.html#install-gdal-ogr-error-handler
-        """
-        self.err_level = gdal.CE_None
-        self.err_type = 0
-        self.err_msg = ''
-
-    def handler(self, err_level, err_type, err_msg):
-        """Makes errors messages more readable."""
-        # available types
-        err_class = {gdal.CE_None: 'None',
-                     gdal.CE_Debug: 'Debug',
-                     gdal.CE_Warning: 'Warning',
-                     gdal.CE_Failure: 'Failure',
-                     gdal.CE_Fatal: 'Fatal'
-                     }
-        # getting type
-        err_type = err_class.get(err_type, 'None')
-
-        # cleaning message
-        err_msg = err_msg.replace('\n', ' ')
-
-        # disabling OGR exceptions raising to avoid future troubles
-        ogr.DontUseExceptions()
-
-        # propagating
-        self.err_level = err_level
-        self.err_type = err_type
-        self.err_msg = err_msg
-
-        # end of function
-        return self.err_level, self.err_type, self.err_msg
-
-
 class ReadGDB():
-    def __init__(self, gdbpath, dico_gdb, tipo, txt=''):
-        u""" Uses OGR functions to extract basic informations about
+    def __init__(self, source_path, dico_dataset, tipo, txt=''):
+        u"""Use OGR functions to extract basic informations about
         geographic vector file (handles shapefile or MapInfo tables)
         and store into dictionaries.
 
-        gdbpath = path to the File Geodatabase Esri
-        dico_gdb = dictionary for global informations
+        source_path = path to the File Geodatabase Esri
+        dico_dataset = dictionary for global informations
         dico_fields = dictionary for the fields' informations
         li_fieds = ordered list of fields
         tipo = format
@@ -86,222 +66,115 @@ class ReadGDB():
 
         """
         # handling ogr specific exceptions
-        ogrerr = OGRErrorHandler()
-        errhandler = ogrerr.handler
+        errhandler = gdal_err.handler
         gdal.PushErrorHandler(errhandler)
-        ogr.UseExceptions()
-        self.alert = 0
-
-        # counting alerts
+        gdal.UseExceptions()
         self.alert = 0
 
         # opening GDB
         try:
-            gdb = ogr.Open(gdbpath, 0)
-        except Exception:
-            self.erratum(dico_gdb, gdbpath, u'err_corrupt')
+            driver = ogr.GetDriverByName(str("OpenFileGDB"))
+            src = driver.Open(source_path, 0)
+        except Exception as e:
+            logging.error(e)
+            youtils.erratum(dico_dataset, source_path, u'err_corrupt')
             self.alert = self.alert + 1
             return None
 
         # GDB name and parent folder
-        dico_gdb['name'] = path.basename(gdb.GetName())
-        dico_gdb['folder'] = path.dirname(gdb.GetName())
+        try:
+            dico_dataset['name'] = path.basename(src.GetName())
+            dico_dataset['folder'] = path.dirname(src.GetName())
+        except AttributeError as e:
+            dico_dataset['name'] = path.basename(source_path)
+            dico_dataset['folder'] = path.dirname(source_path)
         # layers count and names
-        dico_gdb['layers_count'] = gdb.GetLayerCount()
+        dico_dataset['layers_count'] = src.GetLayerCount()
         li_layers_names = []
         li_layers_idx = []
-        dico_gdb['layers_names'] = li_layers_names
-        dico_gdb['layers_idx'] = li_layers_idx
+        dico_dataset['layers_names'] = li_layers_names
+        dico_dataset['layers_idx'] = li_layers_idx
 
         # cumulated size
-        total_size = 0
-        for chemins in walk(gdbpath):
-            for file in chemins[2]:
-                chem_complete = path.join(chemins[0], file)
-                if path.isfile(chem_complete):
-                    total_size = total_size + path.getsize(chem_complete)
-                else:
-                    pass
-        dico_gdb[u"total_size"] = self.sizeof(total_size)
+        dico_dataset[u"total_size"] = youtils.sizeof(source_path)
 
         # global dates
-        dico_gdb[u'date_actu'] = strftime('%d/%m/%Y',
-                                          localtime(path.getmtime(gdbpath)))
-        dico_gdb[u'date_crea'] = strftime('%d/%m/%Y',
-                                          localtime(path.getctime(gdbpath)))
+        crea, up = path.getctime(source_path), path.getmtime(source_path)
+        dico_dataset[u'date_crea'] = strftime('%Y/%m/%d',
+                                              localtime(crea))
+        dico_dataset[u'date_actu'] = strftime('%Y/%m/%d',
+                                              localtime(up))
         # total fields count
         total_fields = 0
-        dico_gdb['total_fields'] = total_fields
+        dico_dataset['total_fields'] = total_fields
         # total objects count
         total_objs = 0
-        dico_gdb['total_objs'] = total_objs
+        dico_dataset['total_objs'] = total_objs
         # parsing layers
-        for layer_idx in range(gdb.GetLayerCount()):
+        for layer_idx in range(src.GetLayerCount()):
             # dictionary where will be stored informations
             dico_layer = OrderedDict()
             # parent GDB
-            dico_layer['gdb_name'] = path.basename(gdb.GetName())
+            dico_layer['src_name'] = path.basename(src.GetName())
             # getting layer object
-            layer = gdb.GetLayerByIndex(layer_idx)
-            # layer name
+            layer = src.GetLayerByIndex(layer_idx)
+            # layer globals
             li_layers_names.append(layer.GetName())
-            # layer index
+            dico_layer[u'title'] = georeader.get_title(layer)
             li_layers_idx.append(layer_idx)
-            # getting layer globlal informations
-            self.infos_basics(layer, dico_layer, txt)
+
+            # features
+            layer_feat_count = layer.GetFeatureCount()
+            dico_layer[u'num_obj'] = layer_feat_count
+            if layer_feat_count == 0:
+                """ if layer doesn't have any object, return an error """
+                dico_layer[u'error'] = u'err_nobjet'
+                self.alert = self.alert + 1
+            else:
+                pass
+
+            # fields
+            layer_def = layer.GetLayerDefn()
+            dico_layer['num_fields'] = layer_def.GetFieldCount()
+            dico_layer['fields'] = georeader.get_fields_details(layer_def)
+
+            # geometry type
+            dico_layer[u'type_geom'] = georeader.get_geometry_type(layer)
+
+            # SRS
+            srs_details = georeader.get_srs_details(layer, txt)
+            dico_layer[u'srs'] = srs_details[0]
+            dico_layer[u'EPSG'] = srs_details[1]
+            dico_layer[u'srs_type'] = srs_details[2]
+
+            # spatial extent
+            extent = georeader.get_extent_as_tuple(layer)
+            dico_layer[u'Xmin'] = extent[0]
+            dico_layer[u'Xmax'] = extent[1]
+            dico_layer[u'Ymin'] = extent[2]
+            dico_layer[u'Ymax'] = extent[3]
+
             # storing layer into the GDB dictionary
-            dico_gdb['{0}_{1}'.format(layer_idx,
-                                      dico_layer.get('title'))] = dico_layer
+            dico_dataset['{0}_{1}'
+                         .format(layer_idx,
+                                 dico_layer.get('title'))] = dico_layer
             # summing fields number
-            total_fields += dico_layer.get(u'num_fields')
+            total_fields += dico_layer.get('num_fields', 0)
             # summing objects number
-            total_objs += dico_layer.get(u'num_obj')
+            total_objs += dico_layer.get('num_obj', 0)
             # deleting dictionary to ensure having cleared space
             del dico_layer
         # storing fileds and objects sum
-        dico_gdb['total_fields'] = total_fields
-        dico_gdb['total_objs'] = total_objs
+        dico_dataset['total_fields'] = total_fields
+        dico_dataset['total_objs'] = total_objs
 
         # warnings messages
-        dico_gdb['err_gdal'] = ogrerr.err_type, ogrerr.err_msg
-
-    def infos_basics(self, layer_obj, dico_layer, txt):
-        u""" get the global informations about the layer """
-        # title
-        try:
-            dico_layer[u'title'] = unicode(layer_obj.GetName())
-        except UnicodeDecodeError:
-            layerName = layer_obj.GetName().decode('latin1', errors='replace')
-            dico_layer[u'title'] = layerName
-
-        # features count
-        dico_layer[u'num_obj'] = layer_obj.GetFeatureCount()
-
-        if layer_obj.GetFeatureCount() == 0:
-            u""" if layer doesn't have any object, return an error """
-            dico_layer[u'error'] = u'err_nobjet'
-            self.alert = self.alert + 1
-        else:
-            # getting geography and geometry informations
-            srs = layer_obj.GetSpatialRef()
-            self.infos_geos(layer_obj, srs, dico_layer, txt)
-
-        # getting fields informations
-        dico_fields = OrderedDict()
-        layer_def = layer_obj.GetLayerDefn()
-        dico_layer['num_fields'] = layer_def.GetFieldCount()
-        self.infos_fields(layer_def, dico_fields)
-        dico_layer['fields'] = dico_fields
-
-        # end of function
-        return dico_layer
-
-    def infos_geos(self, layer_obj, srs, dico_layer, txt):
-        u""" get the informations about geography and geometry """
-        # SRS
-        srs.AutoIdentifyEPSG()
-        # srs type
-        srsmetod = [(srs.IsCompound(), txt.get('srs_comp')),
-                    (srs.IsGeocentric(), txt.get('srs_geoc')),
-                    (srs.IsGeographic(), txt.get('srs_geog')),
-                    (srs.IsLocal(), txt.get('srs_loca')),
-                    (srs.IsProjected(), txt.get('srs_proj')),
-                    (srs.IsVertical(), txt.get('srs_vert'))]
-        # searching for a match with one of srs types
-        for srsmet in srsmetod:
-            if srsmet[0] == 1:
-                typsrs = srsmet[1]
-            else:
-                continue
-        # in case of not match
-        try:
-            dico_layer[u'srs_type'] = unicode(typsrs)
-        except UnboundLocalError:
-            typsrs = txt.get('srs_nr')
-            dico_layer[u'srs_type'] = unicode(typsrs)
-
-        # handling exceptions in srs names'encoding
-        try:
-            if srs.GetAttrValue(str('PROJCS')) != 'unnamed':
-                dico_layer[u'srs'] = unicode(srs.GetAttrValue(str('PROJCS'))).replace('_', ' ')
-            else:
-                dico_layer[u'srs'] = unicode(srs.GetAttrValue(str('PROJECTION'))).replace('_', ' ')
-        except UnicodeDecodeError:
-            if srs.GetAttrValue(str('PROJCS')) != 'unnamed':
-                dico_layer[u'srs'] = srs.GetAttrValue(str('PROJCS')).decode('latin1').replace('_', ' ')
-            else:
-                dico_layer[u'srs'] = srs.GetAttrValue(str('PROJECTION')).decode('latin1').replace('_', ' ')
-        finally:
-            dico_layer[u'EPSG'] = unicode(srs.GetAttrValue(str("AUTHORITY"), 1))
-
-        # World SRS default
-        if dico_layer[u'EPSG'] == u'4326' and dico_layer[u'srs'] == u'None':
-            dico_layer[u'srs'] = u'WGS 84'
+        if self.alert:
+            dico_dataset['err_gdal'] = gdal_err.err_type, gdal_err.err_msg
         else:
             pass
-
-        # first feature and geometry type
-        try:
-            first_obj = layer_obj.GetNextFeature()
-            geom = first_obj.GetGeometryRef()
-        except AttributeError, e:
-            print e, layer_obj.GetName(), layer_obj.GetFeatureCount()
-            first_obj = layer_obj.GetNextFeature()
-            geom = first_obj.GetGeometryRef()
-
-        # geometry type human readable
-        if geom.GetGeometryName() == u'POINT':
-            dico_layer[u'type_geom'] = txt.get('geom_point')
-        elif u'LINESTRING' in geom.GetGeometryName():
-            dico_layer[u'type_geom'] = txt.get('geom_ligne')
-        elif u'POLYGON' in geom.GetGeometryName():
-            dico_layer[u'type_geom'] = txt.get('geom_polyg')
-        else:
-            dico_layer[u'type_geom'] = geom.GetGeometryName()
-
-        # spatial extent (bounding box)
-        dico_layer[u'Xmin'] = round(layer_obj.GetExtent()[0], 2)
-        dico_layer[u'Xmax'] = round(layer_obj.GetExtent()[1], 2)
-        dico_layer[u'Ymin'] = round(layer_obj.GetExtent()[2], 2)
-        dico_layer[u'Ymax'] = round(layer_obj.GetExtent()[3], 2)
-
-        # end of function
-        return dico_layer
-
-    def infos_fields(self, layer_def, dico_fields):
-        u""" get the informations about fields definitions """
-        for i in range(layer_def.GetFieldCount()):
-            champomy = layer_def.GetFieldDefn(i)  # fields ordered
-            dico_fields[champomy.GetName()] = champomy.GetTypeName(),\
-                                              champomy.GetWidth(),\
-                                              champomy.GetPrecision()
-        # end of function
-        return dico_fields
-
-    def sizeof(self, os_size):
-        u""" return size in different units depending on size
-        see http://stackoverflow.com/a/1094933 """
-        for size_cat in ['octets', 'Ko', 'Mo', 'Go']:
-            if os_size < 1024.0:
-                return "%3.1f %s" % (os_size, size_cat)
-            os_size /= 1024.0
-        return "%3.1f %s" % (os_size, " To")
-
-    def erratum(self, dico_gdb, gdbpath, mess):
-        u""" errors handling """
-        # local variables
-        dico_gdb[u'name'] = path.basename(gdbpath)
-        dico_gdb[u'folder'] = path.dirname(gdbpath)
-        try:
-            def_couche = self.layer.GetLayerDefn()
-            dico_gdb[u'num_fields'] = def_couche.GetFieldCount()
-        except AttributeError:
-            mess = mess
-        finally:
-            dico_gdb[u'error'] = mess
-            dico_gdb[u'layers_count'] = 0
-        # End of function
-        return dico_gdb
+        # clean exit
+        del src
 
 # ############################################################################
 # #### Stand alone program #######
@@ -330,7 +203,8 @@ if __name__ == '__main__':
     li_gdb = [
               r'Points.gdb',
               r'Polygons.gdb',
-              r'AAHH.gdb'
+              r'GDB_Test.gdb',
+              r'MulitNet_2015_12.gdb',
               ]
     for root, dirs, files in walk(r'..\test\datatest'):
             num_folders = num_folders + len(dirs)
@@ -338,9 +212,9 @@ if __name__ == '__main__':
                 try:
                     unicode(path.join(root, d))
                     full_path = path.join(root, d)
-                except UnicodeDecodeError, e:
+                except UnicodeDecodeError as e:
                     full_path = path.join(root, d.decode('latin1'))
-                    print unicode(full_path), e
+                    logging.error(unicode(full_path), e)
                 if full_path[-4:].lower() == '.gdb':
                     # add complete path of shapefile
                     li_gdb.append(path.abspath(full_path))
@@ -348,18 +222,21 @@ if __name__ == '__main__':
                     pass
 
     # recipient datas
-    dico_gdb = OrderedDict()
+    dico_dataset = OrderedDict()
 
     # read GDB
-    for gdbpath in li_gdb:
-        dico_gdb.clear()
-        if path.isdir(gdbpath):
-            print("\n{0}: ".format(gdbpath))
-            ReadGDB(gdbpath,
-                    dico_gdb,
+    for source_path in li_gdb:
+        dico_dataset.clear()
+        source_path = path.abspath(source_path)
+        print(path.isdir(source_path), source_path)
+        if path.isdir(source_path):
+            print("\n{0}: ".format(path.realpath(source_path)))
+            ReadGDB(source_path,
+                    dico_dataset,
                     'Esri FileGDB',
                     textos)
             # print results
-            print(dico_gdb)
+            print(dico_dataset)
         else:
+            print(path.isfile(source_path), source_path)
             pass

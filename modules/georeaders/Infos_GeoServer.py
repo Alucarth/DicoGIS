@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 from __future__ import unicode_literals
+from __future__ import print_function
 
 # ----------------------------------------------------------------------------
 # Name:         InfosWFS
@@ -67,7 +68,7 @@ class ReadGeoServer():
         for layer in layers:
             # print(layer.name, layer.enabled, layer.resource._store.name, layer.resource._workspace.name)
             title = layer.resource.title
-            print(layer.resource._workspace.name + "/wms?layers={}:{};".format(layer.resource._workspace.name, layer.name), title.encode("utf8"))
+            print((layer.resource._workspace.name + "/wms?layers={}:{};".format(layer.resource._workspace.name, layer.name), title.encode("utf8")))
             # print(title.encode("utf8"))
             # dico_layers[layer.name] = layer.enabled, layer.resource.title, layer.resource.abstract, layer.resource.keywords
             # dico_stores[layer.resource._store.name] = dico_layers

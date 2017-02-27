@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 from __future__ import unicode_literals
+from __future__ import print_function
 
 # ----------------------------------------------------------------------------
 # Name:         InfosSpatialite
@@ -237,8 +238,8 @@ class ReadSpaDB():
         try:
             first_obj = layer_obj.GetNextFeature()
             geom = first_obj.GetGeometryRef()
-        except AttributeError, e:
-            print e, layer_obj.GetName(), layer_obj.GetFeatureCount()
+        except AttributeError as e:
+            print(e, layer_obj.GetName(), layer_obj.GetFeatureCount())
             first_obj = layer_obj.GetNextFeature()
             geom = first_obj.GetGeometryRef()
 

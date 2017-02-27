@@ -144,7 +144,7 @@ class ReadGeoPDF(object):
         # opening file
         try:
             self.geopdf = gdal.Open(pdfpath, GA_ReadOnly)
-        except Exception, e:
+        except Exception as e:
             self.alert += 1
             self.erratum(dico_geopdf, pdfpath, u'err_incomp')
             return

@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 from __future__ import unicode_literals
+from __future__ import print_function
 
 # -----------------------------------------------------------------------------
 # Name:         Infos MXD
@@ -208,7 +209,7 @@ if __name__ == '__main__' and __package__ is None:
         from sys import exit
         exit('ArcPy not found. Check your installation.')
     else:
-        print("ArcPy: ", checker.check_arcpy())
+        print(("ArcPy: ", checker.check_arcpy()))
         pass
 
     # ------------ Real start ----------------

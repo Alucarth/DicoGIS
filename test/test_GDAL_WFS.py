@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 from __future__ import unicode_literals
+from __future__ import print_function
 
 #-------------------------------------------------------------------------------
 # Name:         InfosWFS
@@ -64,12 +65,12 @@ class Read_WFS():
         textos['geom_ligne'] = u'Line'
         textos['geom_polyg'] = u'Polygon'
         # playing with driver
-        print "\nLet's play with OGR Openwfs driver".upper()
+        print("\nLet's play with OGR Openwfs driver".upper())
         print("WFS available methods: {0}".format(dir(wfs)))
 
 
 
-        print wfs.__sizeof__()
+        print(wfs.__sizeof__())
         # print(wfs.GetStyleTable())
         print("{0} layers found into.".format(wfs.GetLayerCount()))
         for index in range(wfs.GetLayerCount()):
@@ -78,7 +79,7 @@ class Read_WFS():
             # first feature and geometry type
             obj = layer.GetFeature(1)
             geom = obj.GetGeometryRef()
-            print geom.GetGeometryName()
+            print(geom.GetGeometryName())
             # SRS
             srs = layer.GetSpatialRef()
             srs.AutoIdentifyEPSG()
@@ -98,7 +99,7 @@ class Read_WFS():
                 else:
                     continue
 
-            print typsrs
+            print(typsrs)
 
             print("\n==============================================\n\t\tLayer available methods: {0}\n".format(dir(layer)))
             print("\nLayer: {0}".format(layer.GetName()))
@@ -112,7 +113,7 @@ Ymin = {2} - Ymax = {3}".format(layer.GetExtent()[0],
             print("Geometry type: {0}".format(layer.GetGeomType()))
             # print("Geometry name: {0}".format(layer.GetGeomName()))  # doesn't work
             print("Geometry column: {0}".format(layer.GetGeometryColumn()))
-            print dir(layer.GetGeomType())
+            print(dir(layer.GetGeomType()))
             
             # fields information about each layer
             layer_def = layer.GetLayerDefn()
@@ -220,14 +221,14 @@ if __name__ == '__main__':
     except AttributeError:
         wfs = WebFeatureService(WFS_URL, version="1.1.0")
 
-    print("\n\tGlobal: ", dir(wfs))
+    print(("\n\tGlobal: ", dir(wfs)))
     print(wfs.version)
     print(wfs.url)
     print(wfs.items()[0][1])
     help(wfs.getSRS)
     print(wfs.timeout)
 
-    print("\n\tIdentification: ", dir(wfs.identification))
+    print(("\n\tIdentification: ", dir(wfs.identification)))
     print(wfs.identification.type)
     print(wfs.identification.title)
     print(wfs.identification.service)
@@ -239,7 +240,7 @@ if __name__ == '__main__':
     print(wfs.identification.accessconstraints)
     print(wfs.identification.profiles)
     
-    print("\n\tProvider: ", dir(wfs.provider))
+    print(("\n\tProvider: ", dir(wfs.provider)))
     print(wfs.provider.name)
     print(wfs.provider.url)
     print(wfs.provider.contact.email)
@@ -251,7 +252,7 @@ if __name__ == '__main__':
     print(wfs.provider.contact.postcode)
     print(wfs.provider.contact.country)
 
-    print("\n\tOperations: ", [op.name for op in wfs.operations])
+    print(("\n\tOperations: ", [op.name for op in wfs.operations]))
     
     op_describe = wfs.getOperationByName('DescribeFeatureType')
     help(op_describe)
@@ -282,11 +283,11 @@ if __name__ == '__main__':
 
         except UnicodeEncodeError:
             title = wfs[layer].title
-            print title.encode("UTF-8")
+            print(title.encode("UTF-8"))
             abstract = wfs[layer].abstract
-            if abstract: print abstract.encode("UTF-8")
-            print wfs[layer].id
-            print wfs[layer].keywords
+            if abstract: print(abstract.encode("UTF-8"))
+            print(wfs[layer].id)
+            print(wfs[layer].keywords)
             print(wfs[layer].boundingBox)
             print(wfs[layer].boundingBoxWGS84)
             print(wfs[layer].keywords)

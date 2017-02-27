@@ -1,3 +1,4 @@
+from __future__ import print_function
 from openpyxl import Workbook
 from openpyxl.compat import range
 from openpyxl.cell import get_column_letter

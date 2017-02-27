@@ -1,4 +1,5 @@
-﻿from xlwt import Workbook, easyxf
+﻿from __future__ import print_function
+from xlwt import Workbook, easyxf
 from xlwt.Utils import rowcol_to_cell
 
 
@@ -9,13 +10,13 @@ cell = easyxf('pattern: pattern solid, fore_colour light_blue;'
 
 book = Workbook(encoding='UTF-8')
 help(book)
-print book.country_code
-print book.tab_width
+print(book.country_code)
+print(book.tab_width)
 book.set_owner('DicoGIS')
-print book.owner
+print(book.owner)
 
 # book.encoding = 'UTF-8'
-print book.encoding
+print(book.encoding)
 
 sheet = book.add_sheet('Precedence')
 

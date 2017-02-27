@@ -18,6 +18,7 @@
 ########### Libraries #############
 ###################################
 # Standard library
+from __future__ import print_function
 from os import path, chdir, listdir   # files and folder managing
 from time import localtime, strftime
 
@@ -61,8 +62,8 @@ class ReadDWG():
         dr_dxf = ogr.GetDriverByName("DXF")
         try:
             dxf = dr_dxf.Open(dxfpath, 0)
-        except Exception, e:
-            print e
+        except Exception as e:
+            print(e)
             return
 
         # check if DXF is OGR friendly
@@ -227,8 +228,8 @@ class ReadDWG():
         try:
             first_obj = layer_obj.GetNextFeature()
             geom = first_obj.GetGeometryRef()
-        except AttributeError, e:
-            print e, layer_obj.GetName()
+        except AttributeError as e:
+            print(e, layer_obj.GetName())
             first_obj = layer_obj.GetNextFeature()
             geom = first_obj.GetGeometryRef()
 
