@@ -1116,6 +1116,8 @@ class DicoGIS(Tk):
         else:
             avert('DicoGIS - User error', self.blabla.get('nodata'))
             return
+        # georeaders
+        georeader_vector = ReadVectorFlatDataset()
         # creating the Excel workbook
         self.wb = files2xlsx(texts=self.blabla)  # TESTING
         logger.info('Excel file created')
@@ -1195,7 +1197,7 @@ class DicoGIS(Tk):
                 self.dico_layer.clear()
                 # getting the informations
                 try:
-                    ReadVectorFlatDataset(path.abspath(shp),
+                    georeader_vector.infos_dataset(path.abspath(shp),
                                           self.dico_layer,
                                           'Esri shapefiles',
                                           self.blabla)
@@ -1231,7 +1233,7 @@ class DicoGIS(Tk):
                 print(self.dico_layer.get("err_gdal"))
                 # getting the informations
                 try:
-                    ReadVectorFlatDataset(path.abspath(tab),
+                    georeader_vector.infos_dataset(path.abspath(tab),
                                           self.dico_layer,
                                           'MapInfo tab',
                                           self.blabla)
@@ -1265,7 +1267,7 @@ class DicoGIS(Tk):
                 self.dico_fields.clear()
                 # getting the informations
                 try:
-                    ReadVectorFlatDataset(path.abspath(kml),
+                    georeader_vector.infos_dataset(path.abspath(kml),
                                           self.dico_layer,
                                           'Google KML/KMZ',
                                           self.blabla)
@@ -1299,7 +1301,7 @@ class DicoGIS(Tk):
                 self.dico_fields.clear()
                 # getting the informations
                 try:
-                    ReadVectorFlatDataset(path.abspath(gml),
+                    georeader_vector.infos_dataset(path.abspath(gml),
                                           self.dico_layer,
                                           'GML',
                                           self.blabla)
@@ -1333,7 +1335,7 @@ class DicoGIS(Tk):
                 self.dico_fields.clear()
                 # getting the informations
                 try:
-                    ReadVectorFlatDataset(path.abspath(geojson),
+                    georeader_vector.infos_dataset(path.abspath(geojson),
                                           self.dico_layer,
                                           'GeoJSON',
                                           self.blabla)

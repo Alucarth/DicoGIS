@@ -18,6 +18,10 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 # ############################################################################
 # ######### Libraries #############
 # #################################
+# Python 2 and 3 compatibility
+from future.standard_library import install_aliases
+install_aliases()
+
 # Standard library
 from collections import OrderedDict  # Python 3 backported
 import logging
@@ -34,18 +38,38 @@ except ImportError:
 
 from gdalconst import *
 
+# custom submodules
+try:
+    from .gdal_exceptions_handler import GdalErrorHandler
+    from .geo_infos_generic import GeoInfosGenericReader
+    from .geoutils import Utils
+except ValueError:
+    from gdal_exceptions_handler import GdalErrorHandler
+    from geo_infos_generic import GeoInfosGenericReader
+    from geoutils import Utils
+
+# ############################################################################
+# ######### Globals ############
+# ##############################
+
+gdal_err = GdalErrorHandler()
+georeader = GeoInfosGenericReader()
+youtils = Utils()
+
 # ############################################################################
 # ######### Classes #############
 # #################################
 
+
 class ReadPostGIS():
-    def __init__(self, layer, dico_layer, dico_fields, tipo, text=''):
+    def __init__(self, host="localhost", port=5432, dbname="postgis",
+                 user="postgres", password="postgres", views_included=1):
         u"""Uses gdal/ogr functions to extract basic informations about
         geographic file (handles shapefile or MapInfo tables)
         and store into the dictionaries.
 
         layer = path to the geographic file
-        dico_layer = dictionary for global informations
+        dico_dataset = dictionary for global informations
         dico_fields = dictionary for the fields' informations
         tipo = feature type to read
         text = dictionary of texts to display
@@ -57,16 +81,42 @@ class ReadPostGIS():
 
         # Creating variables
         self.alert = 0
+        if views_included:
+            gdal.SetConfigOption(str("PG_LIST_ALL_TABLES"), str("YES"))
+        else:
+            gdal.SetConfigOption(str("PG_LIST_ALL_TABLES"), str("NO"))
 
-        # raising incompatible files
-        # if not source:
-        #     u""" if file is not compatible """
-        #     self.erratum(dico_layer, layerpath, u'err_nobjet')
-        #     self.alert = self.alert + 1
-        #     return None
-        # else:
-        #     pass
+        self.conn_settings = "PG: host={} port={} dbname={} user={} password={}"\
+                             .format(host, port, dbname, user, password)
+        self.conn = self.pg_connection()
+        self.db_version = self.get_version()
+        self.schemas = self.get_schemas()
 
+    def establish_connection(self):
+        """TO DOC."""
+        try:
+            conn = ogr.Open(str(self.conn_settings))
+            conn = gdal.OpenEx(str(self.conn_settings))
+            logging.info("Access granted : connecting people!")
+            self.total_layers = conn.GetLayerCount()
+            return conn
+        except Exception as e:
+            logging.error('Connection failed. Check settings: {0}'.format(str(e)))
+            return 0
+
+    def get_version(self):
+        """TO DO."""
+        sql_version = str("SELECT PostGIS_full_version();")
+        return self.conn.ExecuteSQL(sql_version)
+
+    def get_schemas(self):
+        """TO DO."""
+        sql_schemas = str("select nspname from pg_catalog.pg_namespace;")
+        return self.conn.ExecuteSQL(sql_schemas)
+
+    def infos_dataset(self, layer, dico_dataset, tipo, txt=''):
+        """TO DO."""
+        dico_dataset['type'] = tipo
         # raising forbidden access
         try:
             obj = layer.GetNextFeature()  # get the first object
@@ -74,13 +124,13 @@ class ReadPostGIS():
             if u'permission denied' in str(e):
                 mess = str(e).split('\n')[0]
                 self.alert = self.alert + 1
-                self.erratum(dico_layer, layer, mess)
+                self.erratum(dico_dataset, layer, mess)
                 logging.error("GDAL: {} - {}".format(layer.GetName(), mess))
                 return None
             else:
                 pass
         except Exception as e:
-            print(e)
+            logging.error(e)
 
         try:
             self.geom = obj.GetGeometryRef()        # get the geometry
@@ -97,33 +147,33 @@ class ReadPostGIS():
         except AttributeError:
             mess = "No geodata"
             self.alert = self.alert + 1
-            self.erratum(dico_layer, layer, mess)
+            self.erratum(dico_dataset, layer, mess)
             return None
         except UnboundLocalError:
             return None
 
         # basic information
-        dico_layer[u'type'] = tipo
-        self.infos_basics(layer, dico_layer, text)
+        dico_dataset[u'type'] = tipo
+        self.infos_basics(layer, dico_dataset, text)
         # geometry information
-        self.infos_geom(layer, dico_layer, text)
+        self.infos_geom(layer, dico_dataset, text)
         # fields information
         self.infos_fields(dico_fields)
 
-    def infos_basics(self, layer, dico_layer, txt):
+    def infos_basics(self, layer, dico_dataset, txt):
         u""" get the global informations about the layer """
         # Storing into the dictionary
-        dico_layer[u'name'] = layer.GetName()
-        dico_layer[u'title'] = layer.GetName().capitalize()
-        dico_layer[u'num_obj'] = layer.GetFeatureCount()
-        dico_layer[u'num_fields'] = self.def_couche.GetFieldCount()
+        dico_dataset[u'name'] = layer.GetName()
+        dico_dataset[u'title'] = layer.GetName().capitalize()
+        dico_dataset[u'num_obj'] = layer.GetFeatureCount()
+        dico_dataset[u'num_fields'] = self.def_couche.GetFieldCount()
 
         # schema name
         try:
             layer.GetName().split('.')[1]
-            dico_layer[u'folder'] = layer.GetName().split('.')[0]
+            dico_dataset[u'folder'] = layer.GetName().split('.')[0]
         except IndexError:
-            dico_layer[u'folder'] = 'public'
+            dico_dataset[u'folder'] = 'public'
 
         ## SRS
         # srs type
@@ -143,59 +193,59 @@ class ReadPostGIS():
                 continue
         # in case of not match
         try:
-            dico_layer[u'srs_type'] = unicode(typsrs)
+            dico_dataset[u'srs_type'] = unicode(typsrs)
         except UnboundLocalError:
             typsrs = txt.get('srs_nr')
-            dico_layer[u'srs_type'] = unicode(typsrs)
+            dico_dataset[u'srs_type'] = unicode(typsrs)
 
 
         # Handling exception in srs names'encoding
         try:
             if self.srs.GetAttrValue(str("PROJCS")) != str("unnamed"):
-                dico_layer[u'srs'] = unicode(self.srs.GetAttrValue(str("PROJCS"))).replace('_', ' ')
+                dico_dataset[u'srs'] = unicode(self.srs.GetAttrValue(str("PROJCS"))).replace('_', ' ')
             else:
-                dico_layer[u'srs'] = unicode(self.srs.GetAttrValue(str("PROJECTION"))).replace('_', ' ')
+                dico_dataset[u'srs'] = unicode(self.srs.GetAttrValue(str("PROJECTION"))).replace('_', ' ')
         except UnicodeDecodeError:
             if self.srs.GetAttrValue(str("PROJCS")) != str("unnamed"):
-                dico_layer[u'srs'] = self.srs.GetAttrValue(str("PROJCS")).decode('latin1').replace('_', ' ')
+                dico_dataset[u'srs'] = self.srs.GetAttrValue(str("PROJCS")).decode('latin1').replace('_', ' ')
             else:
-                dico_layer[u'srs'] = self.srs.GetAttrValue(str("PROJECTION")).decode('latin1').replace('_', ' ')
-        dico_layer[u'EPSG'] = unicode(self.srs.GetAttrValue(str("AUTHORITY"), 1))
+                dico_dataset[u'srs'] = self.srs.GetAttrValue(str("PROJECTION")).decode('latin1').replace('_', ' ')
+        dico_dataset[u'EPSG'] = unicode(self.srs.GetAttrValue(str("AUTHORITY"), 1))
         # EPSG code
-        if dico_layer[u'EPSG'] == u'4326' and dico_layer[u'srs'] == u'None':
-            dico_layer[u'srs'] = u'WGS 84'
+        if dico_dataset[u'EPSG'] == u'4326' and dico_dataset[u'srs'] == u'None':
+            dico_dataset[u'srs'] = u'WGS 84'
         else:
             pass
 
         # end of function
-        return dico_layer, layer, txt
+        return dico_dataset, layer, txt
 
-    def infos_geom(self, layer, dico_layer, txt):
+    def infos_geom(self, layer, dico_dataset, txt):
         u"""Get the informations about geometry."""
         try:
             # geometry type
             if self.geom.GetGeometryName() == u'POINT':
-                dico_layer[u'type_geom'] = txt.get('geom_point')
+                dico_dataset[u'type_geom'] = txt.get('geom_point')
             elif u'LINESTRING' in self.geom.GetGeometryName():
-                dico_layer[u'type_geom'] = txt.get('geom_ligne')
+                dico_dataset[u'type_geom'] = txt.get('geom_ligne')
             elif u'POLYGON' in self.geom.GetGeometryName():
-                dico_layer[u'type_geom'] = txt.get('geom_polyg')
+                dico_dataset[u'type_geom'] = txt.get('geom_polyg')
             else:
-                dico_layer[u'type_geom'] = self.geom.GetGeometryName()
+                dico_dataset[u'type_geom'] = self.geom.GetGeometryName()
         except AttributeError, e:
             mess = str(e).split('\n')[0]
             # self.alert = self.alert + 1
-            # self.erratum(dico_layer, layer, mess)
+            # self.erratum(dico_dataset, layer, mess)
             logging.warning("GDAL: {} - {}".format(layer.GetName(), mess))
-            dico_layer[u'type_geom'] = "ERROR: not recognized"
+            dico_dataset[u'type_geom'] = "ERROR: not recognized"
 
         # Spatial extent (bounding box)
-        dico_layer[u'Xmin'] = round(layer.GetExtent()[0], 2)
-        dico_layer[u'Xmax'] = round(layer.GetExtent()[1], 2)
-        dico_layer[u'Ymin'] = round(layer.GetExtent()[2], 2)
-        dico_layer[u'Ymax'] = round(layer.GetExtent()[3], 2)
+        dico_dataset[u'Xmin'] = round(layer.GetExtent()[0], 2)
+        dico_dataset[u'Xmax'] = round(layer.GetExtent()[1], 2)
+        dico_dataset[u'Ymin'] = round(layer.GetExtent()[2], 2)
+        dico_dataset[u'Ymax'] = round(layer.GetExtent()[3], 2)
         # end of function
-        return dico_layer
+        return dico_dataset
 
     def infos_fields(self, dico_fields):
         u""" get the informations about fields definitions """
@@ -245,7 +295,7 @@ if __name__ == '__main__':
     textos['geom_ligne'] = u'Line'
     textos['geom_polyg'] = u'Polygon'
     # recipient datas
-    dico_layer = OrderedDict()     # dictionary where will be stored informations
+    dico_dataset = OrderedDict()     # dictionary where will be stored informations
     dico_fields = OrderedDict()     # dictionary for fields information
     # PostGIS database settings
     test_host = 'postgresql-guts.alwaysdata.net'
@@ -277,10 +327,9 @@ if __name__ == '__main__':
 
     # parsing layers
     for layer in conn:
-        dico_layer.clear()
-        dico_fields.clear()
+        dico_dataset.clear()
         print("\n")
         print(layer.GetName())
         # if "_current"
-        ReadPostGIS(layer, dico_layer, dico_fields, 'pg', textos)
-        print(dico_layer, dico_fields)
+        ReadPostGIS(layer, dico_dataset, 'pg', textos)
+        print(dico_dataset)

@@ -63,7 +63,16 @@ youtils = Utils()
 
 
 class ReadVectorFlatDataset():
-    def __init__(self, source_path, dico_dataset, tipo, txt=''):
+    def __init__(self):
+        """Class constructor."""
+        # handling ogr specific exceptions
+        errhandler = gdal_err.handler
+        gdal.PushErrorHandler(errhandler)
+        gdal.UseExceptions()
+        ogr.UseExceptions()
+        self.alert = 0
+
+    def infos_dataset(self, source_path, dico_dataset, tipo, txt=''):
         """Use OGR functions to extract basic informations about
         geographic vector file (handles shapefile or MapInfo tables)
         and store into dictionaries.
@@ -73,30 +82,14 @@ class ReadVectorFlatDataset():
         dico_fields = dictionary for the fields' informations
         li_fieds = ordered list of fields
         tipo = shp or tab
-        text = dictionary of text in the selected language
-        """
-        # handling ogr specific exceptions
-        errhandler = gdal_err.handler
-        gdal.PushErrorHandler(errhandler)
-        gdal.UseExceptions()
-        ogr.UseExceptions()
-        self.alert = 0
-
+        text = dictionary of text in the selected language"""
         # changing working directory to layer folder
         chdir(path.dirname(source_path))
         dico_dataset['type'] = tipo
 
         # raising corrupt files
         try:
-            # driver = ogr.GetDriverByName(str("ESRI Shapefile"))
-            # print(help(driver.Open))
-            # source_ogr = driver.Open(source_path, 0)
-            # source = ogr.Open(source_path)
             src = gdal.OpenEx(source_path, 0)  # GDAL driver
-            # print(type(source_ogr))
-            # print(type(source_gdal))
-            # print(source_ogr == source_gdal)
-            # print(dir(source), source.GetDriver())
         except Exception as e:
             logging.error(e)
             self.alert = self.alert + 1
@@ -188,16 +181,17 @@ if __name__ == '__main__':
     within the official repository (https://github.com/Guts/DicoGIS)"""
     # libraries import
     # from os import getcwd
+    vectorReader = ReadVectorFlatDataset()
     # test files
-    li_shp = [path.realpath(r'..\..\test\datatest\vectors\shp\itineraires_rando.shp'),
-              path.realpath(r'..\..\test\datatest\vectors\shp\airports.shp'),
-              path.realpath(r'..\..\test\datatest\vectors\tab\tab\airports_MI.tab'),
-              path.realpath(r'..\..\test\datatest\vectors\tab\tab\Hydrobiologie.TAB'),
-              path.realpath(r'..\..\test\datatest\vectors\geojson\wc2014_MapTour.geojson'),
-              path.realpath(r'..\..\test\datatest\vectors\gml\airports.gml'),
-              path.realpath(r'..\..\test\datatest\vectors\kml\wc2014_MapTour.kml'),
-              path.realpath(r'..\..\test\datatest\vectors\kml\PPRI_Loire_sept2014.kmz'),
-              ]
+    li_vectors = [path.realpath(r'..\..\test\datatest\vectors\shp\itineraires_rando.shp'),
+                  path.realpath(r'..\..\test\datatest\vectors\shp\airports.shp'),
+                  path.realpath(r'..\..\test\datatest\vectors\tab\tab\airports_MI.tab'),
+                  path.realpath(r'..\..\test\datatest\vectors\tab\tab\Hydrobiologie.TAB'),
+                  path.realpath(r'..\..\test\datatest\vectors\geojson\wc2014_MapTour.geojson'),
+                  path.realpath(r'..\..\test\datatest\vectors\gml\airports.gml'),
+                  path.realpath(r'..\..\test\datatest\vectors\kml\wc2014_MapTour.kml'),
+                  path.realpath(r'..\..\test\datatest\vectors\kml\PPRI_Loire_sept2014.kmz'),
+                  ]
     # test text dictionary
     textos = OrderedDict()
     textos['srs_comp'] = u'Compound'
@@ -210,17 +204,16 @@ if __name__ == '__main__':
     textos['geom_ligne'] = u'Line'
     textos['geom_polyg'] = u'Polygon'
     # recipient datas
-    dico_dataset = OrderedDict()     # dictionary where will be stored informations
-    dico_fields = OrderedDict()    # dictionary for fields information
+    dico_dataset = OrderedDict()  # dictionary where will be stored info
+    dico_fields = OrderedDict()   # dictionary for fields information
     # execution
-    for shp in li_shp:
+    for vector in li_vectors:
         """ looping on shapefiles list """
         # reset recipient data
         dico_dataset.clear()
-        dico_fields.clear()
         # getting the informations
-        print('\n{0}'.format(shp))
-        info_shp = ReadVectorFlatDataset(path.abspath(shp),
+        print('\n{0}'.format(vector))
+        info_shp = vectorReader.infos_dataset(path.abspath(vector),
                                          dico_dataset,
                                          'shape',
                                          textos)
