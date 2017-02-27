@@ -240,12 +240,16 @@ class ReadLYR():
         dico_lyr[u'srs'] = srs.name
         dico_lyr[u'srs_type'] = srs.type
         if srs.type == u'Projected':
-            dico_lyr[u'EPSG'] = srs.PCSCode, srs.PCSName, srs.projectionCode, srs.projectionName
+            dico_lyr[u'EsriSRS'] = srs.PCSCode, srs.PCSName, srs.projectionCode, srs.projectionName
+            dico_lyr[u'EPSG'] = srs.projectionCode
         elif srs.type == u'Geographic':
-            dico_lyr[u'EPSG'] = srs.GCSCode, srs.GCSName, srs.datumCode, srs.datumName
+            dico_lyr[u'EsriSRS'] = srs.GCSCode, srs.GCSName, srs.datumCode, srs.datumName
+            dico_lyr[u'EPSG'] = srs.projectionCode
         else:
-            dico_lyr[u'EPSG'] = (srs.PCSCode, srs.PCSName, srs.projectionCode, srs.projectionName),\
-                                (srs.GCSCode, srs.GCSName, srs.datumCode, srs.datumName)
+            dico_lyr[u'EsriSRS'] = (srs.PCSCode, srs.PCSName, srs.projectionCode, srs.projectionName),\
+                                   (srs.GCSCode, srs.GCSName, srs.datumCode, srs.datumName)
+            dico_lyr[u'EPSG'] = srs.projectionCode
+
 
         # end of function
         return
