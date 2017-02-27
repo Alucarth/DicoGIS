@@ -85,7 +85,7 @@ from modules import TextsManager
 utils_global = Utilities()
 
 # LOG
-logger = logging.getLogger()
+logger = logging.getLogger("DicoGIS")
 logging.captureWarnings(True)
 logger.setLevel(logging.INFO)  # all errors will be get
 log_form = logging.Formatter('%(asctime)s || %(levelname)s || %(module)s || %(message)s')
@@ -106,10 +106,8 @@ class DicoGIS(Tk):
     def __init__(self):
         u""" Main window constructor
         Creates 1 frame and 2 labelled subframes"""
-        # start
-        logging.info("")
-        logging.info('\t============== DicoGIS =============')
-        logging.info('Version: {0}'.format(self.DGversion))
+        logger.info('\t============== DicoGIS =============')
+        logger.info('Version: {0}'.format(self.DGversion))
 
         # manage settings outside the main class
         self.settings = OptionsManager(r"options.ini")
@@ -120,21 +118,21 @@ class DicoGIS(Tk):
         Tk.__init__(self)               # constructor of parent graphic class
         self.title(u'DicoGIS {0}'.format(self.DGversion))
         if opersys == 'win32':
-            logging.info('Operating system: {0}'.format(platform.platform()))
+            logger.info('Operating system: {0}'.format(platform.platform()))
             self.iconbitmap('DicoGIS.ico')    # windows icon
             self.uzer = env.get(u'USERNAME')
         elif opersys == 'linux2':
-            logging.info('Operating system: {0}'.format(platform.platform()))
+            logger.info('Operating system: {0}'.format(platform.platform()))
             self.uzer = env.get(u'USER')
             icon = Image("photo", file=r'data/img/DicoGIS_logo.gif')
             self.call('wm', 'iconphoto', self._w, icon)
             self.style = Style().theme_use('clam')
         elif opersys == 'darwin':
-            logging.info('Operating system: {0}'.format(platform.platform()))
+            logger.info('Operating system: {0}'.format(platform.platform()))
             self.uzer = env.get(u'USER')
         else:
-            logging.warning('Operating system unknown')
-            logging.info('Operating system: {0}'.format(platform.platform()))
+            logger.warning('Operating system unknown')
+            logger.info('Operating system: {0}'.format(platform.platform()))
         self.resizable(width=False, height=False)
         self.focus_force()
 
@@ -461,7 +459,7 @@ class DicoGIS(Tk):
 
         # widgets placement
         self.ent_url_service.grid(row=0, column=1,
-                           sticky="NSWE", padx=2, pady=2)
+                                  sticky="NSWE", padx=2, pady=2)
 
 # =================================================================================
 
@@ -673,7 +671,7 @@ class DicoGIS(Tk):
             try:
                 self.settings.load_settings(parent=self)
             except:
-                logging.error("Load settings failed: option or section is missing.")
+                logger.error("Load settings failed: option or section is missing.")
         else:
             pass
         self.ddl_lang.set(self.def_lang)
@@ -718,8 +716,7 @@ class DicoGIS(Tk):
 # =================================================================================
 
     def ui_switch(self, cb_value, parent):
-        """Change state of  all children widgets
-        within a parent class
+        """Change state of  all children widgets within a parent class.
 
         cb_value=boolean
         parent=Tkinter class with children (Frame, Labelframe, Tk, etc.)
@@ -775,10 +772,10 @@ class DicoGIS(Tk):
                 else:
                     locale.setlocale(locale.LC_ALL, str("en_GB.utf8"))
 
-            logging.info("Language switched to: {0}"\
+            logger.info("Language switched to: {0}"\
                          .format(self.ddl_lang.get()))
         except locale.Error:
-            logging.error('Selected locale is not installed')
+            logger.error('Selected locale is not installed')
 
         # End of function
         return self.blabla
@@ -842,7 +839,7 @@ class DicoGIS(Tk):
         # Looping in folders structure
         self.status.set(self.blabla.get('gui_prog1'))
         self.prog_layers.start()
-        logging.info('Begin of folders parsing')
+        logger.info('Begin of folders parsing')
         for root, dirs, files in walk(foldertarget):
             self.num_folders = self.num_folders + len(dirs)
             for d in dirs:
@@ -953,7 +950,7 @@ class DicoGIS(Tk):
         self.li_mapdocs.extend(self.li_mxd)
         # end of listing
         self.prog_layers.stop()
-        logging.info("End of folders parsing: {0} shapefiles - "
+        logger.info("End of folders parsing: {0} shapefiles - "
                      "{1} tables (MapInfo) - "
                      "{2} KML - "
                      "{3} GML - "
@@ -1077,19 +1074,19 @@ class DicoGIS(Tk):
         # process files or PostGIS database
         if self.typo == 0:
             self.nb.select(0)
-            logging.info('=> files process started')
+            logger.info('=> files process started')
             self.process_files()
         elif self.typo == 1:
             self.nb.select(1)
-            logging.info('=> DB process started')
+            logger.info('=> DB process started')
             self.check_fields()
         elif self.typo == 2:
             self.nb.select(2)
-            logging.info('=> web services process started')
+            logger.info('=> web services process started')
             # self.check_fields()
         elif self.typo == 3:
             self.nb.select(3)
-            logging.info('=> Isogeo started')
+            logger.info('=> Isogeo started')
             self.process_isogeo()
         else:
             pass
@@ -1121,8 +1118,7 @@ class DicoGIS(Tk):
             return
         # creating the Excel workbook
         self.wb = files2xlsx(texts=self.blabla)  # TESTING
-        self.configexcel()
-        logging.info('Excel file created')
+        logger.info('Excel file created')
         # configuring the progress bar
         total_files = 0
         if self.opt_shp.get() and len(self.li_shp) > 0:
@@ -1187,11 +1183,11 @@ class DicoGIS(Tk):
         line_maps = 1       # line rank of maps & plans dictionary
 
         if self.opt_shp.get() and len(self.li_shp) > 0:
-            logging.info('\n\tProcessing shapefiles: start')
+            logger.info('\n\tProcessing shapefiles: start')
             for shp in self.li_shp:
                 """ looping on shapefiles list """
                 self.status.set(path.basename(shp))
-                logging.info('\n' + shp)
+                logger.info('\n' + shp)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1203,30 +1199,30 @@ class DicoGIS(Tk):
                                           self.dico_layer,
                                           'Esri shapefiles',
                                           self.blabla)
-                    logging.info('\t Infos OK')
+                    logger.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
-                    logging.error(e)
+                    logger.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
                 self.wb.store_md_vector(self.dico_layer)
 
-                logging.info('\t Wrote into the dictionary')
+                logger.info('\t Wrote into the dictionary')
                 # getting for metrics analysis
-                logging.info('\t Added to global metrics')
+                logger.info('\t Added to global metrics')
                 # increment the line number
                 line_vectors = line_vectors + 1
         else:
-            logging.info('\tIgnoring {0} shapefiles'.format(len(self.li_shp)))
+            logger.info('\tIgnoring {0} shapefiles'.format(len(self.li_shp)))
             pass
 
         if self.opt_tab.get() and len(self.li_tab) > 0:
-            logging.info('\n\tProcessing MapInfo tables: start')
+            logger.info('\n\tProcessing MapInfo tables: start')
             for tab in self.li_tab:
                 """ looping on MapInfo tables list """
                 self.status.set(path.basename(tab))
-                logging.info('\n' + tab)
+                logger.info('\n' + tab)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1239,28 +1235,28 @@ class DicoGIS(Tk):
                                           self.dico_layer,
                                           'MapInfo tab',
                                           self.blabla)
-                    logging.info('\t Infos OK')
+                    logger.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
-                    logging.error(e)
+                    logger.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel file
                 self.wb.store_md_vector(self.dico_layer)
 
-                logging.info('\t Wrote into the dictionary')
+                logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_vectors = line_vectors + 1
         else:
-            logging.info('\tIgnoring {0} MapInfo tables'.format(len(self.li_tab)))
+            logger.info('\tIgnoring {0} MapInfo tables'.format(len(self.li_tab)))
             pass
 
         if self.opt_kml.get() and len(self.li_kml) > 0:
-            logging.info('\n\tProcessing KML-KMZ: start')
+            logger.info('\n\tProcessing KML-KMZ: start')
             for kml in self.li_kml:
                 """ looping on KML/KMZ list """
                 self.status.set(path.basename(kml))
-                logging.info('\n' + kml)
+                logger.info('\n' + kml)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1273,28 +1269,28 @@ class DicoGIS(Tk):
                                           self.dico_layer,
                                           'Google KML/KMZ',
                                           self.blabla)
-                    logging.info('\t Infos OK')
+                    logger.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
-                    logging.error(e)
+                    logger.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
                 self.wb.store_md_vector(self.dico_layer)
 
-                logging.info('\t Wrote into the dictionary')
+                logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_vectors = line_vectors + 1
         else:
-            logging.info('\tIgnoring {0} KML'.format(len(self.li_kml)))
+            logger.info('\tIgnoring {0} KML'.format(len(self.li_kml)))
             pass
 
         if self.opt_gml.get() and len(self.li_gml) > 0:
-            logging.info('\n\tProcessing GML: start')
+            logger.info('\n\tProcessing GML: start')
             for gml in self.li_gml:
                 """ looping on GML list """
                 self.status.set(path.basename(gml))
-                logging.info('\n' + gml)
+                logger.info('\n' + gml)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1307,28 +1303,28 @@ class DicoGIS(Tk):
                                           self.dico_layer,
                                           'GML',
                                           self.blabla)
-                    logging.info('\t Infos OK')
+                    logger.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
-                    logging.error(e)
+                    logger.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
                 self.wb.store_md_vector(self.dico_layer)
 
-                logging.info('\t Wrote into the dictionary')
+                logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_vectors = line_vectors + 1
         else:
-            logging.info('\tIgnoring {0} GML'.format(len(self.li_gml)))
+            logger.info('\tIgnoring {0} GML'.format(len(self.li_gml)))
             pass
 
         if self.opt_geoj.get() and len(self.li_geoj) > 0:
-            logging.info('\n\tProcessing GeoJSON: start')
+            logger.info('\n\tProcessing GeoJSON: start')
             for geojson in self.li_geoj:
                 """ looping on GeoJSON list """
                 self.status.set(path.basename(geojson))
-                logging.info('\n' + geojson)
+                logger.info('\n' + geojson)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1341,28 +1337,28 @@ class DicoGIS(Tk):
                                           self.dico_layer,
                                           'GeoJSON',
                                           self.blabla)
-                    logging.info('\t Infos OK')
+                    logger.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
-                    logging.error(e)
+                    logger.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
                 self.wb.store_md_vector(self.dico_layer)
 
-                logging.info('\t Wrote into the dictionary')
+                logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_vectors = line_vectors + 1
         else:
-            logging.info('\tIgnoring {0} GeoJSON'.format(len(self.li_geoj)))
+            logger.info('\tIgnoring {0} GeoJSON'.format(len(self.li_geoj)))
             pass
 
         if self.opt_gxt.get() and len(self.li_gxt) > 0:
-            logging.info('\n\tProcessing GXT: start')
+            logger.info('\n\tProcessing GXT: start')
             for gxtpath in self.li_gxt:
                 """ looping on gxt list """
                 self.status.set(path.basename(gxtpath))
-                logging.info('\n' + gxtpath)
+                logger.info('\n' + gxtpath)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1375,28 +1371,28 @@ class DicoGIS(Tk):
                             self.dico_layer,
                             'Geoconcept eXport Text',
                             self.blabla)
-                    logging.info('\t Infos OK')
+                    logger.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
-                    logging.error(e)
+                    logger.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
                 self.wb.store_md_vector(self.dico_layer)
 
-                logging.info('\t Wrote into the dictionary')
+                logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_vectors = line_vectors + 1
         else:
-            logging.info('\tIgnoring {0} Geoconcept eXport Text'.format(len(self.li_gxt)))
+            logger.info('\tIgnoring {0} Geoconcept eXport Text'.format(len(self.li_gxt)))
             pass
 
         if self.opt_rast.get() and len(self.li_raster) > 0:
-            logging.info('\n\tProcessing rasters: start')
+            logger.info('\n\tProcessing rasters: start')
             for raster in self.li_raster:
                 """ looping on rasters list """
                 self.status.set(path.basename(raster))
-                logging.info('\n' + raster)
+                logger.info('\n' + raster)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1410,29 +1406,29 @@ class DicoGIS(Tk):
                                  self.dico_bands,
                                  path.splitext(raster)[1],
                                  self.blabla)
-                    logging.info('\t Infos OK')
+                    logger.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
-                    logging.error(e)
+                    logger.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
                 self.wb.store_md_raster(self.dico_raster,
                                         self.dico_bands)
 
-                logging.info('\t Wrote into the dictionary')
+                logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_rasters = line_rasters + 1
         else:
-            logging.info('\tIgnoring {0} rasters'.format(len(self.li_raster)))
+            logger.info('\tIgnoring {0} rasters'.format(len(self.li_raster)))
             pass
 
         if self.opt_egdb.get() and len(self.li_egdb) > 0:
-            logging.info('\n\tProcessing Esri FileGDB: start')
+            logger.info('\n\tProcessing Esri FileGDB: start')
             for gdb in self.li_egdb:
                 """ looping on FileGDB list """
                 self.status.set(path.basename(gdb))
-                logging.info('\n' + gdb)
+                logger.info('\n' + gdb)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1445,28 +1441,28 @@ class DicoGIS(Tk):
                              self.dico_fdb,
                              'Esri FileGeoDataBase',
                              self.blabla)
-                    logging.info('\t Infos OK')
+                    logger.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
-                    logging.error(e)
+                    logger.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
                 self.wb.store_md_fdb(self.dico_fdb)
 
-                logging.info('\t Wrote into the dictionary')
+                logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_fdb += self.dico_fdb.get('layers_count') + 1
         else:
-            logging.info('\tIgnoring {0} Esri FileGDB'.format(len(self.li_egdb)))
+            logger.info('\tIgnoring {0} Esri FileGDB'.format(len(self.li_egdb)))
             pass
 
         if self.opt_spadb.get() and len(self.li_spadb) > 0:
-            logging.info('\n\tProcessing Spatialite DB: start')
+            logger.info('\n\tProcessing Spatialite DB: start')
             for spadb in self.li_spadb:
                 """ looping on Spatialite DBs list """
                 self.status.set(path.basename(spadb))
-                logging.info('\n' + spadb)
+                logger.info('\n' + spadb)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1479,28 +1475,28 @@ class DicoGIS(Tk):
                                self.dico_fdb,
                                'Spatialite',
                                self.blabla)
-                    logging.info('\t Infos OK')
+                    logger.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
-                    logging.error(e)
+                    logger.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
                 self.wb.store_md_fdb(self.dico_fdb)
 
-                logging.info('\t Wrote into the dictionary')
+                logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_fdb += self.dico_fdb.get('layers_count') + 1
         else:
-            logging.info('\tIgnoring {0} Spatialite DB'.format(len(self.li_spadb)))
+            logger.info('\tIgnoring {0} Spatialite DB'.format(len(self.li_spadb)))
             pass
 
         if self.opt_cdao.get() and len(self.li_cdao) > 0:
-            logging.info('\n\tProcessing CAO/DAO: start')
+            logger.info('\n\tProcessing CAO/DAO: start')
             for dxf in self.li_dxf:
                 """ looping on DXF list """
                 self.status.set(path.basename(dxf))
-                logging.info('\n' + dxf)
+                logger.info('\n' + dxf)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1512,23 +1508,23 @@ class DicoGIS(Tk):
                             self.dico_cdao,
                             'AutoCAD DXF',
                             self.blabla)
-                    logging.info('\t Infos OK')
+                    logger.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
-                    logging.error(e)
+                    logger.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
                 self.wb.store_md_cad(self.dico_cdao)
 
-                logging.info('\t Wrote into the dictionary')
+                logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_cdao += self.dico_cdao.get('layers_count') + 1
 
             for dwg in self.li_dwg:
                 """ looping on DWG list """
                 self.status.set(path.basename(dwg))
-                logging.info('\n' + dwg)
+                logger.info('\n' + dwg)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1541,7 +1537,7 @@ class DicoGIS(Tk):
                                                             self.blabla.get('browse'))
                 except UnicodeDecodeError:
                     # write a notification into the log file
-                    logging.warning('Path name with special letters: {}'.format(path.dirname(dwg).decode('utf8')))
+                    logger.warning('Path name with special letters: {}'.format(path.dirname(dwg).decode('utf8')))
                     # decode the fucking path name
                     link = 'HYPERLINK("{0}"; "{1}")'.format(path.dirname(dwg).decode('utf8'),
                                                             self.blabla.get('browse'))
@@ -1551,20 +1547,20 @@ class DicoGIS(Tk):
                 # Name of parent folder
                 self.feuyCDAO.write(line_cdao, 2, path.basename(path.dirname(dwg)))
 
-                # logging
-                logging.info('\t Wrote into the dictionary')
+                # logger
+                logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 line_cdao += 1
         else:
-            logging.info('\tIgnoring {0} CAO/DAO files'.format(len(self.li_cdao)))
+            logger.info('\tIgnoring {0} CAO/DAO files'.format(len(self.li_cdao)))
             pass
 
         if self.opt_pdf.get() and len(self.li_pdf) > 0:
-            logging.info('\n\tProcessing Geospatial PDF: start')
+            logger.info('\n\tProcessing Geospatial PDF: start')
             for pdf in self.li_pdf:
                 """ looping on PDF list """
                 self.status.set(path.basename(pdf))
-                logging.info('\n' + pdf)
+                logger.info('\n' + pdf)
                 # increment the progress bar
                 self.prog_layers["value"] = self.prog_layers["value"] + 1
                 self.update()
@@ -1576,20 +1572,20 @@ class DicoGIS(Tk):
                                 self.dico_pdf,
                                 'Geospatial PDF',
                                 self.blabla)
-                    logging.info('\t Infos OK')
+                    logger.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
-                    logging.error(e)
+                    logger.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
                 self.wb.store_md_mapdoc(self.dico_pdf)
 
-                logging.info('\t Wrote into the dictionary')
+                logger.info('\t Wrote into the dictionary')
                 # increment the line number
                 # line_maps += self.dico_pdf.get('layers_count') + 1
         else:
-            logging.info('\tIgnoring {0} Geospatial PDF'.format(len(self.li_pdf)))
+            logger.info('\tIgnoring {0} Geospatial PDF'.format(len(self.li_pdf)))
             pass
 
         if self.opt_lyr.get() and len(self.li_lyr) > 0:
@@ -1646,7 +1642,7 @@ class DicoGIS(Tk):
                                        dest_filename=self.output.get(),
                                        ftype="Excel Workbook",
                                        dlg_title=self.blabla.get('gui_excel'))
-        logging.info('\n\tWorkbook saved: %s', self.output.get())
+        logger.info('\n\tWorkbook saved: %s', self.output.get())
         self.bell()
 
         # quit and exit
@@ -1661,10 +1657,10 @@ class DicoGIS(Tk):
         u"""Process PostGIS DB analisis."""
         # creating the Excel workbook
         self.configexcel()
-        logging.info('Excel file created')
+        logger.info('Excel file created')
         # getting the info from shapefiles and compile it in the excel
         line = 1    # line of dictionary
-        logging.info('\tPostGIS table processing...')
+        logger.info('\tPostGIS table processing...')
         # setting progress bar
         self.prog_layers["maximum"] = conn.GetLayerCount()
         # parsing the layers
@@ -1673,17 +1669,18 @@ class DicoGIS(Tk):
             self.dico_layer.clear()
             self.dico_fields.clear()
             ReadPostGIS(layer,
-                         self.dico_layer,
-                         self.dico_fields,
-                         'PostGIS table',
-                         self.blabla)
-            logging.info('Table examined: %s' % layer.GetName())
+                        self.dico_layer,
+                        self.dico_fields,
+                        'PostGIS table',
+                        self.blabla)
+            logger.info('Table examined: {}'.format(layer.GetName()))
             # writing to the Excel dictionary
-            self.dictionarize_pg(self.dico_layer,
-                                 self.dico_fields,
-                                 self.feuyPG,
-                                 line)
-            logging.info('\t Wrote into the dictionary')
+            # self.dictionarize_pg(self.dico_layer,
+            #                      self.dico_fields,
+            #                      self.feuyPG,
+            #                      line)
+            self.wb.store_md_sgdb(self.dico_layer)
+            logger.info('\t Wrote into the dictionary')
             # increment the line number
             line = line + 1
             # increment the progress bar
@@ -1691,7 +1688,7 @@ class DicoGIS(Tk):
             self.update()
         # saving dictionary
         self.savedico()
-        logging.info('\n\tWorkbook saved: %s', self.output.get())
+        logger.info('\n\tWorkbook saved: %s', self.output.get())
 
         # quit and exit
         utils_global.open_dir_file(self.output.get())
@@ -1745,7 +1742,7 @@ class DicoGIS(Tk):
         else:
             pass
         # no error detected: let's test connection
-        logging.info("Required fields are OK.")
+        logger.info("Required fields are OK.")
         self.test_connection()
         # End of function
         return
@@ -1758,7 +1755,7 @@ class DicoGIS(Tk):
         # more information about the GDAL HTTP proxy options here:
         # http://trac.osgeo.org/gdal/wiki/ConfigOptions#GDALOGRHTTPoptions
         if self.opt_proxy.get():
-            logging.info("Proxy configured.")
+            logger.info("Proxy configured.")
             gdal.SetConfigOption('GDAL_HTTP_PROXY', '{0}:{1}'.format(self.prox_server.get(),
                                                                      self.prox_port.get()))
             if self.opt_ntlm.get():
@@ -1769,15 +1766,15 @@ class DicoGIS(Tk):
             else:
                 pass
         else:
-            logging.info("No proxy configured.")
+            logger.info("No proxy configured.")
 
         # checking if user chose to list PostGIS views
         if self.opt_pgvw.get():
             gdal.SetConfigOption(str("PG_LIST_ALL_TABLES"), str("YES"))
-            logging.info("PostgreSQL views enabled.")
+            logger.info("PostgreSQL views enabled.")
         else:
             gdal.SetConfigOption(str("PG_LIST_ALL_TABLES"), str("NO"))
-            logging.info("PostgreSQL views disabled.")
+            logger.info("PostgreSQL views disabled.")
 
         # testing connection settings
         try:
@@ -1788,21 +1785,21 @@ class DicoGIS(Tk):
             # sql_version = "SELECT PostGIS_full_version();"
             # version = conn.ExecuteSQL(sql_version)
         except Exception as e:
-            logging.warning("Connection failed: {0}.".format(e))
+            logger.warning("Connection failed: {0}.".format(e))
             self.status.set("Connection failed: {0}.".format(e))
             avert(title=self.blabla.get("err_pg_conn_fail"), message=unicode(e))
             return
 
         # if connection successed
         self.status.set("{} tables".format(conn.GetLayerCount()))
-        logging.info("Connection to database {0} successed."
+        logger.info("Connection to database {0} successed."
                      "{1} tables found.".format(self.dbnb.get(),
                                                 conn.GetLayerCount()))
         # set the default output file
         self.output.delete(0, END)
-        self.output.insert(0, "DicoGIS_{0}-{1}_{2}.xls".format(self.dbnb.get(),
-                                                               self.host.get(),
-                                                               self.today))
+        self.output.insert(0, "DicoGIS_{0}-{1}_{2}.xlsx".format(self.dbnb.get(),
+                                                                self.host.get(),
+                                                                self.today))
         # launching the process
         self.process_db(conn)
         # end of function
@@ -1857,7 +1854,7 @@ class DicoGIS(Tk):
 
         # saving dictionary
         self.savedico()
-        logging.info('\n\tWorkbook saved: %s', self.output.get())
+        logger.info('\n\tWorkbook saved: %s', self.output.get())
 
         # quit and exit
         utils_global.open_dir_file(self.output.get())
@@ -1867,303 +1864,11 @@ class DicoGIS(Tk):
         # end of function
         return
 
-    def configexcel(self):
-        u"""Create and configure the Excel workbook."""
-        # Basic configuration
-        self.book = Workbook(encoding='utf8')
-        self.book.set_owner(str('DicoGIS_') + str(self.DGversion))
-        logging.info('Workbook created')
-        # Some customization: fonts and styles
-        # headers style
-        self.entete = easyxf('pattern: pattern solid, fore_colour black;'
-                             'font: colour white, bold True, height 220;'
-                             'align: horiz center')
-        # hyperlinks style
-        self.url = easyxf(u'font: underline single')
-        # errors style
-        self.xls_erreur = easyxf('pattern: pattern solid, fore_colour red;'
-                                 'font: colour white, bold True;')
-        # cell style handling return in-cell
-        self.xls_wrap = easyxf('align: wrap True')
-        # date cell style
-        self.xls_date = easyxf(num_format_str='DD/MM/YYYY')
-
-        # columns headers
-        if self.typo == 0:
-            """ adding a new sheet for metrics """
-            # sheet
-            self.feuySTATS = self.book.add_sheet('Metrics',
-                                                 cell_overwrite_ok=True)
-            # headers
-            self.feuySTATS.write(0, 0, "Totals", self.entete)
-            self.feuySTATS.write(0, 1, "=== Global Statistics ===", self.entete)
-            self.feuySTATS.write(1, 0, self.blabla.get('feats_class'), self.entete)
-            self.feuySTATS.write(2, 0, self.blabla.get('num_attrib'), self.entete)
-            self.feuySTATS.write(3, 0, self.blabla.get('num_objets'), self.entete)
-            self.feuySTATS.write(4, 0, self.blabla.get('gdal_warn'), self.entete)
-            self.feuySTATS.write(6, 0, self.blabla.get('geometrie'), self.entete)
-            logging.info('Sheet for global statistics adedd')
-            # tunning headers
-            # lg_shp_names = [len(lg) for lg in self.li_shp]
-            # lg_tab_names = [len(lg) for lg in self.li_tab]
-            # self.feuySTATS.col(0).width = max(lg_shp_names + lg_tab_names) * 100
-            # self.feuySTATS.col(1).width = len(self.blabla.get('browse')) * 256
-            # self.feuySTATS.col(9).width = 35 * 256
-        else:
-            pass
-
-        if self.typo == 0 \
-            and (self.opt_shp.get() + self.opt_tab.get() + self.opt_kml.get()
-                 + self.opt_gml.get() + self.opt_geoj.get()) > 0\
-            and len(self.li_vectors) > 0:
-            """ adding a new sheet for vectors informations """
-            self.wb.set_worksheets(has_vector=1)
-            # sheet
-            self.feuyVC = self.book.add_sheet(self.blabla.get('sheet_vectors'),
-                                              cell_overwrite_ok=True)
-            # headers
-            self.feuyVC.write(0, 0, self.blabla.get('nomfic'), self.entete)
-            self.feuyVC.write(0, 1, self.blabla.get('path'), self.entete)
-            self.feuyVC.write(0, 2, self.blabla.get('theme'), self.entete)
-            self.feuyVC.write(0, 3, self.blabla.get('num_attrib'), self.entete)
-            self.feuyVC.write(0, 4, self.blabla.get('num_objets'), self.entete)
-            self.feuyVC.write(0, 5, self.blabla.get('geometrie'), self.entete)
-            self.feuyVC.write(0, 6, self.blabla.get('srs'), self.entete)
-            self.feuyVC.write(0, 7, self.blabla.get('srs_type'), self.entete)
-            self.feuyVC.write(0, 8, self.blabla.get('codepsg'), self.entete)
-            self.feuyVC.write(0, 9, self.blabla.get('emprise'), self.entete)
-            self.feuyVC.write(0, 10, self.blabla.get('date_crea'), self.entete)
-            self.feuyVC.write(0, 11, self.blabla.get('date_actu'), self.entete)
-            self.feuyVC.write(0, 12, self.blabla.get('format'), self.entete)
-            self.feuyVC.write(0, 13, self.blabla.get('li_depends'), self.entete)
-            self.feuyVC.write(0, 14, self.blabla.get('tot_size'), self.entete)
-            self.feuyVC.write(0, 15, self.blabla.get('li_chps'), self.entete)
-            self.feuyVC.write(0, 16, self.blabla.get('gdal_warn'), self.entete)
-            logging.info('Sheet vectors adedd')
-            # tunning headers
-            lg_shp_names = [len(lg) for lg in self.li_shp]
-            lg_tab_names = [len(lg) for lg in self.li_tab]
-            self.feuyVC.col(0).width = max(lg_shp_names + lg_tab_names) * 100
-            self.feuyVC.col(1).width = len(self.blabla.get('browse')) * 256
-            self.feuyVC.col(9).width = 35 * 256
-            # freezing headers line and first column
-            self.feuyVC.set_panes_frozen(True)
-            self.feuyVC.set_horz_split_pos(1)
-            self.feuyVC.set_vert_split_pos(1)
-        else:
-            pass
-
-        if self.typo == 0\
-           and self.opt_rast.get() == 1\
-           and len(self.li_raster) > 0:
-            """ adding a new sheet for rasters informations """
-            self.wb.set_worksheets(has_raster=1)
-            # sheet
-            self.feuyRS = self.book.add_sheet(self.blabla.get('sheet_rasters'),
-                                              cell_overwrite_ok=True)
-            # headers
-            self.feuyRS.write(0, 0, self.blabla.get('nomfic'), self.entete)
-            self.feuyRS.write(0, 1, self.blabla.get('path'), self.entete)
-            self.feuyRS.write(0, 2, self.blabla.get('theme'), self.entete)
-            self.feuyRS.write(0, 3, self.blabla.get('size_Y'), self.entete)
-            self.feuyRS.write(0, 4, self.blabla.get('size_X'), self.entete)
-            self.feuyRS.write(0, 5, self.blabla.get('pixel_w'), self.entete)
-            self.feuyRS.write(0, 6, self.blabla.get('pixel_h'), self.entete)
-            self.feuyRS.write(0, 7, self.blabla.get('origin_x'), self.entete)
-            self.feuyRS.write(0, 8, self.blabla.get('origin_y'), self.entete)
-            self.feuyRS.write(0, 9, self.blabla.get('srs_type'), self.entete)
-            self.feuyRS.write(0, 10, self.blabla.get('codepsg'), self.entete)
-            self.feuyRS.write(0, 11, self.blabla.get('emprise'), self.entete)
-            self.feuyRS.write(0, 12, self.blabla.get('date_crea'), self.entete)
-            self.feuyRS.write(0, 13, self.blabla.get('date_actu'), self.entete)
-            self.feuyRS.write(0, 14, self.blabla.get('num_bands'), self.entete)
-            self.feuyRS.write(0, 15, self.blabla.get('format'), self.entete)
-            self.feuyRS.write(0, 16, self.blabla.get('compression'), self.entete)
-            self.feuyRS.write(0, 17, self.blabla.get('coloref'), self.entete)
-            self.feuyRS.write(0, 18, self.blabla.get('li_depends'), self.entete)
-            self.feuyRS.write(0, 19, self.blabla.get('tot_size'), self.entete)
-            self.feuyRS.write(0, 20, self.blabla.get('gdal_warn'), self.entete)
-            logging.info('Sheet rasters created')
-            # tunning headers
-            lg_rast_names = [len(lg) for lg in self.li_raster]
-            self.feuyRS.col(0).width = max(lg_rast_names) * 100
-            self.feuyRS.col(1).width = len(self.blabla.get('browse')) * 256
-            # freezing headers line and first column
-            self.feuyRS.set_panes_frozen(True)
-            self.feuyRS.set_horz_split_pos(1)
-            self.feuyRS.set_vert_split_pos(1)
-        else:
-            pass
-
-        if self.typo == 0\
-           and (self.opt_spadb.get() + self.opt_egdb.get())\
-           and len(self.li_fdb) > 0:
-            """ adding a new sheet for flat geodatabases informations """
-            self.wb.set_worksheets(has_filedb=1)
-            # sheet
-            self.feuyFGDB = self.book.add_sheet(self.blabla.get('sheet_filedb'),
-                                                cell_overwrite_ok=True)
-            # headers
-            self.feuyFGDB.write(0, 0, self.blabla.get('nomfic'), self.entete)
-            self.feuyFGDB.write(0, 1, self.blabla.get('path'), self.entete)
-            self.feuyFGDB.write(0, 2, self.blabla.get('theme'), self.entete)
-            self.feuyFGDB.write(0, 3, self.blabla.get('tot_size'), self.entete)
-            self.feuyFGDB.write(0, 4, self.blabla.get('date_crea'), self.entete)
-            self.feuyFGDB.write(0, 5, self.blabla.get('date_actu'), self.entete)
-            self.feuyFGDB.write(0, 6, self.blabla.get('feats_class'), self.entete)
-            self.feuyFGDB.write(0, 7, self.blabla.get('num_attrib'), self.entete)
-            self.feuyFGDB.write(0, 8, self.blabla.get('num_objets'), self.entete)
-            self.feuyFGDB.write(0, 9, self.blabla.get('geometrie'), self.entete)
-            self.feuyFGDB.write(0, 10, self.blabla.get('srs'), self.entete)
-            self.feuyFGDB.write(0, 11, self.blabla.get('srs_type'), self.entete)
-            self.feuyFGDB.write(0, 12, self.blabla.get('codepsg'), self.entete)
-            self.feuyFGDB.write(0, 13, self.blabla.get('emprise'), self.entete)
-            self.feuyFGDB.write(0, 14, self.blabla.get('li_chps'), self.entete)
-            logging.info('Sheet FileGDB created')
-            # tunning headers
-            lg_gdb_names = [len(lg) for lg in self.li_egdb]
-            self.feuyFGDB.col(0).width = max(lg_gdb_names) * 100
-            self.feuyFGDB.col(1).width = len(self.blabla.get('browse')) * 256
-            self.feuyFGDB.col(4).width = len(self.blabla.get('date_crea')) * 256
-            self.feuyFGDB.col(5).width = len(self.blabla.get('date_actu')) * 256
-            self.feuyFGDB.col(6).width = len(self.blabla.get('feats_class')) * 256
-            self.feuyFGDB.col(13).width = 35 * 256
-            # freezing headers line and first column
-            self.feuyFGDB.set_panes_frozen(True)
-            self.feuyFGDB.set_horz_split_pos(1)
-            self.feuyFGDB.set_vert_split_pos(1)
-        else:
-            pass
-
-        if self.typo == 0\
-            and (self.opt_pdf.get() + self.opt_lyr.get() + self.opt_qgs.get()
-                 + self.opt_mxd.get()) > 0\
-            and len(self.li_mapdocs) > 0:
-            """ adding a new sheet for maps documents informations """
-            self.wb.set_worksheets(has_mapdocs=1)
-            # sheet
-            self.feuyMAPS = self.book.add_sheet(self.blabla.get('sheet_maplans'),
-                                                cell_overwrite_ok=True)
-            # headers
-            self.feuyMAPS.write(0, 0, self.blabla.get('nomfic'), self.entete)
-            self.feuyMAPS.write(0, 1, self.blabla.get('path'), self.entete)
-            self.feuyMAPS.write(0, 2, self.blabla.get('theme'), self.entete)
-            self.feuyMAPS.write(0, 3, self.blabla.get('custom_title'), self.entete)
-            self.feuyMAPS.write(0, 4, self.blabla.get('creator_prod'), self.entete)
-            self.feuyMAPS.write(0, 5, self.blabla.get('keywords'), self.entete)
-            self.feuyMAPS.write(0, 6, self.blabla.get('subject'), self.entete)
-            self.feuyMAPS.write(0, 7, self.blabla.get('res_image'), self.entete)
-            self.feuyMAPS.write(0, 8, self.blabla.get('tot_size'), self.entete)
-            self.feuyMAPS.write(0, 9, self.blabla.get('date_crea'), self.entete)
-            self.feuyMAPS.write(0, 10, self.blabla.get('date_actu'), self.entete)
-            self.feuyMAPS.write(0, 11, self.blabla.get('origin_x'), self.entete)
-            self.feuyMAPS.write(0, 12, self.blabla.get('origin_y'), self.entete)
-            self.feuyMAPS.write(0, 13, self.blabla.get('srs'), self.entete)
-            self.feuyMAPS.write(0, 14, self.blabla.get('srs_type'), self.entete)
-            self.feuyMAPS.write(0, 15, self.blabla.get('codepsg'), self.entete)
-            self.feuyMAPS.write(0, 16, self.blabla.get('sub_layers'), self.entete)
-            self.feuyMAPS.write(0, 17, self.blabla.get('num_attrib'), self.entete)
-            self.feuyMAPS.write(0, 18, self.blabla.get('num_objets'), self.entete)
-            self.feuyMAPS.write(0, 19, self.blabla.get('li_chps'), self.entete)
-            logging.info('Sheet Maps & Documents created')
-            # tunning headers
-            lg_maps_names = [len(lg) for lg in self.li_mapdocs]
-            self.feuyMAPS.col(0).width = max(lg_maps_names) * 100
-            self.feuyMAPS.col(1).width = len(self.blabla.get('browse')) * 256
-            self.feuyMAPS.col(4).width = len(self.blabla.get('date_crea')) * 256
-            self.feuyMAPS.col(5).width = len(self.blabla.get('date_actu')) * 256
-            self.feuyMAPS.col(6).width = len(self.blabla.get('sub_layers')) * 275
-            self.feuyMAPS.col(13).width = 35 * 256
-            # freezing headers line and first column
-            self.feuyMAPS.set_panes_frozen(True)
-            self.feuyMAPS.set_horz_split_pos(1)
-            self.feuyMAPS.set_vert_split_pos(1)
-        else:
-            pass
-
-        if self.typo == 0\
-           and self.opt_cdao.get() == 1\
-           and len(self.li_cdao) > 0:
-            """ adding a new sheet for CAO informations """
-            self.wb.set_worksheets(has_cad=1)
-            # sheet
-            self.feuyCDAO = self.book.add_sheet(self.blabla.get('sheet_cdao'), cell_overwrite_ok=True)
-            # headers
-            self.feuyCDAO.write(0, 0, self.blabla.get('nomfic'), self.entete)
-            self.feuyCDAO.write(0, 1, self.blabla.get('path'), self.entete)
-            self.feuyCDAO.write(0, 2, self.blabla.get('theme'), self.entete)
-            self.feuyCDAO.write(0, 3, self.blabla.get('tot_size'), self.entete)
-            self.feuyCDAO.write(0, 4, self.blabla.get('date_crea'), self.entete)
-            self.feuyCDAO.write(0, 5, self.blabla.get('date_actu'), self.entete)
-            self.feuyCDAO.write(0, 6, self.blabla.get('sub_layers'), self.entete)
-            self.feuyCDAO.write(0, 7, self.blabla.get('num_attrib'), self.entete)
-            self.feuyCDAO.write(0, 8, self.blabla.get('num_objets'), self.entete)
-            self.feuyCDAO.write(0, 9, self.blabla.get('geometrie'), self.entete)
-            self.feuyCDAO.write(0, 10, self.blabla.get('srs'), self.entete)
-            self.feuyCDAO.write(0, 11, self.blabla.get('srs_type'), self.entete)
-            self.feuyCDAO.write(0, 12, self.blabla.get('codepsg'), self.entete)
-            self.feuyCDAO.write(0, 13, self.blabla.get('emprise'), self.entete)
-            self.feuyCDAO.write(0, 14, self.blabla.get('li_chps'), self.entete)
-            logging.info('Sheet CAO - DAO created')
-            # tunning headers
-            lg_gdb_names = [len(lg) for lg in self.li_cdao]
-            self.feuyCDAO.col(0).width = max(lg_gdb_names) * 100
-            self.feuyCDAO.col(1).width = len(self.blabla.get('browse')) * 256
-            self.feuyCDAO.col(4).width = len(self.blabla.get('date_crea')) * 256
-            self.feuyCDAO.col(5).width = len(self.blabla.get('date_actu')) * 256
-            self.feuyCDAO.col(6).width = len(self.blabla.get('feats_class')) * 256
-            self.feuyCDAO.col(13).width = 35 * 256
-            # freezing headers line and first column
-            self.feuyCDAO.set_panes_frozen(True)
-            self.feuyCDAO.set_horz_split_pos(1)
-            self.feuyCDAO.set_vert_split_pos(1)
-        else:
-            pass
-
-        if self.typo == 1:
-            """ adding a new sheet for PostGIS informations """
-            self.wb.set_worksheets(has_sgbd=1)
-            # sheet
-            self.feuyPG = self.book.add_sheet(u'PostGIS',
-                                              cell_overwrite_ok=True)
-            # headers
-            self.feuyPG.write(0, 0, self.blabla.get('nomfic'), self.entete)
-            self.feuyPG.write(0, 1, self.blabla.get('conn_chain'), self.entete)
-            self.feuyPG.write(0, 2, self.blabla.get('schema'), self.entete)
-            self.feuyPG.write(0, 3, self.blabla.get('num_attrib'), self.entete)
-            self.feuyPG.write(0, 4, self.blabla.get('num_objets'), self.entete)
-            self.feuyPG.write(0, 5, self.blabla.get('geometrie'), self.entete)
-            self.feuyPG.write(0, 6, self.blabla.get('srs'), self.entete)
-            self.feuyPG.write(0, 7, self.blabla.get('srs_type'), self.entete)
-            self.feuyPG.write(0, 8, self.blabla.get('codepsg'), self.entete)
-            self.feuyPG.write(0, 9, self.blabla.get('emprise'), self.entete)
-            self.feuyPG.write(0, 10, self.blabla.get('date_crea'), self.entete)
-            self.feuyPG.write(0, 11, self.blabla.get('date_actu'), self.entete)
-            self.feuyPG.write(0, 12, self.blabla.get('format'), self.entete)
-            self.feuyPG.write(0, 13, self.blabla.get('li_chps'), self.entete)
-            logging.info('Sheet PostGIS created')
-            # tunning headers
-            self.feuyPG.col(1).width = len(self.blabla.get('browse')) * 256
-            # freezing headers line and first column
-            self.feuyPG.set_panes_frozen(True)
-            self.feuyPG.set_horz_split_pos(1)
-            self.feuyPG.set_vert_split_pos(1)
-        else:
-            pass
-
-        if self.typo == 3:
-            ConfigExcel(workbook=self.book, opt_isogeo=1, text=self.blabla)
-        else:
-            pass
-
-        # end of function
-        return self.book, self.entete, self.url, self.xls_erreur
-
     def dictionarize_lyr(self, mapdoc_infos, sheet, line):
         u""" write the infos of the map document into the Excel workbook """
         # in case of a source error
         if mapdoc_infos.get('error'):
-            logging.warning('\tproblem detected')
+            logger.warning('\tproblem detected')
             # source name
             sheet.write(line, 0, mapdoc_infos.get('name'))
             # link to parent folder
@@ -2188,7 +1893,7 @@ class DicoGIS(Tk):
                                                     self.blabla.get('browse'))
         except UnicodeDecodeError:
             # write a notification into the log file
-            logging.warning('Path name with special letters: {}'.format(mapdoc_infos.get(u'folder').decode('utf8')))
+            logger.warning('Path name with special letters: {}'.format(mapdoc_infos.get(u'folder').decode('utf8')))
             # decode the fucking path name
             link = 'HYPERLINK("{0}"; "{1}")'.format(mapdoc_infos.get(u'folder').decode('utf8'),
                                                     self.blabla.get('browse'))
@@ -2233,7 +1938,7 @@ class DicoGIS(Tk):
             # Type of SRS
             sheet.write(line, 14, mapdoc_infos.get(u'srs_type'))
             # EPSG code
-            sheet.write(line, 15, mapdoc_infos.get(u'EPSG')[0])
+            sheet.write(line, 15, mapdoc_infos.get(u'EsriSRS')[0])
         else:
             pass
 
@@ -2272,7 +1977,7 @@ class DicoGIS(Tk):
                     self.dico_err[layer_infos.get('name')] = self.blabla.get(u'err_encod')\
                                                         + chp.decode('latin1') \
                                                         + u"\n\n"
-                    logging.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
+                    logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
                     # decode the fucking field name
                     champs = champs + chp.decode('latin1') \
                     + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
@@ -2285,7 +1990,7 @@ class DicoGIS(Tk):
             sheet.write(line, 19, champs)
 
             # write layer's name into the log
-            # logging.info('\t -- {0} = OK'.format(mapdoc_layer.get(u'title')))
+            # logger.info('\t -- {0} = OK'.format(mapdoc_layer.get(u'title')))
 
         else:
             pass
@@ -2294,17 +1999,17 @@ class DicoGIS(Tk):
         return self.feuyMAPS, line
 
     def dictionarize_pg(self, layer_infos, sheet, line):
-        u""" write the infos of the layer into the Excel workbook """
+        u"""Write the infos of the layer into the Excel workbook."""
         # local variables
         champs = ""
         # in case of a source error
         if layer_infos.get('error'):
-            logging.warning('\tproblem detected')
+            logger.warning('\tproblem detected')
             sheet.write(line, 0, layer_infos.get('name'))
             sheet.write(line, 1, "{0}:{1}-{2}".format(self.host.get(),
                                                       self.port.get(),
                                                       self.dbnb.get()),
-                                                      self.xls_erreur)
+                        self.xls_erreur)
             sheet.write(line, 2, layer_infos.get('error'), self.xls_erreur)
             # Interruption of function
             return sheet
@@ -2365,7 +2070,7 @@ class DicoGIS(Tk):
                 self.dico_err[layer_infos.get('name')] = self.blabla.get(u'err_encod') + \
                                                          chp.decode('latin1') + \
                                                          u"\n\n"
-                logging.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
+                logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
                 # decode the fucking field name
                 champs = champs + chp.decode('latin1') \
                         + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
@@ -2379,45 +2084,6 @@ class DicoGIS(Tk):
 
         # End of function
         return self.book, self.feuyPG
-
-    def savedico(self):
-        u"""Save the Excel file."""
-        # Prompt of folder where save the file
-        saved = asksaveasfilename(initialdir=self.target.get(),
-                                  defaultextension='.xls',
-                                  initialfile=self.output.get(),
-                                  filetypes=[(self.blabla.get('gui_excel'),
-                                              "*.xls")],
-                                  # message='Select where to save the output file',
-                                  title='Output location')
-
-        # check if the extension is correctly indicated
-        if path.splitext(saved)[1] != ".xls":
-            saved = saved + ".xls"
-        else:
-            pass
-        if path.splitext(saved)[1] != ".xlsx":
-            saved_xlsx = saved + ".xlsx"
-        else:
-            pass
-        # save
-        if saved != ".xls":
-            try:
-                self.book.save(saved)
-                self.output.delete(0, END)
-                self.output.insert(0, saved)
-            except IOError:
-                avert(title=u'Concurrent access',
-                      message=u'Please close Microsoft Excel before saving.')
-                return
-        else:
-            avert(title=u'Not saved', message="You cancelled saving operation")
-            exit()
-
-        
-        self.wb.save(path.join(self.target.get(), saved_xlsx))
-        # End of function
-        return self.book, saved
 
 # ############################################################################
 # #### Stand alone program ########
