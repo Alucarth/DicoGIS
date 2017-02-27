@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 from __future__ import unicode_literals
+from __future__ import print_function
 #------------------------------------------------------------------------------
 # Name:         Texts Manager
 # Purpose:      Load texts from localized files to display in a parent program
@@ -76,4 +77,4 @@ if __name__ == '__main__':
                    locale_folder=r'../../data/locale')
 
     # return texts
-    print blabla
+    print(blabla)

@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 from __future__ import unicode_literals
+from __future__ import print_function
 
 
 
@@ -11,8 +12,8 @@ class test_MP():
     """ """
     def read_featureClass(self, featureclass):
         """  """
-        print featureclass
-        print len(featureclass)
+        print(featureclass)
+        print(len(featureclass))
 
         # end of function
         return

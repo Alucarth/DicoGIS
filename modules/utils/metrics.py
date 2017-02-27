@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 from __future__ import unicode_literals
+from __future__ import print_function
 #------------------------------------------------------------------------------
 # Name:         Metrics
 # Purpose:      Perform some statistical metrics from DicoGIS
@@ -44,7 +45,7 @@ class MetricsManager(dict):
         TODO
         """
         print('youhou')
-        print dico_global.keys()
+        print(dico_global.keys())
         self['total_fields'] += dico_global.get('num_fields')
         pass
 

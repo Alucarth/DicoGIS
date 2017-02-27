@@ -2,6 +2,7 @@
 #!/usr/bin/env python
 
 
+from __future__ import print_function
 import os
 import re
 import multiprocessing
@@ -24,7 +25,7 @@ except ImportError:
 
 def update_shapefiles(shapefile):
     # Define the projection to wgs84 — factory code is 4326
-    print shapefile + " : " + arcpy.GetCount_management(shapefile) + " entities."
+    print(shapefile + " : " + arcpy.GetCount_management(shapefile) + " entities.")
 
     # End update_shapefiles
 
