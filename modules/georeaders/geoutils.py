@@ -33,8 +33,9 @@ from os import listdir, path, walk
 
 class Utils(object):
     """TO DOC"""
-    def __init__(self):
+    def __init__(self, ds_type="flat"):
         """Instanciate Utils class."""
+        self.ds_type = ds_type
         super(Utils, self).__init__()
 
     def list_dependencies(self, main_file_path, exclude=""):
@@ -80,19 +81,19 @@ class Utils(object):
 
         return "%3.1f %s" % (total_size, " To")
 
-    def erratum(self, dico_gdb, gdbpath, mess):
+    def erratum(self, ctner=dict(), src="", ds_lyr=None, mess_type=1, mess=""):
         """Handle errors message and store it into __dict__."""
-        # local variables
-        dico_gdb[u'name'] = path.basename(gdbpath)
-        dico_gdb[u'folder'] = path.dirname(gdbpath)
-        try:
-            print(type(self.layer))
-            def_couche = self.layer.GetLayerDefn()
-            dico_gdb[u'num_fields'] = def_couche.GetFieldCount()
-        except AttributeError:
-            mess = mess
-        finally:
-            dico_gdb[u'error'] = mess
-            dico_gdb[u'layers_count'] = 0
-        # End of function
-        return dico_gdb
+        if self.ds_type == "flat":
+            # local variables
+            ctner['name'] = path.basename(src)
+            ctner['folder'] = path.dirname(src)
+            ctner['error'] = mess
+            # method end
+            return ctner
+        elif self.ds_type == "postgis":
+            ctner['name'] = mess_type
+            ctner['error'] = mess
+            # method end
+            return ctner
+        else:
+            pass

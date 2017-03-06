@@ -32,12 +32,10 @@ from time import localtime, strftime
 # 3rd party libraries
 try:
     from osgeo import gdal
-    from osgeo import ogr  # handler for vector spatial files
-    from osgeo import osr
+    from osgeo import ogr
 except ImportError:
     import gdal
-    import ogr  # handler for vector spatial files
-    import osr
+    import ogr
 
 # custom submodules
 try:
@@ -55,7 +53,7 @@ except ValueError:
 
 gdal_err = GdalErrorHandler()
 georeader = GeoInfosGenericReader()
-youtils = Utils()
+youtils = Utils("flat")
 
 # ############################################################################
 # ######### Classes #############
