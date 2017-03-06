@@ -1,4 +1,4 @@
-﻿# -*- coding: UTF-8 -*-
+# -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 from __future__ import (absolute_import, print_function, unicode_literals)
 # ----------------------------------------------------------------------------
@@ -82,7 +82,8 @@ class ReadVectorFlatDataset():
         dico_fields = dictionary for the fields' informations
         li_fieds = ordered list of fields
         tipo = shp or tab
-        text = dictionary of text in the selected language"""
+        text = dictionary of text in the selected language
+        """
         # changing working directory to layer folder
         chdir(path.dirname(source_path))
         dico_dataset['type'] = tipo
