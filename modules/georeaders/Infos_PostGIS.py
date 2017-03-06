@@ -62,8 +62,9 @@ youtils = Utils()
 
 
 class ReadPostGIS():
-    def __init__(self, host="localhost", port=5432, dbname="postgis",
-                 user="postgres", password="postgres", views_included=1):
+    def __init__(self, host="localhost", port=5432, db_name="postgis",
+                 user="postgres", password="postgres", views_included=1,
+                 dico_dataset=OrderedDict()):
         u"""Uses gdal/ogr functions to extract basic informations about
         geographic file (handles shapefile or MapInfo tables)
         and store into the dictionaries.
@@ -86,22 +87,40 @@ class ReadPostGIS():
         else:
             gdal.SetConfigOption(str("PG_LIST_ALL_TABLES"), str("NO"))
 
+        # testing connection
         self.conn_settings = "PG: host={} port={} dbname={} user={} password={}"\
-                             .format(host, port, dbname, user, password)
-        self.conn = self.pg_connection()
-        self.db_version = self.get_version()
-        self.schemas = self.get_schemas()
+                             .format(host, port, db_name, user, password)
+        self.conn = self.get_connection()
+        if not self.conn:
+            self.alert += 1
+            youtils.erratum(dico_dataset, self.conn_settings, u'err_corrupt')
+            dico_dataset['err_gdal'] = gdal_err.err_type, gdal_err.err_msg
+            return None
+        else:
+            pass
 
-    def establish_connection(self):
+        # store basic info
+        dico_dataset["sgbd_host"] = host
+        dico_dataset["sgbd_port"] = port
+        dico_dataset["db_name"] = db_name
+        dico_dataset["user"] = user
+        dico_dataset["password"] = password
+        dico_dataset["connection_string"] = self.conn_settings
+        dico_dataset["sgbd_version"] = self.get_version()
+        dico_dataset["sgbd_schemas"] = self.get_schemas()
+
+        # print(self.conn.GetLayerCount())
+        # test = self.get_version()
+        # print(dir(test))
+
+    def get_connection(self):
         """TO DOC."""
         try:
             conn = ogr.Open(str(self.conn_settings))
-            conn = gdal.OpenEx(str(self.conn_settings))
             logging.info("Access granted : connecting people!")
-            self.total_layers = conn.GetLayerCount()
             return conn
         except Exception as e:
-            logging.error('Connection failed. Check settings: {0}'.format(str(e)))
+            logging.error("Connection failed. Check settings: {0}".format(str(e)))
             return 0
 
     def get_version(self):
@@ -307,29 +326,38 @@ if __name__ == '__main__':
                                                                    test_user,
                                                                    test_pwd)
 
-    # include views
-    gdal.SetConfigOption(str("PG_LIST_ALL_TABLES"), str("YES"))
-    try:
-        conn = ogr.Open(str(test_conn))
-        print("Access granted : connecting people!")
-        print("Layer count: {0}".format(conn.GetLayerCount()))
+    # # include views
+    # gdal.SetConfigOption(str("PG_LIST_ALL_TABLES"), str("YES"))
+    # try:
+    #     conn = ogr.Open(str(test_conn))
+    #     print("Access granted : connecting people!")
+    #     print("Layer count: {0}".format(conn.GetLayerCount()))
 
-        sql_version = str("SELECT PostGIS_full_version();")
-        version = conn.ExecuteSQL(sql_version)
+    #     sql_version = str("SELECT PostGIS_full_version();")
+    #     version = conn.ExecuteSQL(sql_version)
 
-        # schemas list
-        sql_schemas = str("select nspname from pg_catalog.pg_namespace;")
-        schemas = conn.ExecuteSQL(sql_schemas)
-        print("Driver name: {0}".format(conn.GetDriver().GetName()))
-    except Exception as e:
-        print('Connection failed. Check settings: {0}'.format(str(e)))
-        exit()
+    #     # schemas list
+    #     sql_schemas = str("select nspname from pg_catalog.pg_namespace;")
+    #     schemas = conn.ExecuteSQL(sql_schemas)
+    #     print("Driver name: {0}".format(conn.GetDriver().GetName()))
+    # except Exception as e:
+    #     print('Connection failed. Check settings: {0}'.format(str(e)))
+    #     exit()
 
-    # parsing layers
-    for layer in conn:
-        dico_dataset.clear()
-        print("\n")
-        print(layer.GetName())
-        # if "_current"
-        ReadPostGIS(layer, dico_dataset, 'pg', textos)
-        print(dico_dataset)
+    # # parsing layers
+    # for layer in conn:
+    #     dico_dataset.clear()
+    #     print("\n")
+    #     print(layer.GetName())
+    #     # if "_current"
+    #     ReadPostGIS(layer, dico_dataset, 'pg', textos)
+    #     print(dico_dataset)
+
+    pgReader = ReadPostGIS(host=test_host, port=5432, db_name=test_db,
+                           user=test_user, password=test_pwd,
+                           views_included=1, dico_dataset=dico_dataset)
+    # print(dico_dataset)
+
+    version = dico_dataset.get("sgbd_version")
+    print(dir(version))
+    print(version.__str__)
