@@ -24,8 +24,13 @@ from os import path, walk   # files and folder managing
 from time import localtime, strftime
 
 # 3rd party libraries
-from osgeo import ogr, osr
-from osgeo import gdal
+try:
+    from osgeo import gdal
+    from osgeo import ogr
+except ImportError:
+    import gdal
+    import ogr
+
 from gdalconst import *
 
 # custom submodules
@@ -44,7 +49,7 @@ except ValueError:
 
 gdal_err = GdalErrorHandler()
 georeader = GeoInfosGenericReader()
-youtils = Utils()
+youtils = Utils(ds_type="flat")
 
 # ############################################################################
 # ######### Classes ############
