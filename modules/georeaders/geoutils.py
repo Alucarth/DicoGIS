@@ -82,7 +82,13 @@ class Utils(object):
         return "%3.1f %s" % (total_size, " To")
 
     def erratum(self, ctner=dict(), src="", ds_lyr=None, mess_type=1, mess=""):
-        """Handle errors message and store it into __dict__."""
+        """Handle errors message and store it into __dict__.
+
+        mess_type allowed values:
+          1: impossible to read dataset (corruption, format...)
+          2: dataset no contains any feature object
+          3: no SRS
+        """
         if self.ds_type == "flat":
             # local variables
             ctner['name'] = path.basename(src)
