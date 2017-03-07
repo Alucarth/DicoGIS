@@ -71,7 +71,6 @@ from modules import ReadIsogeoOpenCatalog  # Isogeo catalogs
 from modules import ReadLYR  # Esri LYR files
 
 from modules import CheckNorris
-from modules import ConfigExcel
 from modules import files2xlsx
 from modules import Utilities
 # from modules import MetricsManager
@@ -1074,19 +1073,20 @@ class DicoGIS(Tk):
         # process files or PostGIS database
         if self.typo == 0:
             self.nb.select(0)
-            logger.info('=> files process started')
+            logger.info('PROCESS LAUNCHED: files')
             self.process_files()
         elif self.typo == 1:
             self.nb.select(1)
-            logger.info('=> DB process started')
+            self.wb.set_worksheets(has_sgbd=1)
+            logger.info('PROCESS LAUNCHED: SGBD')
             self.check_fields()
         elif self.typo == 2:
             self.nb.select(2)
-            logger.info('=> web services process started')
+            logger.info('PROCESS LAUNCHED: services')
             # self.check_fields()
         elif self.typo == 3:
             self.nb.select(3)
-            logger.info('=> Isogeo started')
+            logger.info('PROCESS LAUNCHED: Isogeo')
             self.process_isogeo()
         else:
             pass
@@ -1120,6 +1120,7 @@ class DicoGIS(Tk):
         georeader_vector = ReadVectorFlatDataset()
         # creating the Excel workbook
         self.wb = files2xlsx(texts=self.blabla)  # TESTING
+        if len(self.li_vectors): self.wb.set_worksheets(has_vector=1)
         logger.info('Excel file created')
         # configuring the progress bar
         total_files = 0
@@ -1198,9 +1199,9 @@ class DicoGIS(Tk):
                 # getting the informations
                 try:
                     georeader_vector.infos_dataset(path.abspath(shp),
-                                          self.dico_layer,
-                                          'Esri shapefiles',
-                                          self.blabla)
+                                                   self.dico_layer,
+                                                   'Esri shapefiles',
+                                                   self.blabla)
                     logger.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
@@ -1658,7 +1659,6 @@ class DicoGIS(Tk):
     def process_db(self, conn):
         u"""Process PostGIS DB analisis."""
         # creating the Excel workbook
-        self.configexcel()
         logger.info('Excel file created')
         # getting the info from shapefiles and compile it in the excel
         line = 1    # line of dictionary
@@ -1822,7 +1822,6 @@ class DicoGIS(Tk):
         ReadIsogeoOpenCatalog(url_oc, lang, dico_md)
 
         # creating the Excel file
-        self.configexcel()
         sheet_isogeo = self.book._Workbook__worksheets[0]
 
         offset = 0
