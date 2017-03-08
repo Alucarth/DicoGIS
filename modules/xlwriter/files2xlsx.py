@@ -212,7 +212,7 @@ class files2xlsx(Workbook):
                        has_mapdocs=0, has_cad=0, has_lyr=0, has_sgbd=0):
         """Add news sheets depending on present metadata types."""
         # SHEETS & HEADERS
-        if has_vector:
+        if has_vector and self.txt.get("sheet_vectors") not in self.sheetnames:
             self.ws_v = self.create_sheet(title=self.txt.get("sheet_vectors"))
             # headers
             self.ws_v.append([self.txt.get(i) for i in self.li_cols_vector])
@@ -226,7 +226,7 @@ class files2xlsx(Workbook):
         else:
             pass
 
-        if has_raster:
+        if has_raster and self.txt.get("sheet_rasters") not in self.sheetnames:
             self.ws_r = self.create_sheet(title=self.txt.get("sheet_rasters"))
             # headers
             self.ws_r.append([self.txt.get(i) for i in self.li_cols_raster])
@@ -240,7 +240,7 @@ class files2xlsx(Workbook):
         else:
             pass
 
-        if has_filedb:
+        if has_filedb and self.txt.get("sheet_filedb") not in self.sheetnames:
             self.ws_fdb = self.create_sheet(title=self.txt.get("sheet_filedb"))
             # headers
             self.ws_fdb.append([self.txt.get(i) for i in self.li_cols_filedb])
@@ -254,7 +254,7 @@ class files2xlsx(Workbook):
         else:
             pass
 
-        if has_mapdocs:
+        if has_mapdocs and self.txt.get("sheet_maplans") not in self.sheetnames:
             self.ws_mdocs = self.create_sheet(title=self.txt.get("sheet_maplans"))
             # headers
             self.ws_mdocs.append([self.txt.get(i) for i in self.li_cols_mapdocs])
@@ -268,7 +268,7 @@ class files2xlsx(Workbook):
         else:
             pass
 
-        if has_cad:
+        if has_cad and self.txt.get("sheet_cdao") not in self.sheetnames:
             self.ws_cad = self.create_sheet(title=self.txt.get("sheet_cdao"))
             # headers
             self.ws_cad.append([self.txt.get(i) for i in self.li_cols_caodao])
@@ -282,7 +282,7 @@ class files2xlsx(Workbook):
         else:
             pass
 
-        if has_sgbd:
+        if has_sgbd and "PostGIS" not in self.sheetnames:
             self.ws_sgbd = self.create_sheet(title="PostGIS")
             # headers
             self.ws_sgbd.append([self.txt.get(i) for i in self.li_cols_sgbd])
@@ -340,12 +340,11 @@ class files2xlsx(Workbook):
         """Store metadata about a vector dataset."""
         # increment line
         self.idx_v += 1
-
         # local variables
         champs = ""
 
         # in case of a source error
-        if layer.get('error'):
+        if "error" in layer:
             # sheet.row(line).set_style(self.xls_erreur)
             err_mess = self.txt.get(layer.get('error'))
             logger.warning('\tproblem detected')
@@ -358,7 +357,7 @@ class files2xlsx(Workbook):
             self.ws_v["C{}".format(self.idx_v)] = err_mess
             self.ws_v["C{}".format(self.idx_v)].style = "Warning Text"
             # gdal info
-            if "err_gdal" in layer.keys():
+            if "err_gdal" in layer:
                 logger.warning('\tproblem detected')
                 self.ws_v["Q{}".format(self.idx_v)] = "{0} : {1}".format(layer.get('err_gdal')[0],
                                                                          layer.get('err_gdal')[1])
@@ -411,7 +410,7 @@ class files2xlsx(Workbook):
         self.ws_v["M{}".format(self.idx_v)] = layer.get(u'type')
         # dependencies
         self.ws_v["N{}".format(self.idx_v)].style = "wrap"
-        self.ws_v.cell("N{}".format(self.idx_v)).value = u' |\n '.join(layer.get(u'dependencies'))
+        self.ws_v.cell("N{}".format(self.idx_v)).value = u' |\n '.join(layer.get('dependencies', []))
         # total size
         self.ws_v["O{}".format(self.idx_v)] = layer.get(u'total_size')
 
@@ -460,7 +459,7 @@ class files2xlsx(Workbook):
         self.idx_r += 1
 
         # in case of a source error
-        if layer.get('error'):
+        if "error" in layer:
             # sheet.row(line).set_style(self.xls_erreur)
             err_mess = self.txt.get(layer.get('error'))
             logger.warning('\tproblem detected')
@@ -547,7 +546,7 @@ class files2xlsx(Workbook):
         self.idx_f += 1
 
         # in case of a source error
-        if filedb.get('error'):
+        if "error" in filedb:
             # sheet.row(line).set_style(self.xls_erreur)
             err_mess = self.txt.get(filedb.get('error'))
             logger.warning('\tproblem detected')
@@ -559,7 +558,7 @@ class files2xlsx(Workbook):
             self.ws_fdb["C{}".format(self.idx_f)] = err_mess
             self.ws_fdb["C{}".format(self.idx_f)].style = "Warning Text"
             # gdal info
-            if "err_gdal" in filedb.keys():
+            if "err_gdal" in filedb:
                 logger.warning('\tproblem detected')
                 self.ws_fdb["Q{}".format(self.idx_v)] = "{0} : {1}"\
                                                         .format(filedb.get('err_gdal')[0],
@@ -683,7 +682,7 @@ class files2xlsx(Workbook):
         champs = ""
 
         # in case of a source error
-        if mapdoc.get('error'):
+        if "error" in mapdoc:
             # sheet.row(line).set_style(self.xls_erreur)
             err_mess = self.txt.get(mapdoc.get('error'))
             logger.warning('\tproblem detected')
@@ -806,7 +805,7 @@ class files2xlsx(Workbook):
         champs = ""
 
         # in case of a source error
-        if cad.get('error'):
+        if "error" in cad:
             # sheet.row(line).set_style(self.xls_erreur)
             err_mess = self.txt.get(cad.get('error'))
             logger.warning('\tproblem detected')
@@ -936,7 +935,7 @@ class files2xlsx(Workbook):
         self.idx_s += 1
 
         # in case of a source error
-        if layer.get('error'):
+        if "error" in layer:
             # sheet.row(line).set_style(self.xls_erreur)
             err_mess = self.txt.get(layer.get('error'))
             logger.warning('\tproblem detected: ' + err_mess)
@@ -948,7 +947,7 @@ class files2xlsx(Workbook):
             self.ws_sgbd["C{}".format(self.idx_s)] = err_mess
             self.ws_sgbd["C{}".format(self.idx_s)].style = "Warning Text"
             # gdal info
-            if "err_gdal" in layer.keys():
+            if "err_gdal" in layer:
                 logger.warning('\tproblem detected')
                 self.ws_v["Q{}".format(self.idx_v)] = "{0} : {1}"\
                                                       .format(layer.get('err_gdal')[0],
@@ -1071,7 +1070,6 @@ if __name__ == '__main__':
     """ Standalone execution and tests
     """
     # ------------ Specific imports ---------------------
-    from os import path
 
     # ------------ REAL START ----------------------------
     wb = files2xlsx()
