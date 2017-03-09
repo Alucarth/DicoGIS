@@ -1,4 +1,4 @@
-# -*- coding: UTF-8 -*-
+﻿# -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 from __future__ import (absolute_import, print_function, unicode_literals)
 # ----------------------------------------------------------------------------
@@ -70,7 +70,7 @@ class ReadVectorFlatDataset():
         ogr.UseExceptions()
         self.alert = 0
 
-    def infos_dataset(self, source_path, dico_dataset, tipo=None, txt=dict()):
+    def infos_dataset(self, source_path, dico_dataset, txt=dict(), tipo=None):
         """Use OGR functions to extract basic informations about
         geographic vector file (handles shapefile or MapInfo tables)
         and store into dictionaries.
@@ -89,6 +89,7 @@ class ReadVectorFlatDataset():
             if not tipo:
                 dico_dataset["type"] = src.GetDriver().LongName
             else:
+                dico_dataset["type"] = tipo
                 pass
         except Exception as e:
             logger.error(e)

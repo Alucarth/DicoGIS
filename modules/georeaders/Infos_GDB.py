@@ -50,6 +50,7 @@ except ValueError:
 gdal_err = GdalErrorHandler()
 georeader = GeoInfosGenericReader()
 youtils = Utils(ds_type="flat")
+logger = logging.getLogger("DicoGIS")
 
 # ############################################################################
 # ######### Classes ############
@@ -57,31 +58,39 @@ youtils = Utils(ds_type="flat")
 
 
 class ReadGDB():
-    def __init__(self, source_path, dico_dataset, tipo, txt=''):
-        u"""Use OGR functions to extract basic informations about
-        geographic vector file (handles shapefile or MapInfo tables)
-        and store into dictionaries.
-
-        source_path = path to the File Geodatabase Esri
-        dico_dataset = dictionary for global informations
-        dico_fields = dictionary for the fields' informations
-        li_fieds = ordered list of fields
-        tipo = format
-        text = dictionary of text in the selected language
-
-        """
+    def __init__(self):
+        """Class constructor."""
         # handling ogr specific exceptions
         errhandler = gdal_err.handler
         gdal.PushErrorHandler(errhandler)
         gdal.UseExceptions()
         self.alert = 0
 
+    def infos_dataset(self, source_path, dico_dataset, txt=dict(), tipo=None):
+        """Use OGR functions to extract basic informations.
+
+        source_path = path to the File Geodatabase Esri
+        dico_dataset = dictionary for global informations
+        tipo = format
+        txt = dictionary of text in the selected language
+        """
+        dico_dataset['type'] = tipo
+
         # opening GDB
         try:
             driver = ogr.GetDriverByName(str("OpenFileGDB"))
             src = driver.Open(source_path, 0)
+            print(driver.GetName())
+            # print(type(src), dir(src.GetDriver()), len(dir(src)))
+            # src = gdal.OpenEx(source_path, 0)  # GDAL driver
+            # print(type(src), dir(src), len(dir(src)))
+            if not tipo:
+                dico_dataset["type"] = driver.GetName()
+            else:
+                dico_dataset["type"] = tipo
+                pass
         except Exception as e:
-            logging.error(e)
+            logger.error(e)
             youtils.erratum(dico_dataset, source_path, u'err_corrupt')
             self.alert = self.alert + 1
             return None
@@ -205,11 +214,10 @@ if __name__ == '__main__':
 
     # searching for File GeoDataBase
     num_folders = 0
-    li_gdb = [
-              r'Points.gdb',
-              r'Polygons.gdb',
-              r'GDB_Test.gdb',
-              r'MulitNet_2015_12.gdb',
+    li_gdb = [path.realpath(r'Points.gdb'),
+              path.realpath(r'Polygons.gdb'),
+              path.realpath(r'GDB_Test.gdb'),
+              path.realpath(r'MulitNet_2015_12.gdb'),
               ]
     for root, dirs, files in walk(r'..\test\datatest'):
             num_folders = num_folders + len(dirs)
@@ -219,7 +227,7 @@ if __name__ == '__main__':
                     full_path = path.join(root, d)
                 except UnicodeDecodeError as e:
                     full_path = path.join(root, d.decode('latin1'))
-                    logging.error(unicode(full_path), e)
+                    logger.error(unicode(full_path), e)
                 if full_path[-4:].lower() == '.gdb':
                     # add complete path of shapefile
                     li_gdb.append(path.abspath(full_path))
@@ -228,6 +236,7 @@ if __name__ == '__main__':
 
     # recipient datas
     dico_dataset = OrderedDict()
+    gdbReader = ReadGDB()
 
     # read GDB
     for source_path in li_gdb:
@@ -236,10 +245,10 @@ if __name__ == '__main__':
         print(path.isdir(source_path), source_path)
         if path.isdir(source_path):
             print("\n{0}: ".format(path.realpath(source_path)))
-            ReadGDB(source_path,
-                    dico_dataset,
-                    'Esri FileGDB',
-                    textos)
+            gdbReader.infos_dataset(source_path=source_path,
+                                    dico_dataset=dico_dataset,
+                                    txt=textos,
+                                    tipo="Esri FileGDB")
             # print results
             print(dico_dataset)
         else:
