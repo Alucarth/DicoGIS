@@ -1119,6 +1119,8 @@ class DicoGIS(Tk):
             return
         # georeaders
         georeader_vector = ReadVectorFlatDataset()
+        georeader_egdb = ReadGDB()
+
         # creating the Excel workbook
         self.wb = files2xlsx(texts=self.blabla)
         logger.info('Excel file created')
@@ -1212,7 +1214,6 @@ class DicoGIS(Tk):
                 try:
                     georeader_vector.infos_dataset(path.abspath(shp),
                                                    self.dico_layer,
-                                                   'Esri shapefiles',
                                                    self.blabla)
                     logger.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
@@ -1221,8 +1222,6 @@ class DicoGIS(Tk):
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
                 # writing to the Excel dictionary
-                print()
-                print(self.dico_layer, type(self.dico_layer))
                 self.wb.store_md_vector(self.dico_layer)
 
                 logger.info('\t Wrote into the dictionary')
@@ -1247,9 +1246,8 @@ class DicoGIS(Tk):
                 # getting the informations
                 try:
                     georeader_vector.infos_dataset(path.abspath(tab),
-                                          self.dico_layer,
-                                          'MapInfo tab',
-                                          self.blabla)
+                                                   self.dico_layer,
+                                                   self.blabla)
                     logger.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
@@ -1279,9 +1277,8 @@ class DicoGIS(Tk):
                 # getting the informations
                 try:
                     georeader_vector.infos_dataset(path.abspath(kml),
-                                          self.dico_layer,
-                                          'Google KML/KMZ',
-                                          self.blabla)
+                                                   self.dico_layer,
+                                                   self.blabla)
                     logger.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
@@ -1310,9 +1307,8 @@ class DicoGIS(Tk):
                 # getting the informations
                 try:
                     georeader_vector.infos_dataset(path.abspath(gml),
-                                          self.dico_layer,
-                                          'GML',
-                                          self.blabla)
+                                                   self.dico_layer,
+                                                   self.blabla)
                     logger.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
@@ -1341,9 +1337,8 @@ class DicoGIS(Tk):
                 # getting the informations
                 try:
                     georeader_vector.infos_dataset(path.abspath(geojson),
-                                          self.dico_layer,
-                                          'GeoJSON',
-                                          self.blabla)
+                                                   self.dico_layer,
+                                                   self.blabla)
                     logger.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
@@ -1403,9 +1398,9 @@ class DicoGIS(Tk):
                 # getting the informations
                 try:
                     ReadRasters(path.abspath(raster),
-                                 self.dico_raster,
-                                 self.dico_bands,
-                                 path.splitext(raster)[1],
+                                self.dico_raster,
+                                self.dico_bands,
+                                path.splitext(raster)[1],
                                  self.blabla)
                     logger.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
@@ -1435,10 +1430,10 @@ class DicoGIS(Tk):
                 self.dico_fields.clear()
                 # getting the informations
                 try:
-                    ReadGDB(path.abspath(gdb),
-                            self.dico_fdb,
-                            'Esri FileGeoDataBase',
-                            self.blabla)
+                    georeader_egdb.infos_dataset(path.abspath(gdb),
+                                                 self.dico_fdb,
+                                                 self.blabla,
+                                                 tipo="Esri FileGDB")
                     logger.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
@@ -1467,9 +1462,9 @@ class DicoGIS(Tk):
                 # getting the informations
                 try:
                     ReadSpaDB(path.abspath(spadb),
-                               self.dico_fdb,
-                               'Spatialite',
-                               self.blabla)
+                              self.dico_fdb,
+                              'Spatialite',
+                              self.blabla)
                     logger.info('\t Infos OK')
                 except (AttributeError, RuntimeError, Exception) as e:
                     """ empty files """
