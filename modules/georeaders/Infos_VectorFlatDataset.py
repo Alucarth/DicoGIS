@@ -25,7 +25,6 @@ install_aliases()
 # Standard library
 from collections import OrderedDict  # Python 3 backported
 import logging
-from os import path
 from os import chdir, listdir, path       # files and folder managing
 from time import localtime, strftime
 
@@ -54,6 +53,7 @@ except ValueError:
 gdal_err = GdalErrorHandler()
 georeader = GeoInfosGenericReader()
 youtils = Utils("flat")
+logger = logging.getLogger("DicoGIS")
 
 # ############################################################################
 # ######### Classes #############
@@ -70,31 +70,33 @@ class ReadVectorFlatDataset():
         ogr.UseExceptions()
         self.alert = 0
 
-    def infos_dataset(self, source_path, dico_dataset, tipo, txt=''):
+    def infos_dataset(self, source_path, dico_dataset, tipo=None, txt=dict()):
         """Use OGR functions to extract basic informations about
         geographic vector file (handles shapefile or MapInfo tables)
         and store into dictionaries.
 
         source_path = path to the geographic file
         dico_dataset = dictionary for global informations
-        dico_fields = dictionary for the fields' informations
-        li_fieds = ordered list of fields
-        tipo = shp or tab
-        text = dictionary of text in the selected language
+        tipo = format
+        txt = dictionary of text in the selected language
         """
         # changing working directory to layer folder
         chdir(path.dirname(source_path))
-        dico_dataset['type'] = tipo
 
         # raising corrupt files
         try:
             src = gdal.OpenEx(source_path, 0)  # GDAL driver
+            if not tipo:
+                dico_dataset["type"] = src.GetDriver().LongName
+            else:
+                pass
         except Exception as e:
-            logging.error(e)
+            logger.error(e)
             self.alert = self.alert + 1
+            dico_dataset["type"] = tipo
             youtils.erratum(dico_dataset, source_path, u'err_corrupt')
-            dico_dataset['err_gdal'] = gdal_err.err_type, gdal_err.err_msg
-            return None
+            dico_dataset["err_gdal"] = gdal_err.err_type, gdal_err.err_msg
+            return 0
 
         # raising incompatible files
         if not src:
@@ -102,7 +104,7 @@ class ReadVectorFlatDataset():
             self.alert += 1
             dico_dataset['err_gdal'] = gdal_err.err_type, gdal_err.err_msg
             youtils.erratum(dico_dataset, source_path, u'err_nobjet')
-            return None
+            return 0
         else:
             layer = src.GetLayer()   # get the layer
             pass
@@ -137,7 +139,7 @@ class ReadVectorFlatDataset():
             u""" if layer doesn't have any object, return an error """
             self.alert += 1
             youtils.erratum(dico_dataset, source_path, u'err_nobjet')
-            return None
+            return 0
         else:
             pass
 
@@ -168,8 +170,9 @@ class ReadVectorFlatDataset():
         else:
             pass
 
-        # clean exit
+        # clean & exit
         del src
+        return 1, dico_dataset
 
 # ############################################################################
 # #### Stand alone program ########
@@ -186,7 +189,7 @@ if __name__ == '__main__':
                   path.realpath(r'..\..\test\datatest\vectors\shp\airports.shp'),
                   path.realpath(r'..\..\test\datatest\vectors\tab\tab\airports_MI.tab'),
                   path.realpath(r'..\..\test\datatest\vectors\tab\tab\Hydrobiologie.TAB'),
-                  path.realpath(r'..\..\test\datatest\vectors\geojson\wc2014_MapTour.geojson'),
+                  path.realpath(r'..\..\test\datatest\vectors\geojson\airports.geojson'),
                   path.realpath(r'..\..\test\datatest\vectors\gml\airports.gml'),
                   path.realpath(r'..\..\test\datatest\vectors\kml\wc2014_MapTour.kml'),
                   path.realpath(r'..\..\test\datatest\vectors\kml\PPRI_Loire_sept2014.kmz'),
@@ -204,7 +207,6 @@ if __name__ == '__main__':
     textos['geom_polyg'] = u'Polygon'
     # recipient datas
     dico_dataset = OrderedDict()  # dictionary where will be stored info
-    dico_fields = OrderedDict()   # dictionary for fields information
     # execution
     for vector in li_vectors:
         """ looping on shapefiles list """
@@ -212,8 +214,7 @@ if __name__ == '__main__':
         dico_dataset.clear()
         # getting the informations
         print('\n{0}'.format(vector))
-        info_shp = vectorReader.infos_dataset(path.abspath(vector),
-                                         dico_dataset,
-                                         'shape',
-                                         textos)
-        print(('\n', dico_dataset))
+        info_ds = vectorReader.infos_dataset(path.abspath(vector),
+                                             dico_dataset,
+                                             txt=textos)
+        print(info_ds)
