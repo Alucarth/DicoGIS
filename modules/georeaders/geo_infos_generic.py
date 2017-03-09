@@ -27,9 +27,20 @@ import logging
 from collections import OrderedDict  # Python 3 backported
 
 # 3rd party libraries
-from osgeo import ogr, osr
-from osgeo import gdal
+try:
+    from osgeo import gdal, ogr, osr
+except ImportError:
+    import gdal
+    import ogr
+    import osr
+
 from gdalconst import *
+
+# ############################################################################
+# ######### Globals ############
+# ##############################
+
+logger = logging.getLogger("DicoGIS")
 
 # ##############################################################################
 # ########## Classes ###############
@@ -85,12 +96,12 @@ class GeoInfosGenericReader(object):
         #     layer_geom = first_obj.GetGeometryRef()
         #     print("GOT IT")
         # except AttributeError as e:
-        #     logging.error("{}: {}".format(layer.GetName(), e))
+        #     logger.error("{}: {}".format(layer.GetName(), e))
         #     first_obj = layer.GetNextFeature()
         #     if hasattr(first_obj, "GetGeometryRef"):
         #         layer_geom = first_obj.GetGeometryRef()
         #     else:
-        #         logging.error("LAYER: {} has not Attribute GetGeometryRef".format(layer.GetName()))
+        #         logger.error("LAYER: {} has not Attribute GetGeometryRef".format(layer.GetName()))
         #         return None
 
     def get_srs_details(self, layer, txt):
