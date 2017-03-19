@@ -4,14 +4,14 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 # -----------------------------------------------------------------------------
 # Name:         DicoGIS
 # Purpose:      Automatize the creation of a dictionnary of geographic data
-#                   contained in a folders structures.
-#                   It produces an Excel output file (.xls)
+#               contained in a folders structures.
+#               It produces an Excel output file (.xlsx)
 #
 # Author:       Julien Moura (@geojulien)
 #
 # Python:       2.7.x
 # Created:      14/02/2013
-# Updated:      15/03/2016
+# Updated:      19/03/2017
 #
 # Licence:      GPL 3
 # ------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 # Standard library
 from Tkinter import Tk, StringVar, IntVar, Image    # GUI
 from Tkinter import W, PhotoImage, ACTIVE, DISABLED, END
-from tkFileDialog import askdirectory, asksaveasfilename    # dialogs
+from tkFileDialog import askdirectory
 from tkMessageBox import showinfo as info, showerror as avert
 from ttk import Combobox, Progressbar, Style, Labelframe, Frame
 from ttk import Label, Button, Entry, Checkbutton, Notebook  # widgets
@@ -46,17 +46,7 @@ from logging.handlers import RotatingFileHandler
 from collections import OrderedDict  # ordered dictionary
 
 # 3rd party libraries
-try:
-    from osgeo import gdal
-    from osgeo import ogr  # handler for vector spatial files
-    from osgeo import osr
-except ImportError:
-    import gdal
-    import ogr  # handler for vector spatial files
-    import osr
-
 from isogeo_pysdk import Isogeo
-from xlwt import easyxf, Formula, Workbook  # excel writer
 
 # Custom modules
 from modules import ReadRasters    # for rasters files
@@ -75,6 +65,10 @@ from modules import Utilities
 # from modules import MetricsManager
 from modules import OptionsManager
 from modules import TextsManager
+
+# custom UI
+from ui import MiscButtons
+
 
 # ##############################################################################
 # ############ Globals ############
@@ -638,6 +632,12 @@ class DicoGIS(Tk):
                                                                                  padx=2,
                                                                                  pady=2,
                                                                                  sticky="WE")
+        # miscellaneous
+        misc_frame = MiscButtons(self)
+        misc_frame.grid(row=4,
+                        padx=2,
+                        pady=2,
+                        sticky="NSWE")
         # language switcher
         self.ddl_lang = Combobox(self,
                                  values=li_lang,
