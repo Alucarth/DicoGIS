@@ -51,6 +51,7 @@ except ValueError:
 gdal_err = GdalErrorHandler()
 georeader = GeoInfosGenericReader()
 youtils = Utils(ds_type="postgis")
+logger = logging.getLogger("DicoGIS")
 
 # ############################################################################
 # ######### Classes #############
@@ -82,18 +83,19 @@ class ReadPostGIS():
         self.alert = 0
         if views_included:
             gdal.SetConfigOption(str("PG_LIST_ALL_TABLES"), str("YES"))
+            logger.info("PostgreSQL views enabled.")
         else:
             gdal.SetConfigOption(str("PG_LIST_ALL_TABLES"), str("NO"))
+            logger.info("PostgreSQL views disabled.")
 
         # connection infos
+        self.host = host
+        self.port = port
+        self.db_name = db_name
+        self.user = user
+        self.password = password
         self.conn_settings = "PG: host={} port={} dbname={} user={} password={}"\
                              .format(host, port, db_name, user, password)
-        dico_dataset["sgbd_host"] = host
-        dico_dataset["sgbd_port"] = port
-        dico_dataset["db_name"] = db_name
-        dico_dataset["user"] = user
-        dico_dataset["password"] = password
-        dico_dataset["connection_string"] = self.conn_settings
 
         # testing connection
         self.conn = self.get_connection()
@@ -114,10 +116,13 @@ class ReadPostGIS():
         """TO DOC."""
         try:
             conn = ogr.Open(str(self.conn_settings))
-            logging.info("Access granted : connecting people!")
+            logging.info("Access granted : connecting people to {} tables!"
+                         .format(len(conn)))
             return conn
         except Exception as e:
-            logging.error("Connection failed. Check settings: {0}".format(str(e)))
+            self.dico_dataset["conn_state"] = unicode(e)
+            logging.error("Connection failed. Check settings: {0}"
+                          .format(str(e)))
             return 0
 
     def get_version(self):
@@ -146,6 +151,18 @@ class ReadPostGIS():
             dico_dataset['type'] = tipo
             pass
 
+        # connection info
+        dico_dataset["sgbd_host"] = self.host
+        dico_dataset["sgbd_port"] = self.port
+        dico_dataset["db_name"] = self.db_name
+        dico_dataset["user"] = self.user
+        dico_dataset["password"] = self.password
+        dico_dataset["connection_string"] = self.conn_settings
+
+        # layer name
+        dico_dataset['name'] = layer.GetName()
+        dico_dataset['title'] = layer.GetName().capitalize()
+
         # raising forbidden access
         try:
             obj = layer.GetFeatureCount()  # get the first object
@@ -162,8 +179,6 @@ class ReadPostGIS():
             logging.error(e)
             return None
 
-        dico_dataset['name'] = layer.GetName()
-        dico_dataset['title'] = layer.GetName().capitalize()
         # schema name
         try:
             layer.GetName().split('.')[1]
@@ -250,8 +265,18 @@ if __name__ == '__main__':
                            user=test_user, password=test_pwd,
                            views_included=1, dico_dataset=dico_dataset,
                            txt=textos)
+    # check if connection succeeded
+    if not pgReader.conn:
+        # connection failed
+        print(dico_dataset)
+        exit()
+    else:
+        print("{} tables found."
+              .format(len(pgReader.conn)))
+
+    # parse layers
     for layer in pgReader.conn:
         dico_dataset.clear()
-        print(layer.GetName())
+        print("\n", layer.GetName())
         pgReader.infos_dataset(layer)
         print(dico_dataset)

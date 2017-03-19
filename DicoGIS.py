@@ -87,8 +87,8 @@ utils_global = Utilities()
 logger = logging.getLogger("DicoGIS")
 logging.captureWarnings(True)
 logger.setLevel(logging.INFO)  # all errors will be get
-log_form = logging.Formatter('%(asctime)s || %(levelname)s || %(module)s || %(message)s')
-logfile = RotatingFileHandler('LOG_DicoGIS.log', 'a', 5000000, 1)
+log_form = logging.Formatter("%(asctime)s || %(levelname)s || %(module)s || %(message)s")
+logfile = RotatingFileHandler("LOG_DicoGIS.log", "a", 5000000, 1)
 logfile.setLevel(logging.INFO)
 logfile.setFormatter(log_form)
 logger.addHandler(logfile)
@@ -1070,6 +1070,10 @@ class DicoGIS(Tk):
         self.nb.tab(2, state=DISABLED)
         self.nb.tab(3, state=DISABLED)
 
+        # creating the Excel workbook
+        self.wb = files2xlsx(texts=self.blabla)
+        logger.info('Excel file created')
+
         # process files or PostGIS database
         if self.typo == 0:
             self.nb.select(0)
@@ -1120,10 +1124,6 @@ class DicoGIS(Tk):
         # georeaders
         georeader_vector = ReadVectorFlatDataset()
         georeader_egdb = ReadGDB()
-
-        # creating the Excel workbook
-        self.wb = files2xlsx(texts=self.blabla)
-        logger.info('Excel file created')
 
         # sheets and progress bar
         total_files = 0
@@ -1636,44 +1636,37 @@ class DicoGIS(Tk):
         # End path.abspath(of) function
         return
 
-    def process_db(self, conn):
+    def process_db(self, sgbd_reader):
         u"""Process PostGIS DB analisis."""
-        # creating the Excel workbook
-        logger.info('Excel file created')
         # getting the info from shapefiles and compile it in the excel
-        line = 1    # line of dictionary
         logger.info('\tPostGIS table processing...')
         # setting progress bar
-        self.prog_layers["maximum"] = conn.GetLayerCount()
+        self.prog_layers["maximum"] = sgbd_reader.conn.GetLayerCount()
         # parsing the layers
-        for layer in conn:
+        for layer in sgbd_reader.conn:
             # reset recipient data
-            self.dico_layer.clear()
-            self.dico_fields.clear()
-            ReadPostGIS(layer,
-                        self.dico_layer,
-                        self.dico_fields,
-                        'PostGIS table',
-                        self.blabla)
+            self.dico_dataset.clear()
+            sgbd_reader.infos_dataset(layer)
             logger.info('Table examined: {}'.format(layer.GetName()))
-            # writing to the Excel dictionary
-            # self.dictionarize_pg(self.dico_layer,
-            #                      self.dico_fields,
-            #                      self.feuyPG,
-            #                      line)
-            self.wb.store_md_sgdb(self.dico_layer)
+            self.wb.store_md_sgdb(self.dico_dataset)
             logger.info('\t Wrote into the dictionary')
-            # increment the line number
-            line = line + 1
             # increment the progress bar
             self.prog_layers["value"] = self.prog_layers["value"] + 1
             self.update()
+
         # saving dictionary
-        self.savedico()
+        self.bell()
+        self.val.config(state=ACTIVE)
+        self.wb.tunning_worksheets()
+        saved = utils_global.safe_save(wb=self.wb,
+                                       dest_dir=self.target.get(),
+                                       dest_filename=self.output.get(),
+                                       ftype="Excel Workbook",
+                                       dlg_title=self.blabla.get('gui_excel'))
         logger.info('\n\tWorkbook saved: %s', self.output.get())
 
         # quit and exit
-        utils_global.open_dir_file(self.output.get())
+        utils_global.open_dir_file(saved[1])
         self.destroy()
         exit()
 
@@ -1733,6 +1726,7 @@ class DicoGIS(Tk):
         """Test database connection and handling specific
         settings : proxy, DB views, etc.
         """
+        self.dico_dataset = OrderedDict()
         # check if a proxy is needed
         # more information about the GDAL HTTP proxy options here:
         # http://trac.osgeo.org/gdal/wiki/ConfigOptions#GDALOGRHTTPoptions
@@ -1750,42 +1744,37 @@ class DicoGIS(Tk):
         else:
             logger.info("No proxy configured.")
 
-        # checking if user chose to list PostGIS views
-        if self.opt_pgvw.get():
-            gdal.SetConfigOption(str("PG_LIST_ALL_TABLES"), str("YES"))
-            logger.info("PostgreSQL views enabled.")
-        else:
-            gdal.SetConfigOption(str("PG_LIST_ALL_TABLES"), str("NO"))
-            logger.info("PostgreSQL views disabled.")
-
         # testing connection settings
-        try:
-            conn = ogr.Open("PG: host={0} port={1} dbname={2} user={3} password={4}".format(
-                            self.host.get(), self.port.get(), self.dbnb.get(), self.user.get(),
-                            self.pswd.get()))
-            conn.GetLayerCount()
-            # sql_version = "SELECT PostGIS_full_version();"
-            # version = conn.ExecuteSQL(sql_version)
-        except Exception as e:
-            logger.warning("Connection failed: {0}.".format(e))
-            self.status.set("Connection failed: {0}.".format(e))
-            avert(title=self.blabla.get("err_pg_conn_fail"), message=unicode(e))
-            return
+        sgbd_reader = ReadPostGIS(host=self.host.get(), port=self.port.get(),
+                                  db_name=self.dbnb.get(), user=self.user.get(),
+                                  password=self.pswd.get(),
+                                  views_included=self.opt_pgvw.get(),
+                                  dico_dataset=self.dico_dataset,
+                                  txt=self.blabla)
 
-        # if connection successed
-        self.status.set("{} tables".format(conn.GetLayerCount()))
-        logger.info("Connection to database {0} successed."
-                     "{1} tables found.".format(self.dbnb.get(),
-                                                conn.GetLayerCount()))
+        # check connection state
+        if not sgbd_reader.conn:
+            fail_reason = self.dico_dataset.get("conn_state")
+            self.status.set("Connection failed: {0}."
+                            .format(fail_reason))
+            avert(title=self.blabla.get("err_pg_conn_fail"),
+                  message=fail_reason)
+            return None
+        else:
+            # connection succeeded
+            pass
+
+        self.status.set("{} tables".format(len(sgbd_reader.conn)))
         # set the default output file
         self.output.delete(0, END)
-        self.output.insert(0, "DicoGIS_{0}-{1}_{2}.xlsx".format(self.dbnb.get(),
-                                                                self.host.get(),
-                                                                self.today))
+        self.output.insert(0, "DicoGIS_{0}-{1}_{2}.xlsx"
+                              .format(self.dbnb.get(),
+                                      self.host.get(),
+                                      self.today))
         # launching the process
-        self.process_db(conn)
+        self.process_db(sgbd_reader)
         # end of function
-        return conn
+        return sgbd_reader
 
     def process_isogeo(self):
         """Extract Isogeo metadata catalog into an Excel worksheet."""

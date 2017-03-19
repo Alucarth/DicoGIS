@@ -87,8 +87,7 @@ class files2xlsx(Workbook):
                       "gdal_warn",
                       ]
 
-    li_cols_filedb = [
-                      "nomfic",
+    li_cols_filedb = ["nomfic",
                       "path",
                       "theme",
                       "tot_size",
@@ -105,28 +104,27 @@ class files2xlsx(Workbook):
                       "li_chps",
                       ]
 
-    li_cols_mapdocs = [
-                      "nomfic",
-                      "path",
-                      "theme",
-                      "custom_title",
-                      "creator_prod",
-                      "keywords",
-                      "subject",
-                      "res_image",
-                      "tot_size",
-                      "date_crea",
-                      "date_actu",
-                      "origin_x",
-                      "origin_y",
-                      "srs",
-                      "srs_type",
-                      "codepsg",
-                      "sub_layers",
-                      "num_attrib",
-                      "num_objets",
-                      "li_chps",
-                      ]
+    li_cols_mapdocs = ["nomfic",
+                       "path",
+                       "theme",
+                       "custom_title",
+                       "creator_prod",
+                       "keywords",
+                       "subject",
+                       "res_image",
+                       "tot_size",
+                       "date_crea",
+                       "date_actu",
+                       "origin_x",
+                       "origin_y",
+                       "srs",
+                       "srs_type",
+                       "codepsg",
+                       "sub_layers",
+                       "num_attrib",
+                       "num_objets",
+                       "li_chps",
+                       ]
 
     li_cols_lyr = ["nomfic",
                    "path",
@@ -150,8 +148,7 @@ class files2xlsx(Workbook):
                    "li_chps",
                    ]
 
-    li_cols_caodao = [
-                      "nomfic",
+    li_cols_caodao = ["nomfic",
                       "path",
                       "theme",
                       "tot_size",
@@ -168,22 +165,20 @@ class files2xlsx(Workbook):
                       "li_chps",
                       ]
 
-    li_cols_sgbd = [
-                      "nomfic",
-                      "conn_chain",
-                      "schema",
-                      "num_attrib",
-                      "num_objets",
-                      "geometrie",
-                      "srs",
-                      "srs_type",
-                      "codepsg",
-                      "emprise",
-                      "date_crea",
-                      "date_actu",
-                      "format",
-                      "li_chps",
-                      ]
+    li_cols_sgbd = ["nomfic",
+                    "conn_chain",
+                    "schema",
+                    "num_attrib",
+                    "num_objets",
+                    "geometrie",
+                    "srs",
+                    "srs_type",
+                    "codepsg",
+                    "emprise",
+                    "format",
+                    "li_chps",
+                    "gdal_err"
+                    ]
 
     def __init__(self, lang="EN", texts=OrderedDict()):
         """TO DOC.
@@ -529,7 +524,7 @@ class files2xlsx(Workbook):
         self.ws_r["T{}".format(self.idx_r)] = layer.get(u'total_size')
 
         # in case of a source error
-        if layer.get('err_gdal', [0,])[0] != 0:
+        if layer.get('err_gdal', [0, ])[0] != 0:
             logger.warning('\tproblem detected')
             self.ws_r["U{}".format(self.idx_r)] = "{0} : {1}".format(layer.get('err_gdal')[0],
                                                                      layer.get('err_gdal')[1])
@@ -934,130 +929,99 @@ class files2xlsx(Workbook):
         # increment line
         self.idx_s += 1
 
+        # local variable
+        champs = ""
+
+        # layer name
+        self.ws_sgbd["A{}".format(self.idx_s)] = layer.get('name')
+
+        # connection string
+        self.ws_sgbd["B{}".format(self.idx_s)] = "{}@{}:{}-{}"\
+                                                 .format(layer.get('user'),
+                                                         layer.get('host'),
+                                                         layer.get('port'),
+                                                         layer.get('db_name'))
+        self.ws_sgbd["B{}".format(self.idx_s)].style = "Hyperlink"
+        # schema
+        self.ws_sgbd["C{}".format(self.idx_s)] = layer.get('folder')
+
         # in case of a source error
         if "error" in layer:
-            # sheet.row(line).set_style(self.xls_erreur)
-            err_mess = self.txt.get(layer.get('error'))
-            logger.warning('\tproblem detected: ' + err_mess)
-            self.ws_sgbd["A{}".format(self.idx_s)] = layer.get('name')
-            link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
-                                                     self.txt.get('browse'))
-            self.ws_sgbd["B{}".format(self.idx_s)] = link
+            self.ws_sgbd["D{}".format(self.idx_s)] = layer.get("error")
+            self.ws_sgbd["A{}".format(self.idx_s)].style = "Warning Text"
             self.ws_sgbd["B{}".format(self.idx_s)].style = "Warning Text"
-            self.ws_sgbd["C{}".format(self.idx_s)] = err_mess
             self.ws_sgbd["C{}".format(self.idx_s)].style = "Warning Text"
+            self.ws_sgbd["D{}".format(self.idx_s)].style = "Warning Text"
             # gdal info
             if "err_gdal" in layer:
-                logger.warning('\tproblem detected')
-                self.ws_v["Q{}".format(self.idx_v)] = "{0} : {1}"\
+                self.ws_v["M{}".format(self.idx_v)] = "{0} : {1}"\
                                                       .format(layer.get('err_gdal')[0],
                                                               layer.get('err_gdal')[1])
-                self.ws_v["Q{}".format(self.idx_v)].style = "Warning Text"
+                self.ws_v["M{}".format(self.idx_v)].style = "Warning Text"
             else:
                 pass
-            # Interruption of function
+            # interruption of function
             return False
         else:
             pass
 
-        # Name
-        self.ws_sgbd["A{}".format(self.idx_s)] = layer.get('name')
+        # structure
+        self.ws_sgbd["D{}".format(self.idx_s)] = layer.get('num_fields')
+        self.ws_sgbd["E{}".format(self.idx_s)] = layer.get('num_obj')
+        self.ws_sgbd["F{}".format(self.idx_s)] = layer.get('type_geom')
 
-        # Path of parent folder formatted to be a hyperlink
-        link = r'=HYPERLINK("{0}","{1}")'.format(layer.get(u'folder'),
-                                                 self.txt.get('browse'))
-        self.ws_sgbd["B{}".format(self.idx_s)] = link
-        self.ws_sgbd["B{}".format(self.idx_s)].style = "Hyperlink"
+        # SRS
+        self.ws_sgbd["G{}".format(self.idx_s)] = layer.get(u'srs')
+        self.ws_sgbd["H{}".format(self.idx_s)] = layer.get(u'srs_type')
+        self.ws_sgbd["I{}".format(self.idx_s)] = layer.get(u'EPSG')
 
-        self.ws_sgbd["C{}".format(self.idx_s)] = path.basename(layer.get(u'folder'))
-        self.ws_sgbd["D{}".format(self.idx_s)] = layer.get(u'total_size')
-        self.ws_sgbd["E{}".format(self.idx_s)] = layer.get(u'date_crea')
-        self.ws_sgbd["F{}".format(self.idx_s)] = layer.get(u'date_actu')
-        self.ws_sgbd["G{}".format(self.idx_s)] = layer.get(u'layers_count')
-        self.ws_sgbd["H{}".format(self.idx_s)] = layer.get(u'total_fields')
-        self.ws_sgbd["I{}".format(self.idx_s)] = layer.get(u'total_objs')
+        # Spatial extent
+        emprise = u"Xmin : {0} - Xmax : {1} | \nYmin : {2} - Ymax : {3}"\
+                  .format(unicode(layer.get('Xmin')),
+                          unicode(layer.get('Xmax')),
+                          unicode(layer.get('Ymin')),
+                          unicode(layer.get('Ymax')))
+        self.ws_sgbd["J{}".format(self.idx_s)].style = "wrap"
+        self.ws_sgbd["J{}".format(self.idx_s)] = emprise
 
-        # parsing layers
-        for (layer_idx, layer_name) in zip(layer.get(u'layers_idx'),
-                                           layer.get(u'layers_names')):
-            # increment line
-            self.idx_s += 1
-            champs = ""
-            # get the layer informations
-            try:
-                gdb_layer = layer.get('{0}_{1}'.format(layer_idx,
-                                                        layer_name))
-            except UnicodeDecodeError:
-                gdb_layer = layer.get('{0}_{1}'.format(layer_idx,
-                                                        unicode(layer_name.decode('latin1'))))
-            # in case of a source error
-            if gdb_layer.get('error'):
-                err_mess = self.txt.get(gdb_layer.get('error'))
-                logger.warning('\tproblem detected: \
-                                  {0} in {1}'.format(err_mess,
-                                                     gdb_layer.get(u'title')))
-                self.ws_sgbd["G{}".format(self.idx_s)] = gdb_layer.get(u'title')
-                self.ws_sgbd["G{}".format(self.idx_s)].style = "Warning Text"
-                self.ws_sgbd["H{}".format(self.idx_s)] = err_mess
-                self.ws_sgbd["H{}".format(self.idx_s)].style = "Warning Text"
-                # Interruption of function
-                continue
+        # type
+        self.ws_sgbd["K{}".format(self.idx_s)] = layer.get(u'type')
+
+        # Field informations
+        fields = layer.get("fields")
+        for chp in fields.keys():
+            # field type
+            if 'Integer' in fields[chp][0]:
+                tipo = self.txt.get(u'entier')
+            elif fields[chp][0] == 'Real':
+                tipo = self.txt.get(u'reel')
+            elif fields[chp][0] == 'String':
+                tipo = self.txt.get(u'string')
+            elif fields[chp][0] == 'Date':
+                tipo = self.txt.get(u'date')
             else:
-                pass
+                tipo = "unknown"
+                logger.warning(chp + " unknown type")
 
-            self.ws_sgbd["G{}".format(self.idx_s)] = gdb_layer.get('title')
-            self.ws_sgbd["H{}".format(self.idx_s)] = gdb_layer.get(u'num_fields')
-            self.ws_sgbd["I{}".format(self.idx_s)] = gdb_layer.get(u'num_obj')
-            self.ws_sgbd["J{}".format(self.idx_s)] = gdb_layer.get(u'type_geom')
-            self.ws_sgbd["K{}".format(self.idx_s)] = gdb_layer.get(u'srs')
-            self.ws_sgbd["L{}".format(self.idx_s)] = gdb_layer.get(u'srs_type')
-            self.ws_sgbd["M{}".format(self.idx_s)] = gdb_layer.get(u'EPSG')
+            # concatenation of field informations
+            try:
+                champs = champs + chp +\
+                          u" (" + tipo + self.txt.get(u'longueur') +\
+                          unicode(fields[chp][1]) +\
+                          self.txt.get(u'precision') +\
+                          unicode(fields[chp][2]) + u") ; "
+            except UnicodeDecodeError:
+                logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
+                # decode the fucking field name
+                champs = champs + chp.decode('latin1') \
+                + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
+                                                        fields[chp][1],
+                                                        fields[chp][2])
+                # then continue
+                continue
 
-            # Spatial extent
-            emprise = u"Xmin : {0} - Xmax : {1} | \nYmin : {2} - Ymax : {3}"\
-                      .format(unicode(gdb_layer.get(u'Xmin')),
-                              unicode(gdb_layer.get(u'Xmax')),
-                              unicode(gdb_layer.get(u'Ymin')),
-                              unicode(gdb_layer.get(u'Ymax')))
-            self.ws_sgbd["N{}".format(self.idx_s)].style = "wrap"
-            self.ws_sgbd["N{}".format(self.idx_s)] = emprise
-
-            # Field informations
-            fields = gdb_layer.get(u'fields')
-            for chp in fields.keys():
-                # field type
-                if 'Integer' in fields[chp][0]:
-                    tipo = self.txt.get(u'entier')
-                elif fields[chp][0] == 'Real':
-                    tipo = self.txt.get(u'reel')
-                elif fields[chp][0] == 'String':
-                    tipo = self.txt.get(u'string')
-                elif fields[chp][0] == 'Date':
-                    tipo = self.txt.get(u'date')
-                else:
-                    tipo = "unknown"
-                    logger.warning(chp + " unknown type")
-
-                # concatenation of field informations
-                try:
-                    champs = champs + chp +\
-                             u" (" + tipo + self.txt.get(u'longueur') +\
-                             unicode(fields[chp][1]) +\
-                             self.txt.get(u'precision') +\
-                             unicode(fields[chp][2]) + u") ; "
-                except UnicodeDecodeError:
-                    logger.warning('Field name with special letters: {}'
-                                    .format(chp.decode('latin1')))
-                    # decode the fucking field name
-                    champs = champs + chp.decode('latin1') \
-                    + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
-                                                            fields[chp][1],
-                                                            fields[chp][2])
-                    # then continue
-                    continue
-
-            # Once all fieds explored, write them
-            self.ws_sgbd["O{}".format(self.idx_s)] = champs
+        # Once all fieds explored, write them
+        self.ws_sgbd["L{}".format(self.idx_s)] = champs
 
         # end of method
         return
