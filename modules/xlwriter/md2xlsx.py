@@ -43,7 +43,7 @@ logger = logging.getLogger("DicoGIS")
 # ##################################
 
 
-class files2xlsx(Workbook):
+class md2xlsx(Workbook):
     """Export into a XLSX worksheet."""
     li_cols_vector = ["nomfic",
                       "path",
@@ -185,7 +185,7 @@ class files2xlsx(Workbook):
 
         Keyword arguments:
         """
-        super(files2xlsx, self).__init__()
+        super(md2xlsx, self).__init__()
         # super(files2xlsx, self).__init__(write_only=True)
         self.txt = texts
 
@@ -928,7 +928,6 @@ class files2xlsx(Workbook):
         """Storing metadata about a file database."""
         # increment line
         self.idx_s += 1
-
         # local variable
         champs = ""
 
@@ -938,8 +937,8 @@ class files2xlsx(Workbook):
         # connection string
         self.ws_sgbd["B{}".format(self.idx_s)] = "{}@{}:{}-{}"\
                                                  .format(layer.get('user'),
-                                                         layer.get('host'),
-                                                         layer.get('port'),
+                                                         layer.get('sgbd_host'),
+                                                         layer.get('sgbd_port'),
                                                          layer.get('db_name'))
         self.ws_sgbd["B{}".format(self.idx_s)].style = "Hyperlink"
         # schema
@@ -1036,11 +1035,15 @@ if __name__ == '__main__':
     # ------------ Specific imports ---------------------
 
     # ------------ REAL START ----------------------------
-    wb = files2xlsx()
-    # wb.set_worksheets(has_vector=1,
-    #                   has_raster=1,
-    #                   has_service=1,
-    #                   has_resource=1)
+    wb = md2xlsx()
+    wb.set_worksheets(has_vector=1,
+                      has_raster=1,
+                      has_service=1,
+                      has_resource=1,
+                      has_cad=1,
+                      has_mapdocs=1,
+                      has_filedb=1,
+                      has_sgbd=1)
 
-    # # saving the test file
-    # wb.save(r"files2xlsx.xlsx")
+    # saving the test file
+    wb.save(r"DicoGIS_files2xlsx.xlsx")

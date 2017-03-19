@@ -7,7 +7,6 @@ from .Infos_PostGIS import ReadPostGIS
 from .Infos_DXF import ReadDXF
 from .Infos_GeoPDF import ReadGeoPDF
 from .Infos_Spatialite import ReadSpaDB
-from .Infos_Isogeo_OC import ReadIsogeoOpenCatalog
 from .Infos_LYR import ReadLYR
 from .Infos_MXD import ReadMXD
 from .geo_infos_generic import GeoInfosGenericReader

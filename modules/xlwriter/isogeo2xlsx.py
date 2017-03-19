@@ -18,17 +18,25 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 # ########## Libraries #############
 # ##################################
 
+# Python 2 and 3 compatibility
+from future.standard_library import install_aliases
+install_aliases()
+
 # Standard library
 from datetime import datetime
+from itertools import zip_longest
 import logging
 from os import path
+import re
+from xml.sax.saxutils import escape  # '<' -> '&lt;'
 
 # 3rd party library
 import arrow
 from isogeo_pysdk import Isogeo
+from isogeo_pysdk import IsogeoTranslator
 from openpyxl import Workbook
-from openpyxl.cell import get_column_letter
-from openpyxl.styles import Style, Font, Alignment
+from openpyxl.utils import get_column_letter
+from openpyxl.styles import NamedStyle, Font, Alignment
 from openpyxl.worksheet.properties import WorksheetProperties
 
 # ##############################################################################
@@ -156,58 +164,94 @@ class Isogeo2xlsx(Workbook):
               ]
 
     cols_rz = ["Titre",  # A
-               "Résumé",  # C
-               "Emplacement",  # D
-               "Groupe de travail",  # E
-               "Mots-clés",  # F
-               "Création",  # G
-               "# mises à jour",  # H
-               "Dernière mise à jour",  # I
-               "Publication",  # J
-               "Format (version)",  # K
-               "Conditions",  # L
-               "Limitations",  # M
-               "# Contacts",  # N
-               "Points de contact",  # O
-               "Autres contacts",  # P
-               "Téléchargeable",  # Q
-               "Visualisable",  # R
-               "Autres",  # S
-               "Editer",  # T
-               "Consulter",  # U
-               "MD - ID",  # V
-               "MD - Création",  # W
-               "MD - Modification",  # X
-               "MD - Langue",  # Y
+               "Résumé",  # B
+               "Emplacement",  # C
+               "Groupe de travail",  # D
+               "Mots-clés",  # E
+               "Création",  # F
+               "# mises à jour",  # G
+               "Dernière mise à jour",  # H
+               "Publication",  # I
+               "Format (version)",  # J
+               "Conditions",  # K
+               "Limitations",  # L
+               "# Contacts",  # M
+               "Points de contact",  # N
+               "Autres contacts",  # O
+               "Téléchargeable",  # P
+               "Visualisable",  # Q
+               "Autres",  # R
+               "Editer",  # S
+               "Consulter",  # T
+               "MD - ID",  # U
+               "MD - Création",  # V
+               "MD - Modification",  # W
+               "MD - Langue",  # X
                ]
 
-    def __init__(self):
-        """ Instanciating the output workbook
-        """
+    def __init__(self, lang="FR", url_base=""):
+        """Instanciating the output workbook."""
         super(Isogeo2xlsx, self).__init__()
         # super(Isogeo2xlsx, self).__init__(write_only=True)
 
+        # OpenCatalog url
+        self.url_base = url_base
+
         # styles
-        self.s_date = Style(number_format='dd/mm/yyyy')
-        self.s_error = Style(font=Font(color="FF0000"))
-        self.s_header = Style(alignment=Alignment(horizontal='center',
-                                                  vertical='center'
-                                                  ),
-                              font=Font(size=12,
-                                        bold=True,
-                                        )
-                              )
-        self.s_link = Style(font=Font(underline="single"))
-        self.s_wrap = Style(alignment=Alignment(wrap_text=True))
+        s_date = NamedStyle(name="date")
+        s_wrap = NamedStyle(name="wrap")
+        s_wrap.alignment = Alignment(wrap_text=True)
+        self.add_named_style(s_date)
+        self.add_named_style(s_wrap)
+
         # deleting the default worksheet
         ws = self.active
         self.remove_sheet(ws)
 
+        # LOCALE
+        if lang.lower() == "fr":
+            s_date.number_format = "dd/mm/yyyy"
+            self.dates_fmt = "DD/MM/YYYY"
+            self.locale_fmt = "fr_FR"
+        else:
+            s_date.number_format = "yyyy/mm/dd"
+            self.dates_fmt = "YYYY/MM/DD"
+            self.locale_fmt = "uk_UK"
+        # TRANSLATIONS
+        self.tr = IsogeoTranslator(lang).tr
+
     # ------------ Setting workbook ---------------------
 
-    def set_worksheets(self, vector=1, raster=1, service=1, resource=1):
-        """ Adds news sheets depending on present metadata types
+    def set_worksheets(self, auto=None, vector=1,
+                       raster=1, service=1, resource=1):
+        """Adds new sheets depending on present metadata types.
+
+        auto: typically auto=search_results.get('tags').keys()
         """
+        if type(auto) == list:
+            logging.info("Automatic sheets creation based on tags")
+            if "type:vector-dataset" in auto:
+                vector = 1
+            else:
+                vector = 0
+            if "type:raster-dataset" in auto:
+                raster = 1
+            else:
+                raster = 0
+                pass
+            if "type:resource" in auto:
+                resource = 1
+            else:
+                resource = 0
+                pass
+            if "type:service" in auto:
+                service = 1
+            else:
+                service = 0
+                pass
+        else:
+            pass
+
         # SHEETS & HEADERS
         if vector:
             self.ws_v = self.create_sheet(title="Vecteurs")
@@ -216,7 +260,7 @@ class Isogeo2xlsx(Workbook):
             # styling
             for i in self.cols_v:
                 self.ws_v.cell(row=1,
-                               column=self.cols_v.index(i) + 1).style = self.s_header
+                               column=self.cols_v.index(i) + 1).style = "Headline 2"
             # initialize line counter
             self.idx_v = 1
             # log
@@ -231,7 +275,7 @@ class Isogeo2xlsx(Workbook):
             # styling
             for i in self.cols_r:
                 self.ws_r.cell(row=1,
-                               column=self.cols_r.index(i) + 1).style = self.s_header
+                               column=self.cols_r.index(i) + 1).style = "Headline 2"
             # initialize line counter
             self.idx_r = 1
             # log
@@ -246,7 +290,7 @@ class Isogeo2xlsx(Workbook):
             # styling
             for i in self.cols_s:
                 self.ws_s.cell(row=1,
-                               column=self.cols_s.index(i) + 1).style = self.s_header
+                               column=self.cols_s.index(i) + 1).style = "Headline 2"
             # initialize line counter
             self.idx_s = 1
             # log
@@ -261,7 +305,7 @@ class Isogeo2xlsx(Workbook):
             # styling
             for i in self.cols_rz:
                 self.ws_rz.cell(row=1,
-                                column=self.cols_rz.index(i) + 1).style = self.s_header
+                                column=self.cols_rz.index(i) + 1).style = "Headline 2"
             # initialize line counter
             self.idx_rz = 1
             # log
@@ -372,9 +416,8 @@ class Isogeo2xlsx(Workbook):
         # data creation date
         if md.get("created"):
             data_created = arrow.get(md.get("created"))
-            data_created = "{0} ({1})".format(data_created.format("DD/MM/YYYY",
-                                                                  "fr_FR"),
-                                              data_created.humanize(locale="fr_FR"))
+            data_created = "{0}".format(data_created.format("DD/MM/YYYY",
+                                                                  "fr_FR"))
         else:
             data_created = ""
         ws["O{}".format(idx)] = data_created
@@ -385,9 +428,8 @@ class Isogeo2xlsx(Workbook):
         # data last update
         if md.get("modified"):
             data_updated = arrow.get(md.get("created"))
-            data_updated = "{0} ({1})".format(data_updated.format("DD/MM/YYYY",
-                                                                  "fr_FR"),
-                                              data_updated.humanize(locale="fr_FR"))
+            data_updated = "{0}".format(data_updated.format("DD/MM/YYYY",
+                                                                  "fr_FR"))
         else:
             data_updated = ""
         ws["Q{}".format(idx)] = data_updated
@@ -448,42 +490,83 @@ class Isogeo2xlsx(Workbook):
             logging.info("Vector dataset without any feature attribute")
             pass
 
-        # QUALITY
-        specs = md.get("specifications", None)
-        if specs:
-            specs_cct = sorted(["{0} ({1})".format(s.get("specification").get("name"),
-                                                   s.get("conformant"))
-                                for s in specs])
-            ws["AB{}".format(idx)] = " ;\n".join(specs_cct)
-        else:
-            logging.info("Vector dataset without specification.")
-            pass
+        # ---- SPECIFICATIONS # -----------------------------------------------
+        specs_in = md.get("specifications", [])
+        specs_out = []
+        for s_in in specs_in:
+            spec = {}
+            # translate specification conformity
+            if s_in.get("conformant"):
+                spec["conformity"] = self.tr("quality", "isConform")
+            else:
+                spec["conformity"] = self.tr("quality", "isNotConform")
+            # ensure other fields
+            spec["name"] = s_in.get("specification").get("name")
+            spec["link"] = s_in.get("specification").get("link")
+            # make data human readable
+            spec_date = arrow.get(s_in.get("specification").get("published")[:19])
+            spec_date = "{0}".format(spec_date.format(self.dates_fmt,
+                                                      self.locale_fmt))
+            spec["date"] = spec_date
+            # store into the final list
+            specs_out.append("{} {} {} - {}".format(spec.get("name"),
+                                                      spec.get("date"),
+                                                      spec.get("link"),
+                                                      spec.get("conformity")))
+        ws["AB{}".format(idx)] = " ;\n".join(specs_out)
+
         # topology
         ws["AC{}".format(idx)] = md.get("topologicalConsistency", "")
 
-        # CGUs
-        # conditions
-        conds = md.get("conditions", None)
-        if conds:
-            conds_cct = sorted(["{0}".format(c.setdefault("license",
-                                                          {"name": "No license"}).get("name"))
-                               for c in conds])
-            ws["AD{}".format(idx)] = " ;\n".join(conds_cct)
-        else:
-            logging.info("Vector dataset without conditions.")
-            pass
+        # ---- CGUs # --------------------------------------------------------
+        cgus_in = md.get("conditions", [])
+        cgus_out = []
+        for c_in in cgus_in:
+            cgu = {}
+            # ensure other fields
+            cgu["description"] = self.clean_xml(c_in.get("description", ""))
+            if "license" in c_in.keys():
+                cgu["name"] = self.clean_xml(c_in.get("license").get("name", "NR"))
+                cgu["link"] = c_in.get("license").get("link", "")
+                cgu["content"] = self.clean_xml(c_in.get("license").get("content", ""))
+            else:
+                cgu["name"] = self.tr("conditions", "noLicense")
 
-        # limitations
-        limits = md.get("limitations", None)
-        if limits:
-            limits_cct = sorted(["{0} ({1}) {2}".format(l.get("type"),
-                                                        "{}".format(l.get("restriction", "NR")),
-                                                        "{}".format(l.get("directive", {"name": ""}).get("name")))
-                                for l in limits])
-            ws["AE{}".format(idx)] = " ;\n".join(limits_cct)
-        else:
-            logging.info("Vector dataset without limitation")
-            pass
+            # store into the final list
+            cgus_out.append("{} {}. {} {}".format(cgu.get("name"),
+                                                         cgu.get("description", ""),
+                                                         cgu.get("content", ""),
+                                                         cgu.get("link", "")))
+        ws["AD{}".format(idx)] = " ;\n".join(cgus_out)
+
+        # ---- LIMITATIONS # -------------------------------------------------
+        lims_in = md.get("limitations", [])
+        lims_out = []
+        for l_in in lims_in:
+            limitation = {}
+            # ensure other fields
+            limitation["description"] = self.clean_xml(l_in.get("description", ""))
+            limitation["type"] = self.tr("limitations", l_in.get("type"))
+            # legal type
+            if l_in.get("type") == "legal":
+                limitation["restriction"] = self.tr("restrictions", l_in.get("restriction"))
+            else:
+                pass
+            # INSPIRE precision
+            if "directive" in l_in.keys():
+                limitation["inspire"] = self.clean_xml(l_in.get("directive").get("name"))
+                limitation["content"] = self.clean_xml(l_in.get("directive").get("description"))
+            else:
+                pass
+
+            # store into the final list
+            lims_out.append("{} {}. {} {} {}".format(limitation.get("type"),
+                                                    limitation.get("description", ""),
+                                                    limitation.get("restriction", ""),
+                                                    limitation.get("content", ""),
+                                                    limitation.get("inspire", "")))
+
+        ws["AE{}".format(idx)] = " ;\n".join(lims_out)
 
         # CONTACTS
         contacts = md.get("contacts")
@@ -510,7 +593,13 @@ class Isogeo2xlsx(Workbook):
         link_edit = r'=HYPERLINK("{0}","{1}")'.format("https://app.isogeo.com/resources/" + md.get("_id"),
                                                       "Editer")
         ws["AL{}".format(idx)] = link_edit
-        ws["AL{}".format(idx)].style = self.s_link
+        ws["AL{}".format(idx)].style = "Hyperlink"
+
+        link_visu = r'=HYPERLINK("{0}","{1}")'.format(self.url_base + "/m/" + md.get("_id"),
+                                                      "Version en ligne")
+
+        ws["AM{}".format(idx)] = link_visu
+        ws["AM{}".format(idx)].style = "Hyperlink"
 
         # METADATA
         # id
@@ -534,21 +623,21 @@ class Isogeo2xlsx(Workbook):
         ws["AQ{}".format(idx)] = md.get("language")
 
         # STYLING
-        ws["C{}".format(idx)].style = self.s_wrap
-        ws["F{}".format(idx)].style = self.s_wrap
-        ws["G{}".format(idx)].style = self.s_wrap
-        ws["I{}".format(idx)].style = self.s_wrap
-        ws["J{}".format(idx)].style = self.s_wrap
-        ws["K{}".format(idx)].style = self.s_date
-        ws["L{}".format(idx)].style = self.s_date
-        ws["U{}".format(idx)].style = self.s_wrap
-        ws["AA{}".format(idx)].style = self.s_wrap
-        ws["AB{}".format(idx)].style = self.s_wrap
-        ws["AC{}".format(idx)].style = self.s_wrap
-        ws["AD{}".format(idx)].style = self.s_wrap
-        ws["AE{}".format(idx)].style = self.s_wrap
-        ws["AG{}".format(idx)].style = self.s_wrap
-        ws["AH{}".format(idx)].style = self.s_wrap
+        ws["C{}".format(idx)].style = "wrap"
+        ws["F{}".format(idx)].style = "wrap"
+        ws["G{}".format(idx)].style = "wrap"
+        ws["I{}".format(idx)].style = "wrap"
+        ws["J{}".format(idx)].style = "wrap"
+        ws["K{}".format(idx)].style = "date"
+        ws["L{}".format(idx)].style = "date"
+        ws["U{}".format(idx)].style = "wrap"
+        ws["AA{}".format(idx)].style = "wrap"
+        ws["AB{}".format(idx)].style = "wrap"
+        ws["AC{}".format(idx)].style = "wrap"
+        ws["AD{}".format(idx)].style = "wrap"
+        ws["AE{}".format(idx)].style = "wrap"
+        ws["AG{}".format(idx)].style = "wrap"
+        ws["AH{}".format(idx)].style = "wrap"
 
         # LOG
         logging.info("Vector metadata stored: {} ({})".format(md.get("name"),
@@ -684,42 +773,82 @@ class Isogeo2xlsx(Workbook):
         # scale
         ws["W{}".format(idx)] = md.get("scale")
 
-        # QUALITY
-        specs = md.get("specifications", None)
-        if specs:
-            specs_cct = sorted(["{0} ({1})".format(s.get("specification").get("name"),
-                                                   s.get("conformant"))
-                                for s in specs])
-            ws["X{}".format(idx)] = " ;\n".join(specs_cct)
-        else:
-            logging.info("Vector dataset without specification.")
-            pass
+        # ---- SPECIFICATIONS # -----------------------------------------------
+        specs_in = md.get("specifications", [])
+        specs_out = []
+        for s_in in specs_in:
+            spec = {}
+            # translate specification conformity
+            if s_in.get("conformant"):
+                spec["conformity"] = self.tr("quality", "isConform")
+            else:
+                spec["conformity"] = self.tr("quality", "isNotConform")
+            # ensure other fields
+            spec["name"] = s_in.get("specification").get("name")
+            spec["link"] = s_in.get("specification").get("link")
+            # make data human readable
+            spec_date = arrow.get(s_in.get("specification").get("published")[:19])
+            spec_date = "{0}".format(spec_date.format(self.dates_fmt,
+                                                      self.locale_fmt))
+            spec["date"] = spec_date
+            # store into the final list
+            specs_out.append("{} {} {} - {}".format(spec.get("name"),
+                                                      spec.get("date"),
+                                                      spec.get("link"),
+                                                      spec.get("conformity")))
+        ws["X{}".format(idx)] = " ;\n".join(specs_out)
         # topology
         ws["Y{}".format(idx)] = md.get("topologicalConsistency", "")
 
-        # CGUs
-        # conditions
-        conds = md.get("conditions", None)
-        if conds:
-            conds_cct = sorted(["{0}".format(c.setdefault("license",
-                                                          {"name": "No license"}).get("name"))
-                               for c in conds])
-            ws["Z{}".format(idx)] = " ;\n".join(conds_cct)
-        else:
-            logging.info("Vector dataset without conditions.")
-            pass
+        # ---- CGUs # --------------------------------------------------------
+        cgus_in = md.get("conditions", [])
+        cgus_out = []
+        for c_in in cgus_in:
+            cgu = {}
+            # ensure other fields
+            cgu["description"] = self.clean_xml(c_in.get("description", ""))
+            if "license" in c_in.keys():
+                cgu["name"] = self.clean_xml(c_in.get("license").get("name", "NR"))
+                cgu["link"] = c_in.get("license").get("link", "")
+                cgu["content"] = self.clean_xml(c_in.get("license").get("content", ""))
+            else:
+                cgu["name"] = self.tr("conditions", "noLicense")
 
-        # limitations
-        limits = md.get("limitations", None)
-        if limits:
-            limits_cct = sorted(["{0} ({1}) {2}".format(l.get("type"),
-                                                        "{}".format(l.get("restriction", "NR")),
-                                                        "{}".format(l.get("directive", {"name": ""}).get("name")))
-                                for l in limits])
-            ws["AA{}".format(idx)] = " ;\n".join(limits_cct)
-        else:
-            logging.info("Vector dataset without limitation")
-            pass
+            # store into the final list
+            cgus_out.append("{} {}. {} {}".format(cgu.get("name"),
+                                                         cgu.get("description", ""),
+                                                         cgu.get("content", ""),
+                                                         cgu.get("link", "")))
+        ws["Z{}".format(idx)] = " ;\n".join(cgus_out)
+
+        # ---- LIMITATIONS # -------------------------------------------------
+        lims_in = md.get("limitations", [])
+        lims_out = []
+        for l_in in lims_in:
+            limitation = {}
+            # ensure other fields
+            limitation["description"] = self.clean_xml(l_in.get("description", ""))
+            limitation["type"] = self.tr("limitations", l_in.get("type"))
+            # legal type
+            if l_in.get("type") == "legal":
+                limitation["restriction"] = self.tr("restrictions", l_in.get("restriction"))
+            else:
+                pass
+            # INSPIRE precision
+            if "directive" in l_in.keys():
+                limitation["inspire"] = self.clean_xml(l_in.get("directive").get("name"))
+                limitation["content"] = self.clean_xml(l_in.get("directive").get("description"))
+            else:
+                pass
+
+            # store into the final list
+            lims_out.append("{} {}. {} {} {}".format(limitation.get("type"),
+                                                    limitation.get("description", ""),
+                                                    limitation.get("restriction", ""),
+                                                    limitation.get("content", ""),
+                                                    limitation.get("inspire", "")))
+
+        ws["AA{}".format(idx)] = " ;\n".join(lims_out)
 
         # CONTACTS
         contacts = md.get("contacts")
@@ -746,8 +875,13 @@ class Isogeo2xlsx(Workbook):
         link_edit = r'=HYPERLINK("{0}","{1}")'.format("https://app.isogeo.com/resources/" + md.get("_id"),
                                                       "Editer")
         ws["AH{}".format(idx)] = link_edit
-        ws["AH{}".format(idx)].style = self.s_link
+        ws["AH{}".format(idx)].style = "Hyperlink"
 
+        link_visu = r'=HYPERLINK("{0}","{1}")'.format(self.url_base + "/m/" + md.get("_id"),
+                                                      "Version en ligne")
+
+        ws["AI{}".format(idx)] = link_visu
+        ws["AI{}".format(idx)].style = "Hyperlink"
         # METADATA
         # id
         ws["AJ{}".format(idx)] = md.get("_id")
@@ -770,20 +904,20 @@ class Isogeo2xlsx(Workbook):
         ws["AM{}".format(idx)] = md.get("language")
 
         # STYLING
-        ws["C{}".format(idx)].style = self.s_wrap
-        ws["F{}".format(idx)].style = self.s_wrap
-        ws["G{}".format(idx)].style = self.s_wrap
-        ws["I{}".format(idx)].style = self.s_wrap
-        ws["J{}".format(idx)].style = self.s_wrap
-        ws["K{}".format(idx)].style = self.s_date
-        ws["L{}".format(idx)].style = self.s_date
-        ws["U{}".format(idx)].style = self.s_wrap
-        ws["X{}".format(idx)].style = self.s_wrap
-        ws["Y{}".format(idx)].style = self.s_wrap
-        ws["Z{}".format(idx)].style = self.s_wrap
-        ws["AA{}".format(idx)].style = self.s_wrap
-        ws["AC{}".format(idx)].style = self.s_wrap
-        ws["AD{}".format(idx)].style = self.s_wrap
+        ws["C{}".format(idx)].style = "wrap"
+        ws["F{}".format(idx)].style = "wrap"
+        ws["G{}".format(idx)].style = "wrap"
+        ws["I{}".format(idx)].style = "wrap"
+        ws["J{}".format(idx)].style = "wrap"
+        ws["K{}".format(idx)].style = "date"
+        ws["L{}".format(idx)].style = "date"
+        ws["U{}".format(idx)].style = "wrap"
+        ws["X{}".format(idx)].style = "wrap"
+        ws["Y{}".format(idx)].style = "wrap"
+        ws["Z{}".format(idx)].style = "wrap"
+        ws["AA{}".format(idx)].style = "wrap"
+        ws["AC{}".format(idx)].style = "wrap"
+        ws["AD{}".format(idx)].style = "wrap"
 
         # LOG
         logging.info("Raster metadata stored: {} ({})".format(md.get("name"),
@@ -876,40 +1010,80 @@ class Isogeo2xlsx(Workbook):
             pass
         ws["M{}".format(idx)] = bbox
 
-        # QUALITY
-        specs = md.get("specifications", None)
-        if specs:
-            specs_cct = sorted(["{0} ({1})".format(s.get("specification").get("name"),
-                                                   s.get("conformant"))
-                                for s in specs])
-            ws["N{}".format(idx)] = " ;\n".join(specs_cct)
-        else:
-            logging.info("Vector dataset without specification.")
-            pass
+        # ---- SPECIFICATIONS # -----------------------------------------------
+        specs_in = md.get("specifications", [])
+        specs_out = []
+        for s_in in specs_in:
+            spec = {}
+            # translate specification conformity
+            if s_in.get("conformant"):
+                spec["conformity"] = self.tr("quality", "isConform")
+            else:
+                spec["conformity"] = self.tr("quality", "isNotConform")
+            # ensure other fields
+            spec["name"] = s_in.get("specification").get("name")
+            spec["link"] = s_in.get("specification").get("link")
+            # make data human readable
+            spec_date = arrow.get(s_in.get("specification").get("published")[:19])
+            spec_date = "{0}".format(spec_date.format(self.dates_fmt,
+                                                      self.locale_fmt))
+            spec["date"] = spec_date
+            # store into the final list
+            specs_out.append("{} {} {} - {}".format(spec.get("name"),
+                                                      spec.get("date"),
+                                                      spec.get("link"),
+                                                      spec.get("conformity")))
+        ws["N{}".format(idx)] = " ;\n".join(specs_out)
 
-        # CGUs
-        # conditions
-        conds = md.get("conditions", None)
-        if conds:
-            conds_cct = sorted(["{0}".format(c.setdefault("license",
-                                                          {"name": "No license"}).get("name"))
-                               for c in conds])
-            ws["O{}".format(idx)] = " ;\n".join(conds_cct)
-        else:
-            logging.info("Vector dataset without conditions.")
-            pass
+        # ---- CGUs # --------------------------------------------------------
+        cgus_in = md.get("conditions", [])
+        cgus_out = []
+        for c_in in cgus_in:
+            cgu = {}
+            # ensure other fields
+            cgu["description"] = self.clean_xml(c_in.get("description", ""))
+            if "license" in c_in.keys():
+                cgu["name"] = self.clean_xml(c_in.get("license").get("name", "NR"))
+                cgu["link"] = c_in.get("license").get("link", "")
+                cgu["content"] = self.clean_xml(c_in.get("license").get("content", ""))
+            else:
+                cgu["name"] = self.tr("conditions", "noLicense")
 
-        # limitations
-        limits = md.get("limitations", None)
-        if limits:
-            limits_cct = sorted(["{0} ({1}) {2}".format(l.get("type"),
-                                                        "{}".format(l.get("restriction", "NR")),
-                                                        "{}".format(l.get("directive", {"name": ""}).get("name")))
-                                for l in limits])
-            ws["P{}".format(idx)] = " ;\n".join(limits_cct)
-        else:
-            logging.info("Service without limitation")
-            pass
+            # store into the final list
+            cgus_out.append("{} {}. {} {}".format(cgu.get("name"),
+                                                         cgu.get("description", ""),
+                                                         cgu.get("content", ""),
+                                                         cgu.get("link", "")))
+        ws["O{}".format(idx)] = " ;\n".join(cgus_out)
+
+        # ---- LIMITATIONS # -------------------------------------------------
+        lims_in = md.get("limitations", [])
+        lims_out = []
+        for l_in in lims_in:
+            limitation = {}
+            # ensure other fields
+            limitation["description"] = self.clean_xml(l_in.get("description", ""))
+            limitation["type"] = self.tr("limitations", l_in.get("type"))
+            # legal type
+            if l_in.get("type") == "legal":
+                limitation["restriction"] = self.tr("restrictions", l_in.get("restriction"))
+            else:
+                pass
+            # INSPIRE precision
+            if "directive" in l_in.keys():
+                limitation["inspire"] = self.clean_xml(l_in.get("directive").get("name"))
+                limitation["content"] = self.clean_xml(l_in.get("directive").get("description"))
+            else:
+                pass
+
+            # store into the final list
+            lims_out.append("{} {}. {} {} {}".format(limitation.get("type"),
+                                                    limitation.get("description", ""),
+                                                    limitation.get("restriction", ""),
+                                                    limitation.get("content", ""),
+                                                    limitation.get("inspire", "")))
+
+        ws["P{}".format(idx)] = " ;\n".join(lims_out)
 
         # CONTACTS
         contacts = md.get("contacts")
@@ -936,7 +1110,13 @@ class Isogeo2xlsx(Workbook):
         link_edit = r'=HYPERLINK("{0}","{1}")'.format("https://app.isogeo.com/resources/" + md.get("_id"),
                                                       "Editer")
         ws["W{}".format(idx)] = link_edit
-        ws["W{}".format(idx)].style = self.s_link
+        ws["W{}".format(idx)].style = "Hyperlink"
+
+        link_visu = r'=HYPERLINK("{0}","{1}")'.format(self.url_base + "/m/" + md.get("_id"),
+                                                      "Version en ligne")
+
+        ws["X{}".format(idx)] = link_visu
+        ws["X{}".format(idx)].style = "Hyperlink"
 
         # METADATA
         # id
@@ -960,14 +1140,14 @@ class Isogeo2xlsx(Workbook):
         ws["AB{}".format(idx)] = md.get("language")
 
         # STYLING
-        ws["C{}".format(idx)].style = self.s_wrap
-        ws["F{}".format(idx)].style = self.s_wrap
-        ws["M{}".format(idx)].style = self.s_wrap
-        ws["N{}".format(idx)].style = self.s_wrap
-        ws["O{}".format(idx)].style = self.s_wrap
-        ws["P{}".format(idx)].style = self.s_wrap
-        ws["R{}".format(idx)].style = self.s_wrap
-        ws["S{}".format(idx)].style = self.s_wrap
+        ws["C{}".format(idx)].style = "wrap"
+        ws["F{}".format(idx)].style = "wrap"
+        ws["M{}".format(idx)].style = "wrap"
+        ws["N{}".format(idx)].style = "wrap"
+        ws["O{}".format(idx)].style = "wrap"
+        ws["P{}".format(idx)].style = "wrap"
+        ws["R{}".format(idx)].style = "wrap"
+        ws["S{}".format(idx)].style = "wrap"
 
         # LOG
         logging.info("Service metadata stored: {} ({})".format(md.get("name"),
@@ -982,17 +1162,16 @@ class Isogeo2xlsx(Workbook):
         # variables
         tags = md.get("tags")
 
-        ws["A{}".format(idx)] = md.get('title')
-        ws["B{}".format(idx)] = md.get('name')
-        ws["C{}".format(idx)] = md.get('abstract')
-        ws["D{}".format(idx)] = md.get('path', "ND")
-        ws["E{}".format(idx)] = md.get('owner')
+        ws["A{}".format(idx)] = md.get("title", "NR")
+        ws["B{}".format(idx)] = md.get("abstract", "")
+        ws["C{}".format(idx)] = md.get("path", "")
+        ws["D{}".format(idx)] = md.get("owner")
 
         # KEYWORDS
         if "keywords" in md.keys():
             keywords = [k.get("text") for k in md.get("keywords")
                         if k.get("_tag").startswith("keyword:is")]
-            ws["F{}".format(idx)] = " ;\n".join(sorted(keywords))
+            ws["E{}".format(idx)] = " ;\n".join(sorted(keywords))
         else:
             logging.info("Service without any keyword")
 
@@ -1005,10 +1184,10 @@ class Isogeo2xlsx(Workbook):
                                               data_created.humanize(locale="fr_FR"))
         else:
             data_created = ""
-        ws["G{}".format(idx)] = data_created
+        ws["F{}".format(idx)] = data_created
 
         # events count
-        ws["H{}".format(idx)] = len(md.get('events', ""))
+        ws["G{}".format(idx)] = len(md.get("events", ""))
 
         # data last update
         if md.get("modified"):
@@ -1018,7 +1197,7 @@ class Isogeo2xlsx(Workbook):
                                               data_updated.humanize(locale="fr_FR"))
         else:
             data_updated = ""
-        ws["I{}".format(idx)] = data_updated
+        ws["H{}".format(idx)] = data_updated
 
         # TECHNICAL
         # format
@@ -1026,33 +1205,59 @@ class Isogeo2xlsx(Workbook):
             format_lbl = next(v for k, v in tags.items() if 'format:' in k)
         else:
             format_lbl = "NR"
-        ws["K{}".format(idx)] = u"{0} ({1} - {2})".format(format_lbl,
+        ws["J{}".format(idx)] = u"{0} ({1} - {2})".format(format_lbl,
                                                           md.get("formatVersion", "NR"),
                                                           md.get("encoding", "NR"))
 
-        # CGUs
-        # conditions
-        conds = md.get("conditions", None)
-        if conds:
-            conds_cct = sorted(["{0}".format(c.setdefault("license",
-                                                          {"name": "No license"}).get("name"))
-                               for c in conds])
-            ws["L{}".format(idx)] = " ;\n".join(conds_cct)
-        else:
-            logging.info("Vector dataset without conditions.")
-            pass
+        # ---- CGUs # --------------------------------------------------------
+        cgus_in = md.get("conditions", [])
+        cgus_out = []
+        for c_in in cgus_in:
+            cgu = {}
+            # ensure other fields
+            cgu["description"] = self.clean_xml(c_in.get("description", ""))
+            if "license" in c_in.keys():
+                cgu["name"] = self.clean_xml(c_in.get("license").get("name", "NR"))
+                cgu["link"] = c_in.get("license").get("link", "")
+                cgu["content"] = self.clean_xml(c_in.get("license").get("content", ""))
+            else:
+                cgu["name"] = self.tr("conditions", "noLicense")
 
-        # limitations
-        limits = md.get("limitations", None)
-        if limits:
-            limits_cct = sorted(["{0} ({1}) {2}".format(l.get("type"),
-                                                        "{}".format(l.get("restriction", "NR")),
-                                                        "{}".format(l.get("directive", {"name": ""}).get("name")))
-                                for l in limits])
-            ws["M{}".format(idx)] = " ;\n".join(limits_cct)
-        else:
-            logging.info("Service without limitation")
-            pass
+            # store into the final list
+            cgus_out.append("{} {}. {} {}".format(cgu.get("name"),
+                                                         cgu.get("description", ""),
+                                                         cgu.get("content", ""),
+                                                         cgu.get("link", "")))
+        ws["K{}".format(idx)] = " ;\n".join(cgus_out)
+
+        # ---- LIMITATIONS # -------------------------------------------------
+        lims_in = md.get("limitations", [])
+        lims_out = []
+        for l_in in lims_in:
+            limitation = {}
+            # ensure other fields
+            limitation["description"] = self.clean_xml(l_in.get("description", ""))
+            limitation["type"] = self.tr("limitations", l_in.get("type"))
+            # legal type
+            if l_in.get("type") == "legal":
+                limitation["restriction"] = self.tr("restrictions", l_in.get("restriction"))
+            else:
+                pass
+            # INSPIRE precision
+            if "directive" in l_in.keys():
+                limitation["inspire"] = self.clean_xml(l_in.get("directive").get("name"))
+                limitation["content"] = self.clean_xml(l_in.get("directive").get("description"))
+            else:
+                pass
+
+            # store into the final list
+            lims_out.append("{} {}. {} {} {}".format(limitation.get("type"),
+                                                    limitation.get("description", ""),
+                                                    limitation.get("restriction", ""),
+                                                    limitation.get("content", ""),
+                                                    limitation.get("inspire", "")))
+
+        ws["L{}".format(idx)] = " ;\n".join(lims_out)
 
         # CONTACTS
         contacts = md.get("contacts")
@@ -1063,54 +1268,60 @@ class Isogeo2xlsx(Workbook):
             contacts_other_cct = ["{0} ({1})".format(contact.get("contact").get("name"),
                                                      contact.get("contact").get("email"))\
                                   for contact in contacts if contact.get("role") != "pointOfContact"]
-            ws["N{}".format(idx)] = len(contacts)
-            ws["O{}".format(idx)] = " ;\n".join(contacts_pt_cct)
-            ws["P{}".format(idx)] = " ;\n".join(contacts_other_cct)
+            ws["M{}".format(idx)] = len(contacts)
+            ws["N{}".format(idx)] = " ;\n".join(contacts_pt_cct)
+            ws["O{}".format(idx)] = " ;\n".join(contacts_other_cct)
         else:
-            ws["N{}".format(idx)] = 0
+            ws["M{}".format(idx)] = 0
             logging.info("Service without any contact")
 
         # ACTIONS
-        ws["Q{}".format(idx)] = "action:download" in tags
-        ws["R{}".format(idx)] = "action:view" in tags
-        ws["S{}".format(idx)] = "action:other" in tags
+        ws["P{}".format(idx)] = "action:download" in tags
+        ws["Q{}".format(idx)] = "action:view" in tags
+        ws["R{}".format(idx)] = "action:other" in tags
 
         # LINKS
         link_edit = r'=HYPERLINK("{0}","{1}")'.format("https://app.isogeo.com/resources/" + md.get("_id"),
                                                       "Editer")
-        ws["T{}".format(idx)] = link_edit
-        ws["T{}".format(idx)].style = self.s_link
+        ws["S{}".format(idx)] = link_edit
+        ws["S{}".format(idx)].style = "Hyperlink"
+
+        link_visu = r'=HYPERLINK("{0}","{1}")'.format(self.url_base + "/m/" + md.get("_id"),
+                                                      "Version en ligne")
+
+        ws["T{}".format(idx)] = link_visu
+        ws["T{}".format(idx)].style = "Hyperlink"
 
         # METADATA
         # id
-        ws["X{}".format(idx)] = md.get("_id")
+        ws["U{}".format(idx)] = md.get("_id")
 
         # creation
         md_created = arrow.get(md.get("_created")[:19])
         md_created = "{0} ({1})".format(md_created.format("DD/MM/YYYY",
                                                           "fr_FR"),
                                         md_created.humanize(locale="fr_FR"))
-        ws["W{}".format(idx)] = md_created
+        ws["V{}".format(idx)] = md_created
 
         # last update
         md_updated = arrow.get(md.get("_modified")[:19])
         md_updated = "{0} ({1})".format(md_updated.format("DD/MM/YYYY",
                                                           "fr_FR"),
                                         md_updated.humanize(locale="fr_FR"))
-        ws["X{}".format(idx)] = md_updated
+        ws["W{}".format(idx)] = md_updated
 
         # lang
-        ws["Y{}".format(idx)] = md.get("language")
+        ws["X{}".format(idx)] = md.get("language")
 
         # STYLING
-        ws["C{}".format(idx)].style = self.s_wrap
-        ws["F{}".format(idx)].style = self.s_wrap
-        ws["M{}".format(idx)].style = self.s_wrap
-        ws["N{}".format(idx)].style = self.s_wrap
-        ws["O{}".format(idx)].style = self.s_wrap
-        ws["P{}".format(idx)].style = self.s_wrap
-        ws["R{}".format(idx)].style = self.s_wrap
-        ws["S{}".format(idx)].style = self.s_wrap
+        ws["C{}".format(idx)].style = "wrap"
+        ws["F{}".format(idx)].style = "wrap"
+        ws["M{}".format(idx)].style = "wrap"
+        ws["N{}".format(idx)].style = "wrap"
+        ws["O{}".format(idx)].style = "wrap"
+        ws["P{}".format(idx)].style = "wrap"
+        ws["R{}".format(idx)].style = "wrap"
+        ws["S{}".format(idx)].style = "wrap"
 
         # LOG
         logging.info("Resource metadata stored: {} ({})".format(md.get("name"),
@@ -1144,6 +1355,47 @@ class Isogeo2xlsx(Workbook):
                                                           sheet.max_row)
         pass
 
+    def remove_accents(self, input_str, substitute=u""):
+        """Clean string from special characters.
+
+        source: http://stackoverflow.com/a/5843560
+        """
+        return unicode(substitute).join(char for char in input_str if char.isalnum())
+
+    def clean_xml(self, invalid_xml, mode="soft", substitute="_"):
+        """Clean string of XML invalid characters.
+
+        source: http://stackoverflow.com/a/13322581/2556577
+        """
+        # assumptions:
+        #   doc = *( start_tag / end_tag / text )
+        #   start_tag = '<' name *attr [ '/' ] '>'
+        #   end_tag = '<' '/' name '>'
+        ws = r'[ \t\r\n]*'  # allow ws between any token
+        name = '[a-zA-Z]+'  # note: expand if necessary but the stricter the better
+        attr = '{name} {ws} = {ws} "[^"]*"'  # note: fragile against missing '"'; no "'"
+        start_tag = '< {ws} {name} {ws} (?:{attr} {ws})* /? {ws} >'
+        end_tag = '{ws}'.join(['<', '/', '{name}', '>'])
+        tag = '{start_tag} | {end_tag}'
+
+        assert '{{' not in tag
+        while '{' in tag:   # unwrap definitions
+            tag = tag.format(**vars())
+
+        tag_regex = re.compile('(%s)' % tag, flags=re.VERBOSE)
+
+        # escape &, <, > in the text
+        iters = [iter(tag_regex.split(invalid_xml))] * 2
+        pairs = izip_longest(*iters, fillvalue='')  # iterate 2 items at a time
+
+        # get the clean version
+        clean_version = ''.join(escape(text) + tag for text, tag in pairs)
+        if mode == "strict":
+            clean_version = re.sub(r"<.*?>", substitute, clean_version)
+        else:
+            pass
+        return clean_version
+
 # #############################################################################
 # ##### Stand alone program ########
 # ##################################
@@ -1162,12 +1414,14 @@ if __name__ == '__main__':
         pass
 
     config = SafeConfigParser()
-    config.read(r"..\settings.ini")
+    config.read(r"..\settings_dev.ini")
 
     settings = {s: dict(config.items(s)) for s in config.sections()}
     app_id = settings.get('auth').get('app_id')
     app_secret = settings.get('auth').get('app_secret')
     client_lang = settings.get('basics').get('def_codelang')
+    def_oc = settings.get('basics').get('def_oc',
+                                        "http://open.isogeo.com/s/fbc04d8809784283b60e5f78ddc1e2cb/LoXCxjcjvRclWdCPzh17HXfhNYO20")
 
     # ------------ Connecting to Isogeo API ----------------
     # instanciating the class
@@ -1192,8 +1446,8 @@ if __name__ == '__main__':
                                    sub_resources=includes)
 
     # ------------ REAL START ----------------------------
-    wb = Isogeo2xlsx()
-    wb.set_worksheets()
+    wb = Isogeo2xlsx(url_base=def_oc)
+    wb.set_worksheets(auto=search_results.get('tags').keys())
 
     # parsing metadata
     for md in search_results.get('results'):
