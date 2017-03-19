@@ -97,7 +97,8 @@ class Utils(object):
             # method end
             return ctner
         elif self.ds_type == "postgis":
-            ctner['name'] = mess_type
+            ctner['name'] = ds_lyr.GetName()
+            ctner['error_type'] = mess_type
             ctner['error'] = mess
             # method end
             return ctner
