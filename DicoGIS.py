@@ -67,11 +67,10 @@ from modules import ReadGDB        # for Esri FileGeoDataBase
 from modules import ReadSpaDB      # for Spatialite DB
 from modules import ReadDXF        # for AutoCAD DXF
 from modules import ReadGeoPDF     # for Geospatial PDF
-from modules import ReadIsogeoOpenCatalog  # Isogeo catalogs
 from modules import ReadLYR  # Esri LYR files
 
 from modules import CheckNorris
-from modules import files2xlsx
+from modules import md2xlsx
 from modules import Utilities
 # from modules import MetricsManager
 from modules import OptionsManager
@@ -1071,7 +1070,7 @@ class DicoGIS(Tk):
         self.nb.tab(3, state=DISABLED)
 
         # creating the Excel workbook
-        self.wb = files2xlsx(texts=self.blabla)
+        self.wb = md2xlsx(texts=self.blabla)
         logger.info('Excel file created')
 
         # process files or PostGIS database
@@ -1967,93 +1966,6 @@ class DicoGIS(Tk):
 
         # End of function
         return self.feuyMAPS, line
-
-    def dictionarize_pg(self, layer_infos, sheet, line):
-        u"""Write the infos of the layer into the Excel workbook."""
-        # local variables
-        champs = ""
-        # in case of a source error
-        if layer_infos.get('error'):
-            logger.warning('\tproblem detected')
-            sheet.write(line, 0, layer_infos.get('name'))
-            sheet.write(line, 1, "{0}:{1}-{2}".format(self.host.get(),
-                                                      self.port.get(),
-                                                      self.dbnb.get()),
-                        self.xls_erreur)
-            sheet.write(line, 2, layer_infos.get('error'), self.xls_erreur)
-            # Interruption of function
-            return sheet
-        else:
-            pass
-
-        # Name
-        sheet.write(line, 0, layer_infos.get('name'))
-
-        # Connection chain to reach database
-        sheet.write(line, 1, "{0}:{1}-{2}".format(self.host.get(),
-                                                  self.port.get(),
-                                                  self.dbnb.get()))
-        # Name of parent folder
-        sheet.write(line, 2, path.basename(layer_infos.get(u'folder')))
-
-        # Geometry type
-        sheet.write(line, 5, layer_infos.get(u'type_geom'))
-        # Spatial extent
-        emprise = u"Xmin : " + unicode(layer_infos.get(u'Xmin')) +\
-                  u", Xmax : " + unicode(layer_infos.get(u'Xmax')) +\
-                  u", Ymin : " + unicode(layer_infos.get(u'Ymin')) +\
-                  u", Ymax : " + unicode(layer_infos.get(u'Ymax'))
-        sheet.write(line, 9, emprise)
-        # Name of srs
-        sheet.write(line, 6, layer_infos.get(u'srs'))
-        # Type of SRS
-        sheet.write(line, 7, layer_infos.get(u'srs_type'))
-        # EPSG code
-        sheet.write(line, 8, layer_infos.get(u'EPSG'))
-        # Number of fields
-        sheet.write(line, 3, layer_infos.get(u'num_fields'))
-        # Name of objects
-        sheet.write(line, 4, layer_infos.get(u'num_obj'))
-        # Format of data
-        sheet.write(line, 12, layer_infos.get(u'type'))
-        # Field informations
-        fields = layer_infos.get("fields")
-        for chp in fields.keys():
-            # field type
-            if 'Integer' in fields[chp][0]:
-                tipo = self.blabla.get(u'entier')
-            elif fields[chp][0] == 'Real':
-                tipo = self.blabla.get(u'reel')
-            elif fields[chp][0] == 'String':
-                tipo = self.blabla.get(u'string')
-            elif fields[chp][0] == 'Date':
-                tipo = self.blabla.get(u'date')
-            # concatenation of field informations
-            try:
-                champs = champs + chp +\
-                         u" (" + tipo + self.blabla.get(u'longueur') +\
-                         unicode(fields[chp][1]) +\
-                         self.blabla.get(u'precision') +\
-                         unicode(fields[chp][2]) + u") ; "
-            except UnicodeDecodeError:
-                # write a notification into the log file
-                self.dico_err[layer_infos.get('name')] = self.blabla.get(u'err_encod') + \
-                                                         chp.decode('latin1') + \
-                                                         u"\n\n"
-                logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
-                # decode the fucking field name
-                champs = champs + chp.decode('latin1') \
-                        + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
-                                                                fields[chp][1],
-                                                                fields[chp][2])
-                # then continue
-                continue
-
-        # Once all fieds explored, write them
-        sheet.write(line, 13, champs)
-
-        # End of function
-        return self.book, self.feuyPG
 
 # ############################################################################
 # #### Stand alone program ########
