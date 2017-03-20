@@ -1,0 +1,83 @@
+//$DELIMITER "tab"
+//$QUOTED-TEXT "no"
+//$CHARSET ANSI
+//$UNIT Distance:m
+//$FORMAT 2
+//$SYSCOORD {Type: 101}
+//$FIELDS Class=gxt_qgis_airports;Subclass=gxt_qgis_airports;Kind=1;Fields=Private#Identifier	Private#Class	Private#Subclass	Private#Name	Private#NbFields	cat	NA3	ELEV	F_CODE	IKO	NAME	USE	CREATION	PASSENGERS	Private#X	Private#Y
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	1	US00157	78.000	Airport/Airfield	PA	NOATAK	Other	1979/05/11	4	-1258616.900000000	6502586.830000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	2	US00229	264.000	Airport/Airfield	PA	AMBLER	Other	1979/05/11	0	-551138.450000000	6267485.600000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	3	US00186	585.000	Airport/Airfield	PABT	BETTLES	Other	1979/05/11	19	356882.260000000	6188622.210000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	4	US59150	9.000	Airport/Airfield	PAOT	RALPH WIEN MEM	Civilian/Public	1979/05/11	9	-1237904.330000000	6251122.980000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	5	US00173	21.000	Airport/Airfield	PA	SELAWIK	Other	1979/05/11	15	-872273.250000000	6106465.430000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	6	US00193	1113.000	Airport/Airfield	PA	INDIAN MOUNTAIN LRRS	Other	1979/05/11	42	44546.230000000	5845664.550000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	7	US00177	21.000	Airport/Airfield	PA	BUCKLAND	Other	1979/05/11	21	-1065841.890000000	5899198.960000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	8	US00146	243.000	Airport/Airfield	PATC	TIN CITY LRRS	Other	1979/05/11	0	-2095798.810000000	5909537.340000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	9	US00150	1329.000	Airport/Airfield	PA	GRANITE MOUNTAIN AFS	Other	1979/05/11	65	-1107924.870000000	5691643.860000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	10	US03057	9.000	Airport/Airfield	PA	PORT CLARENCE CGS	Other	1979/05/11	22	-1959538.970000000	5765851.890000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	11	US00188	207.000	Airport/Airfield	PATA	RALPH M CALHOUN	Other	1979/05/11	0	291155.220000000	5550660.440000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	12	US00155	108.000	Airport/Airfield	PA	KOYUK	Other	1979/05/11	56	-1107943.530000000	5518548.440000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	13	US75867	138.000	Airport/Airfield	PAGA	EDWARD G PITKA SR	Joint Military/Civilian	1979/05/11	64	-458394.110000000	5396346.700000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	14	US60244	12.000	Airport/Airfield	PA	MOSES POINT	Other	1979/05/11	35	-1256990.350000000	5448639.110000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	15	US42171	33.000	Airport/Airfield	PAOM	NOME	Civilian/Public	1979/05/11	52	-1792919.540000000	5459156.190000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	16	US00211	1461.000	Airport/Airfield	PA	KALAKAKET CREEK  AS	Military	1979/05/11	117	-448577.900000000	5281732.660000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	17	US00436	18.000	Airport/Airfield	PAUN	UNALAKLEET	Other	1979/05/11	49	-1091682.670000000	5131737.530000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	18	US00327	624.000	Airport/Airfield	PA	MINCHUMINA	Other	1979/05/11	116	273852.870000000	5076413.950000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	19	US91222	24.000	Airport/Airfield	PA	GAMBELL	Other	1982/09/09	60	-2830822.890000000	5411496.430000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	20	US00453	48.000	Airport/Airfield	PA	SAVOONGA	Other	1982/09/09	77	-2644310.160000000	5331877.440000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	21	US80563	306.000	Airport/Airfield	PAMC	MC GRATH	Civilian/Public	1982/09/09	120	-266253.980000000	4736123.660000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	22	US00342	858.000	Airport/Airfield	PATL	TATALINA LRRS	Other	1982/09/09	149	-328414.980000000	4716360.600000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	23	US00466	12.000	Airport/Airfield	PA	EMMONAK	Other	1982/09/09	57	-1744270.180000000	4809531.830000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	24	US00455	282.000	Airport/Airfield	PA	ANVIK	Other	1982/09/09	135	-1036446.840000000	4669664.480000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	25	US95665	327.000	Airport/Airfield	PATK	TALKEETNA	Civilian/Public	1982/09/09	145	662363.380000000	4520425.350000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	26	US00458	282.000	Airport/Airfield	PA	ST MARYS	Other	1982/09/09	147	-1585048.340000000	4516822.910000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	27	US00440	417.000	Airport/Airfield	PACZ	CAPE ROMANZOF LRRS	Other	1982/09/09	163	-2065491.900000000	4490538.990000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	28	US00317	78.000	Airport/Airfield	PA	ANIAK	Other	1982/09/09	122	-960987.780000000	4270023.350000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	29	US00338	1449.000	Airport/Airfield	PASV	SPARREVOHN LRRS	Other	1982/09/09	211	-277226.020000000	4055442.190000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	30	US38091	111.000	Airport/Airfield	PABE	BETHEL	Civilian/Public	1982/09/09	141	-1392094.860000000	4017915.630000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	31	US45021	87.000	Airport/Airfield	PAEN	KENAI MUNI	Civilian/Public	1982/09/09	138	493563.150000000	3869619.290000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	32	US34970	96.000	Airport/Airfield	PA	SOLDOTNA	Other	1982/09/09	146	532621.790000000	3835669.190000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	33	US00447	42.000	Airport/Airfield	PA	MEKORYUK	Other	1982/09/09	123	-2199782.270000000	3989629.630000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	34	US00201	393.000	Airport/Airfield	PFYU	FORT YUKON	Other	1982/09/09	203	1275304.530000000	6140755.200000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	35	US99779	408.000	Airport/Airfield	PAFB	WAINWRIGHT AAF	Military	1982/09/09	210	992911.930000000	5471034.030000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	36	US90129	396.000	Airport/Airfield	PAFA	FAIRBANKS INTL	Civilian/Public	1982/09/09	215	955711.990000000	5458755.990000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	37	US49463	501.000	Airport/Airfield	PAEI	EIELSON AFB	Military	1982/09/09	230	1078903.580000000	5416425.610000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	38	US18668	330.000	Airport/Airfield	PA	NENANA MUNI	Other	1982/09/09	220	774426.620000000	5346412.980000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	39	US00191	504.000	Airport/Airfield	PACL	CLEAR	Other	1982/09/09	243	773769.170000000	5255402.670000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	40	US11435	1167.000	Airport/Airfield	PABI	ALLEN AAF	Military	1982/09/09	282	1324133.090000000	5197270.690000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	41	US34092	1416.000	Airport/Airfield	PA	TANACROSS	Other	1982/09/09	297	1739099.960000000	5027295.790000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	42	US33180	1569.000	Airport/Airfield	PAOR	NORTHWAY	Civilian/Public	1901/10/26	309	1993396.520000000	4917592.030000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	43	US91368	1443.000	Airport/Airfield	PAGK	GULKANA	Civilian/Public	1789/07/14	313	1452800.410000000	4533758.620000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	44	US33235	225.000	Airport/Airfield	PAAQ	PALMER MUNI	Civilian/Public	1986/10/26	0	852046.670000000	4266202.300000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	45	US00343	135.000	Airport/Airfield	PA	BIG LAKE	Other	1986/10/26	221	727860.880000000	4235917.760000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	46	US00341	345.000	Airport/Airfield	PAFR	BRYANT AHP	Military	1986/10/26	269	762040.160000000	4137711.270000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	47	US58704	192.000	Airport/Airfield	PAED	ELMENDORF AFB	Military	1986/10/26	0	735724.850000000	4131921.190000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	48	US01693	123.000	Airport/Airfield	PAMR	MERRILL FLD	Civilian/Public	1986/10/26	231	729627.980000000	4117944.040000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	49	US77679	129.000	Airport/Airfield	PANC	ANCHORAGE INTL	Civilian/Public	1986/10/26	238	704210.590000000	4101648.700000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	50	US96982	108.000	Airport/Airfield	PAVD	VALDEZ	Other	1986/10/26	234	1362457.150000000	4145200.530000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	51	US40776	36.000	Airport/Airfield	PACV	MERLE K MUDHOLE SMITH	Other	1986/10/26	183	1527332.940000000	3928110.320000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	52	US80341	18.000	Airport/Airfield	PA	SEWARD	Other	1986/10/26	150	832047.620000000	3724788.640000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	53	US00483	189.000	Airport/Airfield	PAIL	ILIAMNA	Other	1986/10/26	0	-168132.280000000	3559985.040000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	54	US53682	75.000	Airport/Airfield	PAHO	HOMER	Other	1986/10/26	233	465449.540000000	3528313.490000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	55	US00488	606.000	Airport/Airfield	PA	BIG MOUNTAIN AFS	Military	1986/10/26	352	-233313.190000000	3417552.330000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	56	US07889	78.000	Airport/Airfield	PADL	DILLINGHAM	Civilian/Public	1986/10/26	244	-844018.150000000	3327975.140000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	57	US81498	51.000	Airport/Airfield	PAKN	KING SALMON	Joint Military/Civilian	1986/10/26	224	-501987.390000000	3174126.270000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	58	US00476	492.000	Airport/Airfield	PAEH	CAPE NEWENHAM LRRS	Other	1986/10/26	360	-1526155.000000000	3246053.700000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	59	US22587	66.000	Airport/Airfield	PADQ	KODIAK	Joint Military/Civilian	1986/10/26	247	293805.830000000	2827765.920000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	60	US00475	57.000	Airport/Airfield	PASN	ST PAUL ISLAND	Other	1986/10/26	243	-3179671.310000000	3001250.930000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	61	US00482	78.000	Airport/Airfield	PA	PORT HEIDEN	Other	1986/10/26	266	-921344.980000000	2566989.240000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	62	US00477	114.000	Airport/Airfield	PA	ST GEORGE	Other	1986/10/26	294	-3122511.060000000	2765349.900000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	63	US95048	87.000	Airport/Airfield	PACD	COLD BAY	Civilian/Public	1986/10/26	281	-1816198.900000000	2012829.180000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	64	US95921	18.000	Airport/Airfield	PADU	UNALASKA	Other	1986/10/26	185	-2692920.780000000	1671951.450000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	65	US00578	66.000	Airport/Airfield	PA	NIKOLSKI AS	Military	1985/08/09	272	-3257915.420000000	1433525.800000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	66	US76610	51.000	Airport/Airfield	PA	ATKA	Other	1985/08/09	260	-4480198.520000000	1492348.030000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	67	US47439	30.000	Airport/Airfield	PAYA	YAKUTAT	Civilian/Public	1985/08/09	228	2634420.200000000	3752745.910000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	68	US97565	39.000	Airport/Airfield	PAGY	SKAGWAY	Other	1985/08/09	249	3418277.210000000	3935405.150000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	69	US62749	12.000	Airport/Airfield	PA	HAINES	Other	1985/08/09	171	3403121.720000000	3849074.350000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	70	US19342	30.000	Airport/Airfield	PA	GUSTAVUS	Other	1985/08/09	238	3451748.540000000	3549955.370000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	71	US47648	18.000	Airport/Airfield	PA	HOONAH	Other	1985/08/09	205	3539731.080000000	3449869.130000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	72	US94530	156.000	Airport/Airfield	PA	KAKE	Other	1985/08/09	0	3941104.360000000	3135887.330000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	73	US14079	96.000	Airport/Airfield	PA	PETERSBURG JAMES A JOHNSON	Other	1985/08/09	333	4141889.520000000	3139116.180000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	74	US38648	39.000	Airport/Airfield	PA	WRANGELL	Other	1985/08/09	271	4288271.500000000	3065425.980000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	75	US05477	72.000	Airport/Airfield	PA	KLAWOCK	Other	1985/08/09	321	4255605.430000000	2705772.050000000
+-1	gxt_qgis_airports	gxt_qgis_airports	gxt_qgis_airports	9	76	US11438	108.000	Airport/Airfield	PANT	ANNETTE ISLAND	Other	1985/08/09	356	4615124.980000000	2620432.360000000
