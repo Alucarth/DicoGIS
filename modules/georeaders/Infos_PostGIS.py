@@ -127,8 +127,9 @@ class ReadPostGIS():
 
     def get_version(self):
         """TO DO."""
-        sql_version = str("SELECT PostGIS_full_version();")
-        return self.conn.ExecuteSQL(sql_version)
+        sql = self.conn.ExecuteSQL(str("SELECT PostGIS_full_version();"))
+        feat = sql.GetNextFeature()
+        return feat.GetField(0)
 
     def get_schemas(self):
         """TO DO."""
@@ -158,6 +159,9 @@ class ReadPostGIS():
         dico_dataset["user"] = self.user
         dico_dataset["password"] = self.password
         dico_dataset["connection_string"] = self.conn_settings
+        # sgbd info
+        dico_dataset["sgbd_version"] = self.get_version()
+        dico_dataset["sgbd_schemas"] = self.get_schemas()
 
         # layer name
         dico_dataset['name'] = layer.GetName()
