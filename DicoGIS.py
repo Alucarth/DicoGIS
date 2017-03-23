@@ -67,7 +67,7 @@ from modules import OptionsManager
 from modules import TextsManager
 
 # custom UI
-from ui import MiscButtons
+from modules import MiscButtons
 
 
 # ##############################################################################
