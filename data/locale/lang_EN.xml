@@ -53,6 +53,7 @@
 	<sheet_filedb>File databases</sheet_filedb>
 	<sheet_cdao>CAD</sheet_cdao>
 	<sheet_maplans>Maps documents</sheet_maplans>
+	<sheet_lyr>Layers files</sheet_lyr>
 	<nomfic>Filename</nomfic>
 	<path>Path</path>
 	<browse>Reach the folder</browse>

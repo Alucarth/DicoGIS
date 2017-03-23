@@ -53,6 +53,7 @@
 	<sheet_filedb>Base de données fichiers</sheet_filedb>
 	<sheet_cdao>CAO - DAO</sheet_cdao>
 	<sheet_maplans>Documents cartographiques</sheet_maplans>
+	<sheet_lyr>Fichiers de couches</sheet_lyr>
 	<nomfic>Nom du fichier</nomfic>
 	<path>Chemin</path>
 	<browse>Atteindre le dossier</browse>

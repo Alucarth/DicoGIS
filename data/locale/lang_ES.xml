@@ -53,6 +53,7 @@
 	<sheet_filedb>Base de datos archivo</sheet_filedb>
 	<sheet_cdao>CAO y DAO</sheet_cdao>
 	<sheet_maplans>Documentos cartográficos</sheet_maplans>
+	<sheet_lyr>Archivos de capas</sheet_lyr>
 	<nomfic>Nombre del archivo</nomfic>
 	<path>Ruta</path>
 	<browse>Alcanzar la carpeta</browse>
