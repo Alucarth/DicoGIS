@@ -259,7 +259,7 @@ class md2xlsx(Workbook):
                                    column=self.li_cols_mapdocs.index(i) + 1).style = "Headline 2"
 
             # initialize line counter
-            self.idx_m = 1
+            self.idx_l = 1
         else:
             pass
 
@@ -287,6 +287,19 @@ class md2xlsx(Workbook):
                                   column=self.li_cols_sgbd.index(i) + 1).style = "Headline 2"
             # initialize line counter
             self.idx_s = 1
+        else:
+            pass
+
+        if has_lyr and "PostGIS" not in self.sheetnames:
+            self.ws_lyr = self.create_sheet(title="PostGIS")
+            # headers
+            self.ws_lyr.append([self.txt.get(i) for i in self.li_cols_lyr])
+            # styling
+            for i in self.li_cols_lyr:
+                self.ws_lyr.cell(row=1,
+                                 column=self.li_cols_lyr.index(i) + 1).style = "Headline 2"
+            # initialize line counter
+            self.idx_l = 1
         else:
             pass
 
@@ -1025,6 +1038,262 @@ class md2xlsx(Workbook):
         # end of method
         return
 
+    def store_md_lyr(self, layer):
+        """To store mapdocs information from DicoGIS."""
+        # increment line
+        self.idx_l += 1
+
+        # local variables
+        champs = ""
+
+        # in case of a source error
+        if "error" in mapdoc:
+            # sheet.row(line).set_style(self.xls_erreur)
+            err_mess = self.txt.get(mapdoc.get('error'))
+            logger.warning('\tproblem detected')
+            self.ws_mdocs["A{}".format(self.idx_l)] = mapdoc.get('name')
+            self.ws_mdocs["A{}".format(self.idx_l)].style = "Warning Text"
+            link = r'=HYPERLINK("{0}","{1}")'.format(mapdoc.get(u'folder'),
+                                                     self.txt.get('browse'))
+            self.ws_mdocs["B{}".format(self.idx_l)] = link
+            self.ws_mdocs["B{}".format(self.idx_l)].style = "Warning Text"
+            self.ws_mdocs["C{}".format(self.idx_l)] = err_mess
+            self.ws_mdocs["C{}".format(self.idx_l)].style = "Warning Text"
+            # Interruption of function
+            return False
+        else:
+            pass
+
+        # Name
+        self.ws_mdocs["A{}".format(self.idx_l)] = mapdoc.get('name')
+
+        # Path of parent folder formatted to be a hyperlink
+        link = r'=HYPERLINK("{0}","{1}")'.format(mapdoc.get(u'folder'),
+                                                 self.txt.get('browse'))
+        self.ws_mdocs["B{}".format(self.idx_l)] = link
+        self.ws_mdocs["B{}".format(self.idx_l)].style = "Hyperlink"
+        self.ws_mdocs["C{}".format(self.idx_l)] = path.dirname(mapdoc.get('folder'))
+        self.ws_mdocs["D{}".format(self.idx_l)] = mapdoc.get('title')
+        self.ws_mdocs["E{}".format(self.idx_l)] = mapdoc.get('creator_prod')
+        self.ws_mdocs["F{}".format(self.idx_l)] = mapdoc.get('keywords')
+        self.ws_mdocs["G{}".format(self.idx_l)] = mapdoc.get('subject')
+        self.ws_mdocs["H{}".format(self.idx_l)] = mapdoc.get('dpi')
+        self.ws_mdocs["I{}".format(self.idx_l)] = mapdoc.get('total_size')
+        self.ws_mdocs["J{}".format(self.idx_l)] = mapdoc.get('date_crea')
+        self.ws_mdocs["K{}".format(self.idx_l)] = mapdoc.get('date_actu')
+        self.ws_mdocs["L{}".format(self.idx_l)] = mapdoc.get('xOrigin')
+        self.ws_mdocs["M{}".format(self.idx_l)] = mapdoc.get('yOrigin')
+        self.ws_mdocs["N{}".format(self.idx_l)] = mapdoc.get('srs')
+        self.ws_mdocs["O{}".format(self.idx_l)] = mapdoc.get('srs_type')
+        self.ws_mdocs["P{}".format(self.idx_l)] = mapdoc.get('EPSG')
+        self.ws_mdocs["Q{}".format(self.idx_l)] = mapdoc.get('layers_count')
+        self.ws_mdocs["R{}".format(self.idx_l)] = mapdoc.get('total_fields')
+        self.ws_mdocs["S{}".format(self.idx_l)] = mapdoc.get('total_objs')
+
+        for (layer_idx, layer_name) in zip(mapdoc.get(u'layers_idx'),
+                                           mapdoc.get(u'layers_names')):
+            # increment line
+            self.idx_l += 1
+            champs = ""
+
+            # get the layer informations
+            try:
+                mdoc_layer = mapdoc.get('{0}_{1}'.format(layer_idx,
+                                                         layer_name))
+            except UnicodeDecodeError:
+                mdoc_layer = mapdoc.get('{0}_{1}'.format(layer_idx,
+                                                         unicode(layer_name.decode('latin1'))))
+            # in case of a source error
+            if mdoc_layer.get('error'):
+                err_mess = self.txt.get(mdoc_layer.get('error'))
+                logger.warning('\tproblem detected: \
+                                  {0} in {1}'.format(err_mess,
+                                                     mdoc_layer.get(u'title')))
+                self.ws_mdocs["Q{}".format(self.idx_f)] = mdoc_layer.get(u'title')
+                self.ws_mdocs["Q{}".format(self.idx_f)].style = "Warning Text"
+                self.ws_mdocs["R{}".format(self.idx_f)] = err_mess
+                self.ws_mdocs["R{}".format(self.idx_f)].style = "Warning Text"
+                # loop must go on
+                continue
+            else:
+                pass
+            # layer info
+            self.ws_mdocs["Q{}".format(self.idx_l)] = mdoc_layer.get('title')
+            self.ws_mdocs["R{}".format(self.idx_l)] = mdoc_layer.get('num_fields')
+            self.ws_mdocs["S{}".format(self.idx_l)] = mdoc_layer.get('num_objs')
+
+            # Field informations
+            fields = mdoc_layer.get(u'fields')
+            for chp in fields.keys():
+                # field type
+                if 'Integer' in fields[chp][0]:
+                    tipo = self.txt.get(u'entier')
+                elif fields[chp][0] == 'Real':
+                    tipo = self.txt.get(u'reel')
+                elif fields[chp][0] == 'String':
+                    tipo = self.txt.get(u'string')
+                elif fields[chp][0] == 'Date':
+                    tipo = self.txt.get(u'date')
+                else:
+                    tipo = "unknown"
+                    logger.warning(chp + " unknown type")
+
+                # concatenation of field informations
+                try:
+                    champs = champs + chp +\
+                              u" (" + tipo + self.txt.get(u'longueur') +\
+                              unicode(fields[chp][1]) +\
+                              self.txt.get(u'precision') +\
+                              unicode(fields[chp][2]) + u") ; "
+                except UnicodeDecodeError:
+                    logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
+                    # decode the fucking field name
+                    champs = champs + chp.decode('latin1') \
+                    + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
+                                                            fields[chp][1],
+                                                            fields[chp][2])
+                    # then continue
+                    continue
+
+            # Once all fieds explored, write them
+            self.ws_fdb["T{}".format(self.idx_f)] = champs
+
+        # end of method
+        return
+
+    # def dictionarize_lyr(self, mapdoc_infos, sheet, line):
+    #     u""" write the infos of the map document into the Excel workbook """
+    #     # in case of a source error
+    #     if mapdoc_infos.get('error'):
+    #         logger.warning('\tproblem detected')
+    #         # source name
+    #         sheet.write(line, 0, mapdoc_infos.get('name'))
+    #         # link to parent folder
+    #         link = 'HYPERLINK("{0}"; "{1}")'.format(mapdoc_infos.get(u'folder'),
+    #                                                 self.blabla.get('browse'))
+    #         sheet.write(line, 1, Formula(link), self.url)
+    #         sheet.write(line, 2, self.blabla.get(mapdoc_infos.get('error')),
+    #                     self.xls_erreur)
+    #         # incrementing line
+    #         mapdoc_infos['layers_count'] = 0
+    #         # exiting function
+    #         return sheet, line
+    #     else:
+    #         pass
+
+    #     # PDF source name
+    #     sheet.write(line, 0, mapdoc_infos.get('name'))
+
+    #     # Path of parent folder formatted to be a hyperlink
+    #     try:
+    #         link = 'HYPERLINK("{0}"; "{1}")'.format(mapdoc_infos.get(u'folder'),
+    #                                                 self.blabla.get('browse'))
+    #     except UnicodeDecodeError:
+    #         # write a notification into the log file
+    #         logger.warning('Path name with special letters: {}'.format(mapdoc_infos.get(u'folder').decode('utf8')))
+    #         # decode the fucking path name
+    #         link = 'HYPERLINK("{0}"; "{1}")'.format(mapdoc_infos.get(u'folder').decode('utf8'),
+    #                                                 self.blabla.get('browse'))
+
+    #     sheet.write(line, 1, Formula(link), self.url)
+
+    #     # Name of parent folder
+    #     sheet.write(line, 2, path.basename(mapdoc_infos.get(u'folder')))
+
+    #     # Document title
+    #     sheet.write(line, 3, mapdoc_infos.get(u'title'))
+
+    #     # Type of lyr
+    #     sheet.write(line, 4, mapdoc_infos.get(u'type'))
+
+    #     # Type of lyr
+    #     sheet.write(line, 5, mapdoc_infos.get(u'license'))
+
+    #     # subject
+    #     sheet.write(line, 6, mapdoc_infos.get(u'description'))
+
+    #     # total size
+    #     sheet.write(line, 8, mapdoc_infos.get(u'total_size'))
+
+    #     # Creation date
+    #     sheet.write(line, 9, mapdoc_infos.get(u'date_crea'), self.xls_date)
+    #     # Last update date
+    #     sheet.write(line, 10, mapdoc_infos.get(u'date_actu'), self.xls_date)
+
+    #     if mapdoc_infos.get(u'type') in ['Feature', 'Raster']:
+    #         # Spatial extent
+    #         emprise = u"Xmin : {0} - Xmax : {1} \
+    #                    \nYmin : {2} - Ymax : {3}".format(unicode(mapdoc_infos.get(u'Xmin')),
+    #                                                      unicode(mapdoc_infos.get(u'Xmax')),
+    #                                                      unicode(mapdoc_infos.get(u'Ymin')),
+    #                                                      unicode(mapdoc_infos.get(u'Ymax'))
+    #                                                      )
+    #         sheet.write(line, 11, emprise, self.xls_wrap)
+
+    #         # SRS name
+    #         sheet.write(line, 13, mapdoc_infos.get(u'srs'))
+    #         # Type of SRS
+    #         sheet.write(line, 14, mapdoc_infos.get(u'srs_type'))
+    #         # EPSG code
+    #         sheet.write(line, 15, mapdoc_infos.get(u'EsriSRS')[0])
+    #     else:
+    #         pass
+
+    #     if mapdoc_infos.get(u'type') == u'Group':
+    #         # Layers count
+    #         sheet.write(line, 16, mapdoc_infos.get(u'layers_count'))
+    #         # layer's name
+    #         sheet.write(line + 1, 16, ' ; '.join(mapdoc_infos.get(u'layers_names')))
+    #     else:
+    #         pass
+
+    #     if mapdoc_infos.get(u'type') == u'Feature':
+    #         # number of fields
+    #         sheet.write(line, 17, mapdoc_infos.get(u'num_fields'))
+
+    #         # number of objects
+    #         sheet.write(line, 18, mapdoc_infos.get(u'num_obj'))
+
+    #         # definition query
+    #         sheet.write(line, 7, mapdoc_infos.get(u'defquery'))
+
+    #         # fields domain
+    #         fields_info = mapdoc_infos.get(u'fields')
+    #         champs = ""
+    #         for chp in fields_info.keys():
+    #             tipo = fields_info.get(chp)[0]
+    #             # concatenation of field informations
+    #             try:
+    #                 champs = champs + chp +\
+    #                           u" (" + tipo + self.blabla.get(u'longueur') +\
+    #                           unicode(fields_info.get(chp)[1]) +\
+    #                           self.blabla.get(u'precision') +\
+    #                           unicode(fields_info.get(chp)[2]) + u") ; "
+    #             except UnicodeDecodeError:
+    #                 # write a notification into the log file
+    #                 self.dico_err[layer_infos.get('name')] = self.blabla.get(u'err_encod')\
+    #                                                     + chp.decode('latin1') \
+    #                                                     + u"\n\n"
+    #                 logger.warning('Field name with special letters: {}'.format(chp.decode('latin1')))
+    #                 # decode the fucking field name
+    #                 champs = champs + chp.decode('latin1') \
+    #                 + u" ({}, Lg. = {}, Pr. = {}) ;".format(tipo,
+    #                                                         fields_info.get(chp)[1],
+    #                                                         fields_info.get(chp)[2])
+    #                 # then continue
+    #                 continue
+
+    #         # Once all fieds explored, write them
+    #         sheet.write(line, 19, champs)
+
+    #         # write layer's name into the log
+    #         # logger.info('\t -- {0} = OK'.format(mapdoc_layer.get(u'title')))
+
+    #     else:
+    #         pass
+
+    #     # End of function
+    #     return self.feuyMAPS, line
 # ############################################################################
 # ##### Stand alone program ########
 # ##################################
