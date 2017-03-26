@@ -21,17 +21,11 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 # ##################################
 
 # Standard library
-from Tkinter import Tk, StringVar, IntVar, Image    # GUI
-from Tkinter import W, PhotoImage, ACTIVE, DISABLED, END, VERTICAL
-from tkFileDialog import askdirectory
-from tkMessageBox import showinfo as info, showerror as avert
-from ttk import Combobox, Progressbar, Style, Labelframe, Frame
-from ttk import Label, Button, Entry, Checkbutton, Separator
-import tkFont   # font library
+from Tkinter import PhotoImage, StringVar, Tk, VERTICAL
+from ttk import Frame, Label, Separator
 
 import logging
 from os import path
-from webbrowser import open_new_tab
 
 # ##############################################################################
 # ############ Globals ############
