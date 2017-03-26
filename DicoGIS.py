@@ -21,20 +21,19 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 # ##################################
 
 # Standard library
-from Tkinter import Tk, StringVar, IntVar, Image    # GUI
-from Tkinter import W, PhotoImage, ACTIVE, DISABLED, END
+from Tkinter import Tk, StringVar, Image
+from Tkinter import ACTIVE, DISABLED, END
 from tkFileDialog import askdirectory
 from tkMessageBox import showinfo as info, showerror as avert
-from ttk import Combobox, Progressbar, Style, Labelframe, Frame
-from ttk import Label, Button, Entry, Checkbutton, Notebook  # widgets
+from ttk import Combobox, Progressbar, Style, Labelframe
+from ttk import Label, Button, Entry, Notebook
 import tkFont   # font library
 
 import locale
 from sys import exit, platform as opersys
-from os import listdir, walk, path         # files and folder managing
+from os import listdir, walk, path
 from os import environ as env
 from time import strftime
-from webbrowser import open_new
 import threading    # handling various subprocesses
 
 import platform  # about operating systems
@@ -68,7 +67,11 @@ from modules import TextsManager
 
 # custom UI
 from modules import MiscButtons
-
+from modules import TabFiles
+from modules import TabIsogeo
+from modules import TabServices
+from modules import TabSettings
+from modules import TabSGBD
 
 # ##############################################################################
 # ############ Globals ############
@@ -198,11 +201,13 @@ class DicoGIS(Tk):
         # Notebook
         self.nb = Notebook(self)
         # tabs
-        self.tab_files = Frame(self.nb)         # tab_id = 0
-        self.tab_sgbd = Frame(self.nb)          # tab_id = 1
-        self.tab_webservices = Frame(self.nb)   # tab_id = 2
-        self.tab_isogeo = Frame(self.nb)        # tab_id = 3
-        self.tab_options = Frame(self.nb)       # tab_id = 4
+        self.tab_files = TabFiles(self.nb, self.blabla,
+                                  self.setpathtarg)     # tab_id = 0
+        self.tab_sgbd = TabSGBD(self.nb)
+        self.tab_webservices = TabServices(self.nb)     # tab_id = 2
+        self.tab_isogeo = TabIsogeo(self.nb, self.blabla, "")  # tab_id = 3
+        self.tab_options = TabSettings(self.nb, self.blabla,
+                                       utils_global.ui_switch)   # tab_id = 4
 
         # fillfulling text
         TextsManager().load_texts(dico_texts=self.blabla,
@@ -215,368 +220,28 @@ class DicoGIS(Tk):
                     text=self.blabla.get('gui_tab1'),
                     padding=3)
 
-        # Frame: target folder
-        self.FrPath = Labelframe(self.tab_files,
-                                 name='files',
-                                 text=self.blabla.get('gui_fr1'))
-        # target folder
-        self.labtarg = Label(self.FrPath, text=self.blabla.get('gui_path'))
-        self.target = Entry(master=self.FrPath, width=35)
-        self.browsetarg = Button(self.FrPath,       # browse button
-                                 text=self.blabla.get('gui_choix'),
-                                 command=lambda: self.setpathtarg(),
-                                 takefocus=True)
-        self.browsetarg.focus_force()               # force the focus on
-
-        # widgets placement
-        self.labtarg.grid(row=1, column=1, columnspan=1,
-                          sticky="NSWE", padx=2, pady=2)
-        self.target.grid(row=1, column=2, columnspan=1,
-                         sticky="NSWE", padx=2, pady=2)
-        self.browsetarg.grid(row=1, column=3,
-                             sticky="NSWE", padx=2, pady=2)
-
-        # Frame: filters of formats
-        self.FrFilters = Labelframe(self.tab_files,
-                                    name='filters',
-                                    text=self.blabla.get('gui_fr3'))
-        # formats options
-        self.opt_shp = IntVar(self.FrFilters)   # able/disable shapefiles
-        self.opt_tab = IntVar(self.FrFilters)   # able/disable MapInfo tables
-        self.opt_kml = IntVar(self.FrFilters)   # able/disable KML
-        self.opt_gml = IntVar(self.FrFilters)   # able/disable GML
-        self.opt_geoj = IntVar(self.FrFilters)  # able/disable GeoJSON
-        self.opt_gxt = IntVar(self.FrFilters)  # able/disable GXT
-        self.opt_egdb = IntVar(self.FrFilters)  # able/disable Esri FileGDB
-        self.opt_spadb = IntVar(self.FrFilters)  # able/disable Spatalite DB
-        self.opt_rast = IntVar(self.FrFilters)  # able/disable rasters
-        self.opt_cdao = IntVar(self.FrFilters)  # able/disable CAO/DAO files
-        self.opt_pdf = IntVar(self.FrFilters)   # able/disable Geospatial PDF
-        self.opt_lyr = IntVar(self.FrFilters)   # able/disable Geospatial Lyr
-        self.opt_mxd = IntVar(self.FrFilters)   # able/disable Geospatial MXD
-        self.opt_qgs = IntVar(self.FrFilters)   # able/disable Geospatial QGS
-
-        # format choosen: check buttons
-        caz_shp = Checkbutton(self.FrFilters,
-                              text=u'.shp',
-                              variable=self.opt_shp)
-        caz_tab = Checkbutton(self.FrFilters,
-                              text=u'.tab',
-                              variable=self.opt_tab)
-        caz_kml = Checkbutton(self.FrFilters,
-                              text=u'.kml',
-                              variable=self.opt_kml)
-        caz_gml = Checkbutton(self.FrFilters,
-                              text=u'.gml',
-                              variable=self.opt_gml)
-        caz_geoj = Checkbutton(self.FrFilters,
-                               text=u'.geojson',
-                               variable=self.opt_geoj)
-        caz_gxt = Checkbutton(self.FrFilters,
-                              text=u'.gxt',
-                              variable=self.opt_gxt)
-        caz_egdb = Checkbutton(self.FrFilters,
-                               text=u'Esri FileGDB',
-                               variable=self.opt_egdb)
-        caz_spadb = Checkbutton(self.FrFilters,
-                                text=u'Spatialite',
-                                variable=self.opt_spadb)
-        caz_rast = Checkbutton(self.FrFilters,
-                               text=u'rasters ({0})'.format(', '.join(self.li_raster_formats)),
-                               variable=self.opt_rast)
-        caz_cdao = Checkbutton(self.FrFilters,
-                               text=u'CAO/DAO',
-                               variable=self.opt_cdao)
-        caz_pdf = Checkbutton(self.FrFilters,
-                              text=u'Geospatial PDF',
-                              variable=self.opt_pdf)
-        caz_lyr = Checkbutton(self.FrFilters,
-                              text=u'.lyr',
-                              variable=self.opt_lyr)
-        caz_mxd = Checkbutton(self.FrFilters,
-                              text=u'.mxd',
-                              variable=self.opt_mxd)
-        caz_qgs = Checkbutton(self.FrFilters,
-                              text=u'.qgs',
-                              variable=self.opt_qgs)
-        # widgets placement
-        caz_shp.grid(row=1,
-                     column=0,
-                     sticky="NSWE",
-                     padx=2, pady=2)
-        caz_tab.grid(row=1,
-                     column=1,
-                     sticky="NSWE",
-                     padx=2, pady=2)
-        caz_kml.grid(row=1,
-                     column=2,
-                     sticky="NSWE",
-                     padx=2, pady=2)
-        caz_gml.grid(row=1,
-                     column=3,
-                     sticky="NSWE",
-                     padx=2, pady=2)
-        caz_geoj.grid(row=1,
-                      column=4,
-                      sticky="NSWE",
-                      padx=2, pady=2)
-        caz_gxt.grid(row=1,
-                     column=7,
-                     sticky="NSWE",
-                     padx=2, pady=2)
-        caz_pdf.grid(row=1,
-                     column=5,
-                     columnspan=2,
-                     sticky="NSWE",
-                     padx=2, pady=2)
-        caz_rast.grid(row=2,
-                      column=0,
-                      columnspan=2,
-                      sticky="NSWE",
-                      padx=2, pady=2)
-        caz_egdb.grid(row=2,
-                      column=2,
-                      columnspan=2,
-                      sticky="NSWE",
-                      padx=2, pady=2)
-        caz_cdao.grid(row=2,
-                      column=4,
-                      columnspan=1,
-                      sticky="NSWE",
-                      padx=2, pady=2)
-        caz_spadb.grid(row=2,
-                       column=5,
-                       columnspan=2,
-                       sticky="NSWE",
-                       padx=2, pady=2)
-        caz_lyr.grid(row=3,
-                     column=0,
-                     columnspan=2,
-                     sticky="NSWE",
-                     padx=2, pady=2)
-        caz_mxd.grid(row=3,
-                     column=1,
-                     columnspan=2,
-                     sticky="NSWE",
-                     padx=2, pady=2)
-        caz_qgs.grid(row=3,
-                     column=2,
-                     columnspan=2,
-                     sticky="NSWE",
-                     padx=2, pady=2)
-
-        # frames placement
-        self.FrPath.grid(row=3, column=1,
-                         padx=2, pady=2, sticky="NSWE")
-        self.FrFilters.grid(row=4, column=1,
-                            padx=2, pady=2, sticky="NSWE")
-
 # =================================================================================
 
         # ## TAB 2: Database ##
         self.nb.add(self.tab_sgbd,
                     text=self.blabla.get('gui_tab2'), padding=3)
 
-        # subframe
-        self.FrDb = Labelframe(self.tab_sgbd,
-                               name='database',
-                               text=self.blabla.get('gui_fr2'))
-
-        # DB variables
-        self.opt_pgvw = IntVar(self.FrDb)   # able/disable PostGIS views
-        self.host = StringVar(self.FrDb, 'localhost')
-        self.port = IntVar(self.FrDb, 5432)
-        self.dbnb = StringVar(self.FrDb)
-        self.user = StringVar(self.FrDb, 'postgres')
-        self.pswd = StringVar(self.FrDb)
-
-        # Form widgets
-        self.ent_H = Entry(self.FrDb, textvariable=self.host)
-        self.ent_P = Entry(self.FrDb, textvariable=self.port, width=5)
-        self.ent_D = Entry(self.FrDb, textvariable=self.dbnb)
-        self.ent_U = Entry(self.FrDb, textvariable=self.user)
-        self.ent_M = Entry(self.FrDb, textvariable=self.pswd, show='*')
-
-        caz_pgvw = Checkbutton(self.FrDb,
-                               text=self.blabla.get('gui_views'),
-                               variable=self.opt_pgvw)
-
-        # Label widgets
-        self.lb_H = Label(self.FrDb, text=self.blabla.get('gui_host'))
-        self.lb_P = Label(self.FrDb, text=self.blabla.get('gui_port'))
-        self.lb_D = Label(self.FrDb, text=self.blabla.get('gui_db'))
-        self.lb_U = Label(self.FrDb, text=self.blabla.get('gui_user'))
-        self.lb_M = Label(self.FrDb, text=self.blabla.get('gui_mdp'))
-        # widgets placement
-        self.ent_H.grid(row=1, column=1, columnspan=2,
-                        sticky="NSEW", padx=2, pady=2)
-        self.ent_P.grid(row=1, column=3, columnspan=1,
-                        sticky="NSE", padx=2, pady=2)
-        self.ent_D.grid(row=2, column=1, columnspan=1,
-                        sticky="NSEW", padx=2, pady=2)
-        self.ent_U.grid(row=2, column=3, columnspan=1,
-                        sticky="NSEW", padx=2, pady=2)
-        self.ent_M.grid(row=3, column=1, columnspan=3,
-                        sticky="NSEW", padx=2, pady=2)
-        self.lb_H.grid(row=1, column=0,
-                       sticky="NSEW", padx=2, pady=2)
-        self.lb_P.grid(row=1, column=3,
-                       sticky="NSW", padx=2, pady=2)
-        self.lb_D.grid(row=2, column=0,
-                       sticky="NSW", padx=2, pady=2)
-        self.lb_U.grid(row=2, column=2,
-                       sticky="NSW", padx=2, pady=2)
-        self.lb_M.grid(row=3, column=0,
-                       sticky="NSWE", padx=2, pady=2)
-        caz_pgvw.grid(row=4, column=0,
-                      sticky="NSWE", padx=2, pady=2)
-
-        # frame position
-        self.FrDb.grid(row=3, column=1, sticky="NSWE", padx=2, pady=2)
-
 # =================================================================================
         # ## TAB 3: web services ##
         self.nb.add(self.tab_webservices,
                     text=self.blabla.get('gui_tab3'), padding=3)
-        # variables
-        self.url_service = StringVar(self.tab_webservices,
-                                     'http://suite.opengeo.org/geoserver/wfs?request=GetCapabilities')
-
-        # widgets
-        self.lb_url_service = Label(self.tab_webservices,
-                                    text='OpenCatalog')
-        self.ent_url_service = Entry(self.tab_webservices,
-                                     width=75,
-                                     textvariable=self.url_service)
-
-        # widgets placement
-        self.ent_url_service.grid(row=0, column=1,
-                                  sticky="NSWE", padx=2, pady=2)
 
 # =================================================================================
 
         # ## TAB 4: Isogeo ##
         self.nb.add(self.tab_isogeo,
                     text='Isogeo', padding=3)
-        # variables
-        self.url_OpenCatalog = StringVar(self.tab_isogeo, 'http://open.isogeo.com')
-        # widgets
-        self.lb_urlOC = Label(self.tab_isogeo,
-                              text='OpenCatalog')
-        self.ent_urlOC = Entry(self.tab_isogeo,
-                               width=75,
-                               textvariable=self.url_OpenCatalog)
-        # widgets placement
-        self.lb_urlOC.grid(row=0, column=1,
-                           sticky="NSWE", padx=2, pady=2)
-        self.ent_urlOC.grid(row=0, column=2, columnspan=2,
-                            sticky="NSWE", padx=2, pady=2)
 
 # =================================================================================
 
         # ## TAB 5: Options ##
         self.nb.add(self.tab_options,
                     text='Options', padding=3)
-
-        # subframes
-
-        self.FrOptProxy = Frame(self.tab_options,
-                                name='settings-proxy',
-                                # text=self.blabla.get('gui_fr2')
-                                )
-        self.FrOptIsogeo = Frame(self.tab_options,
-                                 name='settings-isogeo',
-                                 # text='Isogeo'
-                                 )
-
-        # options values
-        self.opt_proxy = IntVar(self.tab_options)  # proxy option
-        self.opt_isogeo = IntVar(self.tab_options)  # Isogeo option
-
-        # Options form widgets
-        caz_prox = Checkbutton(self.tab_options,
-                               text=u'Proxy',
-                               variable=self.opt_proxy,
-                               command=lambda: self.ui_switch(self.opt_proxy,
-                                                              self.FrOptProxy))
-        caz_isogeo = Checkbutton(self.tab_options,
-                                 text=u'Isogeo',
-                                 variable=self.opt_isogeo,
-                                 command=lambda: self.ui_switch(self.opt_isogeo,
-                                                                self.FrOptIsogeo))
-
-        # positionning
-        caz_prox.grid(row=0, column=0,
-                      sticky="NSWE", padx=2, pady=2)
-        self.FrOptProxy.grid(row=0, column=1, columnspan=8,
-                             sticky="NSWE", padx=2, pady=2,
-                             rowspan=3)
-        caz_isogeo.grid(row=3, column=0,
-                        sticky="NSWE", padx=2, pady=2)
-        self.FrOptIsogeo.grid(row=3, column=1, columnspan=8,
-                              sticky="NSWE", padx=2, pady=2,
-                              rowspan=4)
-
-        # ------------------------------------------------------------------------
-        # proxy specific variables
-        self.opt_ntlm = IntVar(self.FrOptProxy, 0)  # proxy NTLM protocol option
-        self.prox_server = StringVar(self.FrOptProxy, 'proxy.server.com')
-        self.prox_port = IntVar(self.FrOptProxy, 80)
-        self.prox_user = StringVar(self.FrOptProxy, 'proxy_user')
-        self.prox_pswd = StringVar(self.FrOptProxy, '****')
-
-        # widgets
-        self.prox_ent_H = Entry(self.FrOptProxy, textvariable=self.prox_server)
-        self.prox_ent_P = Entry(self.FrOptProxy, textvariable=self.prox_port)
-        self.prox_ent_M = Entry(self.FrOptProxy, textvariable=self.prox_pswd, show='*')
-
-        self.prox_lb_H = Label(self.FrOptProxy, text=self.blabla.get('gui_prox_server'))
-        self.prox_lb_P = Label(self.FrOptProxy, text=self.blabla.get('gui_port'))
-        caz_ntlm = Checkbutton(self.FrOptProxy,
-                               text=u'NTLM',
-                               variable=self.opt_ntlm)
-        self.prox_lb_M = Label(self.FrOptProxy, text=self.blabla.get('gui_mdp'))
-
-        # proxy widgets position
-        self.prox_lb_H.grid(row=1, column=0,
-                            sticky="NSEW", padx=2, pady=2)
-        self.prox_ent_H.grid(row=1, column=1, columnspan=2,
-                             sticky="NSEW", padx=2, pady=2)
-        self.prox_lb_P.grid(row=1, column=2,
-                            sticky="NSEW", padx=2, pady=2)
-        self.prox_ent_P.grid(row=1, column=3, columnspan=2,
-                             sticky="NSEW", padx=2, pady=2)
-        caz_ntlm.grid(row=2, column=0,
-                      sticky="NSEW", padx=2, pady=2)
-        self.prox_lb_M.grid(row=2, column=1,
-                            sticky="NSEW", padx=2, pady=2)
-        self.prox_ent_M.grid(row=2, column=2, columnspan=2,
-                             sticky="NSEW", padx=2, pady=2)
-
-        # ------------------------------------------------------------------------
-        # Isogeo application variables
-        self.isog_app_id = StringVar(self.FrOptIsogeo, 'application_id')
-        self.isog_app_tk = StringVar(self.FrOptIsogeo, 'secret')
-
-        # widgets
-        isog_ent_id = Entry(self.FrOptIsogeo,
-                            textvariable=self.isog_app_id)
-        isog_ent_tk = Entry(self.FrOptIsogeo,
-                            textvariable=self.isog_app_tk)
-
-        isog_lb_id = Label(self.FrOptIsogeo, text="Application ID")
-        isog_lb_tk = Label(self.FrOptIsogeo, text="Application secret")
-
-        # Isogeo widgets position
-        isog_lb_id.grid(row=1, column=1,
-                        sticky="NSEW", padx=2, pady=2)
-        isog_ent_id.grid(row=1, column=2, columnspan=2,
-                         sticky="NSEW", padx=2, pady=2)
-        isog_lb_tk.grid(row=2, column=1,
-                        sticky="NSEW", padx=2, pady=2)
-        isog_ent_tk.grid(row=2, column=2, columnspan=2,
-                         sticky="NSEW", padx=2, pady=2)
-
 
 # =================================================================================
         # ## MAIN FRAME ##
@@ -615,26 +280,10 @@ class DicoGIS(Tk):
         # widgets placement
         self.prog_layers.pack(expand=1, fill='both')
 
-        # logo
-        self.icone = PhotoImage(file=r'data/img/DicoGIS_logo.gif')
-        Label(self,
-              borderwidth=2,
-              image=self.icone).grid(row=1, rowspan=2,
-                                     column=0, padx=2,
-                                     pady=2, sticky=W)
-        # credits
-        s = Style(self)
-        s.configure('Kim.TButton', foreground='DodgerBlue', borderwidth=0)
-        Button(self,
-               text='by @GeoJulien\nGPL3 - 2016',
-               style='Kim.TButton',
-               command=lambda: open_new('https://github.com/Guts/DicoGIS')).grid(row=3,
-                                                                                 padx=2,
-                                                                                 pady=2,
-                                                                                 sticky="WE")
         # miscellaneous
-        misc_frame = MiscButtons(self)
-        misc_frame.grid(row=4,
+        misc_frame = MiscButtons(self, "")
+        misc_frame.grid(row=2,
+                        rowspan=3,
                         padx=2,
                         pady=2,
                         sticky="NSWE")
@@ -676,17 +325,17 @@ class DicoGIS(Tk):
         self.change_lang(1)
 
         # set UI options tab
-        self.ui_switch(self.opt_proxy,
-                       self.FrOptProxy)
-        self.ui_switch(self.opt_isogeo,
-                       self.FrOptIsogeo)
+        utils_global.ui_switch(self.tab_options.opt_proxy,
+                               self.tab_options.FrOptProxy)
+        utils_global.ui_switch(self.tab_options.opt_isogeo,
+                               self.tab_options.FrOptIsogeo)
 
         # check ArcPy
         if opersys != 'win32' or not checker.check_arcpy()[0]:
-            caz_lyr.config(state=DISABLED)
-            caz_mxd.config(state=DISABLED)
-            self.opt_lyr.set(0)
-            self.opt_mxd.set(0)
+            self.tab_files.caz_lyr.config(state=DISABLED)
+            self.tab_files.caz_mxd.config(state=DISABLED)
+            self.tab_files.opt_lyr.set(0)
+            self.tab_files.opt_mxd.set(0)
         else:
             pass
 
@@ -694,7 +343,7 @@ class DicoGIS(Tk):
         if not checker.check_internet_connection():
             self.nb.tab(2, state=DISABLED)
             self.nb.tab(3, state=DISABLED)
-        elif self.opt_isogeo.get() == 0:
+        elif self.tab_options.opt_isogeo.get() == 0:
             self.nb.tab(3, state=DISABLED)
         else:
             # checking Isogeo
@@ -713,21 +362,6 @@ class DicoGIS(Tk):
 
 # =================================================================================
 
-    def ui_switch(self, cb_value, parent):
-        """Change state of  all children widgets within a parent class.
-
-        cb_value=boolean
-        parent=Tkinter class with children (Frame, Labelframe, Tk, etc.)
-        """
-        if cb_value.get():
-            for child in parent.winfo_children():
-                child.configure(state=ACTIVE)
-        else:
-            for child in parent.winfo_children():
-                child.configure(state=DISABLED)
-        # end of function
-        return
-
     def change_lang(self, event):
         u"""Update the texts dictionary with the language selected."""
         new_lang = self.ddl_lang.get()
@@ -738,20 +372,20 @@ class DicoGIS(Tk):
         # update widgets text
         self.welcome.config(text=self.blabla.get('hi') + self.uzer)
         self.can.config(text=self.blabla.get('gui_quit'))
-        self.FrPath.config(text=self.blabla.get('gui_fr1'))
-        self.FrDb.config(text=self.blabla.get('gui_fr2'))
-        self.FrFilters.config(text=self.blabla.get('gui_fr3'))
-        self.FrOutp.config(text=self.blabla.get('gui_fr4'))
-        self.FrProg.config(text=self.blabla.get('gui_prog'))
-        self.labtarg.config(text=self.blabla.get('gui_path'))
-        self.browsetarg.config(text=self.blabla.get('gui_choix'))
-        self.val.config(text=self.blabla.get('gui_go'))
+        self.tab_files.FrPath.config(text=self.blabla.get('gui_fr1'))
+        self.tab_sgbd.FrDb.config(text=self.blabla.get('gui_fr2'))
+        self.tab_files.FrFilters.config(text=self.blabla.get('gui_fr3'))
+        self.FrOutp.config(text=self.blabla.get('gui_fr4', "Output"))
+        self.FrProg.config(text=self.blabla.get('gui_prog', "Progression"))
+        self.tab_files.labtarg.config(text=self.blabla.get('gui_path'))
+        self.tab_files.browsetarg.config(text=self.blabla.get('gui_choix'))
+        self.val.config(text=self.blabla.get('gui_go', "Launch"))
         self.nameoutput.config(text=self.blabla.get('gui_fic'))
-        self.lb_H.config(text=self.blabla.get('gui_host'))
-        self.lb_P.config(text=self.blabla.get('gui_port'))
-        self.lb_D.config(text=self.blabla.get('gui_db'))
-        self.lb_U.config(text=self.blabla.get('gui_user'))
-        self.lb_M.config(text=self.blabla.get('gui_mdp'))
+        self.tab_sgbd.lb_H.config(text=self.blabla.get('gui_host'))
+        self.tab_sgbd.lb_P.config(text=self.blabla.get('gui_port'))
+        self.tab_sgbd.lb_D.config(text=self.blabla.get('gui_db'))
+        self.tab_sgbd.lb_U.config(text=self.blabla.get('gui_user'))
+        self.tab_sgbd.lb_M.config(text=self.blabla.get('gui_mdp'))
 
         # setting locale according to the language passed
         try:
@@ -771,7 +405,7 @@ class DicoGIS(Tk):
                     locale.setlocale(locale.LC_ALL, str("en_GB.utf8"))
 
             logger.info("Language switched to: {0}"\
-                         .format(self.ddl_lang.get()))
+                        .format(self.ddl_lang.get()))
         except locale.Error:
             logger.error('Selected locale is not installed')
 
@@ -789,8 +423,8 @@ class DicoGIS(Tk):
         # check if a folder has been choosen
         if foldername:
             try:
-                self.target.delete(0, END)
-                self.target.insert(0, foldername)
+                self.tab_files.target.delete(0, END)
+                self.tab_files.target.insert(0, foldername)
             except:
                 info(title=self.blabla.get('nofolder'),
                      message=self.blabla.get('nofolder'))
@@ -800,7 +434,7 @@ class DicoGIS(Tk):
         # set the default output file
         self.output.delete(0, END)
         self.output.insert(0,
-                           "DicoGIS_{0}_{1}.xlsx".format(path.split(self.target.get())[1],
+                           "DicoGIS_{0}_{1}.xlsx".format(path.split(self.tab_files.target.get())[1],
                                                         self.today))
         # count geofiles in a separated thread
         proc = threading.Thread(target=self.ligeofiles,
@@ -832,7 +466,7 @@ class DicoGIS(Tk):
         self.li_lyr = []
         self.li_mxd = []
         self.li_qgs = []
-        self.browsetarg.config(state=DISABLED)
+        self.tab_files.browsetarg.config(state=DISABLED)
 
         # Looping in folders structure
         self.status.set(self.blabla.get('gui_prog1'))
@@ -1046,7 +680,7 @@ class DicoGIS(Tk):
                                 self.blabla.get('log_numfold')))
 
         # reactivating the buttons
-        self.browsetarg.config(state=ACTIVE)
+        self.tab_files.browsetarg.config(state=ACTIVE)
         self.val.config(state=ACTIVE)
         # End of function
         return foldertarget, self.li_shp, self.li_tab, self.li_kml,\
@@ -1100,10 +734,10 @@ class DicoGIS(Tk):
     def process_files(self):
         u"""Launch the different processes."""
         # check if at least a format has been choosen
-        if (self.opt_shp.get() + self.opt_tab.get() + self.opt_kml.get() +
-           self.opt_gml.get() + self.opt_geoj.get() + self.opt_rast.get() +
-           self.opt_egdb.get() + self.opt_cdao.get() + self.opt_pdf.get() +
-           self.opt_lyr.get()):
+        if (self.tab_files.opt_shp.get() + self.tab_files.opt_tab.get() + self.tab_files.opt_kml.get() +
+           self.tab_files.opt_gml.get() + self.tab_files.opt_geoj.get() + self.tab_files.opt_rast.get() +
+           self.tab_files.opt_egdb.get() + self.tab_files.opt_cdao.get() + self.tab_files.opt_pdf.get() +
+           self.tab_files.opt_lyr.get()):
             pass
         else:
             avert('DicoGIS - User error', self.blabla.get('noformat'))
@@ -1126,62 +760,62 @@ class DicoGIS(Tk):
 
         # sheets and progress bar
         total_files = 0
-        if self.opt_shp.get() and len(self.li_shp):
+        if self.tab_files.opt_shp.get() and len(self.li_shp):
             total_files += len(self.li_shp)
             self.wb.set_worksheets(has_vector=1)
         else:
             pass
-        if self.opt_tab.get() and len(self.li_tab):
+        if self.tab_files.opt_tab.get() and len(self.li_tab):
             total_files += len(self.li_tab)
             self.wb.set_worksheets(has_vector=1)
         else:
             pass
-        if self.opt_kml.get()and len(self.li_kml):
+        if self.tab_files.opt_kml.get()and len(self.li_kml):
             total_files += len(self.li_kml)
             self.wb.set_worksheets(has_vector=1)
         else:
             pass
-        if self.opt_gml.get() and len(self.li_gml):
+        if self.tab_files.opt_gml.get() and len(self.li_gml):
             total_files += len(self.li_gml)
             self.wb.set_worksheets(has_vector=1)
         else:
             pass
-        if self.opt_geoj.get() and len(self.li_geoj):
+        if self.tab_files.opt_geoj.get() and len(self.li_geoj):
             total_files += len(self.li_geoj)
             self.wb.set_worksheets(has_vector=1)
         else:
             pass
-        if self.opt_gxt.get() and len(self.li_gxt):
+        if self.tab_files.opt_gxt.get() and len(self.li_gxt):
             total_files += len(self.li_gxt)
             self.wb.set_worksheets(has_vector=1)
         else:
             pass
-        if self.opt_rast.get() and len(self.li_raster):
+        if self.tab_files.opt_rast.get() and len(self.li_raster):
             total_files += len(self.li_raster)
             self.wb.set_worksheets(has_raster=1)
         else:
             pass
-        if self.opt_egdb.get() and len(self.li_egdb):
+        if self.tab_files.opt_egdb.get() and len(self.li_egdb):
             total_files += len(self.li_egdb)
             self.wb.set_worksheets(has_filedb=1)
         else:
             pass
-        if self.opt_spadb.get() and len(self.li_spadb):
+        if self.tab_files.opt_spadb.get() and len(self.li_spadb):
             total_files += len(self.li_spadb)
             self.wb.set_worksheets(has_filedb=1)
         else:
             pass
-        if self.opt_cdao.get() and len(self.li_cdao):
+        if self.tab_files.opt_cdao.get() and len(self.li_cdao):
             total_files += len(self.li_cdao)
             self.wb.set_worksheets(has_cad=1)
         else:
             pass
-        if self.opt_pdf.get() and len(self.li_pdf):
+        if self.tab_files.opt_pdf.get() and len(self.li_pdf):
             total_files += len(self.li_pdf)
             self.wb.set_worksheets(has_mapdocs=1)
         else:
             pass
-        if self.opt_lyr.get() and len(self.li_lyr):
+        if self.tab_files.opt_lyr.get() and len(self.li_lyr):
             total_files += len(self.li_lyr)
             self.wb.set_worksheets(has_lyr=1)
         else:
@@ -1198,7 +832,7 @@ class DicoGIS(Tk):
         line_cdao = 1       # line rank of CAO/DAO dictionary
         line_maps = 1       # line rank of maps & plans dictionary
 
-        if self.opt_shp.get() and len(self.li_shp) > 0:
+        if self.tab_files.opt_shp.get() and len(self.li_shp) > 0:
             logger.info('\n\tProcessing shapefiles: start')
             for shp in self.li_shp:
                 """ looping on shapefiles list """
@@ -1230,7 +864,7 @@ class DicoGIS(Tk):
             logger.info('\tIgnoring {0} shapefiles'.format(len(self.li_shp)))
             pass
 
-        if self.opt_tab.get() and len(self.li_tab) > 0:
+        if self.tab_files.opt_tab.get() and len(self.li_tab) > 0:
             logger.info('\n\tProcessing MapInfo tables: start')
             for tab in self.li_tab:
                 """ looping on MapInfo tables list """
@@ -1261,7 +895,7 @@ class DicoGIS(Tk):
             logger.info('\tIgnoring {0} MapInfo tables'.format(len(self.li_tab)))
             pass
 
-        if self.opt_kml.get() and len(self.li_kml) > 0:
+        if self.tab_files.opt_kml.get() and len(self.li_kml) > 0:
             logger.info('\n\tProcessing KML-KMZ: start')
             for kml in self.li_kml:
                 """ looping on KML/KMZ list """
@@ -1291,7 +925,7 @@ class DicoGIS(Tk):
             logger.info('\tIgnoring {0} KML'.format(len(self.li_kml)))
             pass
 
-        if self.opt_gml.get() and len(self.li_gml) > 0:
+        if self.tab_files.opt_gml.get() and len(self.li_gml) > 0:
             logger.info('\n\tProcessing GML: start')
             for gml in self.li_gml:
                 """ looping on GML list """
@@ -1321,7 +955,7 @@ class DicoGIS(Tk):
             logger.info('\tIgnoring {0} GML'.format(len(self.li_gml)))
             pass
 
-        if self.opt_geoj.get() and len(self.li_geoj) > 0:
+        if self.tab_files.opt_geoj.get() and len(self.li_geoj) > 0:
             logger.info('\n\tProcessing GeoJSON: start')
             for geojson in self.li_geoj:
                 """ looping on GeoJSON list """
@@ -1351,7 +985,7 @@ class DicoGIS(Tk):
             logger.info('\tIgnoring {0} GeoJSON'.format(len(self.li_geoj)))
             pass
 
-        if self.opt_gxt.get() and len(self.li_gxt) > 0:
+        if self.tab_files.opt_gxt.get() and len(self.li_gxt) > 0:
             logger.info('\n\tProcessing GXT: start')
             for gxtpath in self.li_gxt:
                 """ looping on gxt list """
@@ -1382,7 +1016,7 @@ class DicoGIS(Tk):
             logger.info('\tIgnoring {0} Geoconcept eXport Text'.format(len(self.li_gxt)))
             pass
 
-        if self.opt_rast.get() and len(self.li_raster) > 0:
+        if self.tab_files.opt_rast.get() and len(self.li_raster) > 0:
             logger.info('\n\tProcessing rasters: start')
             for raster in self.li_raster:
                 """ looping on rasters list """
@@ -1415,7 +1049,7 @@ class DicoGIS(Tk):
             logger.info('\tIgnoring {0} rasters'.format(len(self.li_raster)))
             pass
 
-        if self.opt_egdb.get() and len(self.li_egdb) > 0:
+        if self.tab_files.opt_egdb.get() and len(self.li_egdb) > 0:
             logger.info('\n\tProcessing Esri FileGDB: start')
             for gdb in self.li_egdb:
                 """ looping on FileGDB list """
@@ -1446,7 +1080,7 @@ class DicoGIS(Tk):
             logger.info('\tIgnoring {0} Esri FileGDB'.format(len(self.li_egdb)))
             pass
 
-        if self.opt_spadb.get() and len(self.li_spadb) > 0:
+        if self.tab_files.opt_spadb.get() and len(self.li_spadb) > 0:
             logger.info('\n\tProcessing Spatialite DB: start')
             for spadb in self.li_spadb:
                 """ looping on Spatialite DBs list """
@@ -1477,7 +1111,7 @@ class DicoGIS(Tk):
             logger.info('\tIgnoring {0} Spatialite DB'.format(len(self.li_spadb)))
             pass
 
-        if self.opt_cdao.get() and len(self.li_cdao) > 0:
+        if self.tab_files.opt_cdao.get() and len(self.li_cdao) > 0:
             logger.info('\n\tProcessing CAO/DAO: start')
             for dxf in self.li_dxf:
                 """ looping on DXF list """
@@ -1538,7 +1172,7 @@ class DicoGIS(Tk):
             logger.info('\tIgnoring {0} CAO/DAO files'.format(len(self.li_cdao)))
             pass
 
-        if self.opt_pdf.get() and len(self.li_pdf) > 0:
+        if self.tab_files.opt_pdf.get() and len(self.li_pdf) > 0:
             logger.info('\n\tProcessing Geospatial PDF: start')
             for pdf in self.li_pdf:
                 """ looping on PDF list """
@@ -1571,7 +1205,7 @@ class DicoGIS(Tk):
             logger.info('\tIgnoring {0} Geospatial PDF'.format(len(self.li_pdf)))
             pass
 
-        if self.opt_lyr.get() and len(self.li_lyr) > 0:
+        if self.tab_files.opt_lyr.get() and len(self.li_lyr) > 0:
             logger.info('\n\tProcessing Esri LYR : start')
             for lyr in self.li_lyr:
                 """ looping on lyr list """
@@ -1621,7 +1255,7 @@ class DicoGIS(Tk):
         self.val.config(state=ACTIVE)
         self.wb.tunning_worksheets()
         saved = utils_global.safe_save(wb=self.wb,
-                                       dest_dir=self.target.get(),
+                                       dest_dir=self.tab_files.target.get(),
                                        dest_filename=self.output.get(),
                                        ftype="Excel Workbook",
                                        dlg_title=self.blabla.get('gui_excel'))
@@ -1676,42 +1310,42 @@ class DicoGIS(Tk):
         u""" Check if required fields are not empty """
         # error counter
         # checking empty fields
-        if self.host.get() == u''\
-           or self.host.get() == self.blabla.get("err_pg_empty_field"):
-            self.ent_H.configure(foreground="red")
-            self.ent_H.delete(0, END)
-            self.ent_H.insert(0, self.blabla.get("err_pg_empty_field"))
+        if self.tab_sgbd.host.get() == u''\
+           or self.tab_sgbd.host.get() == self.blabla.get("err_pg_empty_field"):
+            self.tab_sgbd.ent_H.configure(foreground="red")
+            self.tab_sgbd.ent_H.delete(0, END)
+            self.tab_sgbd.ent_H.insert(0, self.blabla.get("err_pg_empty_field"))
             return
         else:
             pass
-        if not self.ent_P.get():
-            self.ent_P.configure(foreground='red')
-            self.ent_P.delete(0, END)
-            self.ent_P.insert(0, 0000)
+        if not self.tab_sgbd.ent_P.get():
+            self.tab_sgbd.ent_P.configure(foreground='red')
+            self.tab_sgbd.ent_P.delete(0, END)
+            self.tab_sgbd.ent_P.insert(0, 0000)
             return
         else:
             pass
-        if self.dbnb.get() == u''\
-           or self.host.get() == self.blabla.get("err_pg_empty_field"):
-            self.ent_D.configure(foreground='red')
-            self.ent_D.delete(0, END)
-            self.ent_D.insert(0, self.blabla.get("err_pg_empty_field"))
+        if self.tab_sgbd.dbnb.get() == u''\
+           or self.tab_sgbd.host.get() == self.blabla.get("err_pg_empty_field"):
+            self.tab_sgbd.ent_D.configure(foreground='red')
+            self.tab_sgbd.ent_D.delete(0, END)
+            self.tab_sgbd.ent_D.insert(0, self.blabla.get("err_pg_empty_field"))
             return
         else:
             pass
-        if self.user.get() == u''\
-           or self.host.get() == self.blabla.get("err_pg_empty_field"):
-            self.ent_U.configure(foreground='red')
-            self.ent_U.delete(0, END)
-            self.ent_U.insert(0, self.blabla.get("err_pg_empty_field"))
+        if self.tab_sgbd.user.get() == u''\
+           or self.tab_sgbd.host.get() == self.blabla.get("err_pg_empty_field"):
+            self.tab_sgbd.ent_U.configure(foreground='red')
+            self.tab_sgbd.ent_U.delete(0, END)
+            self.tab_sgbd.ent_U.insert(0, self.blabla.get("err_pg_empty_field"))
             return
         else:
             pass
-        if self.pswd.get() == u''\
-           or self.pswd.get() == self.blabla.get("err_pg_empty_field"):
-            self.ent_M.configure(foreground="red")
-            self.ent_M.delete(0, END)
-            self.ent_M.insert(0, self.blabla.get("err_pg_empty_field"))
+        if self.tab_sgbd.pswd.get() == u''\
+           or self.tab_sgbd.pswd.get() == self.blabla.get("err_pg_empty_field"):
+            self.tab_sgbd.ent_M.configure(foreground="red")
+            self.tab_sgbd.ent_M.delete(0, END)
+            self.tab_sgbd.ent_M.insert(0, self.blabla.get("err_pg_empty_field"))
             return
         else:
             pass
@@ -1729,11 +1363,11 @@ class DicoGIS(Tk):
         # check if a proxy is needed
         # more information about the GDAL HTTP proxy options here:
         # http://trac.osgeo.org/gdal/wiki/ConfigOptions#GDALOGRHTTPoptions
-        if self.opt_proxy.get():
+        if self.tab_options.opt_proxy.get():
             logger.info("Proxy configured.")
             gdal.SetConfigOption('GDAL_HTTP_PROXY', '{0}:{1}'.format(self.prox_server.get(),
                                                                      self.prox_port.get()))
-            if self.opt_ntlm.get():
+            if self.tab_options.opt_ntlm.get():
                 # if authentication needs ...\
                 # username/password or not (NTLM)
                 gdal.SetConfigOption('GDAL_PROXY_AUTH', 'NTLM')
@@ -1744,10 +1378,12 @@ class DicoGIS(Tk):
             logger.info("No proxy configured.")
 
         # testing connection settings
-        sgbd_reader = ReadPostGIS(host=self.host.get(), port=self.port.get(),
-                                  db_name=self.dbnb.get(), user=self.user.get(),
-                                  password=self.pswd.get(),
-                                  views_included=self.opt_pgvw.get(),
+        sgbd_reader = ReadPostGIS(host=self.tab_sgbd.host.get(),
+                                  port=self.tab_sgbd.port.get(),
+                                  db_name=self.tab_sgbd.dbnb.get(),
+                                  user=self.tab_sgbd.user.get(),
+                                  password=self.tab_sgbd.pswd.get(),
+                                  views_included=self.tab_sgbd.opt_pgvw.get(),
                                   dico_dataset=self.dico_dataset,
                                   txt=self.blabla)
 
@@ -1767,8 +1403,8 @@ class DicoGIS(Tk):
         # set the default output file
         self.output.delete(0, END)
         self.output.insert(0, "DicoGIS_{0}-{1}_{2}.xlsx"
-                              .format(self.dbnb.get(),
-                                      self.host.get(),
+                              .format(self.tab_sgbd.dbnb.get(),
+                                      self.tab_sgbd.host.get(),
                                       self.today))
         # launching the process
         self.process_db(sgbd_reader)
