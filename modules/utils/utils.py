@@ -24,6 +24,7 @@ from os import path, access, R_OK  # files and folder managing
 from sys import exit, platform as opersys
 import subprocess
 
+from Tkinter import ACTIVE, DISABLED
 from tkFileDialog import asksaveasfilename    # dialogs
 from tkMessageBox import showerror as avert
 
@@ -107,6 +108,22 @@ class Utilities(object):
 
         # End of function
         return out_name, out_path
+
+    def ui_switch(self, cb_value, parent):
+        """Change state of  all children widgets within a parent class.
+
+        cb_value=boolean
+        parent=Tkinter class with children (Frame, Labelframe, Tk, etc.)
+        """
+        if cb_value.get():
+            for child in parent.winfo_children():
+                child.configure(state=ACTIVE)
+        else:
+            for child in parent.winfo_children():
+                child.configure(state=DISABLED)
+        # end of function
+        return
+
 
 # ############################################################################
 # #### Stand alone program ########

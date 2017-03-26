@@ -21,16 +21,17 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 # ##################################
 
 # Standard library
-from Tkinter import Tk, StringVar, IntVar, Image    # GUI
-from Tkinter import W, PhotoImage, ACTIVE, DISABLED, END
-from tkFileDialog import askdirectory
-from tkMessageBox import showinfo as info, showerror as avert
-from ttk import Combobox, Progressbar, Style, Labelframe, Frame
-from ttk import Label, Button, Entry, Checkbutton, Notebook  # widgets
-import tkFont   # font library
+from Tkinter import Tk
+from Tkinter import W, PhotoImage
+from ttk import Style, Frame
+from ttk import Label, Button
 
 import logging
+from os import path
 from webbrowser import open_new_tab
+
+# 3rd party modules
+from isogeo_pysdk import Isogeo, __version__ as pysdk_version
 
 # ##############################################################################
 # ############ Globals ############
@@ -46,16 +47,39 @@ logger = logging.getLogger("DicoGIS")
 
 class MiscButtons(Frame):
 
-    def __init__(self, parent):
+    def __init__(self, parent, dicogis_path="../../"):
         """Instanciating the output workbook."""
-        # print(type(self), dir(self))
         self.parent = parent
         Frame.__init__(self)
+        logging.info('Isogeo PySDK version: {0}'.format(pysdk_version))
+
+        # logo
+        ico_path = path.join(path.abspath(dicogis_path),
+                             "data/img/DicoGIS_logo.gif")
+        self.icone = PhotoImage(master=self,
+                                file=ico_path)
+        Label(self,
+              borderwidth=2,
+              image=self.icone).grid(row=1, columnspan=2,
+                                     column=0, padx=2,
+                                     pady=2, sticky=W)
+        # credits
+        s = Style(self)
+        s.configure('Kim.TButton', foreground='DodgerBlue', borderwidth=0)
+        btn_credits = Button(self,
+                             text='by @GeoJulien\nGPL3 - 2017',
+                             style='Kim.TButton',
+                             command=lambda: open_new_tab('https://github.com/Guts/DicoGIS'))
+        btn_credits.grid(row=2,
+                         columnspan=2,
+                         padx=2,
+                         pady=2,
+                         sticky="WE")
 
         # contact
-        mailto = "mailto:Isogeo%20Projects%20"\
-                 "<projects+isogeo2office@isogeo.com>?"\
-                 "subject=[Isogeo2office]%20Question"
+        mailto = "mailto:DicoGIS%20Developer%20"\
+                 "<julien.moura+dev@gmail.com>?"\
+                 "subject=[DicoGIS]%20Question"
         btn_contact = Button(self,
                              text="\U00002709 " + "Contact",
                              command=lambda: open_new_tab(mailto))
@@ -67,14 +91,10 @@ class MiscButtons(Frame):
                          command=lambda: open_new_tab(url_src))
 
         # griding
-        # btn_contact.pack()
-        # btn_src.pack()
-        btn_contact.grid(row=1, rowspan=1,
-                         column=1, padx=2, pady=2,
+        btn_contact.grid(row=3, column=0, padx=2, pady=2,
                          sticky="WE")
-        btn_src.grid(row=1, rowspan=1,
-                     column=2, padx=2, pady=2,
-                     sticky="NSWE")
+        btn_src.grid(row=3, column=1, padx=2, pady=2,
+                     sticky="EW")
 
 # #############################################################################
 # ##### Stand alone program ########
