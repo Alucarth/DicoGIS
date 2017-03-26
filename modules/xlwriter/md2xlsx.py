@@ -259,7 +259,7 @@ class md2xlsx(Workbook):
                                    column=self.li_cols_mapdocs.index(i) + 1).style = "Headline 2"
 
             # initialize line counter
-            self.idx_l = 1
+            self.idx_m = 1
         else:
             pass
 
@@ -290,7 +290,7 @@ class md2xlsx(Workbook):
         else:
             pass
 
-        if has_lyr and "PostGIS" not in self.sheetnames:
+        if has_lyr and "LYR" not in self.sheetnames:
             self.ws_lyr = self.create_sheet(title="PostGIS")
             # headers
             self.ws_lyr.append([self.txt.get(i) for i in self.li_cols_lyr])

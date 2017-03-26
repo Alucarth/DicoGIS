@@ -348,8 +348,8 @@ class DicoGIS(Tk):
         else:
             # checking Isogeo
             try:
-                isogeo = Isogeo(client_id=self.isog_app_id.get(),
-                                client_secret=self.isog_app_tk.get(),
+                isogeo = Isogeo(client_id=self.tab_options.isog_app_id.get(),
+                                client_secret=self.tab_options.isog_app_tk.get(),
                                 lang=self.def_lang)
                 self.isogeo_token = isogeo.connect()
             except ValueError as e:
@@ -1230,22 +1230,22 @@ class DicoGIS(Tk):
                     logger.error(e)
                     self.prog_layers["value"] = self.prog_layers["value"] + 1
                     continue
-                # writing to the Excel dictionary
-                self.dictionarize_lyr(self.dico_layer,
-                                      self.feuyMAPS,
-                                      line_maps)
-                # self.wb.store_md_mapdoc(self.dico_layer)
-                if self.dico_layer.get(u'type') == 'Feature':
-                    self.wb.store_md_vector(self.dico_layer)
-                    line_vectors = line_vectors + 1
-                elif self.dico_layer.get(u'type') == 'Raster':
-                    self.wb.store_md_raster(self.dico_layer, self.dico_bands)
-                    line_rasters = line_rasters + 1
+                # # writing to the Excel dictionary
+                # self.dictionarize_lyr(self.dico_layer,
+                #                       self.feuyMAPS,
+                #                       line_maps)
+                # # self.wb.store_md_mapdoc(self.dico_layer)
+                # if self.dico_layer.get(u'type') == 'Feature':
+                #     self.wb.store_md_vector(self.dico_layer)
+                #     line_vectors = line_vectors + 1
+                # elif self.dico_layer.get(u'type') == 'Raster':
+                #     self.wb.store_md_raster(self.dico_layer, self.dico_bands)
+                #     line_rasters = line_rasters + 1
 
 
-                logger.info('\t Wrote into the dictionary')
-                # increment the line number
-                line_maps += self.dico_layer.get('layers_count')
+                # logger.info('\t Wrote into the dictionary')
+                # # increment the line number
+                # line_maps += self.dico_layer.get('layers_count')
         else:
             logger.info('\tIgnoring {0} Esri LYR'.format(len(self.li_lyr)))
             pass
