@@ -21,9 +21,8 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 # ##################################
 
 # Standard library
-from Tkinter import Tk, StringVar, IntVar
-from ttk import Labelframe, Frame
-from ttk import Label, Entry, Checkbutton
+from Tkinter import StringVar, Tk
+from ttk import Frame, Label, Entry
 
 import logging
 

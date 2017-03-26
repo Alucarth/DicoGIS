@@ -86,7 +86,7 @@ class OptionsManager(object):
         # Isogeo settings
         parent.tab_options.opt_isogeo.set(self.config.get('isogeo', 'opt_isogeo'))
         parent.tab_options.isog_app_id.set(self.config.get('isogeo', 'app_id'))
-        parent.tab_options.set(self.config.get('isogeo', 'app_secret'))
+        parent.tab_options.isog_app_tk.set(self.config.get('isogeo', 'app_secret'))
 
         # log
         logging.info('Last options loaded')

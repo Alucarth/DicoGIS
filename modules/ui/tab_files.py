@@ -21,17 +21,10 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 # ##################################
 
 # Standard library
-from Tkinter import Tk, StringVar, IntVar, Image    # GUI
-from Tkinter import W, PhotoImage, ACTIVE, DISABLED, END, VERTICAL
-from tkFileDialog import askdirectory
-from tkMessageBox import showinfo as info, showerror as avert
-from ttk import Combobox, Progressbar, Style, Labelframe, Frame
-from ttk import Label, Button, Entry, Checkbutton, Separator
-import tkFont   # font library
+from Tkinter import IntVar, Tk
+from ttk import Checkbutton, Button, Entry, Frame, Label, Labelframe
 
 import logging
-from os import path
-from webbrowser import open_new_tab
 
 # ##############################################################################
 # ############ Globals ############
@@ -52,7 +45,6 @@ class TabFiles(Frame):
         self.parent = parent
         Frame.__init__(self)
 
-        print(type(path_browser))
         # -- VARIABLES -------------------------------------------------------
         # formats / type: vectors
         self.li_vectors_formats = (".shp", ".tab", ".kml",
