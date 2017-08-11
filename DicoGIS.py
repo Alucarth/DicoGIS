@@ -1292,7 +1292,7 @@ class DicoGIS(Tk):
         self.val.config(state=ACTIVE)
         self.wb.tunning_worksheets()
         saved = utils_global.safe_save(wb=self.wb,
-                                       dest_dir=self.target.get(),
+                                       # dest_dir=self.target.get(),
                                        dest_filename=self.output.get(),
                                        ftype="Excel Workbook",
                                        dlg_title=self.blabla.get('gui_excel'))
