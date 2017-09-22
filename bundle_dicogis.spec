@@ -6,22 +6,19 @@ from ConfigParser import SafeConfigParser
 from os import path
 
 # ------------ Initial settings ----------------------------------------------
-config = SafeConfigParser()
-config.read(path.realpath("options_TPL.ini"))
-config.set("config", "basics", "filters", "database", "proxy", "isogeo")
-with open(path.realpath("build\\options.ini"), "wb") as configfile:
-    config.write(configfile)
+#config = SafeConfigParser()
+#config.read(path.realpath("options_TPL.ini"))
+#config.set("config", "basics", "filters", "database", "proxy", "isogeo")
+#with open(path.realpath("build\\options.ini"), "wb") as configfile:
+#    config.write(configfile)
 # ----------------------------------------------------------------------------
 
-added_files = [('build\\settings.ini', '.'),
+added_files = [('options.ini', '.'),
                ('LICENSE', '.'),
                ('README.md', '.'),
-               ('i18n\\isogeo2office.pot', 'i18n'),
-               ('i18n\\fr_FR\\LC_MESSAGES\\isogeo2office.mo', 'i18n\\fr_FR\\LC_MESSAGES'),
-               ('templates\\template_Isogeo.docx', 'templates'),
-               ('output\\README.md', 'output'),
                ('DicoGIS.ico', '.'),
                ('data\\img\\DicoGIS_logo.gif', 'data\\img'),
+               ('data\\img\\logo_isogeo.gif', 'data\\img'),
                ('data\\locale\\lang_EN.xml', 'data\\locale'),
                ('data\\locale\\lang_FR.xml', 'data\\locale'),
                ('data\\locale\\lang_ES.xml', 'data\\locale'),
@@ -63,5 +60,5 @@ coll = COLLECT(exe,
                strip=False,
                upx=False,
                name='DicoGIS',
-               icon='dta\\img\\DicoGIS_logo.gif'
+               icon='data\\img\\DicoGIS_logo.gif'
                )
