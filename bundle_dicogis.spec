@@ -2,18 +2,16 @@
 
 block_cipher = None
 
-from ConfigParser import SafeConfigParser
 from os import path
+from shutil import copyfile
 
 # ------------ Initial settings ----------------------------------------------
-#config = SafeConfigParser()
-#config.read(path.realpath("options_TPL.ini"))
-#config.set("config", "basics", "filters", "database", "proxy", "isogeo")
-#with open(path.realpath("build\\options.ini"), "wb") as configfile:
-#    config.write(configfile)
+
+copyfile("options_TPL.ini", "build\options.ini")
+
 # ----------------------------------------------------------------------------
 
-added_files = [('options.ini', '.'),
+added_files = [('build\options.ini', '.'),
                ('LICENSE', '.'),
                ('README.md', '.'),
                ('DicoGIS.ico', '.'),
