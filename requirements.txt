@@ -11,16 +11,9 @@
 # python-setuptools, python-pip, python-dev, python-tk, python-gdal, python-software-properties
 
 # via pypi
-numpy
-gdal
-dxfgrabber
-openpyxl
-OWSLib
-python-dateutil
-pyttk
-pytz
-requests
-six
-xlwt
-arrow
-isogeo-pysdk
+arrow>=0.10.*
+dxfgrabber==0.8.*
+numpy==1.13.*
+GDAL==2.*
+isogeo-pysdk==2.18.*
+openpyxl==2.4.*
