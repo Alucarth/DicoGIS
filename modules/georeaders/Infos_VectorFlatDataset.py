@@ -18,14 +18,11 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 # ############################################################################
 # ######### Libraries #############
 # #################################
-# Python 2 and 3 compatibility
-from future.standard_library import install_aliases
-install_aliases()
 
 # Standard library
 from collections import OrderedDict  # Python 3 backported
 import logging
-from os import chdir, listdir, path       # files and folder managing
+from os import chdir, path       # files and folder managing
 from time import localtime, strftime
 
 # 3rd party libraries
