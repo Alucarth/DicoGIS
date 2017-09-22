@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
-# from __future__ import unicode_literals
+from __future__ import (absolute_import, print_function, unicode_literals)
 
 # ----------------------------------------------------------------------------
 # Name:         Infos Rasters
@@ -20,7 +20,6 @@
 # ######### Libraries #############
 # #################################
 # Standard library
-from __future__ import print_function
 from collections import OrderedDict  # Python 3 backported
 import logging
 from os import chdir, path       # files and folder managing
