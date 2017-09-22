@@ -30,11 +30,27 @@ from DicoGIS import DGversion
 from modules import *
 
 ################################################################################
+########## Functions ##############
+###################################
+
+# add any numpy directory containing a dll file to sys.path
+def numpy_dll_paths_fix():
+    paths = set()
+    np_path = numpy.__path__[0]
+    for dirpath, _, filenames in os.walk(np_path):
+        for item in filenames:
+            if item.endswith('.dll'):
+                paths.add(dirpath)
+
+    sys.path.append(*list(paths))
+
+################################################################################
 ########## Main program ###########
 ###################################
 
 # adding py2exe to the env path
 sys.argv.append('py2exe')
+numpy_dll_paths_fix()
 
 # Specific data for gdal
 gdal_dir = r'data/gdal'
@@ -61,12 +77,37 @@ build_options = dict(
                     build_base='setup/temp_build',
                     )
 
-# conversion settings 
+# conversion settings
 py2exe_options = dict(
                         excludes=['_ssl',  # Exclude _ssl
                                   'pyreadline', 'doctest', 'email',
                                   'optparse', 'pickle'],  # Exclude standard lib
-                        dll_excludes=['MSVCP90.dll'],
+                        dll_excludes=["MSVCP90.dll"
+                                      "libzmq.pyd",
+                                      "geos_c.dll",
+                                      "api-ms-win-core-string-l1-1-0.dll",
+                                      "api-ms-win-core-registry-l1-1-0.dll",
+                                      "api-ms-win-core-errorhandling-l1-1-1.dll",
+                                      "api-ms-win-core-string-l2-1-0.dll",
+                                      "api-ms-win-core-profile-l1-1-0.dll",
+                                      "api-ms-win*.dll",
+                                      "api-ms-win-core-processthreads-l1-1-2.dll",
+                                      "api-ms-win-core-libraryloader-l1-2-1.dll",
+                                      "api-ms-win-core-file-l1-2-1.dll",
+                                      "api-ms-win-security-base-l1-2-0.dll",
+                                      "api-ms-win-eventing-provider-l1-1-0.dll",
+                                      "api-ms-win-core-heap-l2-1-0.dll",
+                                      "api-ms-win-core-libraryloader-l1-2-0.dll",
+                                      "api-ms-win-core-localization-l1-2-1.dll",
+                                      "api-ms-win-core-sysinfo-l1-2-1.dll",
+                                      "api-ms-win-core-synch-l1-2-0.dll",
+                                      "api-ms-win-core-heap-l1-2-0.dll",
+                                      "api-ms-win-core-handle-l1-1-0.dll",
+                                      "api-ms-win-core-io-l1-1-1.dll",
+                                      "api-ms-win-core-com-l1-1-1.dll",
+                                      "api-ms-win-core-memory-l1-1-2.dll",
+                                      "api-ms-win-core-version-l1-1-1.dll",
+                                      "api-ms-win-core-version-l1-1-0.dll"],
                         compressed=1,  # Compress library.zip
                         optimize=2,
                         # bundle_files = 1,
