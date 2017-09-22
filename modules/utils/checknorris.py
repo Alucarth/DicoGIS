@@ -28,6 +28,7 @@ from urllib2 import build_opener, install_opener, ProxyHandler, urlopen
 # ########## Classes ###############
 # ##################################
 
+logger = logging.getLogger("DicoGIS")
 
 class CheckNorris(object):
     """ Check Norris never fails, always tests.
@@ -56,9 +57,9 @@ class CheckNorris(object):
                 from osgeo import gdal
             except ImportError:
                 import gdal
-            logging.info('GDAL version: {}'.format(gdal.__version__))
+            logger.info('GDAL version: {}'.format(gdal.__version__))
         except:
-            logging.error("GDAL is not installed or not reachable. DicoGIS is going to close.")
+            logger.error("GDAL is not installed or not reachable. DicoGIS is going to close.")
             return 1
 
         # GDAL_DATA variable
@@ -66,15 +67,15 @@ class CheckNorris(object):
             try:
                 gdal.SetConfigOption(str('GDAL_DATA'),
                                      str(path.abspath(r'data/gdal')))
-                logging.info("GDAL_DATA path not found in environment variable.\
+                logger.info("GDAL_DATA path not found in environment variable.\
                                   DicoGIS'll use its own: "
                              + path.abspath(r'data/gdal'))
                 return 2
             except:
-                logging.error("Oups! Something's wrong with GDAL_DATA path.")
+                logger.error("Oups! Something's wrong with GDAL_DATA path.")
                 return 3
         else:
-            logging.info("GDAL_DATA path found in environment variable: {}.\
+            logger.info("GDAL_DATA path found in environment variable: {}.\
                          DicoGIS'll use it.".format(env.get("GDAL_DATA")))
             return 4
         # end of method
@@ -87,26 +88,26 @@ class CheckNorris(object):
         try:
             import arcpy
             esri_info = arcpy.GetInstallInfo()
-            logging.info("ArcPy imported from ArcGIS {} v{} in ({})".format(
+            logger.info("ArcPy imported from ArcGIS {} v{} in ({})".format(
                          esri_info.get("ProductName"),
                          esri_info.get("Version"),
                          esri_info.get("InstallDir")))
             # end of method
             return True, esri_info
         except RuntimeError:
-            logging.error("ArcPy is installed, but not licensed.")
+            logger.error("ArcPy is installed, but not licensed.")
             return False, "ArcGIS is installed, but not licensed."
         except ImportError:
-            logging.info("ArcGIS isn't in the SYSPATH. Trying to find it automatically.")
+            logger.info("ArcGIS isn't in the SYSPATH. Trying to find it automatically.")
             # checks if ArcGIS is installed
             if not path.isdir(path.join(env.get("PROGRAMFILES(x86)"), "ArcGIS"))\
                and not path.isdir(path.join(env.get("PROGRAMFILES"), "ArcGIS")):
-                logging.info("ArcGIS isn't installed on this computer.")
+                logger.info("ArcGIS isn't installed on this computer.")
                 return False, "ArcGIS isn't installed on this computer."
             else:
                 arcgis_path = path.join(env.get("PROGRAMFILES(x86)", "PROGRAMFILES"), "ArcGIS")
                 pass
-            logging.info("ArcGIS is installed but not well configured.")
+            logger.info("ArcGIS is installed but not well configured.")
             # path to the last version of 10 branch
             v = max([i[-1] for i in listdir(path.realpath(arcgis_path)) if "Desktop10" in i])
             arcgis_path = path.join(arcgis_path, "Desktop10.{}".format(v))
@@ -118,15 +119,15 @@ class CheckNorris(object):
                 import arcpy
                 import site
                 esri_info = arcpy.GetInstallInfo()
-                logging.info("ArcGIS configuration has been fixed.")
-                logging.info("ArcGIS installation: {}".format(arcpy.ProductInfo()))
+                logger.info("ArcGIS configuration has been fixed.")
+                logger.info("ArcGIS installation: {}".format(arcpy.ProductInfo()))
                 if hasattr(sys, 'real_prefix'):
                     # inside a venv
-                    logging.info("Executing inside a virtualenv. Nice!")
+                    logger.info("Executing inside a virtualenv. Nice!")
                     pypacks = [p for p in sys.path if p.endswith('site-packages')][-1]
                 else:
                     # using system install
-                    logging.info("Executing from the main Python install.")
+                    logger.info("Executing from the main Python install.")
                     pypacks = site.getsitepackages()[1]
 
                 # creatring pth file for future runs
@@ -137,10 +138,10 @@ class CheckNorris(object):
                 # end of method
                 return True, esri_info
             except:
-                logging.info("ArcGIS automatic configuration failed.")
+                logger.info("ArcGIS automatic configuration failed.")
                 return False, "ArcGIS automatic configuration failed."
         else:
-            logging.info("ArcGIS isn't installed on this computer.")
+            logger.info("ArcGIS isn't installed on this computer.")
             return False, "ArcGIS isn't installed on this computer."
 
     def check_internet_connection(self, remote_server="www.google.com"):
@@ -154,10 +155,10 @@ class CheckNorris(object):
             # connect to the host -- tells us if the host is actually
             # reachable
             socket.create_connection((host, 80), 2)
-            logging.info("Internet connection OK.")
+            logger.info("Internet connection OK.")
             return True
         except:
-            logging.info("Internet connection failed.")
+            logger.info("Internet connection failed.")
             pass
         # end of method
         return False
@@ -172,10 +173,10 @@ class CheckNorris(object):
         """
         os_proxies = getproxies()
         if len(os_proxies) == 0 and self.check_internet_connection:
-            logging.info("No proxy needed nor set. Direct connection works.")
+            logger.info("No proxy needed nor set. Direct connection works.")
             return 1
         elif len(os_proxies) == 0 and not self.check_internet_connection:
-            logging.error("Proxy not set in the OS. Needs to be specified")
+            logger.error("Proxy not set in the OS. Needs to be specified")
             return 2
         else:
             #
