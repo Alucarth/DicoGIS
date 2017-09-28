@@ -17,6 +17,7 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 # ###### Standard Libraries ########
 # ##################################
 
+import archook
 import logging
 from os import environ as env, path, listdir
 import socket
@@ -25,31 +26,36 @@ from urllib2 import getproxies
 from urllib2 import build_opener, install_opener, ProxyHandler, urlopen
 
 # #############################################################################
-# ########## Classes ###############
+# ########## Globals ###############
 # ##################################
 
 logger = logging.getLogger("DicoGIS")
 
+# #############################################################################
+# ########## Classes ###############
+# ##################################
+
+
 class CheckNorris(object):
-    """ Check Norris never fails, always tests.
-    """
+    """Check Norris never fails, always tests."""
+
     # -- ATTRIBUTES -----------------------------------------------------------
 
     # -- BEFORE ALL -----------------------------------------------------------
 
     def __init__(self):
-        """ Check Norris welcomes you
-        """
+        """Check Norris welcomes you."""
         super(CheckNorris, self).__init__()
 
     # -- 1 method, 1 check ----------------------------------------------------
 
     def check_gdal(self):
-        """ Checks if OSGeo libs work and if GDAL_DATA is well refrenced.
+        """Check if OSGeo libs work and if GDAL_DATA is well refrenced.
+
         Returns:
         -- 1: GDAL_DATA already exists as environment variable
-        -- 2: GDAL_DATA didn't exist as environment variable then has been added
-        -- 3: GDAL_DATA didn't exist as environment variable then has been added
+        -- 2: GDAL_DATA didn't exist as env variable then has been added
+        -- 3: GDAL_DATA didn't exist as env variable and could'nt be added
         """
         # GDAL install
         try:
@@ -59,7 +65,8 @@ class CheckNorris(object):
                 import gdal
             logger.info('GDAL version: {}'.format(gdal.__version__))
         except:
-            logger.error("GDAL is not installed or not reachable. DicoGIS is going to close.")
+            logger.error("GDAL is not installed or not reachable."
+                         " DicoGIS is going to close.")
             return 1
 
         # GDAL_DATA variable
@@ -67,38 +74,53 @@ class CheckNorris(object):
             try:
                 gdal.SetConfigOption(str('GDAL_DATA'),
                                      str(path.abspath(r'data/gdal')))
-                logger.info("GDAL_DATA path not found in environment variable.\
-                                  DicoGIS'll use its own: "
-                             + path.abspath(r'data/gdal'))
+                logger.info("GDAL_DATA path not found in environment variable."
+                            " DicoGIS'll use its own: " +
+                            path.abspath(r'data/gdal'))
                 return 2
             except:
                 logger.error("Oups! Something's wrong with GDAL_DATA path.")
                 return 3
         else:
-            logger.info("GDAL_DATA path found in environment variable: {}.\
-                         DicoGIS'll use it.".format(env.get("GDAL_DATA")))
+            logger.info("GDAL_DATA path found in environment variable: {}."
+                        " DicoGIS'll use it.".format(env.get("GDAL_DATA")))
             return 4
         # end of method
         return
 
     def check_arcpy(self):
-        """ Checks if arcpy and which version is installed
-        """
+        """Check if arcpy and which version is installed."""
+        # using archook
+        try:
+            archook.get_arcpy()
+            import arcpy
+            esri_info = arcpy.GetInstallInfo()
+            logger.info("ArcPy imported from ArcGIS {} v{} in ({})"
+                        " - using archook"
+                        .format(esri_info.get("ProductName"),
+                                esri_info.get("Version"),
+                                archook.locate_arcgis()))
+            # end of method
+            return True, esri_info
+        except ImportError as e:
+            logger.error(e)
+
         # 3rd party libraries
         try:
             import arcpy
             esri_info = arcpy.GetInstallInfo()
             logger.info("ArcPy imported from ArcGIS {} v{} in ({})".format(
-                         esri_info.get("ProductName"),
-                         esri_info.get("Version"),
-                         esri_info.get("InstallDir")))
+                        esri_info.get("ProductName"),
+                        esri_info.get("Version"),
+                        esri_info.get("InstallDir")))
             # end of method
             return True, esri_info
         except RuntimeError:
             logger.error("ArcPy is installed, but not licensed.")
             return False, "ArcGIS is installed, but not licensed."
         except ImportError:
-            logger.info("ArcGIS isn't in the SYSPATH. Trying to find it automatically.")
+            logger.info("ArcGIS isn't in the SYSPATH."
+                        " Trying to find it automatically.")
             # checks if ArcGIS is installed
             if not path.isdir(path.join(env.get("PROGRAMFILES(x86)"), "ArcGIS"))\
                and not path.isdir(path.join(env.get("PROGRAMFILES"), "ArcGIS")):
@@ -145,7 +167,8 @@ class CheckNorris(object):
             return False, "ArcGIS isn't installed on this computer."
 
     def check_internet_connection(self, remote_server="www.google.com"):
-        """ Checks if an internet connection is operational
+        """Check if an internet connection is operational.
+
         source: http://stackoverflow.com/a/20913928/2556577
         """
         try:
@@ -164,7 +187,8 @@ class CheckNorris(object):
         return False
 
     def check_proxy(self, specific={}):
-        """ Checks if proxy settings are set on the OS
+        """Check if proxy settings are set on the OS.
+
         Returns:
         -- 1 when direct connection works fine
         -- 2 when direct connection fails and any proxy is set in the OS
