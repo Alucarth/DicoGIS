@@ -217,19 +217,19 @@ class DicoGIS(Tk):
 # =================================================================================
         # ## TAB 1: FILES ##
         self.nb.add(self.tab_files,
-                    text=self.blabla.get('gui_tab1'),
+                    text=" Files ",
                     padding=3)
 
 # =================================================================================
 
         # ## TAB 2: Database ##
         self.nb.add(self.tab_sgbd,
-                    text=self.blabla.get('gui_tab2'), padding=3)
+                    text=" PostGIS ", padding=3)
 
 # =================================================================================
         # ## TAB 3: web services ##
         self.nb.add(self.tab_webservices,
-                    text=self.blabla.get('gui_tab3'), padding=3)
+                    text=" Web Service ", padding=3)
 
 # =================================================================================
 
@@ -372,6 +372,9 @@ class DicoGIS(Tk):
         # update widgets text
         self.welcome.config(text=self.blabla.get('hi') + self.uzer)
         self.can.config(text=self.blabla.get('gui_quit'))
+        self.nb.tab(0, text=self.blabla.get('gui_tab1'))
+        self.nb.tab(1, text=self.blabla.get('gui_tab2'))
+        self.nb.tab(2, text=self.blabla.get('gui_tab3'))
         self.tab_files.FrPath.config(text=self.blabla.get('gui_fr1'))
         self.tab_sgbd.FrDb.config(text=self.blabla.get('gui_fr2'))
         self.tab_files.FrFilters.config(text=self.blabla.get('gui_fr3'))
