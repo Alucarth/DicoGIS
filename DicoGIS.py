@@ -45,7 +45,7 @@ from logging.handlers import RotatingFileHandler
 from collections import OrderedDict  # ordered dictionary
 
 # 3rd party libraries
-from isogeo_pysdk import Isogeo
+from isogeo_pysdk import Isogeo, __version__ as isogeosdk_version
 
 # Custom modules
 from modules import ReadRasters    # for rasters files
@@ -103,6 +103,7 @@ class DicoGIS(Tk):
         Creates 1 frame and 2 labelled subframes"""
         logger.info('\t============== DicoGIS =============')
         logger.info('Version: {0}'.format(self.DGversion))
+        logger.info('Isogeo PySDK version: {0}'.format(isogeosdk_version))
 
         # manage settings outside the main class
         self.settings = OptionsManager(r"options.ini")
@@ -372,24 +373,32 @@ class DicoGIS(Tk):
         # update widgets text
         self.welcome.config(text=self.blabla.get('hi') + self.uzer)
         self.can.config(text=self.blabla.get('gui_quit'))
-        self.nb.tab(0, text=self.blabla.get('gui_tab1'))
-        self.nb.tab(1, text=self.blabla.get('gui_tab2'))
-        self.nb.tab(2, text=self.blabla.get('gui_tab3'))
-        self.tab_files.FrPath.config(text=self.blabla.get('gui_fr1'))
-        self.tab_sgbd.FrDb.config(text=self.blabla.get('gui_fr2'))
-        self.tab_files.FrFilters.config(text=self.blabla.get('gui_fr3'))
         self.FrOutp.config(text=self.blabla.get('gui_fr4', "Output"))
         self.FrProg.config(text=self.blabla.get('gui_prog', "Progression"))
-        self.tab_files.labtarg.config(text=self.blabla.get('gui_path'))
-        self.tab_files.browsetarg.config(text=self.blabla.get('gui_choix'))
         self.val.config(text=self.blabla.get('gui_go', "Launch"))
         self.nameoutput.config(text=self.blabla.get('gui_fic'))
+        # tab files
+        self.nb.tab(0, text=self.blabla.get('gui_tab1'))
+        self.tab_files.FrPath.config(text=self.blabla.get('gui_fr1'))
+        self.tab_files.FrFilters.config(text=self.blabla.get('gui_fr3'))
+        self.tab_files.labtarg.config(text=self.blabla.get('gui_path'))
+        self.tab_files.browsetarg.config(text=u"\U0001F3AF " + self.blabla.get('gui_choix'))
+        # sgbd tab
+        self.nb.tab(1, text=self.blabla.get('gui_tab2'))
+        self.tab_sgbd.FrDb.config(text=self.blabla.get('gui_fr2'))
         self.tab_sgbd.lb_H.config(text=self.blabla.get('gui_host'))
         self.tab_sgbd.lb_P.config(text=self.blabla.get('gui_port'))
         self.tab_sgbd.lb_D.config(text=self.blabla.get('gui_db'))
         self.tab_sgbd.lb_U.config(text=self.blabla.get('gui_user'))
         self.tab_sgbd.lb_M.config(text=self.blabla.get('gui_mdp'))
-
+        # web services tab
+        self.nb.tab(2, text=self.blabla.get('gui_tab3'))
+        # options
+        self.nb.tab(4, text=self.blabla.get('gui_tab5'))
+        self.tab_options.prox_lb_H.config(text=self.blabla.get('gui_host'))
+        self.tab_options.prox_lb_P.config(text=self.blabla.get('gui_port'))
+        self.tab_options.prox_lb_M.config(text=self.blabla.get('gui_mdp'))
+        self.tab_options.prox_lb_H.config(text=self.blabla.get('gui_host'))
         # setting locale according to the language passed
         try:
             if opersys == 'win32':
