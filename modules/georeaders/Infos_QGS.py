@@ -95,6 +95,13 @@ class ReadQGS():
         # units
         dico_qgs[u'units'] = qgs_canvas.find('units').text
 
+        # SRS
+        qgs_dest_srs = qgs_canvas.find("destinationsrs").getchildren()
+        print(dir(qgs_dest_srs), qgs_dest_srs[0][1].tag)
+
+        
+        dico_qgs['srs'] = qgs_dest_srs.find("srsid").text
+
         # extent
         qgs_extent = qgs_canvas.find('extent').getchildren()
         dico_qgs[u'Xmin'] = round(float(qgs_extent[0].text), 2)

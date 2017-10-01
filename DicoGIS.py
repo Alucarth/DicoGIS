@@ -393,6 +393,7 @@ class DicoGIS(Tk):
         self.tab_sgbd.lb_M.config(text=self.blabla.get('gui_mdp'))
         # web services tab
         self.nb.tab(2, text=self.blabla.get('gui_tab3'))
+        self.tab_webservices.lb_url_srv.config(text=self.blabla.get('gui_srv_url'))
         # options
         self.nb.tab(4, text=self.blabla.get('gui_tab5'))
         self.tab_options.prox_lb_H.config(text=self.blabla.get('gui_host'))
