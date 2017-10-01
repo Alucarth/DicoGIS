@@ -1,18 +1,18 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis projectname="Départements de France métropolitaine regroupés par région" version="2.18.13">
-  <title>Départements de France métropolitaine regroupés par région</title>
+<qgis projectname="Alaska Airports" version="2.18.13">
+  <title>Alaska Airports</title>
   <autotransaction active="0"/>
   <evaluateDefaultValues active="0"/>
   <layer-tree-group expanded="1" checked="Qt::Checked" name="">
     <customproperties/>
-    <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Checked" id="airports20170930210750823" source="C:\Users\julien.moura\Documents\GitHub\Perso\DicoGIS\test\datatest\vectors\shp\airports.shp" name="airports">
+    <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Checked" id="airports20170930210750823" source="C:/Users/julien.moura/Documents/GitHub/Perso/DicoGIS/test/datatest/vectors/shp/airports.shp" name="Alaska airports by use">
       <customproperties>
         <property key="showFeatureCount" value="1"/>
       </customproperties>
     </layer-tree-layer>
     <layer-tree-group expanded="1" checked="Qt::Checked" name="Fonds de carte">
       <customproperties/>
-      <layer-tree-layer expanded="1" providerKey="gdal" checked="Qt::Checked" id="OCM_Landscape20170930210730298" source="&lt;GDAL_WMS>&#xa;  &lt;Service name=&quot;TMS&quot;>&#xa;    &lt;ServerUrl>https://tile.thunderforest.com/landscape/${z}/${x}/${y}.png&lt;/ServerUrl>&#xa;  &lt;/Service>&#xa;  &lt;DataWindow>&#xa;    &lt;UpperLeftX>-20037508.34&lt;/UpperLeftX>&#xa;    &lt;UpperLeftY>20037508.34&lt;/UpperLeftY>&#xa;    &lt;LowerRightX>20037508.34&lt;/LowerRightX>&#xa;    &lt;LowerRightY>-20037508.34&lt;/LowerRightY>&#xa;    &lt;TileLevel>18&lt;/TileLevel>&#xa;    &lt;TileCountX>1&lt;/TileCountX>&#xa;    &lt;TileCountY>1&lt;/TileCountY>&#xa;    &lt;YOrigin>top&lt;/YOrigin>&#xa;  &lt;/DataWindow>&#xa;  &lt;Projection>EPSG:3857&lt;/Projection>&#xa;  &lt;BlockSizeX>256&lt;/BlockSizeX>&#xa;  &lt;BlockSizeY>256&lt;/BlockSizeY>&#xa;  &lt;BandsCount>3&lt;/BandsCount>&#xa;  &lt;Cache />&#xa;&lt;/GDAL_WMS>" name="OCM Landscape">
+      <layer-tree-layer expanded="1" providerKey="gdal" checked="Qt::Checked" id="OSM_Humanitarian_Data_Model20171001161030399" source="&lt;GDAL_WMS>&#xa;  &lt;Service name=&quot;TMS&quot;>&#xa;    &lt;ServerUrl>http://a.tile.openstreetmap.fr/hot/${z}/${x}/${y}.png&lt;/ServerUrl>&#xa;  &lt;/Service>&#xa;  &lt;DataWindow>&#xa;    &lt;UpperLeftX>-20037508.34&lt;/UpperLeftX>&#xa;    &lt;UpperLeftY>20037508.34&lt;/UpperLeftY>&#xa;    &lt;LowerRightX>20037508.34&lt;/LowerRightX>&#xa;    &lt;LowerRightY>-20037508.34&lt;/LowerRightY>&#xa;    &lt;TileLevel>18&lt;/TileLevel>&#xa;    &lt;TileCountX>1&lt;/TileCountX>&#xa;    &lt;TileCountY>1&lt;/TileCountY>&#xa;    &lt;YOrigin>top&lt;/YOrigin>&#xa;  &lt;/DataWindow>&#xa;  &lt;Projection>EPSG:3857&lt;/Projection>&#xa;  &lt;BlockSizeX>256&lt;/BlockSizeX>&#xa;  &lt;BlockSizeY>256&lt;/BlockSizeY>&#xa;  &lt;BandsCount>3&lt;/BandsCount>&#xa;  &lt;Cache />&#xa;&lt;/GDAL_WMS>&#xa;" name="OSM Humanitarian Data Model">
         <customproperties/>
       </layer-tree-layer>
     </layer-tree-group>
@@ -21,10 +21,10 @@
   <mapcanvas>
     <units>meters</units>
     <extent>
-      <xmin>-21031120.67189527675509453</xmin>
-      <ymin>6702030.55026862025260925</ymin>
-      <xmax>21033414.83843668177723885</xmax>
-      <ymax>10476479.07862882688641548</ymax>
+      <xmin>-22284525.15261274948716164</xmin>
+      <ymin>8205141.43883366882801056</ymin>
+      <xmax>-9826387.45791513100266457</xmax>
+      <ymax>9323009.46988111734390259</ymax>
     </extent>
     <rotation>0</rotation>
     <projections>1</projections>
@@ -45,23 +45,24 @@
       <layer_coordinate_transform destAuthId="EPSG:3857" srcAuthId="EPSG:2154" srcDatumTransform="-1" destDatumTransform="-1" layerid="DEPARTEMENT20150303170638475"/>
       <layer_coordinate_transform destAuthId="EPSG:3857" srcAuthId="EPSG:2964" srcDatumTransform="-1" destDatumTransform="-1" layerid="airports20170930210750823"/>
       <layer_coordinate_transform destAuthId="EPSG:3857" srcAuthId="EPSG:2154" srcDatumTransform="-1" destDatumTransform="-1" layerid="LIMITE_DEPARTEMENT20160309221644773"/>
+      <layer_coordinate_transform destAuthId="EPSG:3857" srcAuthId="EPSG:3857" srcDatumTransform="-1" destDatumTransform="-1" layerid="OSM_Humanitarian_Data_Model20171001161030399"/>
       <layer_coordinate_transform destAuthId="EPSG:3857" srcAuthId="EPSG:3857" srcDatumTransform="-1" destDatumTransform="-1" layerid="OpenLayers_plugin_layer20160309220444019"/>
       <layer_coordinate_transform destAuthId="EPSG:3857" srcAuthId="EPSG:3857" srcDatumTransform="-1" destDatumTransform="-1" layerid="OCM_Landscape20170930210730298"/>
     </layer_coordinate_transform_info>
   </mapcanvas>
   <layer-tree-canvas>
     <custom-order enabled="0">
-      <item>OCM_Landscape20170930210730298</item>
       <item>airports20170930210750823</item>
+      <item>OSM_Humanitarian_Data_Model20171001161030399</item>
     </custom-order>
   </layer-tree-canvas>
   <mapcanvas>
     <units>meters</units>
     <extent>
-      <xmin>-659837.31405138049740344</xmin>
-      <ymin>5017712.72923578880727291</ymin>
-      <xmax>1236207.3755328506231308</xmax>
-      <ymax>6676691.46439242921769619</ymax>
+      <xmin>-22284525.15261274948716164</xmin>
+      <ymin>8205141.43883366882801056</ymin>
+      <xmax>-9826387.45791513100266457</xmax>
+      <ymax>9323009.46988111734390259</ymax>
     </extent>
     <rotation>0</rotation>
     <projections>1</projections>
@@ -80,20 +81,23 @@
     <rendermaptile>0</rendermaptile>
     <layer_coordinate_transform_info>
       <layer_coordinate_transform destAuthId="EPSG:3857" srcAuthId="EPSG:2154" srcDatumTransform="-1" destDatumTransform="-1" layerid="DEPARTEMENT20150303170638475"/>
+      <layer_coordinate_transform destAuthId="EPSG:3857" srcAuthId="EPSG:2964" srcDatumTransform="-1" destDatumTransform="-1" layerid="airports20170930210750823"/>
       <layer_coordinate_transform destAuthId="EPSG:3857" srcAuthId="EPSG:2154" srcDatumTransform="-1" destDatumTransform="-1" layerid="LIMITE_DEPARTEMENT20160309221644773"/>
+      <layer_coordinate_transform destAuthId="EPSG:3857" srcAuthId="EPSG:3857" srcDatumTransform="-1" destDatumTransform="-1" layerid="OSM_Humanitarian_Data_Model20171001161030399"/>
       <layer_coordinate_transform destAuthId="EPSG:3857" srcAuthId="EPSG:3857" srcDatumTransform="-1" destDatumTransform="-1" layerid="OpenLayers_plugin_layer20160309220444019"/>
+      <layer_coordinate_transform destAuthId="EPSG:3857" srcAuthId="EPSG:3857" srcDatumTransform="-1" destDatumTransform="-1" layerid="OCM_Landscape20170930210730298"/>
     </layer_coordinate_transform_info>
   </mapcanvas>
   <legend updateDrawingOrder="true">
-    <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="airports" showFeatureCount="1">
+    <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="Alaska airports by use" showFeatureCount="1">
       <filegroup open="true" hidden="false">
         <legendlayerfile isInOverview="0" layerid="airports20170930210750823" visible="1"/>
       </filegroup>
     </legendlayer>
     <legendgroup open="true" checked="Qt::Checked" name="Fonds de carte">
-      <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="OCM Landscape" showFeatureCount="0">
+      <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="OSM Humanitarian Data Model" showFeatureCount="0">
         <filegroup open="true" hidden="false">
-          <legendlayerfile isInOverview="0" layerid="OCM_Landscape20170930210730298" visible="1"/>
+          <legendlayerfile isInOverview="0" layerid="OSM_Humanitarian_Data_Model20171001161030399" visible="1"/>
         </filegroup>
       </legendlayer>
     </legendgroup>
@@ -106,10 +110,10 @@
         <xmax>20037508.33999999985098839</xmax>
         <ymax>20037508.33999999985098839</ymax>
       </extent>
-      <id>OCM_Landscape20170930210730298</id>
+      <id>OSM_Humanitarian_Data_Model20171001161030399</id>
       <datasource>&lt;GDAL_WMS>
   &lt;Service name="TMS">
-    &lt;ServerUrl>https://tile.thunderforest.com/landscape/${z}/${x}/${y}.png&lt;/ServerUrl>
+    &lt;ServerUrl>http://a.tile.openstreetmap.fr/hot/${z}/${x}/${y}.png&lt;/ServerUrl>
   &lt;/Service>
   &lt;DataWindow>
     &lt;UpperLeftX>-20037508.34&lt;/UpperLeftX>
@@ -126,11 +130,12 @@
   &lt;BlockSizeY>256&lt;/BlockSizeY>
   &lt;BandsCount>3&lt;/BandsCount>
   &lt;Cache />
-&lt;/GDAL_WMS></datasource>
+&lt;/GDAL_WMS>
+</datasource>
       <keywordList>
         <value></value>
       </keywordList>
-      <layername>OCM Landscape</layername>
+      <layername>OSM Humanitarian Data Model</layername>
       <srs>
         <spatialrefsys>
           <proj4>+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs</proj4>
@@ -145,7 +150,7 @@
       </srs>
       <customproperties>
         <property key="identify/format" value="Value"/>
-        <property key="ol_layer_type" value="OCM Landscape"/>
+        <property key="ol_layer_type" value="OSM Humanitarian Data Model"/>
       </customproperties>
       <provider>gdal</provider>
       <noData>
@@ -176,14 +181,15 @@
       <id>airports20170930210750823</id>
       <datasource>../../vectors/shp/airports.shp</datasource>
       <shortname>Airports</shortname>
-      <title>Aéroports des Etats-Unis</title>
-      <abstract>Aéroports des Etats-Unis</abstract>
+      <title>Alaska airports</title>
+      <abstract>Airports located in Alasaka (USA).</abstract>
       <keywordList>
         <value>transport</value>
         <value>airport</value>
+        <value>alaska</value>
         <value>usa</value>
       </keywordList>
-      <layername>airports</layername>
+      <layername>Alaska airports by use</layername>
       <srs>
         <spatialrefsys>
           <proj4>+proj=aea +lat_1=55 +lat_2=65 +lat_0=50 +lon_0=-154 +x_0=0 +y_0=0 +datum=NAD27 +units=us-ft +no_defs</proj4>
@@ -376,8 +382,6 @@
             </layer>
           </symbol>
         </source-symbol>
-        <colorramp type="randomcolors" name="[source]"/>
-        <invertedcolorramp value="0"/>
         <rotation/>
         <sizescale scalemethod="diameter"/>
       </renderer-v2>
@@ -553,6 +557,7 @@
       <SingleCategoryDiagramRenderer diagramType="Histogram" sizeLegend="0" attributeLegend="1">
         <DiagramCategory penColor="#000000" labelPlacementMethod="XHeight" penWidth="0" diagramOrientation="Up" sizeScale="0,0,0,0,0,0" minimumSize="0" barWidth="5" penAlpha="255" maxScaleDenominator="1e+08" backgroundColor="#ffffff" transparency="0" width="15" scaleDependency="Area" backgroundAlpha="255" angleOffset="1440" scaleBasedVisibility="0" enabled="0" height="15" lineSizeScale="0,0,0,0,0,0" sizeType="MM" lineSizeType="MM" minScaleDenominator="inf">
           <fontProperties description="MS Shell Dlg 2,7.5,-1,5,50,0,0,0,0,0" style=""/>
+          <attribute field="" color="#000000" label=""/>
         </DiagramCategory>
         <symbol alpha="1" clip_to_extent="1" type="marker" name="sizeSymbol">
           <layer pass="0" class="SimpleMarker" locked="0">
@@ -578,7 +583,7 @@
         </symbol>
       </SingleCategoryDiagramRenderer>
       <DiagramLayerSettings yPosColumn="-1" showColumn="-1" linePlacementFlags="10" placement="0" dist="0" xPosColumn="-1" priority="0" obstacle="0" zIndex="0" showAll="1"/>
-      <annotationform></annotationform>
+      <annotationform>.</annotationform>
       <aliases>
         <alias field="cat" index="0" name=""/>
         <alias field="NA3" index="1" name=""/>
@@ -607,10 +612,10 @@
           <column width="-1" hidden="1" type="actions"/>
         </columns>
       </attributetableconfig>
-      <editform></editform>
+      <editform>.</editform>
       <editforminit/>
       <editforminitcodesource>0</editforminitcodesource>
-      <editforminitfilepath></editforminitfilepath>
+      <editforminitfilepath>.</editforminitfilepath>
       <editforminitcode><![CDATA[# -*- coding: utf-8 -*-
 """
 QGIS forms can have a Python function that is called when the form is
@@ -664,12 +669,6 @@ def my_form_open(dialog, layer, feature):
     <Legend>
       <filterByMap type="bool">false</filterByMap>
     </Legend>
-    <WMSExtent type="QStringList">
-      <value>-21031120.67189527675509453</value>
-      <value>-2359223.14032631181180477</value>
-      <value>21033414.83843668177723885</value>
-      <value>19537732.76922375708818436</value>
-    </WMSExtent>
     <DefaultStyles>
       <Fill type="QString"></Fill>
       <Line type="QString"></Line>
@@ -702,18 +701,30 @@ def my_form_open(dialog, layer, feature):
     <WMSPrecision type="QString">8</WMSPrecision>
     <Digitizing>
       <DefaultSnapToleranceUnit type="int">2</DefaultSnapToleranceUnit>
-      <LayerSnappingList type="QStringList"/>
-      <LayerSnappingEnabledList type="QStringList"/>
+      <LayerSnappingList type="QStringList">
+        <value>airports20170930210750823</value>
+      </LayerSnappingList>
+      <LayerSnappingEnabledList type="QStringList">
+        <value>disabled</value>
+      </LayerSnappingEnabledList>
       <SnappingMode type="QString">current_layer</SnappingMode>
       <AvoidIntersectionsList type="QStringList"/>
-      <LayerSnappingToleranceUnitList type="QStringList"/>
-      <LayerSnapToList type="QStringList"/>
+      <LayerSnappingToleranceUnitList type="QStringList">
+        <value>2</value>
+      </LayerSnappingToleranceUnitList>
+      <LayerSnapToList type="QStringList">
+        <value>to_vertex_and_segment</value>
+      </LayerSnapToList>
       <DefaultSnapType type="QString">off</DefaultSnapType>
       <DefaultSnapTolerance type="double">0</DefaultSnapTolerance>
-      <LayerSnappingToleranceList type="QStringList"/>
+      <LayerSnappingToleranceList type="QStringList">
+        <value>0.000000</value>
+      </LayerSnappingToleranceList>
     </Digitizing>
     <Identify>
-      <disabledLayers type="QStringList"/>
+      <disabledLayers type="QStringList">
+        <value>OSM_Humanitarian_Data_Model20171001161030399</value>
+      </disabledLayers>
     </Identify>
     <WMSContactPerson type="QString"></WMSContactPerson>
     <WMSContactOrganization type="QString"></WMSContactOrganization>
