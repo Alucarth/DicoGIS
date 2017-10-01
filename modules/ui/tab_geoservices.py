@@ -22,7 +22,7 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 
 # Standard library
 from Tkinter import StringVar, Tk
-from ttk import Frame, Label, Entry
+from ttk import Button, Entry, Frame, Label
 
 import logging
 
@@ -30,7 +30,6 @@ import logging
 # ############ Globals ############
 # #################################
 
-# LOG
 logger = logging.getLogger("DicoGIS")
 
 # ##############################################################################
@@ -46,19 +45,23 @@ class TabServices(Frame):
         Frame.__init__(self)
 
         # variables
-        self.url_service = StringVar(self,
-                                     'http://suite.opengeo.org/geoserver/wfs?request=GetCapabilities')
+        self.url_srv = StringVar(self,
+                                 'http://suite.opengeo.org/geoserver/wfs?request=GetCapabilities')
 
         # widgets
-        self.lb_url_service = Label(self,
-                                    text='OpenCatalog')
-        self.ent_url_service = Entry(self,
-                                     width=75,
-                                     textvariable=self.url_service)
-
+        self.lb_url_srv = Label(self,
+                                text='Web service URL GetCapabilities: ')
+        self.ent_url_srv = Entry(self,
+                                 width=75,
+                                 textvariable=self.url_srv)
+        self.btn_check_srv = Button(self, text="youhou")
         # widgets placement
-        self.ent_url_service.grid(row=0, column=1,
-                                  sticky="NSWE", padx=2, pady=2)
+        self.lb_url_srv.grid(row=0, column=0,
+                             sticky="NSWE", padx=2, pady=2)
+        self.ent_url_srv.grid(row=0, column=1,
+                              sticky="NSWE", padx=2, pady=2)
+        self.btn_check_srv.grid(row=0, column=2,
+                                sticky="NSWE", padx=2, pady=2)
 
 
 # #############################################################################

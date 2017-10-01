@@ -81,21 +81,21 @@ class TabFiles(Frame):
                                  text=txt.get('gui_fr1', "Path"))
 
         # target folder
-        self.labtarg = Label(self.FrPath, text=txt.get('gui_path'))
-        self.target = Entry(master=self.FrPath, width=35)
-        self.browsetarg = Button(self.FrPath,       # browse button
+        self.lb_target = Label(self.FrPath, text=txt.get('gui_path'))
+        self.ent_target = Entry(master=self.FrPath, width=35)
+        self.btn_browse = Button(self.FrPath,
                                  text=u"\U0001F3AF " + txt.get('gui_choix', "Browse"),
                                  command=lambda: path_browser(),
                                  takefocus=True)
-        self.browsetarg.focus_force()               # force the focus on
+        self.btn_browse.focus_force()
 
         # widgets placement
-        self.labtarg.grid(row=1, column=1, columnspan=1,
-                          sticky="NSWE", padx=2, pady=2)
-        self.target.grid(row=1, column=2, columnspan=1,
-                         sticky="NSWE", padx=2, pady=2)
-        self.browsetarg.grid(row=1, column=3,
+        self.lb_target.grid(row=1, column=1, columnspan=1,
+                            sticky="NSWE", padx=2, pady=2)
+        self.ent_target.grid(row=1, column=2, columnspan=1,
                              sticky="NSWE", padx=2, pady=2)
+        self.btn_browse.grid(row=1, column=3,
+                             sticky="NSE", padx=2, pady=2)
 
         # -- Format filters --------------------------------------------------
         self.FrFilters = Labelframe(self,
@@ -152,11 +152,11 @@ class TabFiles(Frame):
                               text=u'Geospatial PDF',
                               variable=self.opt_pdf)
         self.caz_lyr = Checkbutton(self.FrFilters,
-                              text=u'.lyr',
-                              variable=self.opt_lyr)
+                                   text=u'.lyr',
+                                   variable=self.opt_lyr)
         self.caz_mxd = Checkbutton(self.FrFilters,
-                              text=u'.mxd',
-                              variable=self.opt_mxd)
+                                   text=u'.mxd',
+                                   variable=self.opt_mxd)
         caz_qgs = Checkbutton(self.FrFilters,
                               text=u'.qgs',
                               variable=self.opt_qgs)
@@ -211,15 +211,15 @@ class TabFiles(Frame):
                        sticky="NSWE",
                        padx=2, pady=2)
         self.caz_lyr.grid(row=3,
-                     column=0,
-                     columnspan=2,
-                     sticky="NSWE",
-                     padx=2, pady=2)
+                          column=0,
+                          columnspan=2,
+                          sticky="NSWE",
+                          padx=2, pady=2)
         self.caz_mxd.grid(row=3,
-                     column=1,
-                     columnspan=2,
-                     sticky="NSWE",
-                     padx=2, pady=2)
+                          column=1,
+                          columnspan=2,
+                          sticky="NSWE",
+                          padx=2, pady=2)
         caz_qgs.grid(row=3,
                      column=2,
                      columnspan=2,
