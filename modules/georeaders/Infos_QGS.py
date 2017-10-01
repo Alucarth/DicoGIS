@@ -3,33 +3,51 @@
 from __future__ import (absolute_import, print_function, unicode_literals)
 
 # ----------------------------------------------------------------------------
-# Name:         Infos qgs
-# Purpose:      Get some metadata abour qgs files (Esri symbology layer))
+# Name:         QGS Reader
+# Purpose:      Get some metadata about QGIS .qgs files without using QGIS.
 #
-# Author:       Julien Moura (https://github.com/Guts/)
+# Author:       Julien Moura (https://github.com/Guts)
 #
 # Python:       2.7.x
 # Created:      28/09/2015
-# Updated:      12/12/2015
+# Updated:      12/10/2017
 # Licence:      GPL 3
 # ----------------------------------------------------------------------------
 
 # ############################################################################
-########### Libraries #############
-###################################
+# ######### Libraries #############
+# #################################
+
 # Standard library
-from collections import OrderedDict  # Python 3 backported
+import logging
 from os import path, chdir, listdir   # files and folder managing
 from time import localtime, strftime
 from xml.etree import ElementTree
+import xmltodict
+
+# custom submodules
+try:
+    from .geoutils import Utils
+except ValueError:
+    from geoutils import Utils
+
+# ############################################################################
+# ######### Globals ############
+# ##############################
+
+logger = logging.getLogger("DicoGIS")
+youtils = Utils(ds_type="flat")
 
 # ############################################################################
 # ######### Classes #############
 # ###############################
 
+
 class ReadQGS():
-    def __init__(self, qgs_path, dico_qgs, tipo, txt=''):
-        u""" Uses ElementTree to parse QGS files which are XML based files
+    """QGIS projects files (*.qgs) independant reader."""
+
+    def __init__(self, src_path, dico_qgs, tipo, txt=''):
+        u"""Parse QGS files which are XML based files.
 
         qgspath = path to the qgs file
         dico_qgs = dictionary for global informations
@@ -37,24 +55,70 @@ class ReadQGS():
         text = dictionary of text in the selected language
         """
         # changing working directory to layer folder
-        chdir(path.dirname(qgs_path))
-
-        # raising arcpy specific exceptions
+        chdir(path.dirname(src_path))
+        # initializing errors counter
         self.alert = 0
 
+        # context metadata
+        dico_qgs['name'] = path.basename(src_path)
+        dico_qgs['folder'] = path.dirname(src_path)
+        dico_qgs['date_crea'] = strftime("%Y/%m/%d",
+                                         localtime(path.getctime(src_path)))
+        dico_qgs['date_actu'] = strftime("%Y/%m/%d",
+                                         localtime(path.getmtime(src_path)))
+        dico_qgs["total_size"] = youtils.sizeof(src_path)
         # opening qgs
-        qgs = ElementTree.parse(qgs_path).getroot()
-        # print(qgs.getroot().attrib["version"])
-        # print(qgs.find( 'title').text)
+        with open(qgspath, "r") as fd:
+            in_xml = xmltodict.parse(fd.read())
+            logger.debug("QGIS file opened.")
+            xml_qgis = in_xml.get("qgis", {})
+            print(xml_qgis.keys())
+            # BASICS
+            dico_qgs['title'] = xml_qgis.get('title')
+            dico_qgs['description'] = xml_qgis.get('@projectname')
+            dico_qgs['version'] = xml_qgis.get('@version')
+            # MAP CANVAS
+            qgs_map = xml_qgis.get("mapcanvas")
+            if len(qgs_map) > 1:
+                logging.info("QGS file has more than 1 mapcanvas markup.")
+                qgs_map = qgs_map[0]
+            else:
+                pass
+            dico_qgs['units'] = qgs_map.get("units")
+
+            qgs_extent = qgs_map.get('extent')
+            dico_qgs["Xmin"] = round(float(qgs_extent.get("xmin")), 2)
+            dico_qgs["Xmax"] = round(float(qgs_extent.get("xmax")), 2)
+            dico_qgs["Ymin"] = round(float(qgs_extent.get("ymin")), 2)
+            dico_qgs["Ymax"] = round(float(qgs_extent.get("ymax")), 2)
+
+            # SRS
+            qgs_srs = qgs_map.get("destinationsrs").get("spatialrefsys")
+            print(qgs_srs.keys())
+            dico_qgs[u'srs'] = qgs_srs.get("description")
+            if qgs_srs.get("geographicflag") == "false":
+                dico_qgs[u'srs_type'] = u"Projected"
+            else:
+                dico_qgs[u'srs_type'] = u"Geographic"
+            dico_qgs[u'EPSG'] = qgs_srs.get("authid")
+
+            # LAYERS
+            # print(xml_qgis.get("projectlayers").get("maplayer"))
+            qgs_lyrs = xml_qgis.get("projectlayers").get("maplayer")
+            dico_qgs[u'layers_count'] = len(qgs_lyrs)
+            # print(len(qgs_lyrs))
+            # print(xml_qgis.get("mapcanvas")[1].keys())
+
+
+
+        # qgs = ElementTree.parse(src_path).getroot()
+        # # print(qgs.getroot().attrib["version"])
+        # # print(qgs.find( 'title').text)
 
     #     # basics
-        dico_qgs['title'] = qgs.find('title').text
-    #     dico_qgs['description'] = qgs.description
     #     dico_qgs['creator_prod'] = qgs.author
-        dico_qgs['folder'] = path.dirname(qgs_path)
-        dico_qgs['version'] = qgs.attrib["version"]
+        # dico_qgs['version'] = qgs.attrib["version"]
     #     dico_qgs['credits'] = qgs.credits
-    #     dico_qgs['keywords'] = qgs.tags
     #     dico_qgs['subject'] = qgs.summary
     #     dico_qgs['relpath'] = qgs.relativePaths
     #     dico_qgs['url'] = qgs.hyperlinkBase
@@ -86,28 +150,10 @@ class ReadQGS():
 
     #         # reset
     #         del dico_dframe
-        # LAYERS
-        qgs_layers = qgs.find('projectlayers')
-        dico_qgs[u'layers_count'] = len(qgs_layers.getchildren())
-
-        # MAP CANVAS
-        qgs_canvas = qgs.find('mapcanvas')
-        # units
-        dico_qgs[u'units'] = qgs_canvas.find('units').text
-
-        # SRS
-        qgs_dest_srs = qgs_canvas.find("destinationsrs").getchildren()
-        print(dir(qgs_dest_srs), qgs_dest_srs[0][1].tag)
-
-        
-        dico_qgs['srs'] = qgs_dest_srs.find("srsid").text
-
-        # extent
-        qgs_extent = qgs_canvas.find('extent').getchildren()
-        dico_qgs[u'Xmin'] = round(float(qgs_extent[0].text), 2)
-        dico_qgs[u'Xmax'] = round(float(qgs_extent[2].text), 2)
-        dico_qgs[u'Ymin'] = round(float(qgs_extent[1].text), 2)
-        dico_qgs[u'Ymax'] = round(float(qgs_extent[3].text), 2)
+        # # SRS
+        # qgs_dest_srs = qgs_canvas.find("destinationsrs").getchildren()
+        # # print(dir(qgs_dest_srs), qgs_dest_srs[0][1].tag)
+        # # dico_qgs['srs'] = qgs_dest_srs.find("srsid").text
 
         # scale
         # dico_qgs['maxScale'] = layer_obj.maxScale
@@ -116,13 +162,6 @@ class ReadQGS():
     #     # # secondary
     #     # dico_qgs['license'] = layer_obj.credits
     #     # dico_qgs['broken'] = layer_obj.isBroken
-
-    #     size = path.getsize(qgs_path)
-    #     dico_qgs[u"total_size"] = self.sizeof(size)
-
-    #     # global dates
-    #     dico_qgs[u'date_crea'] = strftime('%d/%m/%Y',
-    #                                       localtime(path.getctime(qgs_path)))
 
     #     # # total fields count
     #     # total_fields = 0
@@ -139,12 +178,6 @@ class ReadQGS():
     #     u"""
     #     Gets informations about geography and geometry
     #     """
-    #     # spatial extent
-    #     extent = dataframe.extent
-    #     dico_dframe[u'Xmin'] = round(extent.XMin, 2)
-    #     dico_dframe[u'Xmax'] = round(extent.XMax, 2)
-    #     dico_dframe[u'Ymin'] = round(extent.YMin, 2)
-    #     dico_dframe[u'Ymax'] = round(extent.YMax, 2)
 
     #     # map settings
     #     dico_dframe[u'mapUnits'] = dataframe.mapUnits
@@ -169,28 +202,6 @@ class ReadQGS():
     #     # end of function
     #     return
 
-    def sizeof(self, os_size):
-        u"""
-        Returns size in different units depending on size
-        see http://stackoverflow.com/a/1094933
-        """
-        for size_cat in ['octets', 'Ko', 'Mo', 'Go']:
-            if os_size < 1024.0:
-                return "%3.1f %s" % (os_size, size_cat)
-            os_size /= 1024.0
-        # end of function
-        return "%3.1f %s" % (os_size, " To")
-
-
-    def erratum(self, dico_qgs, qgs_path, mess):
-        u""" errors handler """
-        # storing minimal informations to give clues to solve later
-        dico_qgs[u'name'] = path.basename(qgspath)
-        dico_qgs[u'folder'] = path.dirname(qgspath)
-        dico_qgs[u'error'] = mess
-        # End of function
-        return dico_qgs
-
 # ############################################################################
 # #### Stand alone program ########
 # #################################
@@ -200,18 +211,21 @@ if __name__ == '__main__':
     Standalone execution for development and tests. Paths are relative considering
     a test within the official repository (https://github.com/Guts/DicoGIS/)
     """
+    # specific imports
+    from collections import OrderedDict
     # searching for qgs Files
     dir_qgs = path.abspath(r'..\..\test\datatest\maps_docs\qgs')
     # dir_qgs = path.abspath(r'\\Copernic\SIG_RESSOURCES\1_qgs\ADMINISTRATIF')
     chdir(path.abspath(dir_qgs))
     li_qgs = listdir(path.abspath(dir_qgs))
-    li_qgs = [path.abspath(qgs) for qgs in li_qgs if path.splitext(qgs)[1].lower()=='.qgs']
+    li_qgs = [path.abspath(qgs)
+              for qgs in li_qgs if path.splitext(qgs)[1].lower() == '.qgs']
 
     # recipient datas
     dico_qgs = OrderedDict()
 
     # test text dictionary
-    textos = OrderedDict()
+    textos = dict()
     textos['srs_comp'] = u'Compound'
     textos['srs_geoc'] = u'Geocentric'
     textos['srs_geog'] = u'Geographic'
@@ -228,9 +242,9 @@ if __name__ == '__main__':
         if path.isfile(qgspath):
             # print("\n{0}: ".format(qgspath))
             ReadQGS(qgspath,
-                     dico_qgs,
-                     'QGIS Document',
-                     txt=textos)
+                    dico_qgs,
+                    'QGIS Document',
+                    txt=textos)
             # print results
             print(dico_qgs)
         else:
