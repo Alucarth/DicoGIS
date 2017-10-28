@@ -234,6 +234,7 @@ virtualenv/
 *.log
 *Thumbs.db
 options.ini
+arcpy.pth
 
 # binaries
 /setup/
