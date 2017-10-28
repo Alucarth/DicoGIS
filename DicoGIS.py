@@ -221,7 +221,7 @@ class DicoGIS(Tk):
                     text=" Files ",
                     padding=3)
 
-# =================================================================================
+# ================================================================================
 
         # ## TAB 2: Database ##
         self.nb.add(self.tab_sgbd,
@@ -263,7 +263,7 @@ class DicoGIS(Tk):
         # widgets placement
         self.nameoutput.grid(row=0, column=1,
                              sticky="NSWE", padx=2, pady=2)
-        self.output.grid(row=0, column=2, columnspan=2,
+        self.output.grid(row=0, column=2, columnspan=1,
                          sticky="NSWE", padx=2, pady=2)
 
         # Frame: Progression bar
@@ -381,8 +381,8 @@ class DicoGIS(Tk):
         self.nb.tab(0, text=self.blabla.get('gui_tab1'))
         self.tab_files.FrPath.config(text=self.blabla.get('gui_fr1'))
         self.tab_files.FrFilters.config(text=self.blabla.get('gui_fr3'))
-        self.tab_files.labtarg.config(text=self.blabla.get('gui_path'))
-        self.tab_files.browsetarg.config(text=u"\U0001F3AF " + self.blabla.get('gui_choix'))
+        self.tab_files.lb_target.config(text=self.blabla.get('gui_path'))
+        self.tab_files.btn_browse.config(text=u"\U0001F3AF " + self.blabla.get('gui_choix'))
         # sgbd tab
         self.nb.tab(1, text=self.blabla.get('gui_tab2'))
         self.tab_sgbd.FrDb.config(text=self.blabla.get('gui_fr2'))
@@ -436,9 +436,10 @@ class DicoGIS(Tk):
         # check if a folder has been choosen
         if foldername:
             try:
-                self.tab_files.target.delete(0, END)
-                self.tab_files.target.insert(0, foldername)
-            except:
+                self.tab_files.ent_target.delete(0, END)
+                self.tab_files.ent_target.insert(0, foldername)
+            except Exception as e:
+                logger.debug(e)
                 info(title=self.blabla.get('nofolder'),
                      message=self.blabla.get('nofolder'))
                 return
@@ -446,9 +447,9 @@ class DicoGIS(Tk):
             pass
         # set the default output file
         self.output.delete(0, END)
-        self.output.insert(0,
-                           "DicoGIS_{0}_{1}.xlsx".format(path.split(self.tab_files.target.get())[1],
-                                                        self.today))
+        self.output.insert(0, "DicoGIS_{0}_{1}.xlsx"
+                              .format(path.split(self.tab_files.ent_target.get())[1],
+                                                 self.today))
         # count geofiles in a separated thread
         proc = threading.Thread(target=self.ligeofiles,
                                 args=(foldername, ))
@@ -479,7 +480,7 @@ class DicoGIS(Tk):
         self.li_lyr = []
         self.li_mxd = []
         self.li_qgs = []
-        self.tab_files.browsetarg.config(state=DISABLED)
+        self.tab_files.btn_browse.config(state=DISABLED)
 
         # Looping in folders structure
         self.status.set(self.blabla.get('gui_prog1'))
@@ -693,7 +694,7 @@ class DicoGIS(Tk):
                                 self.blabla.get('log_numfold')))
 
         # reactivating the buttons
-        self.tab_files.browsetarg.config(state=ACTIVE)
+        self.tab_files.btn_browse.config(state=ACTIVE)
         self.val.config(state=ACTIVE)
         # End of function
         return foldertarget, self.li_shp, self.li_tab, self.li_kml,\
