@@ -11,7 +11,7 @@
 # python-setuptools, python-pip, python-dev, python-tk, python-gdal, python-software-properties
 
 # via pypi
-archook
+archook==1.2.0
 arrow>=0.10.*
 dxfgrabber==0.8.*
 numpy==1.13.*
