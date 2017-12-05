@@ -21,17 +21,23 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 # ##################################
 
 # Standard library
-from Tkinter import IntVar, Tk
+from Tkinter import IntVar, StringVar, Tk
+from Tkinter import DISABLED, END
+from tkFileDialog import askdirectory
+from tkMessageBox import showinfo, showerror
 from ttk import Checkbutton, Button, Entry, Frame, Label, Labelframe
 
 import logging
+from os import path
+import threading    # handling various subprocesses
+from time import strftime
 
 # ##############################################################################
 # ############ Globals ############
 # #################################
 
-# LOG
-logger = logging.getLogger("DicoGIS")
+today = strftime("%Y-%m-%d")
+logger = logging.getLogger("DicoGIS")   # LOG
 
 # ##############################################################################
 # ########## Classes ###############
@@ -40,12 +46,14 @@ logger = logging.getLogger("DicoGIS")
 
 class TabFiles(Frame):
 
-    def __init__(self, parent, txt=dict(), path_browser=None):
+    def __init__(self, parent, txt=dict(), path_browser=None, path_var=""):
         """Instanciating the output workbook."""
-        self.parent = parent
+        self.p = parent
+        self.txt = txt
         Frame.__init__(self)
 
         # -- VARIABLES -------------------------------------------------------
+        self.target_path = StringVar()
         # formats / type: vectors
         self.li_vectors_formats = (".shp", ".tab", ".kml",
                                    ".gml", ".geojson")  # vectors handled
@@ -82,10 +90,11 @@ class TabFiles(Frame):
 
         # target folder
         self.lb_target = Label(self.FrPath, text=txt.get('gui_path'))
-        self.ent_target = Entry(master=self.FrPath, width=35)
+        self.ent_target = Entry(master=self.FrPath, width=35,
+                                textvariable=self.target_path)
         self.btn_browse = Button(self.FrPath,
                                  text=u"\U0001F3AF " + txt.get('gui_choix', "Browse"),
-                                 command=lambda: path_browser(),
+                                 command=lambda: self.get_target_path(r"."),
                                  takefocus=True)
         self.btn_browse.focus_force()
 
@@ -232,6 +241,40 @@ class TabFiles(Frame):
         self.FrFilters.grid(row=4, column=1,
                             padx=2, pady=2, sticky="NSWE")
 
+    def get_target_path(self, def_rep):
+        """Browse and insert the path of target folder."""
+        print(self.target_path.get())
+        foldername = askdirectory(parent=self.p,
+                                  initialdir=def_rep,
+                                  mustexist=True,
+                                  title="")
+        # deactivate Go button
+        # self.val.config(state=DISABLED)
+        # check if a folder has been choosen
+        if foldername:
+            try:
+                self.tab_files.ent_target.delete(0, END)
+                self.tab_files.ent_target.insert(0, foldername)
+            except Exception as e:
+                logger.debug(e)
+                showinfo(title=self.txt.get('nofolder'),
+                         message=self.txt.get('nofolder'))
+                return
+        else:
+            pass
+        # set the default output file
+        self.output.delete(0, END)
+        self.output.insert(0, "DicoGIS_{0}_{1}.xlsx"
+                              .format(path.split(self.target_path.get()),
+                                                 today))
+        # count geofiles in a separated thread
+        proc = threading.Thread(target=self.ligeofiles,
+                                args=(foldername, ))
+        proc.daemon = True
+        proc.start()
+        # end of function
+        return foldername
+
 # #############################################################################
 # ##### Stand alone program ########
 # ##################################
@@ -245,6 +288,7 @@ if __name__ == '__main__':
 
     #
     root = Tk()
-    frame = TabFiles(root, path_browser=browse)
+    target_path = StringVar(root)
+    frame = TabFiles(root, path_browser=browse, path_var=target_path)
     frame.pack()
     root.mainloop()
