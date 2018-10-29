@@ -12,11 +12,17 @@ environment:
       PYTHON_VERSION: 2.7
       PYTHON_ARCH: 64
       PYTHONOPTIMIZE: 2
+      DISTUTILS_USE_SDK: 1
+      MSSdk: 1
+      WINDOWS_SDK_VERSION: v7.0
+      SET_SDK_64: Y
 
     - PYTHON: C:\\Python27
       PYTHON_VERSION: 2.7
       PYTHON_ARCH: 32
       PYTHONOPTIMIZE: 2
+      WINDOWS_SDK_VERSION: v7.0
+      SET_SDK_64: Y
 
 # skip_non_tags: true
 
