@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
 from __future__ import (absolute_import, print_function, unicode_literals)
-
 # -----------------------------------------------------------------------------
 # Name:         Infos LYR
 # Purpose:      Get some metadata abour LYR files (Esri symbology layer))
@@ -17,6 +16,10 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 # ############################################################################
 # ########## Libraries #############
 # ##################################
+# Python 2 and 3 compatibility
+from future.standard_library import install_aliases
+install_aliases()
+
 # Standard library
 from collections import OrderedDict  # Python 3 backported
 import logging
@@ -33,6 +36,12 @@ except ImportError:
     logging.error("ArcPy is not installed.")
 except RuntimeError:
     logging.error("ArcPy is installed, but not licensed.")
+
+# ############################################################################
+# ######### Globals ############
+# ##############################
+
+logger = logging.getLogger("DicoGIS")
 
 # #############################################################################
 # ########## Classes #############
@@ -332,20 +341,6 @@ if __name__ == '__main__' and __package__ is None:
     from os import sys
     sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
-    # custom
-    from utils.checknorris import CheckNorris
-
-    # ------------ checking arcpy installation ----------------
-    # Invoke Check Norris
-    checker = CheckNorris()
-
-    if not checker.check_arcpy()[0]:
-        from sys import exit
-        exit('ArcPy not found. Check your installation.')
-    else:
-        logging.info("ArcPy: ", checker.check_arcpy())
-        pass
-
     # ------------ import arcpy ----------------
     # 3rd party libraries
     try:
@@ -355,14 +350,15 @@ if __name__ == '__main__' and __package__ is None:
         from arcpy.da import SearchCursor
     except ImportError:
         logging.error("arcpy isn't well installed.")
+        sys.exit()
 
     # ------------ Real start ----------------
     # searching for lyr Files
     dir_lyr = path.abspath(r'..\..\test\datatest\maps_docs\lyr')
-    # dir_lyr = path.abspath(r'\\Copernic\SIG_RESSOURCES\1_lyr\ADMINISTRATIF')
     chdir(path.abspath(dir_lyr))
     li_lyr = listdir(path.abspath(dir_lyr))
-    li_lyr = [path.abspath(lyr) for lyr in li_lyr if path.splitext(lyr)[1].lower()=='.lyr']
+    li_lyr = [path.abspath(lyr)
+              for lyr in li_lyr if path.splitext(lyr)[1].lower() == '.lyr']
 
     # recipient datas
     dico_lyr = OrderedDict()
@@ -398,5 +394,5 @@ if __name__ == '__main__' and __package__ is None:
             # print results
             print(dico_lyr)
         else:
-            loggin.error("{0} is not a recognized file".format(lyrpath))
+            logger.error("{0} is not a recognized file".format(lyrpath))
             continue
