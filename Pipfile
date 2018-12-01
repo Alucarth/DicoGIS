@@ -1,0 +1,19 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+archook = "==1.2.0"
+arrow = ">=0.10.*"
+dxfgrabber = "==0.8.*"
+numpy = "==1.13.*"
+isogeo-pysdk = "==2.18.*"
+openpyxl = "==2.4.*"
+GDAL = "==2.*"
+
+[dev-packages]
+PyInstaller = "*"
+
+[requires]
+python_version = "3.6"
