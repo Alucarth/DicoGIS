@@ -4,8 +4,12 @@ pool:
   vmImage: "windows-2019"
 strategy:
   matrix:
-    Python37:
+    Python37arch64:
       python.version: '3.7'
+      python.arch: 'x64'
+    Python37arch32:
+      python.version: '3.7'
+      python.arch: 'x86'
 
 steps:
 - checkout: self  # self represents the repo where the initial Pipelines YAML file was found
@@ -16,11 +20,16 @@ steps:
   inputs:
     versionSpec: '$(python.version)'
     addToPath: true
-    architecture: 'x64'
+    architecture: '$(python.arch)'
   displayName: 'Use Python $(python.version)'
 
 - script: |
     python -m pip install --upgrade pip setuptools wheel
     python -m pip install numpy
     python -m pip install .\lib\GDAL-3.0.0-cp37-cp37m-win_amd64.whl
+    python -m pip install -U -r ./requirements.txt
+    python -m pip install -U -r ./requirements_dev.txt
   displayName: 'Install dependencies'
+
+# - script: pyinstaller.exe -y bundle_isogeo2office.spec
+#   displayName: 'Building the executable'
