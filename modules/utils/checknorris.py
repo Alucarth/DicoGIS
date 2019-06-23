@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
-from __future__ import (absolute_import, print_function, unicode_literals)
+from __future__ import absolute_import, print_function, unicode_literals
+
 # -----------------------------------------------------------------------------
 # Name:         Check Norris
 # Purpose:      A class dedicated to perform system test to ensure another
@@ -63,27 +64,30 @@ class CheckNorris(object):
                 from osgeo import gdal
             except ImportError:
                 import gdal
-            logger.info('GDAL version: {}'.format(gdal.__version__))
+            logger.info("GDAL version: {}".format(gdal.__version__))
         except:
-            logger.error("GDAL is not installed or not reachable."
-                         " DicoGIS is going to close.")
+            logger.error(
+                "GDAL is not installed or not reachable." " DicoGIS is going to close."
+            )
             return 1
 
         # GDAL_DATA variable
         if "GDAL_DATA" not in env.keys():
             try:
-                gdal.SetConfigOption(str('GDAL_DATA'),
-                                     str(path.abspath(r'data/gdal')))
-                logger.info("GDAL_DATA path not found in environment variable."
-                            " DicoGIS'll use its own: " +
-                            path.abspath(r'data/gdal'))
+                gdal.SetConfigOption(str("GDAL_DATA"), str(path.abspath(r"data/gdal")))
+                logger.info(
+                    "GDAL_DATA path not found in environment variable."
+                    " DicoGIS'll use its own: " + path.abspath(r"data/gdal")
+                )
                 return 2
             except:
                 logger.error("Oups! Something's wrong with GDAL_DATA path.")
                 return 3
         else:
-            logger.info("GDAL_DATA path found in environment variable: {}."
-                        " DicoGIS'll use it.".format(env.get("GDAL_DATA")))
+            logger.info(
+                "GDAL_DATA path found in environment variable: {}."
+                " DicoGIS'll use it.".format(env.get("GDAL_DATA"))
+            )
             return 4
         # end of method
         return
@@ -94,12 +98,16 @@ class CheckNorris(object):
         try:
             archook.get_arcpy()
             import arcpy
+
             esri_info = arcpy.GetInstallInfo()
-            logger.info("ArcPy imported from ArcGIS {} v{} in ({})"
-                        " - using archook"
-                        .format(esri_info.get("ProductName"),
-                                esri_info.get("Version"),
-                                archook.locate_arcgis()))
+            logger.info(
+                "ArcPy imported from ArcGIS {} v{} in ({})"
+                " - using archook".format(
+                    esri_info.get("ProductName"),
+                    esri_info.get("Version"),
+                    archook.locate_arcgis(),
+                )
+            )
             # end of method
             return True, esri_info
         except ImportError as e:
@@ -108,30 +116,40 @@ class CheckNorris(object):
         # 3rd party libraries
         try:
             import arcpy
+
             esri_info = arcpy.GetInstallInfo()
-            logger.info("ArcPy imported from ArcGIS {} v{} in ({})".format(
-                        esri_info.get("ProductName"),
-                        esri_info.get("Version"),
-                        esri_info.get("InstallDir")))
+            logger.info(
+                "ArcPy imported from ArcGIS {} v{} in ({})".format(
+                    esri_info.get("ProductName"),
+                    esri_info.get("Version"),
+                    esri_info.get("InstallDir"),
+                )
+            )
             # end of method
             return True, esri_info
         except RuntimeError:
             logger.error("ArcPy is installed, but not licensed.")
             return False, "ArcGIS is installed, but not licensed."
         except ImportError:
-            logger.info("ArcGIS isn't in the SYSPATH."
-                        " Trying to find it automatically.")
+            logger.info(
+                "ArcGIS isn't in the SYSPATH." " Trying to find it automatically."
+            )
             # checks if ArcGIS is installed
-            if not path.isdir(path.join(env.get("PROGRAMFILES(x86)"), "ArcGIS"))\
-               and not path.isdir(path.join(env.get("PROGRAMFILES"), "ArcGIS")):
+            if not path.isdir(
+                path.join(env.get("PROGRAMFILES(x86)"), "ArcGIS")
+            ) and not path.isdir(path.join(env.get("PROGRAMFILES"), "ArcGIS")):
                 logger.info("ArcGIS isn't installed on this computer.")
                 return False, "ArcGIS isn't installed on this computer."
             else:
-                arcgis_path = path.join(env.get("PROGRAMFILES(x86)", "PROGRAMFILES"), "ArcGIS")
+                arcgis_path = path.join(
+                    env.get("PROGRAMFILES(x86)", "PROGRAMFILES"), "ArcGIS"
+                )
                 pass
             logger.info("ArcGIS is installed but not well configured.")
             # path to the last version of 10 branch
-            v = max([i[-1] for i in listdir(path.realpath(arcgis_path)) if "Desktop10" in i])
+            v = max(
+                [i[-1] for i in listdir(path.realpath(arcgis_path)) if "Desktop10" in i]
+            )
             arcgis_path = path.join(arcgis_path, "Desktop10.{}".format(v))
             # adding paths to the environment
             sys.path.append(path.join(arcgis_path, "arcpy"))
@@ -140,23 +158,29 @@ class CheckNorris(object):
             try:
                 import arcpy
                 import site
+
                 esri_info = arcpy.GetInstallInfo()
                 logger.info("ArcGIS configuration has been fixed.")
                 logger.info("ArcGIS installation: {}".format(arcpy.ProductInfo()))
-                if hasattr(sys, 'real_prefix'):
+                if hasattr(sys, "real_prefix"):
                     # inside a venv
                     logger.info("Executing inside a virtualenv. Nice!")
-                    pypacks = [p for p in sys.path if p.endswith('site-packages')][-1]
+                    pypacks = [p for p in sys.path if p.endswith("site-packages")][-1]
                 else:
                     # using system install
                     logger.info("Executing from the main Python install.")
                     pypacks = site.getsitepackages()[1]
 
                 # creatring pth file for future runs
-                with open(path.join(pypacks, 'arcpy.pth'), 'w') as pth_arcpy:
-                    pth_arcpy.write(path.realpath(path.join(arcgis_path, "arcpy")) + "\n")
+                with open(path.join(pypacks, "arcpy.pth"), "w") as pth_arcpy:
+                    pth_arcpy.write(
+                        path.realpath(path.join(arcgis_path, "arcpy")) + "\n"
+                    )
                     pth_arcpy.write(path.realpath(path.join(arcgis_path, "bin")) + "\n")
-                    pth_arcpy.write(path.realpath(path.join(arcgis_path, "ArcToolbox\Scripts")) + "\n")
+                    pth_arcpy.write(
+                        path.realpath(path.join(arcgis_path, "ArcToolbox\Scripts"))
+                        + "\n"
+                    )
                 # end of method
                 return True, esri_info
             except:
@@ -204,16 +228,15 @@ class CheckNorris(object):
             return 2
         else:
             #
-            env['http_proxy'] = os_proxies.get("http")
-            env['https_proxy'] = os_proxies.get("https")
+            env["http_proxy"] = os_proxies.get("http")
+            env["https_proxy"] = os_proxies.get("https")
             #
-            proxy = ProxyHandler({
-                                 'http': os_proxies.get("http"),
-                                 'https': os_proxies.get("https")
-                                 })
+            proxy = ProxyHandler(
+                {"http": os_proxies.get("http"), "https": os_proxies.get("https")}
+            )
             opener = build_opener(proxy)
             install_opener(opener)
-            urlopen('http://www.google.com')
+            urlopen("http://www.google.com")
             return 3, os_proxies
 
 
@@ -221,7 +244,7 @@ class CheckNorris(object):
 # ##### Stand alone program ########
 # ##################################
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     """ standalone execution """
     # ------------ Specific imports ----------------
 

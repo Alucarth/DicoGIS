@@ -20,7 +20,7 @@ from __future__ import print_function
 # ##################################
 # Standard library
 from collections import OrderedDict  # Python 3 backported
-from os import path, walk   # files and folder managing
+from os import path, walk  # files and folder managing
 from time import localtime, strftime
 
 # 3rd party libraries
@@ -31,9 +31,9 @@ from geoserver.catalog import Catalog
 # ################################
 
 
-class ReadGeoServer():
-    def __init__(self, gs_axx, dico_gs, tipo, txt=''):
-        u""" Uses OGR functions to extract basic informations about
+class ReadGeoServer:
+    def __init__(self, gs_axx, dico_gs, tipo, txt=""):
+        """ Uses OGR functions to extract basic informations about
         geographic Web Features Services.
 
         gs_axx = tuple like {url of a geoserver, user, password)
@@ -68,28 +68,36 @@ class ReadGeoServer():
         for layer in layers:
             # print(layer.name, layer.enabled, layer.resource._store.name, layer.resource._workspace.name)
             title = layer.resource.title
-            print((layer.resource._workspace.name + "/wms?layers={}:{};".format(layer.resource._workspace.name, layer.name), title.encode("utf8")))
+            print(
+                (
+                    layer.resource._workspace.name
+                    + "/wms?layers={}:{};".format(
+                        layer.resource._workspace.name, layer.name
+                    ),
+                    title.encode("utf8"),
+                )
+            )
             # print(title.encode("utf8"))
             # dico_layers[layer.name] = layer.enabled, layer.resource.title, layer.resource.abstract, layer.resource.keywords
             # dico_stores[layer.resource._store.name] = dico_layers
             # dico_gs[layer.resource._workspace] = dico_stores
         print(dir(layer.resource))
 
+
 # ############################################################################
 # ##### Stand alone program ########
 # ##################################
 
-if __name__ == '__main__':
-    u""" standalone execution for tests. Paths are relative considering a test
+if __name__ == "__main__":
+    """ standalone execution for tests. Paths are relative considering a test
     within the official repository (https://github.com/Guts/DicoGIS/)"""
     from urllib2 import urlopen
+
     # test text dictionary
     textos = OrderedDict()
 
     # listing WFS
-    li_geoservers = [
-
-                     ]
+    li_geoservers = []
 
     # recipient datas
     dico_gs = OrderedDict()
@@ -98,9 +106,6 @@ if __name__ == '__main__':
     for gs in li_geoservers:
         dico_gs.clear()
         print("\n{0}: ".format(gs))
-        ReadGeoServer(gs,
-                      dico_gs,
-                      'GeoServer',
-                      textos)
+        ReadGeoServer(gs, dico_gs, "GeoServer", textos)
         # print results
         # print(dico_gs.keys())

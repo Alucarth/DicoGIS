@@ -1,6 +1,7 @@
 ﻿# -*- coding: UTF-8 -*-
 #!/usr/bin/env python
-from __future__ import (absolute_import, print_function, unicode_literals)
+from __future__ import absolute_import, print_function, unicode_literals
+
 # ----------------------------------------------------------------------------
 # Name:         InfosSHP
 # Purpose:      Use GDAL/OGR library to extract informations about
@@ -22,7 +23,7 @@ from __future__ import (absolute_import, print_function, unicode_literals)
 # Standard library
 from collections import OrderedDict  # Python 3 backported
 import logging
-from os import chdir, path       # files and folder managing
+from os import chdir, path  # files and folder managing
 from time import localtime, strftime
 
 # 3rd party libraries
@@ -57,7 +58,7 @@ logger = logging.getLogger("DicoGIS")
 # ###############################
 
 
-class ReadVectorFlatDataset():
+class ReadVectorFlatDataset:
     def __init__(self):
         """Class constructor."""
         # handling ogr specific exceptions
@@ -92,79 +93,76 @@ class ReadVectorFlatDataset():
             logger.error(e)
             self.alert = self.alert + 1
             dico_dataset["type"] = tipo
-            youtils.erratum(dico_dataset, source_path, u'err_corrupt')
+            youtils.erratum(dico_dataset, source_path, "err_corrupt")
             dico_dataset["err_gdal"] = gdal_err.err_type, gdal_err.err_msg
             return 0
 
         # raising incompatible files
         if not src:
-            u""" if file is not compatible """
+            """ if file is not compatible """
             self.alert += 1
-            dico_dataset['err_gdal'] = gdal_err.err_type, gdal_err.err_msg
-            youtils.erratum(dico_dataset, source_path, u'err_nobjet')
+            dico_dataset["err_gdal"] = gdal_err.err_type, gdal_err.err_msg
+            youtils.erratum(dico_dataset, source_path, "err_nobjet")
             return 0
         else:
-            layer = src.GetLayer()   # get the layer
+            layer = src.GetLayer()  # get the layer
             pass
 
         # dataset name, title and parent folder
         try:
-            dico_dataset['name'] = path.basename(source_path)
-            dico_dataset['folder'] = path.dirname(source_path)
+            dico_dataset["name"] = path.basename(source_path)
+            dico_dataset["folder"] = path.dirname(source_path)
         except AttributeError as e:
-            dico_dataset['name'] = path.basename(layer.GetName())
-            dico_dataset['folder'] = path.dirname(layer.GetName())
-        dico_dataset['title'] = dico_dataset.get('name')[:-4]\
-                                            .replace('_', ' ')\
-                                            .capitalize()
+            dico_dataset["name"] = path.basename(layer.GetName())
+            dico_dataset["folder"] = path.dirname(layer.GetName())
+        dico_dataset["title"] = (
+            dico_dataset.get("name")[:-4].replace("_", " ").capitalize()
+        )
 
         # dependencies and total size
         dependencies = youtils.list_dependencies(source_path, "auto")
-        dico_dataset[u'dependencies'] = dependencies
-        dico_dataset[u"total_size"] = youtils.sizeof(source_path,
-                                                     dependencies)
+        dico_dataset["dependencies"] = dependencies
+        dico_dataset["total_size"] = youtils.sizeof(source_path, dependencies)
         # Getting basic dates
         crea, up = path.getctime(source_path), path.getmtime(source_path)
-        dico_dataset[u'date_crea'] = strftime('%Y/%m/%d',
-                                              localtime(crea))
-        dico_dataset[u'date_actu'] = strftime('%Y/%m/%d',
-                                              localtime(up))
+        dico_dataset["date_crea"] = strftime("%Y/%m/%d", localtime(crea))
+        dico_dataset["date_actu"] = strftime("%Y/%m/%d", localtime(up))
 
         # features
         layer_feat_count = layer.GetFeatureCount()
-        dico_dataset['num_obj'] = layer_feat_count
+        dico_dataset["num_obj"] = layer_feat_count
         if layer_feat_count == 0:
-            u""" if layer doesn't have any object, return an error """
+            """ if layer doesn't have any object, return an error """
             self.alert += 1
-            youtils.erratum(dico_dataset, source_path, u'err_nobjet')
+            youtils.erratum(dico_dataset, source_path, "err_nobjet")
             return 0
         else:
             pass
 
         # fields
         layer_def = layer.GetLayerDefn()
-        dico_dataset['num_fields'] = layer_def.GetFieldCount()
-        dico_dataset['fields'] = georeader.get_fields_details(layer_def)
+        dico_dataset["num_fields"] = layer_def.GetFieldCount()
+        dico_dataset["fields"] = georeader.get_fields_details(layer_def)
 
         # geometry type
-        dico_dataset[u'type_geom'] = georeader.get_geometry_type(layer)
+        dico_dataset["type_geom"] = georeader.get_geometry_type(layer)
 
         # SRS
         srs_details = georeader.get_srs_details(layer, txt)
-        dico_dataset[u'srs'] = srs_details[0]
-        dico_dataset[u'EPSG'] = srs_details[1]
-        dico_dataset[u'srs_type'] = srs_details[2]
+        dico_dataset["srs"] = srs_details[0]
+        dico_dataset["EPSG"] = srs_details[1]
+        dico_dataset["srs_type"] = srs_details[2]
 
         # spatial extent
         extent = georeader.get_extent_as_tuple(layer)
-        dico_dataset[u'Xmin'] = extent[0]
-        dico_dataset[u'Xmax'] = extent[1]
-        dico_dataset[u'Ymin'] = extent[2]
-        dico_dataset[u'Ymax'] = extent[3]
+        dico_dataset["Xmin"] = extent[0]
+        dico_dataset["Xmax"] = extent[1]
+        dico_dataset["Ymin"] = extent[2]
+        dico_dataset["Ymax"] = extent[3]
 
         # warnings messages
         if self.alert:
-            dico_dataset['err_gdal'] = gdal_err.err_type, gdal_err.err_msg
+            dico_dataset["err_gdal"] = gdal_err.err_type, gdal_err.err_msg
         else:
             pass
 
@@ -172,37 +170,39 @@ class ReadVectorFlatDataset():
         del src
         return 1, dico_dataset
 
+
 # ############################################################################
 # #### Stand alone program ########
 # ################################
 
-if __name__ == '__main__':
-    u""" standalone execution for tests. Paths are relative considering a test
+if __name__ == "__main__":
+    """ standalone execution for tests. Paths are relative considering a test
     within the official repository (https://github.com/Guts/DicoGIS)"""
     # libraries import
     # from os import getcwd
     vectorReader = ReadVectorFlatDataset()
     # test files
-    li_vectors = [path.realpath(r'..\..\test\datatest\vectors\shp\itineraires_rando.shp'),
-                  path.realpath(r'..\..\test\datatest\vectors\shp\airports.shp'),
-                  path.realpath(r'..\..\test\datatest\vectors\tab\tab\airports_MI.tab'),
-                  path.realpath(r'..\..\test\datatest\vectors\tab\tab\Hydrobiologie.TAB'),
-                  path.realpath(r'..\..\test\datatest\vectors\geojson\airports.geojson'),
-                  path.realpath(r'..\..\test\datatest\vectors\gml\airports.gml'),
-                  path.realpath(r'..\..\test\datatest\vectors\kml\wc2014_MapTour.kml'),
-                  path.realpath(r'..\..\test\datatest\vectors\kml\PPRI_Loire_sept2014.kmz'),
-                  ]
+    li_vectors = [
+        path.realpath(r"..\..\test\datatest\vectors\shp\itineraires_rando.shp"),
+        path.realpath(r"..\..\test\datatest\vectors\shp\airports.shp"),
+        path.realpath(r"..\..\test\datatest\vectors\tab\tab\airports_MI.tab"),
+        path.realpath(r"..\..\test\datatest\vectors\tab\tab\Hydrobiologie.TAB"),
+        path.realpath(r"..\..\test\datatest\vectors\geojson\airports.geojson"),
+        path.realpath(r"..\..\test\datatest\vectors\gml\airports.gml"),
+        path.realpath(r"..\..\test\datatest\vectors\kml\wc2014_MapTour.kml"),
+        path.realpath(r"..\..\test\datatest\vectors\kml\PPRI_Loire_sept2014.kmz"),
+    ]
     # test text dictionary
     textos = OrderedDict()
-    textos['srs_comp'] = u'Compound'
-    textos['srs_geoc'] = u'Geocentric'
-    textos['srs_geog'] = u'Geographic'
-    textos['srs_loca'] = u'Local'
-    textos['srs_proj'] = u'Projected'
-    textos['srs_vert'] = u'Vertical'
-    textos['geom_point'] = u'Point'
-    textos['geom_ligne'] = u'Line'
-    textos['geom_polyg'] = u'Polygon'
+    textos["srs_comp"] = "Compound"
+    textos["srs_geoc"] = "Geocentric"
+    textos["srs_geog"] = "Geographic"
+    textos["srs_loca"] = "Local"
+    textos["srs_proj"] = "Projected"
+    textos["srs_vert"] = "Vertical"
+    textos["geom_point"] = "Point"
+    textos["geom_ligne"] = "Line"
+    textos["geom_polyg"] = "Polygon"
     # recipient datas
     dico_dataset = OrderedDict()  # dictionary where will be stored info
     # execution
@@ -211,8 +211,8 @@ if __name__ == '__main__':
         # reset recipient data
         dico_dataset.clear()
         # getting the informations
-        print('\n{0}'.format(vector))
-        info_ds = vectorReader.infos_dataset(path.abspath(vector),
-                                             dico_dataset,
-                                             txt=textos)
+        print("\n{0}".format(vector))
+        info_ds = vectorReader.infos_dataset(
+            path.abspath(vector), dico_dataset, txt=textos
+        )
         print(info_ds)
