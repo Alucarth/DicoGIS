@@ -4,10 +4,10 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Format code and tests",
+            "label": "Format code",
             "dependsOn": [
                 "Format code",
-                "Format tests"
+                "Format modules"
             ],
             "problemMatcher": []
         },
@@ -18,21 +18,21 @@
             "args": [
                 "-m",
                 "black",
-                "--target-version=py36",
-                "./isogeo_pysdk"
+                "--target-version=py37",
+                "./DicoGIS.py"
             ],
             "group": "build",
             "problemMatcher": []
         },
         {
-            "label": "Format tests",
+            "label": "Format modules",
             "type": "shell",
             "command": "${config:python.pythonPath}",
             "args": [
                 "-m",
                 "black",
-                "--target-version=py36",
-                "./tests"
+                "--target-version=py37",
+                "./modules"
             ],
             "group": "build",
             "problemMatcher": []
