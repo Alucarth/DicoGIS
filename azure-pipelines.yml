@@ -4,8 +4,6 @@ pool:
   vmImage: "windows-2019"
 strategy:
   matrix:
-    Python36:
-      python.version: '3.6'
     Python37:
       python.version: '3.7'
 
@@ -18,5 +16,5 @@ steps:
 - script: |
     python -m pip install --upgrade pip setuptools wheel
     python -m pip install numpy
-    python -m pip install gdal
+    python -m pip install .\lib\GDAL-3.0.0-cp37-cp37m-win_amd64.whl
   displayName: 'Install dependencies'
