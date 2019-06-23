@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
-from __future__ import (absolute_import, print_function, unicode_literals)
+from __future__ import absolute_import, print_function, unicode_literals
+
 # ------------------------------------------------------------------------------
 # Name:         Isogeo to Microsoft Excel 2010
 # Purpose:      Get metadatas from an Isogeo share and store it into
@@ -29,6 +30,7 @@ from os import listdir, path, walk
 
 class Utils(object):
     """TO DOC"""
+
     def __init__(self, ds_type="flat"):
         """Instanciate Utils class."""
         self.ds_type = ds_type
@@ -41,9 +43,12 @@ class Utils(object):
         else:
             pass
         # dependencies
-        dependencies = [f for f in listdir(path.dirname(main_file_path))
-                        if path.splitext(path.abspath(f))[0] == path.splitext(main_file_path)[0]
-                        and not path.splitext(path.abspath(f).lower())[1] == exclude]
+        dependencies = [
+            f
+            for f in listdir(path.dirname(main_file_path))
+            if path.splitext(path.abspath(f))[0] == path.splitext(main_file_path)[0]
+            and not path.splitext(path.abspath(f).lower())[1] == exclude
+        ]
 
         return dependencies
 
@@ -70,7 +75,7 @@ class Utils(object):
             return None
 
         # prettify units
-        for size_cat in ('octets', 'Ko', 'Mo', 'Go'):
+        for size_cat in ("octets", "Ko", "Mo", "Go"):
             if total_size < 1024.0:
                 return "%3.1f %s" % (total_size, size_cat)
             total_size /= 1024.0
@@ -87,15 +92,15 @@ class Utils(object):
         """
         if self.ds_type == "flat":
             # local variables
-            ctner['name'] = path.basename(src)
-            ctner['folder'] = path.dirname(src)
-            ctner['error'] = mess
+            ctner["name"] = path.basename(src)
+            ctner["folder"] = path.dirname(src)
+            ctner["error"] = mess
             # method end
             return ctner
         elif self.ds_type == "postgis":
-            ctner['name'] = ds_lyr.GetName()
-            ctner['error_type'] = mess_type
-            ctner['error'] = mess
+            ctner["name"] = ds_lyr.GetName()
+            ctner["error_type"] = mess_type
+            ctner["error"] = mess
             # method end
             return ctner
         else:
