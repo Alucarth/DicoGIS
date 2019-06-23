@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "80c9888a6457f1bd6e79518074471973c1dacb6536f3f946e1d0c4edd9a81525"
+            "sha256": "5e4f018432473f984788ae91d51c6a7630b343111398883ca68b49ad1a770e43"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -62,9 +62,10 @@
         },
         "gdal": {
             "hashes": [
+                "sha256:4e9f264e7e5486bbbb5e07866270f4cf53598b71ba1e9971ef7d81fe1c878169",
                 "sha256:5af4fba9ae0bf0d4112b5d68af6df10ae56ad045964dc2dfd48131665cf32385"
             ],
-            "index": "pypi",
+            "path": "./lib/GDAL-3.0.0-cp37-cp37m-win_amd64.whl",
             "version": "==3.0.0"
         },
         "idna": {

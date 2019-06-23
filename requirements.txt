@@ -14,7 +14,7 @@
 archook==1.2.0
 arrow>=0.14.*
 dxfgrabber==1.0.*
+gdal==3.*
+isogeo-pysdk==2.21.*
 numpy
-GDAL==3.*
-isogeo-pysdk>=2.21.*
-openpyxl>=2.6.*
+openpyxl==2.6.*
