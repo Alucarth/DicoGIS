@@ -1,0 +1,22 @@
+# Packaging to a Windows executable
+
+pool:
+  vmImage: "windows-2019"
+strategy:
+  matrix:
+    Python36:
+      python.version: '3.6'
+    Python37:
+      python.version: '3.7'
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '$(python.version)'
+  displayName: 'Use Python $(python.version)'
+
+- script: |
+    python -m pip install --upgrade pip setuptools wheel
+    python -m pip install numpy
+    python -m pip install gdal
+  displayName: 'Install dependencies'
