@@ -10,35 +10,6 @@
 # before install python dependencies, you need the ppa ubuntugis activated and some libraries installed on your os:
 # python-setuptools, python-pip, python-dev, python-tk, python-gdal, python-software-properties
 
-altgraph>=0.14
-appdirs>=1.4.3
-arrow>=0.10.0
-certifi>=2017.7.27.1
-chardet>=3.0.4
-configparser>=3.5.0
-dis3>=0.1.1
-dxfgrabber>=0.8.4
-et-xmlfile>=1.0.1
-future>=0.16.0
-GDAL>=2.2.2
-idna>=2.6
-isogeo-pysdk>=2.18.0.post491
-jdcal>=1.3
-lxml>=3.8.0
-macholib>=1.8
-numpy>=1.13.1
-openpyxl>=2.4.8
-OWSLib>=0.14.0
-packaging>=16.8
-pefile>=2017.9.3
-pycrypto>=2.6.1
-PyInstaller>=3.3
-pyparsing>=2.2.0
-pypiwin32>=219
-pyproj>=1.9.5.1
-python-dateutil>=2.6.1
-pytz>=2017.2
-requests>=2.18.4
-six>=1.10.0
-urllib3>=1.22
-xlwt>=1.2.0
+black
+pyinstaller
+python-dotenv

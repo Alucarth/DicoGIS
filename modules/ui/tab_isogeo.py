@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
-from __future__ import (absolute_import, print_function, unicode_literals)
+from __future__ import absolute_import, print_function, unicode_literals
+
 # -----------------------------------------------------------------------------
 # Name:         DicoGIS
 # Purpose:      Automatize the creation of a dictionnary of geographic data
@@ -40,7 +41,6 @@ logger = logging.getLogger("DicoGIS")
 
 
 class TabIsogeo(Frame):
-
     def __init__(self, parent, txt=dict(), dicogis_path="../../"):
         """Instanciating the output workbook."""
         self.parent = parent
@@ -52,21 +52,17 @@ class TabIsogeo(Frame):
         self.url_input = StringVar(self)
 
         # logo
-        ico_path = path.normpath(path.join(path.abspath(dicogis_path),
-                             "data/img/logo_isogeo.gif"))
-        self.logo_isogeo = PhotoImage(master=self,
-                                      file=ico_path)
+        ico_path = path.normpath(
+            path.join(path.abspath(dicogis_path), "data/img/logo_isogeo.gif")
+        )
+        self.logo_isogeo = PhotoImage(master=self, file=ico_path)
         logo_isogeo = Label(self, borderwidth=2, image=self.logo_isogeo)
 
         # metrics
-        self.app_metrics.set("{} metadata in\n"
-                             "{} shares owned by\n"
-                             "{} workgroups."
-                             .format(10,
-                                     1,
-                                     2))
-        lb_app_metrics = Label(self,
-                               textvariable=self.app_metrics)
+        self.app_metrics.set(
+            "{} metadata in\n" "{} shares owned by\n" "{} workgroups.".format(10, 1, 2)
+        )
+        lb_app_metrics = Label(self, textvariable=self.app_metrics)
 
         # # OpenCatalog check
         # self.lb_input_oc = Label(self,
@@ -114,23 +110,22 @@ class TabIsogeo(Frame):
         #                       command=lambda: self.ui_settings_prompt())
 
         # griding widgets
-        logo_isogeo.grid(row=1, rowspan=3,
-                         column=0, padx=2,
-                         pady=2, sticky="W")
-        Separator(self, orient=VERTICAL).grid(row=1, rowspan=3,
-                                              column=1, padx=2,
-                                              pady=2, sticky="NSE")
+        logo_isogeo.grid(row=1, rowspan=3, column=0, padx=2, pady=2, sticky="W")
+        Separator(self, orient=VERTICAL).grid(
+            row=1, rowspan=3, column=1, padx=2, pady=2, sticky="NSE"
+        )
         lb_app_metrics.grid(row=1, column=2, rowspan=3, sticky="NWE")
         # self.lb_input_oc.grid(row=2, column=2, sticky="WE")
         # btn_settings.grid(row=2, rowspan=1,
         #                   column=3, padx=2, pady=2,
         #                   sticky="NWE")
 
+
 # #############################################################################
 # ##### Stand alone program ########
 # ##################################
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     """To test"""
     root = Tk()
     frame = TabIsogeo(root)

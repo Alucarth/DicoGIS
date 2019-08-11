@@ -1,0 +1,62 @@
+# Packaging to a Windows executable
+
+jobs:
+
+# UNIT TESTS
+- job: 'Test'
+  pool:
+    vmImage: "windows-2019"
+  strategy:
+    matrix:
+      Python37arch64:
+        python.version: '3.7'
+        python.arch: 'x64'
+      Python37arch32:
+        python.version: '3.7'
+        python.arch: 'x86'
+
+  steps:
+  - checkout: self  # self represents the repo where the initial Pipelines YAML file was found
+    fetchDepth: 10  # the depth of commits to ask Git to fetch
+    lfs: 1 
+
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+      addToPath: true
+      architecture: '$(python.arch)'
+    displayName: 'Use Python $(python.version)'
+
+  - script: |
+      python -m pip install --upgrade pip setuptools wheel
+      python -m pip install numpy
+      python -m pip install .\lib\GDAL-3.0.0-cp37-cp37m-win_amd64.whl
+      python -m pip install -U -r ./requirements.txt
+      python -m pip install -U -r ./requirements_dev.txt
+    displayName: 'Install dependencies'
+
+  # - script: pyinstaller.exe -y bundle_isogeo2office.spec
+  #   displayName: 'Building the executable'
+
+# LINT AND FORMATTING CODE
+- job: 'Lint'
+  dependsOn: 'Test'
+  pool:
+    vmImage: "windows-2019"
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.7'
+      architecture: 'x64'
+      addToPath: true
+
+  - script: |
+      python -m pip install -U pip
+      python -m pip install -U black
+    displayName: 'Install black dependencies'
+
+  - script: |
+      python -m black --target-version=py37 .\DicoGIS.py
+      python -m black --target-version=py37 .\modules
+    displayName: 'Apply black code formatting'

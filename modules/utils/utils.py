@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
-from __future__ import (absolute_import, print_function, unicode_literals)
+from __future__ import absolute_import, print_function, unicode_literals
+
 # ----------------------------------------------------------------------------
 # Name:         Geodata Explorer
 # Purpose:      Explore directory structure and list files and folders
@@ -25,13 +26,13 @@ from sys import exit, platform as opersys
 import subprocess
 
 from Tkinter import ACTIVE, DISABLED
-from tkFileDialog import asksaveasfilename    # dialogs
+from tkFileDialog import asksaveasfilename  # dialogs
 from tkMessageBox import showerror as avert
 
 # Imports depending on operating system
-if opersys == 'win32':
-    u""" windows """
-    from os import startfile        # to open a folder/file
+if opersys == "win32":
+    """ windows """
+    from os import startfile  # to open a folder/file
 else:
     pass
 
@@ -42,50 +43,58 @@ else:
 
 class Utilities(object):
     def __init__(self):
-        u"""DicoGIS specific utilities"""
+        """DicoGIS specific utilities"""
         super(Utilities, self).__init__()
 
     def open_dir_file(self, target):
         """Open a file or directory in the explorer of the operating system."""
         # check if the file or the directory exists
         if not path.exists(target):
-            raise IOError('No such file: {0}'.format(target))
+            raise IOError("No such file: {0}".format(target))
 
         # check the read permission
         if not access(target, R_OK):
-            raise IOError('Cannot access file: {0}'.format(target))
+            raise IOError("Cannot access file: {0}".format(target))
 
         # open the directory or the file according to the os
-        if opersys == 'win32':  # Windows
+        if opersys == "win32":  # Windows
             proc = startfile(path.realpath(target))
 
-        elif opersys.startswith('linux'):  # Linux:
-            proc = subprocess.Popen(['xdg-open', target],
-                                    stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE)
+        elif opersys.startswith("linux"):  # Linux:
+            proc = subprocess.Popen(
+                ["xdg-open", target], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            )
 
-        elif opersys == 'darwin':  # Mac:
-            proc = subprocess.Popen(['open', '--', target],
-                                    stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE)
+        elif opersys == "darwin":  # Mac:
+            proc = subprocess.Popen(
+                ["open", "--", target], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            )
 
         else:
             raise NotImplementedError(
-                "Your `%s` isn't a supported operating system`." % opersys)
+                "Your `%s` isn't a supported operating system`." % opersys
+            )
 
         # end of function
         return proc
 
-    def safe_save(self, wb, dest_dir=r".", dest_filename="DicoGIS.xlsx",
-                  ftype="Excel Workbook",
-                  dlg_title="DicoGIS - Save output Excel Workbook"):
-        u"""Safe save output file."""
+    def safe_save(
+        self,
+        wb,
+        dest_dir=r".",
+        dest_filename="DicoGIS.xlsx",
+        ftype="Excel Workbook",
+        dlg_title="DicoGIS - Save output Excel Workbook",
+    ):
+        """Safe save output file."""
         # Prompt of folder where save the file
-        out_name = asksaveasfilename(initialdir=dest_dir,
-                                     initialfile=dest_filename,
-                                     defaultextension='.xlsx',
-                                     filetypes=[(ftype, "*.xlsx")],
-                                     title=dlg_title)
+        out_name = asksaveasfilename(
+            initialdir=dest_dir,
+            initialfile=dest_filename,
+            defaultextension=".xlsx",
+            filetypes=[(ftype, "*.xlsx")],
+            title=dlg_title,
+        )
 
         # check if the extension is correctly indicated
         if path.splitext(out_name)[1] != ".xlsx":
@@ -99,11 +108,13 @@ class Utilities(object):
             try:
                 wb.save(out_path)
             except IOError:
-                avert(title=u'Concurrent access',
-                      message=u'Please close Microsoft Excel before saving.')
+                avert(
+                    title="Concurrent access",
+                    message="Please close Microsoft Excel before saving.",
+                )
                 return out_name
         else:
-            avert(title=u'Not saved', message="You cancelled saving operation")
+            avert(title="Not saved", message="You cancelled saving operation")
             exit()
 
         # End of function
@@ -129,6 +140,6 @@ class Utilities(object):
 # #### Stand alone program ########
 # #################################
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     """ standalone execution """
     utils = Utilities()

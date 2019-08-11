@@ -3,17 +3,27 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[dev-packages]
+black = "==19.3b0"
+codecov = "*"
+flake8 = "*"
+pip = "*"
+PyInstaller = "*"
+pylint = "*"
+pytest= "*"
+python-dotenv = "*"
+setuptools = "*"
+twine = "*"
+wheel = "*"
+
 [packages]
 archook = "==1.2.0"
 arrow = ">=0.10.*"
-dxfgrabber = "==0.8.*"
-numpy = "==1.13.*"
-isogeo-pysdk = "==2.18.*"
-openpyxl = "==2.4.*"
-GDAL = "==2.*"
-
-[dev-packages]
-PyInstaller = "*"
+dxfgrabber = "==1.0.*"
+isogeo-pysdk = "==2.21.*"
+openpyxl = "==2.6.*"
+numpy = "*"
+gdal = {path = "./lib/GDAL-3.0.0-cp37-cp37m-win_amd64.whl", setup_requires = ["numpy"] }
 
 [requires]
-python_version = "3.6"
+python_version = "3.7"
