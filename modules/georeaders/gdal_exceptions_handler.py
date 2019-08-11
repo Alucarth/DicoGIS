@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 #!/usr/bin/env python
-from __future__ import (absolute_import, print_function, unicode_literals)
+from __future__ import absolute_import, print_function, unicode_literals
+
 # ------------------------------------------------------------------------------
 # Name:         Isogeo to Microsoft Excel 2010
 # Purpose:      Get metadatas from an Isogeo share and store it into
@@ -39,22 +40,23 @@ class GdalErrorHandler(object):
         """
         self.err_level = gdal.CE_None
         self.err_type = 0
-        self.err_msg = ''
+        self.err_msg = ""
 
     def handler(self, err_level, err_type, err_msg):
         """Make errors messages more readable."""
         # available types
-        err_class = {gdal.CE_None: 'None',
-                     gdal.CE_Debug: 'Debug',
-                     gdal.CE_Warning: 'Warning',
-                     gdal.CE_Failure: 'Failure',
-                     gdal.CE_Fatal: 'Fatal'
-                     }
+        err_class = {
+            gdal.CE_None: "None",
+            gdal.CE_Debug: "Debug",
+            gdal.CE_Warning: "Warning",
+            gdal.CE_Failure: "Failure",
+            gdal.CE_Fatal: "Fatal",
+        }
         # getting type
-        err_type = err_class.get(err_type, 'None')
+        err_type = err_class.get(err_type, "None")
 
         # cleaning message
-        err_msg = err_msg.replace('\n', ' ')
+        err_msg = err_msg.replace("\n", " ")
 
         # disabling OGR exceptions raising to avoid future troubles
         ogr.DontUseExceptions()

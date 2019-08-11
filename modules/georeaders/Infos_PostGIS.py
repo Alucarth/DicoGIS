@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import (absolute_import, print_function, unicode_literals)
+from __future__ import absolute_import, print_function, unicode_literals
+
 # ----------------------------------------------------------------------------
 # Name:         InfosOGR_PG
 # Purpose:      Use GDAL/OGR library to extract informations about
@@ -55,11 +56,19 @@ logger = logging.getLogger("DicoGIS")
 # #################################
 
 
-class ReadPostGIS():
-    def __init__(self, host="localhost", port=5432, db_name="postgis",
-                 user="postgres", password="postgres", views_included=1,
-                 dico_dataset=OrderedDict(), txt=dict()):
-        u"""Uses gdal/ogr functions to extract basic informations about
+class ReadPostGIS:
+    def __init__(
+        self,
+        host="localhost",
+        port=5432,
+        db_name="postgis",
+        user="postgres",
+        password="postgres",
+        views_included=1,
+        dico_dataset=OrderedDict(),
+        txt=dict(),
+    ):
+        """Uses gdal/ogr functions to extract basic informations about
         geographic file (handles shapefile or MapInfo tables)
         and store into the dictionaries.
 
@@ -91,16 +100,21 @@ class ReadPostGIS():
         self.db_name = db_name
         self.user = user
         self.password = password
-        self.conn_settings = "PG: host={} port={} dbname={} user={} password={}"\
-                             .format(host, port, db_name, user, password)
+        self.conn_settings = "PG: host={} port={} dbname={} user={} password={}".format(
+            host, port, db_name, user, password
+        )
 
         # testing connection
         self.conn = self.get_connection()
         if not self.conn:
             self.alert += 1
-            youtils.erratum(ctner=dico_dataset, mess_type=1,
-                            ds_lyr=self.conn_settings, mess=u'err_connection_failed')
-            dico_dataset['err_gdal'] = gdal_err.err_type, gdal_err.err_msg
+            youtils.erratum(
+                ctner=dico_dataset,
+                mess_type=1,
+                ds_lyr=self.conn_settings,
+                mess="err_connection_failed",
+            )
+            dico_dataset["err_gdal"] = gdal_err.err_type, gdal_err.err_msg
             return None
         else:
             pass
@@ -113,13 +127,13 @@ class ReadPostGIS():
         """TO DOC."""
         try:
             conn = ogr.Open(str(self.conn_settings))
-            logging.info("Access granted : connecting people to {} tables!"
-                         .format(len(conn)))
+            logging.info(
+                "Access granted : connecting people to {} tables!".format(len(conn))
+            )
             return conn
         except Exception as e:
             self.dico_dataset["conn_state"] = unicode(e)
-            logging.error("Connection failed. Check settings: {0}"
-                          .format(str(e)))
+            logging.error("Connection failed. Check settings: {0}".format(str(e)))
             return 0
 
     def get_version(self):
@@ -146,7 +160,7 @@ class ReadPostGIS():
             logging.error("OGR: {} - {}".format(layer, "Not a PostGIS layer."))
             return None
         else:
-            dico_dataset['type'] = tipo
+            dico_dataset["type"] = tipo
             pass
 
         # connection info
@@ -161,15 +175,15 @@ class ReadPostGIS():
         dico_dataset["sgbd_schemas"] = self.get_schemas()
 
         # layer name
-        dico_dataset['name'] = layer.GetName()
-        dico_dataset['title'] = layer.GetName().capitalize()
+        dico_dataset["name"] = layer.GetName()
+        dico_dataset["title"] = layer.GetName().capitalize()
 
         # raising forbidden access
         try:
             obj = layer.GetFeatureCount()  # get the first object
         except RuntimeError as e:
-            if u'permission denied' in str(e):
-                mess = str(e).split('\n')[0]
+            if "permission denied" in str(e):
+                mess = str(e).split("\n")[0]
                 self.alert = self.alert + 1
                 youtils.erratum(ctner=dico_dataset, ds_lyr=layer, mess=mess)
                 logging.error("GDAL: {} - {}".format(layer.GetName(), mess))
@@ -182,98 +196,102 @@ class ReadPostGIS():
 
         # schema name
         try:
-            layer.GetName().split('.')[1]
-            dico_dataset[u'folder'] = layer.GetName().split('.')[0]
+            layer.GetName().split(".")[1]
+            dico_dataset["folder"] = layer.GetName().split(".")[0]
         except IndexError:
-            dico_dataset[u'folder'] = 'public'
+            dico_dataset["folder"] = "public"
 
         # basic information
         # features
         layer_feat_count = layer.GetFeatureCount()
-        dico_dataset['num_obj'] = layer_feat_count
+        dico_dataset["num_obj"] = layer_feat_count
         if layer_feat_count == 0:
-            u""" if layer doesn't have any object, return an error """
+            """ if layer doesn't have any object, return an error """
             self.alert += 1
-            youtils.erratum(ctner=dico_dataset, ds_lyr=layer,
-                            mess='err_nobjet')
+            youtils.erratum(ctner=dico_dataset, ds_lyr=layer, mess="err_nobjet")
             return None
         else:
             pass
 
         # fields
         layer_def = layer.GetLayerDefn()
-        dico_dataset['num_fields'] = layer_def.GetFieldCount()
-        dico_dataset['fields'] = georeader.get_fields_details(layer_def)
+        dico_dataset["num_fields"] = layer_def.GetFieldCount()
+        dico_dataset["fields"] = georeader.get_fields_details(layer_def)
 
         # geometry type
-        dico_dataset[u'type_geom'] = georeader.get_geometry_type(layer)
+        dico_dataset["type_geom"] = georeader.get_geometry_type(layer)
 
         # SRS
         srs_details = georeader.get_srs_details(layer, self.txt)
-        dico_dataset[u'srs'] = srs_details[0]
-        dico_dataset[u'EPSG'] = srs_details[1]
-        dico_dataset[u'srs_type'] = srs_details[2]
+        dico_dataset["srs"] = srs_details[0]
+        dico_dataset["EPSG"] = srs_details[1]
+        dico_dataset["srs_type"] = srs_details[2]
 
         # spatial extent
         extent = georeader.get_extent_as_tuple(layer)
-        dico_dataset[u'Xmin'] = extent[0]
-        dico_dataset[u'Xmax'] = extent[1]
-        dico_dataset[u'Ymin'] = extent[2]
-        dico_dataset[u'Ymax'] = extent[3]
+        dico_dataset["Xmin"] = extent[0]
+        dico_dataset["Xmax"] = extent[1]
+        dico_dataset["Ymin"] = extent[2]
+        dico_dataset["Ymax"] = extent[3]
 
         # warnings messages
         if self.alert:
-            dico_dataset['err_gdal'] = gdal_err.err_type, gdal_err.err_msg
+            dico_dataset["err_gdal"] = gdal_err.err_type, gdal_err.err_msg
         else:
             pass
 
         # clean exit
         del obj
 
+
 # ############################################################################
 # #### Stand alone program ########
 # #################################
 
-if __name__ == '__main__':
-    u""" standalone execution for tests. Paths are relative considering a test
+if __name__ == "__main__":
+    """ standalone execution for tests. Paths are relative considering a test
     within the official repository (https://github.com/Guts/DicoGIS/)"""
     # libraries import
 
     # test text dictionary
     textos = OrderedDict()
-    textos['srs_comp'] = u'Compound'
-    textos['srs_geoc'] = u'Geocentric'
-    textos['srs_geog'] = u'Geographic'
-    textos['srs_loca'] = u'Local'
-    textos['srs_proj'] = u'Projected'
-    textos['srs_vert'] = u'Vertical'
-    textos['geom_point'] = u'Point'
-    textos['geom_ligne'] = u'Line'
-    textos['geom_polyg'] = u'Polygon'
+    textos["srs_comp"] = "Compound"
+    textos["srs_geoc"] = "Geocentric"
+    textos["srs_geog"] = "Geographic"
+    textos["srs_loca"] = "Local"
+    textos["srs_proj"] = "Projected"
+    textos["srs_vert"] = "Vertical"
+    textos["geom_point"] = "Point"
+    textos["geom_ligne"] = "Line"
+    textos["geom_polyg"] = "Polygon"
 
     # PostGIS database settings
-    test_host = 'postgresql-guts.alwaysdata.net'
-    test_db = 'guts_gis'
-    test_user = 'guts_player'
-    test_pwd = 'letsplay'
-    test_conn = "PG: host={} dbname={} user={} password={}".format(test_host,
-                                                                   test_db,
-                                                                   test_user,
-                                                                   test_pwd)
+    test_host = "postgresql-guts.alwaysdata.net"
+    test_db = "guts_gis"
+    test_user = "guts_player"
+    test_pwd = "letsplay"
+    test_conn = "PG: host={} dbname={} user={} password={}".format(
+        test_host, test_db, test_user, test_pwd
+    )
     # use reader
     dico_dataset = OrderedDict()
-    pgReader = ReadPostGIS(host=test_host, port=5432, db_name=test_db,
-                           user=test_user, password=test_pwd,
-                           views_included=1, dico_dataset=dico_dataset,
-                           txt=textos)
+    pgReader = ReadPostGIS(
+        host=test_host,
+        port=5432,
+        db_name=test_db,
+        user=test_user,
+        password=test_pwd,
+        views_included=1,
+        dico_dataset=dico_dataset,
+        txt=textos,
+    )
     # check if connection succeeded
     if not pgReader.conn:
         # connection failed
         print(dico_dataset)
         exit()
     else:
-        print("{} tables found."
-              .format(len(pgReader.conn)))
+        print("{} tables found.".format(len(pgReader.conn)))
 
     # parse layers
     for layer in pgReader.conn:
